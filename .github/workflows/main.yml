@@ -23,19 +23,11 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-o2r-ccache-${{ github.ref }}
           ${{ runner.os }}-o2r-ccache-
-    - name: Cache build folders
-      uses: actions/cache@v4
-      with:
-        key: ${{ runner.os }}-o2r-build-${{ github.ref }}-${{ github.sha }}
-        restore-keys: |
-          ${{ runner.os }}-o2r-build-${{ github.ref }}
-          ${{ runner.os }}-o2r-build-
-        path: |
-          tools/Torch/cmake-build-release
     - name: Generate starship.o2r
       run: |
         export PATH="/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH"
-        make -C tools/Torch type=release -j3
+        cmake -S tools/Torch -B tools/Torch/cmake-build-release -DCMAKE_BUILD_TYPE=Release -G Ninja
+        cmake --build tools/Torch/cmake-build-release --parallel 3
         tools/Torch/cmake-build-release/torch pack port starship.o2r o2r
     - uses: actions/upload-artifact@v4
       with:
