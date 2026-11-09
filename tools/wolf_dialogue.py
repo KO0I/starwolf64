@@ -23,7 +23,8 @@ LOOKUP_OFFSET = 0xCDF0
 CALL_OFFSET = 0x94E8
 LOOKUP_RESOURCE = 'ast_radio/message_table'
 VOICE_RETURN_ROM = 0xC34B8
-UNUSED_GLYPH_BYTES = 400
+# Only END through PRI3 are never rendered. SPC starts the next texture.
+UNUSED_GLYPH_BYTES = 0x138
 SILENT_LOOKUP_ID = 0x10000
 RADIO_SPEAKER_ADDRESS = 0x80177D68
 CREW_SPEAKERS = (0, 5, 10, 15, 20, 25, 30, 35, 400)
@@ -93,10 +94,9 @@ def verify_dialogue(builder, patched):
     restored = bytearray(radio)
     for _, offset, original, _ in builder.identity_changes:
         restored[offset:offset + len(original)] = original
-    restored[400:413] = builder.dialogue_originals['ast_radio'][400:413]
     restored[:len(payload)] = builder.dialogue_originals['ast_radio'][:len(payload)]
-    start, data = builder.dialogue_voice_filter
-    restored[start:start + len(data)] = builder.dialogue_originals['ast_radio'][start:start + len(data)]
+    for start, data in (builder.dialogue_voice_filter, builder.dialogue_voice_table, builder.dialogue_hud_labels):
+        restored[start:start + len(data)] = builder.dialogue_originals['ast_radio'][start:start + len(data)]
     crew_start, crew_data = builder.dialogue_crew_filter
     restored[crew_start:crew_start + len(crew_data)] = builder.dialogue_originals['ast_radio'][crew_start:crew_start + len(crew_data)]
     struct.pack_into('>I', restored, LOOKUP_OFFSET, RADIO_BASE + MESSAGE_OFFSET)
@@ -113,6 +113,10 @@ def verify_dialogue(builder, patched):
     if struct.unpack_from('>II', menu, PROLOGUE_VOICE_OFFSET) != (0, 0x240403E8):
         raise ValueError('Browser prologue still plays the original narration')
     restored = bytearray(menu)
+    for offset, original, expected in builder.menu_color_changes:
+        if menu[offset:offset + len(expected)] != expected:
+            raise ValueError(f'Browser menu color mismatch at {offset:#x}')
+        restored[offset:offset + len(original)] = original
     struct.pack_into('>I', restored, PROLOGUE_VOICE_OFFSET, 0x0C006B40)
     if restored != builder.dialogue_originals['ovl_menu']:
         raise ValueError('Unrelated menu overlay data changed')
@@ -123,7 +127,7 @@ def verify_dialogue(builder, patched):
             raise ValueError(f'Browser dialogue segment mismatch in {stem}')
 
 
-def voice_filter(offset, message_ids):
+def voice_filter(table_offset, message_ids):
     """Map edited voice IDs to zero using byte deltas and escaped absolute IDs."""
     table = bytearray()
     previous = 0
@@ -134,7 +138,7 @@ def voice_filter(offset, message_ids):
         table.extend(bytes((delta,)) if delta < 255 else b'\xff' + struct.pack('>H', message_id))
         previous = message_id
     table.append(0)
-    table_address = RADIO_BASE + offset + 88
+    table_address = RADIO_BASE + table_offset
     words = (
         0x3C080000 | ((table_address + 0x8000) >> 16),  # lui t0, table high
         0x25080000 | (table_address & 0xFFFF),          # addiu t0, table low
@@ -159,7 +163,7 @@ def voice_filter(offset, message_ids):
         0x03E00008,  # return: jr ra
         0x00000000,  # delay: nop
     )
-    return struct.pack('>22I', *words) + table
+    return struct.pack('>22I', *words), bytes(table)
 
 
 def crew_voice_filter(changed_filter_address):
@@ -229,21 +233,33 @@ def mute_changed_dialogue(builder):
         b''.join(struct.pack('<iQ', *entry) for entry in entries))
     radio = builder.segments['ast_radio']
     payload_size = (len(encode('\n'.join(LINES))) * 2 + 3) & ~3
-    data = voice_filter(payload_size, ids)
-    if payload_size + len(data) > UNUSED_GLYPH_BYTES or any(radio[payload_size:payload_size + len(data)]):
-        raise ValueError('Voice filter exceeds the unused control-glyph space')
-    radio[payload_size:payload_size + len(data)] = data
-    builder.dialogue_voice_filter = (payload_size, data)
+    code, table = voice_filter(payload_size, ids)
+    if payload_size + len(table) > UNUSED_GLYPH_BYTES or any(radio[payload_size:payload_size + len(table)]):
+        raise ValueError('Voice filter table exceeds the unused control-glyph space')
+    radio[payload_size:payload_size + len(table)] = table
+    builder.dialogue_voice_table = (payload_size, table)
+    # The rewritten prologue ends earlier than its allocation. Put executable
+    # code and HUD labels after its terminator, before the next message.
+    prologue = builder.identity_offsets[1]
+    count = struct.unpack_from('<I', builder.resources['ast_radio/gMsg_ID_1'], 64)[0]
+    code_offset = (prologue + count * 2 + 3) & ~3
+    label_offset = code_offset + len(code)
+    labels = b'WOLF\0PANTHER\0'
+    limit = min(offset for offset in builder.identity_offsets.values() if offset > prologue)
+    if label_offset + len(labels) > limit:
+        raise ValueError('Dialogue code and labels exceed the retired prologue tail')
+    radio[code_offset:label_offset] = code
+    radio[label_offset:label_offset + len(labels)] = labels
+    builder.dialogue_voice_filter = (code_offset, code)
+    builder.dialogue_hud_labels = (label_offset, labels)
     # Both the message table and Corneria call now use the replacement text at
     # RADIO_BASE. Reuse the old 2050 text allocation without growing radio RAM.
-    crew_filter = crew_voice_filter(RADIO_BASE + payload_size)
+    crew_filter = crew_voice_filter(RADIO_BASE + code_offset)
     original_payload = struct.pack(f'>{len(encode(ORIGINAL_TEXT))}H', *encode(ORIGINAL_TEXT))
     if len(crew_filter) > len(original_payload) or radio[MESSAGE_OFFSET:MESSAGE_OFFSET + len(original_payload)] != original_payload:
         raise ValueError('Original 2050 text allocation is unavailable for the crew voice filter')
     radio[MESSAGE_OFFSET:MESSAGE_OFFSET + len(crew_filter)] = crew_filter
     builder.dialogue_crew_filter = (MESSAGE_OFFSET, crew_filter)
-    if any(radio[400:413]): raise ValueError('HUD label storage is not blank')
-    radio[400:413] = b'WOLF\0PANTHER\0'
 
 
 def patch_dialogue_voice(builder, rom):
@@ -253,12 +269,12 @@ def patch_dialogue_voice(builder, rom):
     address = RADIO_BASE + offset
     if address & 3 or address >> 28 != (VOICE_RETURN_ROM + 0x7FFFF404) >> 28:
         raise ValueError('Voice filter jump is misaligned or out of range')
-    label = RADIO_BASE + 400
+    label = RADIO_BASE + builder.dialogue_hud_labels[0]
     if struct.unpack_from('>II', builder.rom, 0x8BA68) != (0x3C0B800D, 0x256B7730) or struct.unpack_from('>I', builder.rom, 0xD5880)[0] != 0x800D9260:
         raise ValueError('Unexpected original FOX label references')
     struct.pack_into('>II', rom, 0x8BA68, 0x3C0B0000 | ((label + 0x8000) >> 16), 0x256B0000 | (label & 0xFFFF))
     struct.pack_into('>I', rom, 0xD5880, label)
-    panther = RADIO_BASE + 405
+    panther = label + 5
     if struct.unpack_from('>II', builder.rom, 0x8BA98) != (0x3C0C800D, 0x258C7734) or struct.unpack_from('>I', builder.rom, 0xD588C)[0] != 0x800D9274:
         raise ValueError('Unexpected original FALCO label references')
     struct.pack_into('>II', rom, 0x8BA98, 0x3C0C0000 | ((panther + 0x8000) >> 16), 0x258C0000 | (panther & 0xFFFF))
@@ -290,9 +306,11 @@ def verify_dialogue_voice(builder, patched):
         expected = 0 if message_id in builder.dialogue_muted_ids else message_id
         if reverse[crc] != expected:
             raise ValueError('Unexpected native voice suppression')
-    offset, data = builder.dialogue_voice_filter
-    if builder.segments['ast_radio'][offset:offset + len(data)] != data:
-        raise ValueError('Browser voice filter is missing')
+    for offset, data in (builder.dialogue_voice_filter, builder.dialogue_voice_table, builder.dialogue_hud_labels):
+        if builder.segments['ast_radio'][offset:offset + len(data)] != data:
+            raise ValueError('Browser dialogue storage is missing')
+    if builder.segments['ast_radio'][UNUSED_GLYPH_BYTES:0x9C0] != builder.dialogue_originals['ast_radio'][UNUSED_GLYPH_BYTES:0x9C0]:
+        raise ValueError('A printable radio glyph was overwritten')
     offset, crew_data = builder.dialogue_crew_filter
     if builder.segments['ast_radio'][offset:offset + len(crew_data)] != crew_data:
         raise ValueError('Browser crew voice filter is missing')
@@ -311,6 +329,7 @@ def replace_identity(builder):
     for index in range(len(entries) - 1):
         message_id, pointer = struct.unpack_from('>iI', radio, 0xCCAC + index * 8)
         offsets[message_id] = pointer - RADIO_BASE
+    builder.identity_offsets = offsets
     builder.identity_changes = []
     for message_id, offset in offsets.items():
         path = f'ast_radio/gMsg_ID_{message_id}'

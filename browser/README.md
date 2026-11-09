@@ -10,13 +10,15 @@ Decompression is streamed with bounded input chunks and a strict 12 MiB output l
 
 ## Build and export
 
-Put your base ROM at the project root under its existing filename and generate sf64.o2r using the upstream build instructions. Install Pillow for the asset builder if needed.
+Put your base ROM at the project root under its existing filename and generate sf64.o2r using the upstream build instructions. Install NumPy and Pillow for the asset builder if needed.
 
 ~~~sh
 python3 tools/build_wolfen.py
 python3 tools/build_wolfen.py --check
 python3 tools/export_browser_site.py
 ~~~
+
+The build installs the reviewed Wolf, Panther, Krystal, and Kami bodies and pilot heads, plus Vitzy's Expert head. The native Expert fighter also uses her Bill cockpit module. See [character conversion](../assets/characters/INTEGRATION.md) for slot mappings, animation limits, rebuild checks, and credits.
 
 Crew dialogue uses short voiced syllables timed to the text reveal. Wolf uses his original voice lowered three semitones with a bass boost. Panther uses Peppy's voice lowered ten semitones with a bass boost. Kami uses Vitzy's recording lowered three semitones with slower delivery. Krystal uses newly generated English-accent female snippets. Vitzy keeps her own recording at its original base pitch, in the separate Expert pilot slot. Red portrait variants keep the same voice. The prologue narrator has a separate scrambled bank derived from the original narration, played as the text scrolls and stopped when the prologue is skipped or finishes.
 

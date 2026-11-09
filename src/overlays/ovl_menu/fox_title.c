@@ -2856,15 +2856,15 @@ bool Title_Team_OverrideLimbDraw(s32 limbIndex, Gfx** dList, Vec3f* pos, Vec3f* 
             if (limbIndex == 1) {
                 rot->z += sTitleTeam[teamIdx].unk_18;
             }
-            if (limbIndex == 17) {
+            if (limbIndex == 19) {
                 rot->x += sTitleTeam[teamIdx].unk_30;
                 rot->y += sTitleTeam[teamIdx].unk_34;
             }
-            if (limbIndex == 18) {
+            if (limbIndex == 20) {
                 rot->x += sTitleTeam[teamIdx].unk_40;
                 rot->y += sTitleTeam[teamIdx].unk_44;
             }
-            if (limbIndex == 19) {
+            if (limbIndex == 21) {
                 rot->x += 4.0f;
             }
             break;

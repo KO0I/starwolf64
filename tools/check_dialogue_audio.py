@@ -131,7 +131,8 @@ stub_address=0x80000000|((jump&0x3FFFFFF)<<2)
 stub_offset=stub_address-RADIO_BASE
 for muted_ids in ((),(2050,2055),(1,254,255,256,2050,2055,21050)):
     multiple=bytearray(radio)
-    code=voice_filter(stub_offset,muted_ids)
+    instructions,table=voice_filter(stub_offset+88,muted_ids)
+    code=instructions+table
     multiple[stub_offset:stub_offset+len(code)]=code
     for message_id in (2040,2050,2055,2058):
         expected=0 if message_id in muted_ids else message_id

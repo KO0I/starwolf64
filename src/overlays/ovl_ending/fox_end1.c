@@ -782,7 +782,7 @@ bool Ending_80189C64(s32 limbIndex, Gfx** dList, Vec3f* pos, Vec3f* rot, void* d
             }
             break;
 
-        case 6:
+        case 8:
             if (temp_v0 == 2) {
                 rot->x += D_ending_80196FA0[temp_v0][3].x;
                 rot->y += D_ending_80196FA0[temp_v0][3].y;
@@ -790,7 +790,7 @@ bool Ending_80189C64(s32 limbIndex, Gfx** dList, Vec3f* pos, Vec3f* rot, void* d
             }
             break;
 
-        case 9:
+        case 11:
             if (temp_v0 == 2) {
                 rot->x += D_ending_80196FA0[temp_v0][4].x;
                 rot->y += D_ending_80196FA0[temp_v0][4].y;
@@ -798,20 +798,13 @@ bool Ending_80189C64(s32 limbIndex, Gfx** dList, Vec3f* pos, Vec3f* rot, void* d
             }
             break;
 
-        case 17:
-            if (temp_v0 == 2) {
-                rot->x += D_ending_80196FA0[temp_v0][0].x;
-                rot->y += D_ending_80196FA0[temp_v0][0].y;
-                rot->z += D_ending_80196FA0[temp_v0][0].z;
-            }
+        case 19:
+            rot->x += D_ending_80196FA0[temp_v0][0].x;
+            rot->y += D_ending_80196FA0[temp_v0][0].y;
+            rot->z += D_ending_80196FA0[temp_v0][0].z;
             break;
 
-        case 19:
-            if ((temp_v0 == 1) || (temp_v0 == 3) || (temp_v0 == 0)) {
-                rot->x += D_ending_80196FA0[temp_v0][0].x;
-                rot->y += D_ending_80196FA0[temp_v0][0].y;
-                rot->z += D_ending_80196FA0[temp_v0][0].z;
-            }
+        case 21:
             if (temp_v0 == 2) {
                 rot->x += D_ending_80196FA0[temp_v0][6].x;
                 rot->y += D_ending_80196FA0[temp_v0][6].y;

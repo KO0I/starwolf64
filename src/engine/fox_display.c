@@ -172,54 +172,22 @@ bool Display_OnFootCharacter_OverrideLimbDraw(s32 limbIndex, Gfx** gfxPtr, Vec3f
 
     gSPSetGeometryMode(gMasterDisp++, G_CULL_BACK);
 
-    if (player->num == 1) {
-        if (limbIndex == 16) {
-            rot->y += player->unk_154;
-            rot->y -= player->unk_180;
+    if (limbIndex == 11) {
+        if (player->num == 3) {
+            rot->y += player->unk_154 * 0.8f;
+        } else {
+            rot->y += -player->unk_154 * 0.8f;
         }
-        if (limbIndex == 22) {
-            rot->y += -player->unk_158 * 0.8f;
-            rot->x -= player->unk_15C;
-        }
-        if (limbIndex == 1) {
-            gSPClearGeometryMode(gMasterDisp++, G_CULL_BACK);
-            rot->y += player->unk_164;
-        }
-        if (limbIndex == 2) {
-            gSPClearGeometryMode(gMasterDisp++, G_CULL_BACK);
-            rot->y += player->unk_164;
-        }
-        if (limbIndex == 3) {
-            gSPClearGeometryMode(gMasterDisp++, G_CULL_BACK);
-            rot->y += player->unk_168;
-        }
-        if (limbIndex == 4) {
-            gSPClearGeometryMode(gMasterDisp++, G_CULL_BACK);
-            rot->y += player->unk_168;
-        }
-    } else {
-        if (limbIndex == 11) {
-            if (player->num == 0) {
-                rot->y += -player->unk_154 * 0.8f;
-            }
-            if (player->num == 2) {
-                rot->y += player->unk_154;
-                rot->y -= player->unk_180;
-            }
-            if (player->num == 3) {
-                rot->y += player->unk_154 * 0.8f;
-            }
-        }
-        if (limbIndex == 16) {
-            rot->y += -player->unk_158 * 0.8f;
-            rot->x -= player->unk_15C;
-        }
-        if ((limbIndex == 17) && (player->num != 2)) {
-            rot->y += player->unk_180;
-            rot->x -= player->unk_180;
-            rot->y += -player->unk_158 * 0.2f;
-            rot->x += -player->unk_15C * 0.2f;
-        }
+    }
+    if (limbIndex == 16) {
+        rot->y += -player->unk_158 * 0.8f;
+        rot->x -= player->unk_15C;
+    }
+    if (limbIndex == 17) {
+        rot->y += player->unk_180;
+        rot->x -= player->unk_180;
+        rot->y += -player->unk_158 * 0.2f;
+        rot->x += -player->unk_15C * 0.2f;
     }
     return false;
 }
@@ -306,11 +274,11 @@ void Display_OnFootCharacter(Player* player) {
             break;
         case 1:
             Animation_DrawSkeleton(5, aVsOnFootPeppySkel, player->jointTable, Display_OnFootCharacter_OverrideLimbDraw,
-                                   Display_OnFootPeppy_PostLimbDraw, player, gCalcMatrix);
+                                   Display_OnFootFox_PostLimbDraw, player, gCalcMatrix);
             break;
         case 2:
             Animation_DrawSkeleton(5, aVsOnFootSlippySkel, player->jointTable, Display_OnFootCharacter_OverrideLimbDraw,
-                                   Display_OnFootSlippy_PostLimbDraw, player, gCalcMatrix);
+                                   Display_OnFootFox_PostLimbDraw, player, gCalcMatrix);
             break;
         case 3:
             Animation_DrawSkeleton(5, aVsOnFootFalcoSkel, player->jointTable, Display_OnFootCharacter_OverrideLimbDraw,

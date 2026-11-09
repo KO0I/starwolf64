@@ -166,8 +166,15 @@ class Medusa:
             if pointer >> 24 != 6 or offset + count * 16 > len(self.source):
                 raise ValueError('Invalid recovered Battleship vertex range')
             values = [list(struct.unpack_from('>hhhHhhBBBB', self.source, offset + 16 * i)) for i in range(count)]
+            light = (.3, .85, .4)
+            light_length = math.sqrt(sum(component * component for component in light))
             for value in values:
                 value[:3] = self.position(value[:3])
+                normal = [component if component < 128 else component - 256 for component in value[6:9]]
+                length = math.sqrt(sum(component * component for component in normal)) or 1
+                diffuse = max(0, sum(normal[i] * light[i] for i in range(3)) / (length * light_length))
+                shade = round(255 * (.2 + .25 * diffuse))
+                value[6:9] = [shade] * 3
             path = f'medusa/vtx_{offset:04x}_{count}'
             self.vertices[key] = self.emit_vertices(values, path)
         return self.vertices[key]
@@ -205,6 +212,9 @@ class Medusa:
 
     def build(self):
         raw, native = [], []
+        # Hull shading includes ambient light even in an unlit cutscene.
+        raw.append((0xB6000000, 0x20000))
+        native.append((0xB6000000, 0x20000))
         for index, (first, second) in enumerate(self.stream):
             opcode = first >> 24
             if opcode == 4:
@@ -224,6 +234,8 @@ class Medusa:
                 raw.append((first, second))
                 native.append((first, second))
                 self.triangle_count += 2 if opcode == 0xB1 else int(opcode == 0xBF)
+        raw.append((0xB7000000, 0x20000))
+        native.append((0xB7000000, 0x20000))
         self.add_engines(raw, native)
         self.add_lighting(raw, native)
         self.add_markings(raw, native)
@@ -489,8 +501,12 @@ class Medusa:
             else:
                 for (before,), (after,) in zip(struct.iter_unpack('>H', original), struct.iter_unpack('>H', payload)):
                     r, g, b = after >> 11, (after >> 6) & 31, (after >> 1) & 31
-                    if not 1 <= r == g == b <= 4 or before & 1 != after & 1:
+                    if not 6 <= r == g == b <= 11 or before & 1 != after & 1:
                         raise ValueError('Medusa hull is not dark neutral gray with its original transparency')
+        for _, path in self.vertices.values():
+            values = struct.iter_unpack('<hhhHhhBBBB', self.builder.resources[path][68:])
+            if any(not 51 <= value[6] == value[7] == value[8] <= 115 for value in values):
+                raise ValueError('Medusa hull lost its neutral ambient shading')
         for offset, payload, path in self.allocations:
             if path.startswith('medusa/tex_engine_'):
                 for pixel, in struct.iter_unpack('>H', payload):

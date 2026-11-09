@@ -32,7 +32,7 @@ def hull_texture(payload):
     for pixel, in struct.iter_unpack('>H', payload):
         r, g, b = pixel >> 11, (pixel >> 6) & 31, (pixel >> 1) & 31
         brightness = (54 * r + 183 * g + 19 * b) / (256 * 31)
-        gray = 1 + round(3 * brightness)
+        gray = 6 + round(5 * brightness)
         pixels.append(gray << 11 | gray << 6 | gray << 1 | pixel & 1)
     return pack(pixels)
 

@@ -35,7 +35,7 @@ def main():
     if count != 1:
         parser.error("Expected one browser ROM configuration")
     page = page.replace('wolfen.patch.json?v=zip-1', 'wolfen.patch.json?v=' + hashlib.sha256(target).hexdigest()[:16])
-    allowed = set(ASSETS) | {"audio"} | {"index.html", "wolfen.patch.json", ".nojekyll", "LICENSE.md"}
+    allowed = set(ASSETS) | {"audio", "CHARACTER_CREDITS.md", "README_TheRegressor.txt", "Vitzy_README.md"} | {"index.html", "wolfen.patch.json", ".nojekyll", "LICENSE.md"}
     if args.domain:
         allowed.add("CNAME")
     destination = args.output.resolve()
@@ -54,6 +54,12 @@ def main():
     for name in ("bank.json", "wolf.wav", "panther.wav", "kami.wav", "krystal.wav", "vitzy.wav", "narrator.wav"):
         shutil.copyfile(ROOT / "assets/audio/chatter" / name, audio / name)
     shutil.copyfile(ROOT / "LICENSE.md", destination / "LICENSE.md")
+    import zipfile
+    with zipfile.ZipFile(ROOT / "assets/characters/starwolf64-character-assets.zip") as characters:
+        for source_name, public_name in [("CREDITS.md", "CHARACTER_CREDITS.md"),
+                                         ("README_TheRegressor.txt", "README_TheRegressor.txt"),
+                                         ("Vitzy_README.md", "Vitzy_README.md")]:
+            (destination / public_name).write_bytes(characters.read(source_name))
     if args.domain:
         (destination / "CNAME").write_text(args.domain.lower() + "\n")
     manifest = json.loads(patch)
