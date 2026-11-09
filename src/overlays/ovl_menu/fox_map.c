@@ -2105,10 +2105,6 @@ void Map_Prologue_Update(void) {
 
         case 1:
             if ((sMapTimer3 == 0) && (gFillScreenAlpha == 0)) {
-                if ((s32) sPrologueTextYpos == 205) {
-                    Audio_PlayVoiceWithoutBGM(1000);
-                }
-
                 if (sPrologueTextYpos > -355.0f) {
                     sPrologueTextYpos -= D_menu_801CD9EC;
                 }
