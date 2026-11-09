@@ -513,6 +513,8 @@ class Builder:
         full_address, full_stream = self.emit(full_sources, 'full')
         from wolfen_lod import build_lod
         build_lod(self, crc64)
+        from medusa import install_medusa
+        install_medusa(self, crc64)
         from wolf_character import build_character
         build_character(self)
         from vitzy_fighter import build_fighter
@@ -535,6 +537,7 @@ class Builder:
             virtual = struct.unpack_from('>I', out, entry)[0]
             struct.pack_into('>IIII', out, entry, virtual, start, len(out), 0)
         self.character.patch_rom(out)
+        self.medusa.patch_rom(out)
         out.extend(b'\0' * (0x1000000 - len(out)))
         struct.pack_into('>II', out, 0x10, *cartridge_crc(out))
         return out
@@ -556,6 +559,7 @@ class Builder:
         if compressed or patched[start:end] != title or title[0x14140:0x147C0] != data:
             raise ValueError('Native/browser intro title mismatch')
         self.character.verify(patched)
+        self.medusa.verify(patched)
         # Wolf owns the two Fox head lists; teammate heads and flight rigs stay intact.
         protected = [(0x3960, 0x9B60), (0x131F0, 0x14BF0), (0x16B30, len(self.output))]
         for start, end in protected:

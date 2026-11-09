@@ -1,4 +1,5 @@
 #include "global.h"
+#include "medusa.h"
 #include "assets/ast_title.h"
 #include "assets/ast_ending_award_front.h"
 #include "assets/ast_ending_award_back.h"
@@ -1815,17 +1816,17 @@ bool Ending_8018BCB0(void) {
 
 void Ending_8018C21C(void) {
     Vec3f sp124[3] = {
-        { 0.0f, 40.0f, -2530.0f },
-        { 335.0f, -92.0f, -1529.0f },
-        { -335.0f, -92.0f, -1529.0f },
+        { MEDUSA_ENGINE_RIGHT_X, MEDUSA_ENGINE_Y, MEDUSA_ENGINE_Z },
+        { MEDUSA_ENGINE_LEFT_X, MEDUSA_ENGINE_Y, MEDUSA_ENGINE_Z },
+        { 0.0f, 0.0f, 0.0f },
     };
     Vec3f sp10C[2] = {
-        { 4.0f, 1.0f, 10.0f },
-        { 4.4f, 1.0f, 11.0f },
+        { 4.0f * MEDUSA_ENGINE_SCALE, 1.0f * MEDUSA_ENGINE_SCALE, 10.0f * MEDUSA_ENGINE_SCALE },
+        { 4.4f * MEDUSA_ENGINE_SCALE, 1.0f * MEDUSA_ENGINE_SCALE, 11.0f * MEDUSA_ENGINE_SCALE },
     };
     Vec3f spF4[2] = {
-        { 5.1f, 1.0f, 15.0f },
-        { 5.6f, 1.0f, 16.5f },
+        { 5.1f * MEDUSA_ENGINE_SCALE, 1.0f * MEDUSA_ENGINE_SCALE, 15.0f * MEDUSA_ENGINE_SCALE },
+        { 5.6f * MEDUSA_ENGINE_SCALE, 1.0f * MEDUSA_ENGINE_SCALE, 16.5f * MEDUSA_ENGINE_SCALE },
     };
     s32 i2;
     Vec3f* scale;
@@ -1884,10 +1885,11 @@ void Ending_8018C21C(void) {
                         }
 
                         RCP_SetupDL(&gMasterDisp, SETUPDL_49);
-                        gDPSetPrimColor(gMasterDisp++, 0x00, 0x00, 255, 255, 255, 64);
-                        gDPSetEnvColor(gMasterDisp++, 255, 255, 0, 64);
+                        gDPSetPrimColor(gMasterDisp++, 0x00, 0x00, 255, 255, MEDUSA_ENGINE_CORE_B, MEDUSA_ENGINE_GLOW_ALPHA);
+                        gDPSetEnvColor(gMasterDisp++, MEDUSA_ENGINE_GLOW_R, MEDUSA_ENGINE_GLOW_G,
+                                      MEDUSA_ENGINE_GLOW_B, MEDUSA_ENGINE_GLOW_ALPHA);
 
-                        for (i2 = 0, var_s1 = sp124; i2 < 3; i2++, var_s1++) {
+                        for (i2 = 0, var_s1 = sp124; i2 < MEDUSA_ENGINE_COUNT; i2++, var_s1++) {
                             Matrix_Push(&gGfxMatrix);
                             scale = &sp10C[gGameFrameCount % 2];
                             Matrix_Push(&gGfxMatrix);

@@ -6,6 +6,7 @@
 
 #include "global.h"
 #include "assets/vitzy_fighter.h"
+#include "medusa.h"
 #include "assets/ast_aquas.h"
 #include "assets/ast_great_fox.h"
 #include "assets/ast_enmy_space.h"
@@ -2475,9 +2476,9 @@ Vec3f D_demo_800CA0BC[] = {
     { 1373.0, -704.0, -374.0 },
 };
 Vec3f D_demo_800CA0EC[] = {
-    { 0.0, 40.0, -2278.0 },
-    { 295.0, -92.0, -1301.0 },
-    { -295.0, -92.0, -1301.0 },
+    { MEDUSA_ENGINE_RIGHT_X, MEDUSA_ENGINE_Y, MEDUSA_ENGINE_Z },
+    { MEDUSA_ENGINE_LEFT_X, MEDUSA_ENGINE_Y, MEDUSA_ENGINE_Z },
+    { 0.0f, 0.0f, 0.0f },
 };
 Vec3f sCsSyShipPos[8] = {
     { 170.0f, -35.0f, -380.0f },   { -170.0f, -40.0f, -380.0f }, { 170.0f, -130.0f, -380.0f },
@@ -2485,11 +2486,11 @@ Vec3f sCsSyShipPos[8] = {
     { 140.0f, 0.0f, -250.0f },     { -150.0f, 0.0f, -250.0f },
 };
 f32 D_demo_800CA170[] = {
-    0.15f, 0.45f, 0.75f, 1.3f, 0.75f, 0.45f, 0.15f, 0.0f,
+    0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
 };
-f32 D_demo_800CA190[] = { 5.0f, 5.2f };
+f32 D_demo_800CA190[] = { 5.0f * MEDUSA_ENGINE_SCALE, 5.2f * MEDUSA_ENGINE_SCALE };
 f32 D_demo_800CA198[] = {
-    0.5f, 1.5f, 2.5f, 1.5f, 0.5f, 0.2f, 0.2f,
+    0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
 };
 f32 D_demo_800CA1B4[] = {
     -30.0f, -60.0f, -90.0f, -120.0f, -150.0f, -180.0f, -200.0, -210.0,
@@ -2985,10 +2986,11 @@ void Cutscene_DrawGreatFox(void) {
             }
         }
 
-        gDPSetPrimColor(gMasterDisp++, 0, 0, 255, 255, 255, 48);
-        gDPSetEnvColor(gMasterDisp++, 255, 255, 0, 48);
+        gDPSetPrimColor(gMasterDisp++, 0, 0, 255, 255, MEDUSA_ENGINE_CORE_B, MEDUSA_ENGINE_GLOW_ALPHA);
+        gDPSetEnvColor(gMasterDisp++, MEDUSA_ENGINE_GLOW_R, MEDUSA_ENGINE_GLOW_G, MEDUSA_ENGINE_GLOW_B,
+                      MEDUSA_ENGINE_GLOW_ALPHA);
 
-        for (i = 0, var_s6_2 = D_demo_800CA0EC; i < 3; i++, var_s6_2++) {
+        for (i = 0, var_s6_2 = D_demo_800CA0EC; i < MEDUSA_ENGINE_COUNT; i++, var_s6_2++) {
             sp9C[i] = D_demo_800CA190[gGameFrameCount % 2U];
             Matrix_Push(&gGfxMatrix);
             Matrix_Translate(gGfxMatrix, var_s6_2->x, var_s6_2->y, var_s6_2->z, MTXF_APPLY);
