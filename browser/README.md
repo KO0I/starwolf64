@@ -47,9 +47,14 @@ The included service worker supplies the isolation headers needed by the threade
 ~~~sh
 node --test browser/rom-patch.test.mjs browser/rom-file.test.mjs browser/crew-chatter.test.mjs
 node browser/check-browser.mjs http://127.0.0.1:8643/
+node browser/check-audio.mjs http://127.0.0.1:8643/
 ~~~
 
 The browser check selects the local base ROM with the real file picker, boots the emulator, checks input and audio, locates live dialogue RAM, exercises all six chatter banks and pause/resume, and captures desktop and mobile layouts. It also checks that no ROM is served or uploaded. Supply another base ROM path as the second argument after the URL when needed.
+
+The audio check measures the emulator's actual output signal. It verifies that mute resets on refresh, mute lasts through pause/resume within a page session, saved volume survives refresh, and keyboard and sound-button input restore suspended audio. It uses real input events without granting artificial user activation to status reads.
+
+If audio is silent, press Enable sound. Each fresh page load starts unmuted. Mute lasts for the current page session, including pause/resume, and is not remembered after refresh. Other preferences and game saves are preserved. The sound button reflects browser audio suspension. Keyboard and touch controls also resume suspended audio; they preserve the current session's mute setting.
 
 Keyboard, touch, and standard gamepads use the controls below the viewscreen. Save states and game saves are stored in the browser for that site's address.
 
