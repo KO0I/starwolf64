@@ -1473,7 +1473,7 @@ void PlayerShot_DrawShot(PlayerShot* shot) {
                                 break;
                         }
                     } else {
-                        gDPSetEnvColor(gMasterDisp++, 0, 255, 0, 255);
+                        gDPSetEnvColor(gMasterDisp++, 255, 0, 0, 255);
                     }
                     Matrix_RotateZ(gGfxMatrix, gGameFrameCount * 53.0f * M_DTOR, MTXF_APPLY);
                     Matrix_SetGfxMtx(&gMasterDisp);

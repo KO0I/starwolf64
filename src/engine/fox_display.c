@@ -1,4 +1,5 @@
 #include "global.h"
+#include "wolfen.h"
 #include "mods/hit64.c"
 #include "assets/ast_arwing.h"
 #include "assets/ast_allies.h"
@@ -658,7 +659,7 @@ void Display_ArwingWings(ArwingInfo* arwing) {
         // @port: Tag the transform.
         FrameInterpolation_RecordOpenChild("ArwingCharFace", arwing->drawFace);
 
-        Matrix_Translate(gGfxMatrix, 0.0f, 6.4f, -16.5f, MTXF_APPLY);
+        Matrix_Translate(gGfxMatrix, 0.0f, 6.4f - WOLFEN_COCKPIT_DROP + WOLFEN_HEAD_LIFT, -16.5f, MTXF_APPLY);
         Matrix_RotateY(gGfxMatrix, arwing->teamFaceYrot * M_DTOR, MTXF_APPLY);
         Matrix_RotateX(gGfxMatrix, arwing->teamFaceXrot * M_DTOR, MTXF_APPLY);
         Matrix_Scale(gGfxMatrix, 1.0f / 70.925f, 1.0f / 70.925f, 1.0f / 70.925f, MTXF_APPLY);
@@ -680,7 +681,7 @@ void Display_ArwingWings(ArwingInfo* arwing) {
         FrameInterpolation_RecordCloseChild();
     }
 
-    Matrix_Translate(gGfxMatrix, 0.0f, 17.2f, -25.8f, MTXF_APPLY);
+    Matrix_Translate(gGfxMatrix, 0.0f, 17.2f - WOLFEN_COCKPIT_DROP, -25.8f, MTXF_APPLY);
     Matrix_RotateX(gGfxMatrix, arwing->cockpitGlassXrot * M_DTOR, MTXF_APPLY);
     Matrix_SetGfxMtx(&gMasterDisp);
     RCP_SetupDL_64_2();
@@ -952,7 +953,7 @@ void Display_LandmasterEngineGlow_Draw(Player* player) {
         Matrix_Scale(gGfxMatrix, 0.9f * 0.9f, 0.9f * 0.63f, 1.0f, MTXF_APPLY);
     }
     Matrix_SetGfxMtx(&gMasterDisp);
-    Display_DrawEngineGlow(gLevelType);
+    Display_DrawEngineGlow(EG_GREEN);
     Matrix_Pop(&gGfxMatrix);
 
     FrameInterpolation_RecordCloseChild();
@@ -1097,7 +1098,7 @@ void Display_ArwingLaserCharge(Player* player) {
                     break;
             }
         } else {
-            gDPSetEnvColor(gMasterDisp++, 0, 255, 0, 128);
+            gDPSetEnvColor(gMasterDisp++, 255, 0, 0, 128);
         }
 
         Matrix_RotateZ(gGfxMatrix, gGameFrameCount * 53.0f * M_DTOR, MTXF_APPLY);
@@ -1141,8 +1142,8 @@ void Display_ArwingLaserCharge(Player* player) {
 
         switch (laserStrength) {
             case LASERS_SINGLE:
-                gDPSetPrimColor(gMasterDisp++, 0x00, 0x00, 192, 255, 192, 128);
-                gDPSetEnvColor(gMasterDisp++, 64, 255, 64, 128);
+                gDPSetPrimColor(gMasterDisp++, 0x00, 0x00, 255, 192, 192, 128);
+                gDPSetEnvColor(gMasterDisp++, 255, 64, 64, 128);
                 if (player->alternateView && (gLevelMode == LEVELMODE_ON_RAILS)) {
                     Matrix_MultVec3f(gCalcMatrix, &spB8, &sp94);
                 } else {
@@ -1169,8 +1170,8 @@ void Display_ArwingLaserCharge(Player* player) {
             case LASERS_TWIN:
             case LASERS_HYPER:
                 if (laserStrength == LASERS_TWIN) {
-                    gDPSetPrimColor(gMasterDisp++, 0x00, 0x00, 192, 255, 192, 128);
-                    gDPSetEnvColor(gMasterDisp++, 64, 255, 64, 128);
+                    gDPSetPrimColor(gMasterDisp++, 0x00, 0x00, 255, 192, 192, 128);
+                    gDPSetEnvColor(gMasterDisp++, 255, 64, 64, 128);
                 } else {
                     gDPSetPrimColor(gMasterDisp++, 0x00, 0x00, 128, 255, 255, 160);
                     gDPSetEnvColor(gMasterDisp++, 128, 128, 255, 160);
@@ -1251,7 +1252,7 @@ void Display_LandmasterLaserCharge(Player* player) {
                     break;
             }
         } else {
-            gDPSetEnvColor(gMasterDisp++, 0, 255, 0, 128);
+            gDPSetEnvColor(gMasterDisp++, 255, 0, 0, 128);
         }
 
         Matrix_RotateZ(gGfxMatrix, gGameFrameCount * 53.0f * M_DTOR, MTXF_APPLY);
@@ -1300,7 +1301,7 @@ void Display_PlayerFeatures(Player* player) {
                 }
 
                 src.x = 0;
-                src.y = 0;
+                src.y = WOLFEN_HULL_Y;
                 src.z = -40.0f - var_fv0;
 
                 Matrix_MultVec3f(gCalcMatrix, &src, &dest);

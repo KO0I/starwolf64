@@ -35,6 +35,7 @@ cmake-build-*/
 .idea/
 .vs
 build*
+!tools/build_wolfen.py
 logs/
 /mods/
 starship.cfg.json

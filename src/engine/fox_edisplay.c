@@ -5,6 +5,7 @@
 
 #include "prevent_bss_reordering.h"
 #include "global.h"
+#include "wolfen.h"
 #include "sf64object.h"
 #include "assets/ast_katina.h"
 #include "assets/ast_venom_1.h"
@@ -489,7 +490,7 @@ void Actor_DrawEngineAndContrails(Actor* this) {
             sp5C *= 1.111f;
         }
         Matrix_Push(&gGfxMatrix);
-        Matrix_Translate(gGfxMatrix, 0.0f, 0.0f, -60.0f, MTXF_APPLY);
+        Matrix_Translate(gGfxMatrix, 0.0f, WOLFEN_HULL_Y, -60.0f, MTXF_APPLY);
         Matrix_Scale(gGfxMatrix, sp5C, sp5C * 0.7f, sp5C, MTXF_APPLY);
         Matrix_RotateZ(gGfxMatrix, -this->obj.rot.z * M_DTOR, MTXF_APPLY);
         Matrix_RotateX(gGfxMatrix, -this->obj.rot.x * M_DTOR, MTXF_APPLY);
@@ -497,7 +498,7 @@ void Actor_DrawEngineAndContrails(Actor* this) {
         Matrix_RotateY(gGfxMatrix, -gPlayer[gPlayerNum].camYaw, MTXF_APPLY);
         Matrix_RotateX(gGfxMatrix, gPlayer[gPlayerNum].camPitch, MTXF_APPLY);
         Matrix_SetGfxMtx(&gMasterDisp);
-        Display_DrawEngineGlow(gLevelType);
+        Display_DrawEngineGlow(EG_GREEN);
         Matrix_Pop(&gGfxMatrix);
     }
 
