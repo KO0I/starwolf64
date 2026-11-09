@@ -63,7 +63,7 @@ main:fullscreen #screen{height:calc(100svh - 34px);max-height:none}
 <header><h1>A wolf in space</h1><span id="status" role="status">Choose your base ROM</span></header>
 <section id="screen" aria-label="Game viewscreen"><div id="game" tabindex="0" aria-label="Emulated game"></div></section>
 <section id="controls" aria-label="Flight controls">
-<div class="rom-picker"><label for="rom-file">Choose base ROM</label><input id="rom-file" type="file" accept=".z64,.v64,.n64,.zip" aria-describedby="rom-help"><p id="rom-help">Star Fox 64, US v1.1. ROM or ZIP containing one ROM. Files stay on this device.</p><a href="./wolfen.patch.json?v=zip-1" download>Download mod patch</a></div>
+<div class="rom-picker"><label for="rom-file">Choose base ROM</label><input id="rom-file" type="file" accept=".z64,.v64,.n64,.zip" aria-describedby="rom-help"><p id="rom-help">Star Fox 64, US v1.1. ROM or ZIP containing one ROM. Files stay on this device.</p><a href="./wolfen.patch.json?v=4155f0c65e3dee4c" download>Download mod patch</a></div>
 <div class="toolbar">
 <button id="connect" type="button" disabled>Play</button>
 <button data-action="start" type="button">Start / pause</button>
@@ -98,7 +98,7 @@ main:fullscreen #screen{height:calc(100svh - 34px);max-height:none}
 <script>
 window.EJS_player='#game';
 window.EJS_core='mupen64plus_next';
-window.STARWOLF_build='403d2cd64cc0bdd3';
+window.STARWOLF_build='4155f0c65e3dee4c';
 window.EJS_gameName='A wolf in space';
 window.EJS_pathtodata='https://cdn.emulatorjs.org/4.2.3/data/';
 window.EJS_color='#b62c34';
@@ -112,6 +112,6 @@ window.EJS_defaultControls={0:{},1:{},2:{},3:{}};
 window.EJS_defaultOptions={'virtual-gamepad':'disabled','save-save-interval':'30'};
 </script>
 <script src="./coi-serviceworker.js"></script>
-<script type="module" src="./client.js?v=zip-1"></script>
+<script type="module" src="./client.js?v=identity-1"></script>
 </body>
 </html>
