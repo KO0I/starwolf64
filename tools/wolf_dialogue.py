@@ -336,7 +336,9 @@ def replace_identity(builder):
         original = builder.base.read(path)
         codes = struct.unpack_from(f'<{(len(original) - 68) // 2}H', original, 68)
         text = ''.join(chars.get(code, chr(0xE000 + code)) for code in codes[:-1])
-        changed = re.sub(r'\bFox\s+McCloud\b', "Wolf O'Donnell", text)
+        changed = re.sub(r'\b(Arwing|Wolfen)(s?)\b',
+                         lambda match: {'Arwing': 'Wolfen', 'Wolfen': 'Arwing'}[match[1]] + match[2], text)
+        changed = re.sub(r'\bFox\s+McCloud\b', "Wolf O'Donnell", changed)
         changed = re.sub(r'\bFox\b', 'Wolf', changed)
         changed = re.sub(r'\bFalco\s+Lombardi\b', 'Panther Caroso', changed)
         changed = re.sub(r'\bFalco\b', 'Panther', changed)

@@ -600,8 +600,8 @@ void DrawEnhancementsMenu() {
                 .tooltip = "Disable Level of Detail (LOD) to avoid models using lower poly versions at a distance",
                 .defaultValue = true
             });
-            UIWidgets::CVarCheckbox("Character heads inside Arwings at all times", "gTeamFaces", {
-                .tooltip = "Character heads are displayed inside Arwings in all cutscenes",
+            UIWidgets::CVarCheckbox("Character heads inside Wolfens at all times", "gTeamFaces", {
+                .tooltip = "Character heads are displayed inside Wolfens in all cutscenes",
                 .defaultValue = true
             });
             UIWidgets::CVarCheckbox("Use red radio backgrounds for enemies.", "gEnemyRedRadio");
@@ -717,7 +717,7 @@ void DrawEnhancementsMenu() {
                 .tooltip = "Gorgon flashes the screen repeatedly when firing its beam or when teleporting, which causes eye pain for some players and may be harmful to those with photosensitivity.",
                 .defaultValue = false
             });
-            UIWidgets::CVarCheckbox("Add outline to Arwing and Wolfen in radar", "gFighterOutlines", {
+            UIWidgets::CVarCheckbox("Add outline to Wolfen and Arwing in radar", "gFighterOutlines", {
                 .tooltip = "Increases visibility of ships in the radar.",
                 .defaultValue = false
             });
@@ -871,7 +871,7 @@ void DrawDebugMenu() {
         });
         
         UIWidgets::CVarCheckbox("Speed Control", "gDebugSpeedControl", {
-            .tooltip = "Arwing speed control. Use D-PAD Left and Right to Increase/Decrease the Arwing Speed, D-PAD Down to stop movement."
+            .tooltip = "Wolfen speed control. Use D-PAD Left and Right to Increase/Decrease the Wolfen Speed, D-PAD Down to stop movement."
         });
 
         UIWidgets::CVarCheckbox("Debug Ending", "gDebugEnding", {
