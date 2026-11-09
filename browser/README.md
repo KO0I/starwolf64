@@ -45,21 +45,32 @@ The browser check selects the local base ROM with the real file picker, boots th
 
 Keyboard, touch, and standard gamepads use the controls below the viewscreen. Save states and game saves are stored in the browser for that site's address.
 
-## Connect the game subdomain
+## Connect the game domain
 
-Use play.starwolf64.com for the game. The main site and its existing @ and www records remain unchanged.
+The game is hosted at play.starwolf64.com. The main GitHub Pages site at chipchirp.digital has its own repository and settings.
 
-In the starwolf64 repository's Settings, Pages, set Custom domain to play.starwolf64.com. This repository-level setting does not change the account's main GitHub Pages site.
+In the starwolf64 repository's Settings, Pages, set Custom domain to play.starwolf64.com. This repository-level setting leaves the account's main site unchanged.
 
-In the Squarespace Domains dashboard, open starwolf64.com, then DNS, DNS Settings, and Custom Records. Add this one record:
+In the Squarespace Domains dashboard, open starwolf64.com, then DNS, DNS Settings, and Custom Records. Add this record:
 
 | Host | Type | Data |
 | --- | --- | --- |
 | play | CNAME | ko0i.github.io |
 
-Keep all existing @, www, email, and verification records. Use the default TTL. The CNAME target has no repository path and no https:// prefix. A Git submodule is not needed; the game repository has its own Pages deployment.
+Use the default TTL. The CNAME target has no repository path and no https:// prefix. A Git submodule is not needed; the game repository has its own Pages deployment. Keep unrelated email and verification records.
 
-Enable Enforce HTTPS once GitHub has issued the certificate. DNS changes can take 24 to 48 hours to appear everywhere. To undo the DNS change, remove only the play record.
+To send visitors from starwolf64.com to the game, open Website, Domain Forwarding Rules, Add rule:
+
+| Field | Value |
+| --- | --- |
+| Subdomain | @ |
+| Website URL | play.starwolf64.com |
+| Redirect | Temporary 302 during setup |
+| Path forwarding | Remove paths |
+
+Save the forwarding rule and retain the play CNAME. Squarespace manages the root domain's forwarding records. This rule applies to starwolf64.com, not chipchirp.digital. No change to the www record is required.
+
+Enable Enforce HTTPS for the game repository once GitHub has issued its certificate. DNS and forwarding changes can take 24 to 48 hours to appear everywhere.
 
 For an interactive walkthrough, run:
 

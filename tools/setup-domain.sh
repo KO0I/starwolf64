@@ -192,13 +192,13 @@ finish() {
 }
 
 # ──────────────────────────────────────────────────────────────────────────
-# STAGES: Only the dedicated game subdomain is configured.
-TOTAL_STAGES=3
-banner "Connect play.starwolf64.com"
+# STAGES: Game subdomain and root forwarding; the main site stays independent.
+TOTAL_STAGES=4
+banner "Connect Starwolf64"
 stage "Open the domain"
 open_url "https://account.squarespace.com/domains"
 step "Select starwolf64.com, then DNS, then DNS Settings."
-note "Your existing @ and www records stay in place."
+note "chipchirp.digital has its own settings and stays unchanged."
 pause "Press Enter when DNS Settings is open."
 stage "Add the game subdomain"
 step "Under Custom Records, select Add Record."
@@ -206,10 +206,19 @@ say "HOST  TYPE    DATA"
 say "play  CNAME   ko0i.github.io"
 step "Use the default TTL and save the record."
 note "The target has no https:// prefix or repository path."
-note "Keep all existing @, www, email, and verification records."
+note "Keep unrelated email and verification records."
 pause "Press Enter once the play record is saved."
+stage "Forward the bare domain"
+step "Open Website, Domain Forwarding Rules, Add rule."
+say "Subdomain: @"
+say "Website URL: play.starwolf64.com"
+say "Redirect: Temporary 302 during setup"
+say "Path forwarding: Remove paths"
+step "Save the forwarding rule. Keep the play CNAME."
+note "Squarespace manages the root forwarding records."
+pause "Press Enter once the forwarding rule is saved."
 stage "Check the connection"
-say "Tell the assistant that DNS is saved so it can check DNS and HTTPS."
-note "DNS changes may take 24 to 48 hours to appear everywhere."
-note "Rollback: remove only the play CNAME record."
+say "Tell the assistant that DNS and forwarding are saved so it can check HTTPS."
+note "DNS and forwarding changes can take 24 to 48 hours to appear everywhere."
+note "Rollback: remove the forwarding rule, then remove only the play CNAME."
 finish
