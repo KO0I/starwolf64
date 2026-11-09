@@ -61,7 +61,9 @@ export async function prepareRom(input, patch) {
   }
   const source = normalizeRom(input);
   if (source.length !== patch.base?.size ||
-      await digest('SHA-1', source) !== patch.base.sha1) {
+      await digest('SHA-1', source) !== patch.base.sha1 ||
+      typeof patch.base.sha256 !== 'string' ||
+      await digest('SHA-256', source) !== patch.base.sha256) {
     fail('This ROM does not match. Choose an unmodified Star Fox 64 US v1.1 ROM.');
   }
   const size = patch.target?.size;
