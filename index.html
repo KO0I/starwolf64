@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b0c0e">
+<title>A wolf in space</title>
+<style>@font-face{font-family:Arwing;src:url(data:font/ttf;base64,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AG4ATv/oAG8ATv/oAHAAT//nAHEAUP/nAHIAUf/nAHMAUf/nAHQAUv/mAHUAU//mAHYAU//mAHcAVP/mAHgAVf/mAHkAVf/lAHoAVv/lAHsAV//lAHwAWP/lAH0AWP/lAH4AWf/kAH8AWv/kAIAAWv/kAIEAW//kAIIAXP/jAIMAXP/jAIQAXf/jAIUAXv/jAIYAX//jAIcAX//iAIgAYP/iAIkAYf/iAIoAYf/iAIsAYv/hAIwAY//hAI0AY//hAI4AZP/hAI8AZf/hAJAAZv/gAJEAZv/gAJIAZ//gAJMAaP/gAJQAaP/gAJUAaf/fAJYAav/fAJcAa//fAJgAa//fAJkAbP/eAJoAbf/eAJsAbf/eAJwAbv/eAJ0Ab//eAJ4Ab//dAJ8AcP/dAKAAcf/dAKEAcv/dAKIAcv/dAKMAc//cAKQAdP/cAKUAdP/cAKYAdf/cAKcAdv/bAKgAdv/bAKkAd//bAKoAeP/bAKsAef/bAKwAef/aAK0Aev/aAK4Ae//aAK8Ae//aALAAfP/ZALEAff/ZALIAff/ZALMAfv/ZALQAf//ZALUAgP/YALYAgP/YALcAgf/YALgAgv/YALkAgv/YALoAg//XALsAhP/XALwAhP/XAL0Ahf/XAL4Ahv/WAL8Ah//WAMAAh//WAMEAiP/WAMIAif/WAMMAif/VAMQAiv/VAMUAi//VAMYAi//VAMcAjP/VAMgAjf/UAMkAjv/UAMoAjv/UAMsAj//UAMwAkP/TAM0AkP/TAM4Akf/TAM8Akv/TANAAk//TANEAk//SANIAlP/SANMAlf/SANQAlf/SANUAlv/RANYAl//RANcAl//RANgAmP/RANkAmf/RANoAmv/QANsAmv/QANwAm//QAN0AnP/QAN4AnP/QAN8Anf/PAOAAnv/PAOEAnv/PAOIAn//PAOMAoP/OAOQAof/OAOUAof/OAOYAov/OAOcAo//OAOgAo//NAOkApP/NAOoApf/NAOsApf/NAOwApv/NAO0Ap//MAO4AqP/MAO8AqP/MAPAAqf/MAPEAqv/LAPIAqv/LAPMAq//LAPQArP/LAPUArP/LAPYArf/KAPcArv/KAPgAr//KAPkAr//KAPoAsP/KAPsAsf/JAPwAsf/JAP0Asv/JAP4As//JAP8AtP/I) format("truetype");font-weight:400;font-style:normal;font-display:swap}
+*{box-sizing:border-box}
+:root{color-scheme:dark}
+body{margin:0;background:#08090a;color:#c7c8c9;font:15px Arwing,sans-serif}
+body,button,input,select{font-family:Arwing,sans-serif}
+main{width:calc(100% - 12px);max-width:1680px;margin:0 auto;background:repeating-linear-gradient(0deg,#ffffff02 0 1px,transparent 1px 3px),linear-gradient(115deg,#1c1e20,#0b0c0e 40%,#17181a);border-inline:1px solid #282a2c}
+header{height:34px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 10px;border-bottom:1px solid #4c151b;box-shadow:0 1px #080808}
+h1{font-size:clamp(13px,2.5vw,19px);line-height:1;margin:0;font-weight:400;color:#e8e4e3;text-shadow:0 1px #000}
+#status{font-size:11px;color:#a6a4a4;text-align:right;overflow-wrap:anywhere}
+#status:before{content:"";display:inline-block;width:5px;height:5px;margin-right:7px;background:#d32a39;box-shadow:0 0 5px #db233a}
+#screen{width:100%;height:min(calc(100svh - 38px),calc((100vw - 12px)*.5625));max-height:945px;background:#000;border:2px solid;border-color:#35373a #151618 #711c29 #151618;box-shadow:0 1px 0 #050506,0 2px 0 #a4313e,inset 0 0 0 1px #000}
+#game{display:block;width:100%;height:100%;background:#000;object-fit:contain;outline:none}
+#game:focus-visible{outline:1px solid #cf3c4b;outline-offset:-2px}
+#controls{padding:9px 10px 10px;border-top:1px solid #080808;background:linear-gradient(170deg,#252628 0,#121315 25%,#101113 70%,#1b1c1e)}
+.toolbar{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
+button{appearance:none;color:#d9d6d3;background:linear-gradient(#3b3d3f 0,#222427 12%,#17181b 48%,#0c0d0f 50%,#202124);border:1px solid;border-color:#55575a #08090a #08090a #3b3d3f;border-radius:0;min-height:38px;padding:7px 13px;box-shadow:inset 0 -1px #5c1922,1px 1px 1px #000;font-size:13px;cursor:pointer;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+button:hover:not(:disabled){color:#fff;border-top-color:#a14953}
+button:active,.pressed{background:linear-gradient(#08090b,#252025);border-color:#070809 #343537 #6c202b #070809;color:#ff8b96;box-shadow:inset 1px 2px 4px #000,0 0 5px #c6223422}
+button:disabled{opacity:.45;cursor:default}
+button:focus-visible,#stick:focus-visible{outline:2px solid #d34859;outline-offset:2px}
+#connect{color:#ffe4e6;border-top-color:#b84151;background:linear-gradient(#6b2831,#33161d 16%,#1d1015 55%,#3b171f)}
+#disconnect{margin-left:auto}
+.deck{display:flex;align-items:center;justify-content:space-between;gap:16px;max-width:760px;margin:auto}
+.steering{display:flex;align-items:center;gap:10px}
+#stick{position:relative;width:120px;height:120px;flex:none;touch-action:none;user-select:none;background:radial-gradient(ellipse,#070809 35%,#27292c 62%,#070809 65%,#35373b 67%,#141518 70%);border:1px solid #393b3f;box-shadow:inset 0 0 12px #000,0 1px #69202a;clip-path:polygon(12px 0,calc(100% - 12px) 0,100% 12px,100% calc(100% - 12px),calc(100% - 12px) 100%,12px 100%,0 calc(100% - 12px),0 12px)}
+#stick:before,#stick:after{content:"";position:absolute;background:#a02e3b}
+#stick:before{width:1px;height:12px;left:50%;top:5px}
+#stick:after{width:12px;height:1px;top:50%;left:5px}
+.knob{position:absolute;left:calc(50% - 21px);top:calc(50% - 21px);width:42px;height:42px;transform:translate(var(--x,0px),var(--y,0px));background:linear-gradient(130deg,#66696c 0,#292c30 20%,#101114 70%);border:2px outset #3c3e42;box-shadow:3px 5px 7px #000;clip-path:polygon(8px 0,34px 0,42px 8px,42px 34px,34px 42px,8px 42px,0 34px,0 8px)}
+.knob:after{content:"";position:absolute;inset:7px;border:1px solid #9a3340;box-shadow:inset 0 1px 2px #000}
+.directions{display:grid;grid-template-columns:repeat(3,33px);grid-template-rows:repeat(3,33px);gap:2px}
+.directions button{min-height:0;padding:0;font:16px sans-serif}
+.directions [data-action=up]{grid-area:1/2}
+.directions [data-action=left]{grid-area:2/1}
+.directions [data-action=down]{grid-area:3/2}
+.directions [data-action=right]{grid-area:2/3}
+.flight-buttons{display:grid;grid-template-columns:repeat(3,minmax(70px,1fr));gap:6px;flex:1;max-width:390px}
+.flight-buttons button{min-height:46px;padding:7px}
+.flight-buttons [data-action=fire]{color:#ffb1b8;border-top-color:#a43a48}
+.hint{font-size:11px;line-height:1.6;color:#838184;margin:10px 0 0;text-align:center}
+details{font-size:12px;color:#a6a2a2;margin-top:8px}
+summary{cursor:pointer}
+details p{line-height:1.7;margin:8px 0 0}
+main:fullscreen{width:100%;max-width:none;overflow:auto}
+main:fullscreen #screen{height:calc(100svh - 34px);max-height:none}
+@media(max-width:580px){main{width:100%;border:0}header{height:30px;padding:0 7px;gap:7px}#screen{height:calc(100vw*.5625)}#status{max-width:48%;font-size:10px}.deck{gap:9px}.steering{gap:5px}#stick{width:96px;height:96px}.directions{grid-template-columns:repeat(3,26px);grid-template-rows:repeat(3,26px)}.flight-buttons{grid-template-columns:repeat(2,minmax(60px,1fr));gap:5px}.flight-buttons button{font-size:11px;min-height:40px}#controls{padding:8px 7px}.toolbar{gap:5px}button{padding:7px 9px;font-size:11px}.hint{font-size:10px}}
+@media(max-width:360px){.directions{display:none}.steering{gap:0}}
+#game .ejs_menu_bar,#game .ejs_virtualGamepad_parent{display:none!important}
+#game .ejs_parent{width:100%!important;height:100%!important}
+#game *{font-family:Arwing,sans-serif!important}
+.rom-picker{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;font-size:12px}.rom-picker input{max-width:100%;min-width:0;font-size:12px;color:#c7c8c9}.rom-picker p{width:100%;margin:0;line-height:1.6;color:#aaa}.rom-picker a{color:#db8d95}
+</style>
+</head>
+<body>
+<main>
+<header><h1>A wolf in space</h1><span id="status" role="status">Choose your base ROM</span></header>
+<section id="screen" aria-label="Game viewscreen"><div id="game" tabindex="0" aria-label="Emulated game"></div></section>
+<section id="controls" aria-label="Flight controls">
+<div class="rom-picker"><label for="rom-file">Choose base ROM</label><input id="rom-file" type="file" accept=".z64,.v64,.n64" aria-describedby="rom-help"><p id="rom-help">Star Fox 64, US v1.1. Your ROM stays on this device.</p><a href="./wolfen.patch.json" download>Download mod patch</a></div>
+<div class="toolbar">
+<button id="connect" type="button" disabled>Play</button>
+<button data-action="start" type="button">Start / pause</button>
+<button id="sound" type="button">Mute</button>
+<button id="save" type="button" disabled>Save state</button>
+<button id="load" type="button" disabled>Load state</button>
+<button id="fullscreen" type="button">Fullscreen</button>
+<button id="disconnect" type="button" disabled>Pause</button>
+</div>
+<div class="deck">
+<div class="steering">
+<div id="stick" role="group" aria-label="Drag to steer"><div class="knob"></div></div>
+<div class="directions" role="group" aria-label="Steering buttons">
+<button data-action="up" aria-label="Steer up" type="button">↑</button>
+<button data-action="left" aria-label="Steer left" type="button">←</button>
+<button data-action="down" aria-label="Steer down" type="button">↓</button>
+<button data-action="right" aria-label="Steer right" type="button">→</button>
+</div></div>
+<div class="flight-buttons">
+<button data-action="roll_left" type="button">Bank left</button>
+<button data-action="fire" type="button">Fire</button>
+<button data-action="roll_right" type="button">Bank right</button>
+<button data-action="brake" type="button">Brake</button>
+<button data-action="bomb" type="button">Bomb</button>
+<button data-action="boost" type="button">Boost</button>
+</div>
+</div>
+<p class="hint">WASD / arrows steer · X fire · C bomb · Shift boost · Ctrl brake · Q / E bank · Space pause</p>
+<details><summary>Gamepad controls</summary><p>Left stick or D pad steers. X or right trigger fires. Y or left trigger drops a bomb. A boosts. B brakes. Shoulder buttons bank. Menu starts or pauses.</p></details>
+</section>
+</main>
+<script>
+window.EJS_player='#game';
+window.EJS_core='mupen64plus_next';
+window.STARWOLF_build='403d2cd64cc0bdd3';
+window.EJS_gameName='A wolf in space';
+window.EJS_pathtodata='https://cdn.emulatorjs.org/4.2.3/data/';
+window.EJS_color='#b62c34';
+window.EJS_backgroundColor='#000000';
+window.EJS_startButtonName='A wolf in space';
+window.EJS_startOnLoaded=true;
+window.EJS_threads=true;
+window.EJS_volume=.7;
+window.EJS_Buttons={rightClick:false};
+window.EJS_defaultControls={0:{},1:{},2:{},3:{}};
+window.EJS_defaultOptions={'virtual-gamepad':'disabled','save-save-interval':'30'};
+</script>
+<script src="./coi-serviceworker.js"></script>
+<script type="module" src="./client.js"></script>
+</body>
+</html>
