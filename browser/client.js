@@ -21,7 +21,7 @@ fileInput.onchange = async () => {
   if (!file) {status.textContent = 'Choose your base ROM'; return;}
   status.textContent = 'Checking ROM and applying mod...';
   try {
-    const response = await fetch('./wolfen.patch.json?v=zip-1', {cache: 'no-store'});
+    const response = await fetch('./wolfen.patch.json?v=' + (window.STARWOLF_build || 'local'), {cache: 'no-store'});
     if (!response.ok) throw new Error('The game patch could not be loaded. Reload and try again.');
     const patch = await response.json();
     if (window.STARWOLF_build && !patch.target?.sha256?.startsWith(window.STARWOLF_build)) {

@@ -34,6 +34,7 @@ def main():
                           "window.STARWOLF_build='" + hashlib.sha256(target).hexdigest()[:16] + "';", page)
     if count != 1:
         parser.error("Expected one browser ROM configuration")
+    page = page.replace('wolfen.patch.json?v=zip-1', 'wolfen.patch.json?v=' + hashlib.sha256(target).hexdigest()[:16])
     allowed = set(ASSETS) | {"index.html", "wolfen.patch.json", ".nojekyll", "LICENSE.md"}
     if args.domain:
         allowed.add("CNAME")

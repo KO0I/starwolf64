@@ -184,7 +184,7 @@ class Builder:
         self.segments = {}
         self.table_indices = {}
         self.assets = {}
-        for stem in ('ast_arwing', 'ast_star_wolf', 'ast_common', 'ast_enmy_planet', 'ast_enmy_space', 'ast_versus', 'ast_title'):
+        for stem in ('ast_arwing', 'ast_star_wolf', 'ast_common', 'ast_enmy_planet', 'ast_enmy_space', 'ast_versus', 'ast_title', 'ast_vs_menu'):
             virtual, entries = manifest(stem)
             for i in range(64):
                 v, start, end, compressed = struct.unpack_from('>IIII', rom, TABLE + i * 16)
@@ -510,8 +510,16 @@ class Builder:
         full_address, full_stream = self.emit(full_sources, 'full')
         from wolfen_lod import build_lod
         build_lod(self, crc64)
+        from wolf_portraits import replace_portraits
+        replace_portraits(self)
+        from wolf_identity import replace_name_cards
+        replace_name_cards(self)
         from wolf_character import build_character
         build_character(self)
+        from wolf_dialogue import replace_dialogue, replace_identity, mute_changed_dialogue
+        replace_dialogue(self)
+        replace_identity(self)
+        mute_changed_dialogue(self)
         return wing_parts
 
     def patched_rom(self):
@@ -530,13 +538,20 @@ class Builder:
             virtual = struct.unpack_from('>I', out, entry)[0]
             struct.pack_into('>IIII', out, entry, virtual, start, len(out), 0)
         self.character.patch_rom(out)
+        from wolf_dialogue import patch_dialogue_voice
+        patch_dialogue_voice(self, out)
         out.extend(b'\0' * (0x1000000 - len(out)))
         struct.pack_into('>II', out, 0x10, *cartridge_crc(out))
         return out
 
     def verify(self, patched):
         title = self.segments['ast_title']
-        before_character = self.character.original['ast_title']
+        from wolf_identity import verify_name_cards
+        verify_name_cards(self)
+        before_character = bytearray(self.character.original['ast_title'])
+        for stem, _, offset, original, _ in self.name_cards:
+            if stem == 'ast_title':
+                before_character[offset:offset + len(original)] = original
         from wolf_logo import SIZE as logo_size, verify_title_logo
         verify_title_logo(self)
         if len(before_character) != len(self.original_title) or before_character[logo_size:0x14140] != self.original_title[logo_size:0x14140] or before_character[0x147C0:] != self.original_title[0x147C0:]:
@@ -549,6 +564,9 @@ class Builder:
         if compressed or patched[start:end] != title or title[0x14140:0x147C0] != data:
             raise ValueError('Native/browser intro title mismatch')
         self.character.verify(patched)
+        from wolf_dialogue import verify_dialogue, verify_dialogue_voice
+        verify_dialogue(self, patched)
+        verify_dialogue_voice(self, patched)
         # Wolf owns the two Fox head lists; teammate heads and flight rigs stay intact.
         protected = [(0x3960, 0x9B60), (0x131F0, 0x14BF0), (0x16B30, len(self.output))]
         for start, end in protected:
@@ -627,7 +645,8 @@ class Builder:
         for offset, (_, replacement) in ROM_PATCHES.items():
             if struct.unpack_from('>I', patched, offset)[0] != replacement:
                 raise ValueError('Browser flight color/position patch missing')
-        common = self.segments['ast_common']
+        from wolf_portraits import verify_portraits
+        common = verify_portraits(self)
         if common[:0x1AF98] != self.original_common[:0x1AF98] or common[0x1B198:] != self.original_common[0x1B198:]:
             raise ValueError('An unrelated common asset, including hyper lasers, changed')
         pixels = struct.unpack_from('>256H', common, 0x1AF98)
@@ -700,6 +719,7 @@ def main():
         print(f'Mesh triangles: { {name: len(mesh) for name, mesh in builder.geometry.items()} }')
         print(f'Self-contained LOD bytes: {builder.lod_usage}')
         print(f'Wolf character: {len(builder.character.draws)} display lists, {len(builder.character.materials)} private materials, {builder.character.changed_vertices} shaped/patch vertices. Original rigs and teammate assets preserved.')
+        print(f'Wolf cockpit head: {builder.character.cockpit_triangles} triangles; all 5 Fox portrait slots replaced.')
 
 
 if __name__ == '__main__':

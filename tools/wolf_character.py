@@ -3,6 +3,7 @@ import math
 import struct
 
 from build_wolfen import TABLE, commands, crc64, manifest, mio0
+from wolf_head_strap import ATLAS_WIDTH, ATLAS_HEIGHT, is_head_surface, atlas_pixels, head_uv, rebuild_textured_head
 
 
 # Skeleton indices and material assignments are from the US 1.1 character rigs.
@@ -21,11 +22,6 @@ VERSUS_MATERIALS = {
     0x26EB8: 'fur', 0x27268: 'vest', 0x28130: 'glove',
     0x28230: 'equipment', 0x1C9B0: 'eye_fur',
     0xE680: 'equipment', 0xEA80: 'equipment',
-}
-COCKPIT_MATERIALS = {
-    0x39E0: 'fur', 0x3A60: 'fur', 0x3AE0: 'eye',
-    0x3B60: 'black', 0x3BE0: 'fur', 0x3C60: 'black',
-    0x3960: 'black',
 }
 TINTS = {
     'jacket': (26, 26, 30), 'chest': (91, 53, 125), 'scarf': (20, 20, 23),
@@ -60,7 +56,7 @@ def recolor(data, width, height, role):
             color = tuple(v * (.35 + high / 31 * .65) for v in tint)
         elif role in ('eye', 'eye_fur'):
             if g > r * 1.2 and g > b * 1.2:
-                color = (196, 130, 35)
+                color = (180, 20, 28)
             elif role == 'eye_fur' and r > b * 1.35 and r > g * 1.1:
                 color = tuple(v * (.5 + high / 62) for v in TINTS['fur'])
             else:
@@ -126,17 +122,37 @@ class Character:
         struct.pack_into('>I', out, offset, value)
 
     def material(self, stem, pointer, role):
-        key = stem, pointer, role
+        key = stem, 0 if role == 'head_strap' else pointer, role
         if key not in self.materials:
             b = self.builder
             name, fields = b.assets[stem, pointer]
             width, height = int(fields['width']), int(fields['height'])
             if fields['format'] != 'RGBA16':
                 raise ValueError(f'Unexpected character texture format in {name}')
-            data = recolor(self.original[stem][pointer:pointer + width * height * 2], width, height, role)
-            path = f'wolf_character/{stem}_{pointer:X}_{role}'
+            header = bytearray(b.base.read(f'{stem}/{name}')[:80])
+            if role == 'head_strap':
+                data = atlas_pixels()
+                struct.pack_into('<4I', header, 64, 2, ATLAS_WIDTH, ATLAS_HEIGHT, len(data))
+                path = f'wolf_character/{stem}_head_atlas'
+            else:
+                data = recolor(self.original[stem][pointer:pointer + width * height * 2], width, height, role)
+                patch_sample = None
+                if stem == 'ast_title' and pointer == 0x25FA8:
+                    patch_sample = (16, 16)
+                elif stem == 'ast_versus' and pointer in (0x26CB8, 0x26DB8):
+                    patch_sample = (8, 1)
+                if patch_sample is not None:
+                    # Match the painted patch so the old pupil is not a darker spot.
+                    u, v = patch_sample
+                    data = bytearray(data)
+                    # Include neighboring texels used by bilinear filtering.
+                    for y in range(v - 1, v + 2):
+                        for x in range(u - 1, u + 2):
+                            struct.pack_into('>H', data, (y * width + x) * 2, rgba16(0, 0, 0))
+                    data = bytes(data)
+                path = f'wolf_character/{stem}_{pointer:X}_{role}'
             address = self.append(stem, data)
-            b.resources[path] = b.base.read(f'{stem}/{name}')[:80] + data
+            b.resources[path] = bytes(header) + data
             self.materials[key] = address, path, data
         return self.materials[key][:2]
 
@@ -162,6 +178,8 @@ class Character:
             elif stem == 'ast_versus' and limb == 16 and material in (0x26CB8, 0x26DB8) and v[1] < 0:
                 # The low-detail rig has a separate eye on each side of the head.
                 v[4], v[5] = 8 * 32, 1 * 32
+            if is_head_surface(stem, limb, material):
+                v[4:6] = head_uv(stem, v)
         data = b''.join(struct.pack('>hhhHhhBBBB', *v) for v in values)
         if data == raw:
             return None
@@ -190,7 +208,8 @@ class Character:
             if op == 0xFD:
                 material = w1 & 0xFFFFFF
                 if material in roles:
-                    replacement = self.material(stem, material, roles[material])
+                    role = 'head_strap' if is_head_surface(stem, limb, material) else roles[material]
+                    replacement = self.material(stem, material, role)
             elif op == 4:
                 hi, lo = struct.unpack_from('<II', native, native_pos + 8)
                 base_path = self.by_hash[hi << 32 | lo]
@@ -209,6 +228,8 @@ class Character:
             raise ValueError(f'Character native display list size mismatch in {path}')
         b.resources[path] = bytes(native)
         self.draws.append((stem, offset, path))
+        if (stem, limb) in (('ast_title', 19), ('ast_versus', 16)):
+            rebuild_textured_head(self, stem, offset, path)
 
     def skeleton(self, stem, offset, roles):
         data = self.original[stem]
@@ -226,8 +247,8 @@ class Character:
             self.segment(stem)
         self.skeleton('ast_title', 0x2FBAC, TITLE_MATERIALS)
         self.skeleton('ast_versus', 0x1D258, VERSUS_MATERIALS)
-        self.display_list('ast_arwing', 0x90, -1, COCKPIT_MATERIALS)
-        self.display_list('ast_arwing', 0x1C90, -1, COCKPIT_MATERIALS)
+        from wolf_cockpit import build_cockpit_head
+        build_cockpit_head(self)
 
     def patch_rom(self, rom):
         # Scene tables carry virtual start/end pairs independently of the DMA
@@ -249,6 +270,8 @@ class Character:
 
     def verify(self, rom):
         b = self.builder
+        from wolf_cockpit import verify_cockpit_head
+        verify_cockpit_head(self)
         for offset, start, end in self.scene_loads:
             if struct.unpack_from('>II', rom, offset) != (start, end):
                 raise ValueError('Browser character scene load size mismatch')
@@ -261,6 +284,7 @@ class Character:
             if stem == 'ast_arwing':
                 start, end = self.arwing_allocated
                 restored[start:end] = source[start:end]
+                restored[0x90:0x3960] = source[0x90:0x3960]
             if restored != source:
                 raise ValueError(f'Unrelated character data changed in {stem}')
         for (stem, _, _), (address, path, data) in self.materials.items():
@@ -273,7 +297,9 @@ class Character:
         for stem, offset, path in self.draws:
             data = b.segments[stem]
             loaded = set()
-            for w0, w1 in commands(data, offset):
+            first, address = struct.unpack_from('>II', data, offset)
+            stream = address & 0xFFFFFF if first == 0x06010000 else offset
+            for w0, w1 in commands(data, stream):
                 op = w0 >> 24
                 if op in (4, 0xFD) and (w1 & 0xFFFFFF) >= len(data):
                     raise ValueError(f'Invalid character pointer in {path}')

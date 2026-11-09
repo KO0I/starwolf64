@@ -24,7 +24,9 @@ try{
  await call('Runtime.enable');await call('Page.enable');
  await call('Emulation.setDeviceMetricsOverride',{width:1280,height:900,deviceScaleFactor:1,mobile:false});
  for(let i=0;i<50;i++){if(await evaluate("!!document.querySelector('#connect')"))break;await sleep(200)}
- const patchResponse=await fetch(new URL('./wolfen.patch.json?v=zip-1',url));
+ const html=await(await fetch(url)).text();
+ const build=html.match(/STARWOLF_build='([a-f0-9]+)'/)?.[1]||'local';
+ const patchResponse=await fetch(new URL('./wolfen.patch.json?v='+build,url));
  assert(patchResponse.ok,'The patch is missing');
  const patch=await patchResponse.json();
  assert(patch.format==='starwolf64-delta-v1','Expected a delta patch');

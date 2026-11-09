@@ -1197,7 +1197,7 @@ bool func_versus_800C0D10(void) {
 s32 func_versus_800C0E78(void) {
     s32 i;
     u8* D_800D4C80[] = {
-        "FOX",
+        "WOLF",
         "PEPPY",
         "SLIPPY",
         "FALCO",

@@ -2284,7 +2284,7 @@ void HUD_RadioCharacterName_Draw(void) {
 
         switch ((s32) gRadioMsgRadioId) {
             case RCID_FOX:
-                Graphics_DisplaySmallText(xPos, 173, 1.0f, 1.0f, "FOX");
+                Graphics_DisplaySmallText(xPos, 173, 1.0f, 1.0f, "WOLF");
                 break;
 
             case RCID_FALCO:
