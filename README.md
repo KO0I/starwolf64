@@ -2,7 +2,7 @@
 
 A playable Star Wolf mod built on HarbourMasters/Starship. The browser edition runs a delta patch against a visitor-selected Star Fox 64 US v1.1 ROM. The base ROM stays on the visitor's device.
 
-[Play on GitHub Pages](https://ko0i.github.io/starwolf64/) and [build or host your own copy](browser/README.md). The custom domain is starwolf64.com.
+[Play on GitHub Pages](https://ko0i.github.io/starwolf64/) and [build or host your own copy](browser/README.md). The game domain is play.starwolf64.com.
 
 The original Starship instructions and credits follow.
 

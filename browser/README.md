@@ -21,7 +21,7 @@ The static site is written to browser/runtime/site. The exporter uses an explici
 To export with a custom domain:
 
 ~~~sh
-python3 tools/export_browser_site.py --output /tmp/starwolf64-site --domain starwolf64.com
+python3 tools/export_browser_site.py --output /tmp/starwolf64-site --domain play.starwolf64.com
 ~~~
 
 Fork the repository and copy the export to your own GitHub Pages source branch. Use your own domain in --domain, or omit that option to host under your GitHub Pages project address. The page uses relative asset URLs for both arrangements. Preserve LICENSE.md, the service worker license, and Arwing-source.txt when copying it.
@@ -45,21 +45,27 @@ The browser check selects the local base ROM with the real file picker, boots th
 
 Keyboard, touch, and standard gamepads use the controls below the viewscreen. Save states and game saves are stored in the browser for that site's address.
 
-## Point starwolf64.com at GitHub Pages
+## Connect the game subdomain
 
-In the Squarespace Domains dashboard, open starwolf64.com, then DNS and DNS Settings. Replace the Squarespace Defaults website records with:
+Use play.starwolf64.com for the game. The main site and its existing @ and www records remain unchanged.
+
+In the starwolf64 repository's Settings, Pages, set Custom domain to play.starwolf64.com. This repository-level setting does not change the account's main GitHub Pages site.
+
+In the Squarespace Domains dashboard, open starwolf64.com, then DNS, DNS Settings, and Custom Records. Add this one record:
 
 | Host | Type | Data |
 | --- | --- | --- |
-| @ | A | 185.199.108.153 |
-| @ | A | 185.199.109.153 |
-| @ | A | 185.199.110.153 |
-| @ | A | 185.199.111.153 |
-| www | CNAME | ko0i.github.io |
+| play | CNAME | ko0i.github.io |
 
-Keep unrelated email and verification records. Use the default TTL. The CNAME target has no repository path and no https:// prefix.
+Keep all existing @, www, email, and verification records. Use the default TTL. The CNAME target has no repository path and no https:// prefix. A Git submodule is not needed; the game repository has its own Pages deployment.
 
-In the repository's Settings, Pages, set the custom domain to starwolf64.com. Enable Enforce HTTPS once GitHub has issued the certificate. DNS changes can take 24 to 48 hours to appear everywhere.
+Enable Enforce HTTPS once GitHub has issued the certificate. DNS changes can take 24 to 48 hours to appear everywhere. To undo the DNS change, remove only the play record.
+
+For an interactive walkthrough, run:
+
+~~~sh
+bash tools/setup-domain.sh
+~~~
 
 References:
 
