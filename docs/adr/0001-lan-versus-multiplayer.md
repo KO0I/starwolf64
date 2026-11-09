@@ -5,6 +5,7 @@ Date: 2026-11-08
 Updated: 2026-11-09 for the requested pilot roster, original-asset identities, and eight-player Venom target.
 Approval: The user confirmed the design and approved this document and the project glossary at Q14.
 Related terms: [Project glossary](../../GLOSSARY.md).
+Proposed technical plan: [RFL-derived C TCP multiplayer](../plans/lan-tcp-multiplayer.md).
 
 ## Context
 
@@ -342,6 +343,19 @@ The target is native networked simulation on each participating PC.
 Both add lifecycle and deployment work beyond a match hosted by one player.
 The approved session ends when the host leaves.
 
+## RFL reuse and TCP planning
+
+The requested implementation direction is to reuse the C RFL networking as a starting point and adapt it to TCP.
+The located source is `/home/amber/proj/rfl/rfl_net.c` with its `rfl_net.h` interface.
+It opens a UDP `SOCK_DGRAM` socket. No separate C TCP implementation was verified in the checked RFL working copies.
+Its current pose relay is not the authoritative control-and-combat protocol required here.
+
+The [technical plan](../plans/lan-tcp-multiplayer.md) compares bounded main-thread polling with a dedicated I/O worker.
+It proposes bounded nonblocking polling first, a domain-facing C session interface, explicit TCP framing and serialization,
+per-peer backpressure, host-owned gameplay, and a verified prediction boundary.
+The plan records the alternative, source fingerprints, and evidence required to reconsider the choice.
+This is a planning artifact. It does not implement the transport or establish acceptable Wi-Fi or Tailscale responsiveness.
+
 ## Consequences and remaining engineering choices
 
 The host has less network delay than guests.
@@ -354,11 +368,11 @@ Timeout handling must preserve the remaining players' simulation and respawns.
 
 The following details need implementation investigation and validation:
 
-- The transport library, packet format, protocol compatibility rules, and snapshot contents.
+- The RFL-derived C TCP adaptation, packet format, protocol compatibility rules, and snapshot contents, as proposed in the technical plan.
 - Input and snapshot rates relative to the existing simulation cadence.
 - Prediction, reconciliation, and interpolation behavior under delay and packet loss.
 - Timeout duration and the treatment of stale controls before removal.
-- Exact engine and laser palettes for both ships.
+- Exact engine and laser palettes for the aircraft variants and duplicate-pilot appearances.
 - Whether later internet play needs historical hit validation.
 
 These details are not measured results or promises about acceptable latency.
