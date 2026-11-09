@@ -4,7 +4,9 @@ Choose your own unmodified Star Fox 64 US v1.1 ROM, then press Play. The browser
 
 The ROM stays on your device. The public site contains the emulator interface and a delta patch. It contains neither the base ROM nor a complete modified ROM. The hosted patch stores only bytes that differ after the browser reconstructs the original expanded segments. The finished game must match the build's SHA-256 digest.
 
-Extract ZIP archives first. The file picker accepts .z64, .v64, and .n64 byte orders. The normalized base ROM must have SHA-1 09f0d105f476b00efa5303a3ebc42e60a7753b7a.
+The file picker accepts .z64, .v64, .n64, or a ZIP containing exactly one ROM at its root. ZIPs may use stored or DEFLATE compression and must be no larger than 16 MiB. Encrypted files, extra files, directories, links, unsafe paths, ZIP64, split archives, malformed headers, and CRC mismatches are rejected. File names must be valid UTF-8; ASCII names work with older ZIP tools.
+
+Decompression is streamed with bounded input chunks and a strict 12 MiB output limit. The normalized ROM must match the known base ROM's SHA-1 and SHA-256 checksums before emulation. Archive contents are never executed or written to the filesystem. These checks validate an exact ROM rather than perform a general antivirus scan.
 
 ## Build and export
 
@@ -37,7 +39,7 @@ python3 -m http.server 8643 --bind 127.0.0.1 --directory browser/runtime/site
 The included service worker supplies the isolation headers needed by the threaded core. It reloads the page once on the first visit to HTTPS or localhost.
 
 ~~~sh
-node --test browser/rom-patch.test.mjs
+node --test browser/rom-patch.test.mjs browser/rom-file.test.mjs
 node browser/check-browser.mjs http://127.0.0.1:8643/
 ~~~
 

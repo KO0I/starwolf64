@@ -24,7 +24,7 @@ try{
  await call('Runtime.enable');await call('Page.enable');
  await call('Emulation.setDeviceMetricsOverride',{width:1280,height:900,deviceScaleFactor:1,mobile:false});
  for(let i=0;i<50;i++){if(await evaluate("!!document.querySelector('#connect')"))break;await sleep(200)}
- const patchResponse=await fetch(new URL('./wolfen.patch.json',url));
+ const patchResponse=await fetch(new URL('./wolfen.patch.json?v=zip-1',url));
  assert(patchResponse.ok,'The patch is missing');
  const patch=await patchResponse.json();
  assert(patch.format==='starwolf64-delta-v1','Expected a delta patch');
@@ -50,10 +50,18 @@ try{
  assert(ready,'Threaded emulation was not enabled by headers or the service worker');
  assert(await evaluate("document.querySelector('#connect').disabled"),'Play must wait for a base ROM');
  await evaluate("(()=>{const transfer=new DataTransfer();transfer.items.add(new File(['invalid'],'wrong.z64'));const input=document.querySelector('#rom-file');input.files=transfer.files;input.dispatchEvent(new Event('change'))})()");
- for(let i=0;i<80;i++){if(await evaluate("document.querySelector('#status').textContent.includes('extracted')"))break;await sleep(100)}
+ for(let i=0;i<80;i++){if(await evaluate("document.querySelector('#status').textContent.includes('US v1.1')"))break;await sleep(100)}
  assert(await evaluate("document.querySelector('#connect').disabled&&!window.EJS_gameUrl"),'An invalid ROM enabled playback');
  const document=await call('DOM.getDocument');
  const input=await call('DOM.querySelector',{nodeId:document.root.nodeId,selector:'#rom-file'});
+ if(process.argv[4]){
+  await call('DOM.setFileInputFiles',{nodeId:input.nodeId,files:[process.argv[4]]});
+  for(let i=0;i<100;i++){
+   if(await evaluate("document.querySelector('#status').textContent.includes('no other files')"))break;
+   await sleep(100);
+  }
+  assert(await evaluate("document.querySelector('#status').textContent.includes('no other files')&&document.querySelector('#connect').disabled&&!window.EJS_gameUrl"),'A ZIP containing an executable was not rejected');
+ }
  const baseRom=process.argv[3]||fileURLToPath(new URL('../Star Fox 64 (U) (V1.1) [!].z64',import.meta.url));
  await call('DOM.setFileInputFiles',{nodeId:input.nodeId,files:[baseRom]});
  let selected=false;

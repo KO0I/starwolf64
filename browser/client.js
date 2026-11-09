@@ -1,4 +1,5 @@
-import {prepareRom} from './rom-patch.mjs';
+import {prepareRom} from './rom-patch.mjs?v=zip-1';
+import {readRomFile} from './rom-file.mjs';
 const game = document.querySelector('#game');
 const status = document.querySelector('#status');
 const play = document.querySelector('#connect');
@@ -20,16 +21,14 @@ fileInput.onchange = async () => {
   if (!file) {status.textContent = 'Choose your base ROM'; return;}
   status.textContent = 'Checking ROM and applying mod...';
   try {
-    const response = await fetch('./wolfen.patch.json', {cache: 'no-store'});
+    const response = await fetch('./wolfen.patch.json?v=zip-1', {cache: 'no-store'});
     if (!response.ok) throw new Error('The game patch could not be loaded. Reload and try again.');
     const patch = await response.json();
     if (window.STARWOLF_build && !patch.target?.sha256?.startsWith(window.STARWOLF_build)) {
       throw new Error('The game update is incomplete. Reload and try again.');
     }
-    if (file.size !== patch.base?.size) {
-      throw new Error('Choose an extracted, unmodified Star Fox 64 US v1.1 ROM.');
-    }
-    const patched = await prepareRom(new Uint8Array(await file.arrayBuffer()), patch);
+    const original = await readRomFile(file, patch.base?.size);
+    const patched = await prepareRom(original, patch);
     if (current !== selection) return;
     romUrl = URL.createObjectURL(new Blob([patched], {type: 'application/octet-stream'}));
     window.EJS_gameUrl = romUrl;

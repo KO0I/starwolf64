@@ -12,7 +12,7 @@ from rom_patch import create_patch
 ROOT = Path(__file__).resolve().parents[1]
 BASE_NAME = "Star Fox 64 (U) (V1.1) [!].z64"
 BASE_SHA1 = "09f0d105f476b00efa5303a3ebc42e60a7753b7a"
-ASSETS = ("client.js", "rom-patch.mjs", "coi-serviceworker.js",
+ASSETS = ("client.js", "rom-patch.mjs", "rom-file.mjs", "coi-serviceworker.js",
           "coi-serviceworker.LICENSE", "Arwing-source.txt")
 
 

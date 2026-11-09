@@ -66,7 +66,8 @@ def create_patch(source, target):
     patch = {
         "format": FORMAT,
         "base": {"name": "Star Fox 64 (USA), Rev 1", "size": len(source),
-                 "sha1": hashlib.sha1(source).hexdigest()},
+                 "sha1": hashlib.sha1(source).hexdigest(),
+                 "sha256": hashlib.sha256(source).hexdigest()},
         "target": {"size": len(target), "sha256": hashlib.sha256(target).hexdigest()},
         "segments": segments,
         "writes": writes,

@@ -11,7 +11,7 @@ function fixture() {
   target[4] = 99;
   const patch = {
     format: 'starwolf64-delta-v1',
-    base: {size: source.length, sha1: hash('sha1', source)},
+    base: {size: source.length, sha1: hash('sha1', source), sha256: hash('sha256', source)},
     target: {size: target.length, sha256: hash('sha256', target)},
     segments: [], writes: [[4, b64([99])], [8, b64([5, 6, 7, 8])]],
   };
@@ -59,4 +59,10 @@ test('MIO0 expands literal bytes and overlapping back references', () => {
   assert.equal(new TextDecoder().decode(decompressMio0(bytes)), 'ABCABCABC');
   view.setUint16(17, 0x3008);
   assert.throws(() => decompressMio0(bytes), /invalid compressed data/);
+});
+
+test('a mismatched base SHA-256 is rejected even with a matching SHA-1', async () => {
+  const {source, patch} = fixture();
+  patch.base.sha256 = '0'.repeat(64);
+  await assert.rejects(prepareRom(source, patch), /unmodified Star Fox 64/);
 });

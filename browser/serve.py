@@ -10,6 +10,7 @@ FILES = {
     "/": ("index.html", "text/html; charset=utf-8"),
     "/index.html": ("index.html", "text/html; charset=utf-8"),
     "/client.js": ("client.js", "text/javascript; charset=utf-8"),
+    "/rom-file.mjs": ("rom-file.mjs", "text/javascript; charset=utf-8"),
     "/rom-patch.mjs": ("rom-patch.mjs", "text/javascript; charset=utf-8"),
     "/coi-serviceworker.js": ("coi-serviceworker.js", "text/javascript; charset=utf-8"),
     "/wolfen.patch.json": ("wolfen.patch.json", "application/json"),
