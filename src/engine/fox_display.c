@@ -2,6 +2,7 @@
 #include "wolfen.h"
 #include "mods/hit64.c"
 #include "assets/ast_arwing.h"
+#include "assets/vitzy_fighter.h"
 #include "assets/ast_allies.h"
 #include "assets/ast_landmaster.h"
 #include "assets/ast_versus.h"
@@ -372,7 +373,7 @@ void Display_Landmaster(Player* player) {
 }
 
 Gfx* sFaceDL[] = { aAwFoxHeadDL, aAwFalcoHeadDL, aAwSlippyHeadDL, aAwPeppyHeadDL };
-Gfx* sExpertFaceDL[] = { aAwJamesHeadDL, aAwFalcoHeadDL, aAwSlippyHeadDL, aAwPeppyHeadDL };
+Gfx* sExpertFaceDL[] = { gVitzyHeadDL, aAwFalcoHeadDL, aAwSlippyHeadDL, aAwPeppyHeadDL };
 f32 D_display_800CA28C = 2.0f;
 f32 D_display_800CA290 = 13.0f;
 f32 D_display_800CA294 = -10.0f;
@@ -510,6 +511,10 @@ void Display_SetCullingMode(void) {
     }
 }
 
+static bool Display_IsVitzyArwing(const ArwingInfo* arwing) {
+    return Player_IsVitzy(0) && ((arwing == &gPlayer[0].arwing) || (arwing->drawFace == 1));
+}
+
 bool Display_ArwingWingsOverrideLimbDraw(s32 limbIndex, Gfx** gfxPtr, Vec3f* pos, Vec3f* rot, void* wingData) {
     ArwingInfo* arwing = (ArwingInfo*) wingData;
 
@@ -588,6 +593,29 @@ bool Display_ArwingWingsOverrideLimbDraw(s32 limbIndex, Gfx** gfxPtr, Vec3f* pos
             break;
     }
 
+    if (Display_IsVitzyArwing(arwing)) {
+        switch (limbIndex) {
+            case 17:
+                *gfxPtr = (Gfx*) gVitzyBodyDL;
+                break;
+            case 12:
+                if (*gfxPtr != NULL) {
+                    *gfxPtr = (Gfx*) ((arwing->leftWingState == WINGSTATE_BROKEN)
+                                         ? gVitzyRightWingBrokenDL : gVitzyRightWingDL);
+                }
+                break;
+            case 13:
+                if (*gfxPtr != NULL) {
+                    *gfxPtr = (Gfx*) ((arwing->rightWingState == WINGSTATE_BROKEN)
+                                         ? gVitzyLeftWingBrokenDL : gVitzyLeftWingDL);
+                }
+                break;
+            default:
+                *gfxPtr = NULL;
+                break;
+        }
+    }
+
     switch (limbIndex) {
         case 1:
             rot->y -= arwing->upperRightFlapYrot;
@@ -622,6 +650,7 @@ bool Display_ArwingWingsOverrideLimbDraw(s32 limbIndex, Gfx** gfxPtr, Vec3f* pos
 void Display_ArwingWings(ArwingInfo* arwing) {
     Vec3f frameTable[30];
     s32 drawFace;
+    bool vitzy = Display_IsVitzyArwing(arwing);
 
     Matrix_Push(&gGfxMatrix);
 
@@ -645,7 +674,7 @@ void Display_ArwingWings(ArwingInfo* arwing) {
 
     D_display_800CA22C = false;
 
-    drawFace = arwing->drawFace;
+    drawFace = vitzy ? 3 : arwing->drawFace;
     if (D_display_800CA220 != 0) {
         drawFace = true;
     }
@@ -670,7 +699,9 @@ void Display_ArwingWings(ArwingInfo* arwing) {
 
         Matrix_SetGfxMtx(&gMasterDisp);
 
-        if (gExpertMode) {
+        if (vitzy) {
+            gSPDisplayList(gMasterDisp++, gVitzyHeadDL);
+        } else if (gExpertMode) {
             gSPDisplayList(gMasterDisp++, sExpertFaceDL[drawFace - 1]);
         } else {
             gSPDisplayList(gMasterDisp++, sFaceDL[drawFace - 1]);
@@ -690,7 +721,7 @@ void Display_ArwingWings(ArwingInfo* arwing) {
         (gCurrentLevel == LEVEL_CORNERIA)) {
         gDPSetPrimColor(gMasterDisp++, 0x00, 0x00, 255, 255, 255, 120);
         gSPClearGeometryMode(gMasterDisp++, G_CULL_BACK);
-        gSPDisplayList(gMasterDisp++, D_arwing_30194E0);
+        gSPDisplayList(gMasterDisp++, vitzy ? gVitzyCanopyDL : D_arwing_30194E0);
         RCP_SetupDL_46();
         gDPSetPrimColor(gMasterDisp++, 0x00, 0x00, 255, 255, 255, 100);
         gSPDisplayList(gMasterDisp++, D_arwing_30183D0);
@@ -698,7 +729,7 @@ void Display_ArwingWings(ArwingInfo* arwing) {
         RCP_SetupDL_46();
         gDPSetPrimColor(gMasterDisp++, 0x00, 0x00, 255, 255, 255, 140);
         gSPClearGeometryMode(gMasterDisp++, G_CULL_BACK);
-        gSPDisplayList(gMasterDisp++, D_arwing_30194E0);
+        gSPDisplayList(gMasterDisp++, vitzy ? gVitzyCanopyDL : D_arwing_30194E0);
     }
 
     gSPSetGeometryMode(gMasterDisp++, G_CULL_BACK);
@@ -922,6 +953,9 @@ void Display_DrawEngineGlow(EngineGlowColor color) {
         case EG_GREEN:
             gDPSetEnvColor(gMasterDisp++, 0, 255, 0, 255);
             break;
+        case EG_PINK:
+            gDPSetEnvColor(gMasterDisp++, 255, 80, 192, 255);
+            break;
         case EG_ORANGE:
             gDPSetEnvColor(gMasterDisp++, 255, 64, 0, 255);
             break;
@@ -953,7 +987,8 @@ void Display_LandmasterEngineGlow_Draw(Player* player) {
         Matrix_Scale(gGfxMatrix, 0.9f * 0.9f, 0.9f * 0.63f, 1.0f, MTXF_APPLY);
     }
     Matrix_SetGfxMtx(&gMasterDisp);
-    Display_DrawEngineGlow(EG_GREEN);
+    Display_DrawEngineGlow((player->form == FORM_ARWING) &&
+                           (Player_IsVitzy(player->num) || (gLevelType == LEVELTYPE_SPACE)) ? EG_PINK : EG_GREEN);
     Matrix_Pop(&gGfxMatrix);
 
     FrameInterpolation_RecordCloseChild();
@@ -1097,6 +1132,12 @@ void Display_ArwingLaserCharge(Player* player) {
                     gDPSetEnvColor(gMasterDisp++, 32, 32, 255, 128);
                     break;
             }
+        } else if (Player_IsVitzy(player->num)) {
+            if (gLaserStrength[player->num] == LASERS_HYPER) {
+                gDPSetEnvColor(gMasterDisp++, 0, 128, 255, 128);
+            } else {
+                gDPSetEnvColor(gMasterDisp++, 255, 255, 0, 128);
+            }
         } else {
             gDPSetEnvColor(gMasterDisp++, 255, 0, 0, 128);
         }
@@ -1142,8 +1183,10 @@ void Display_ArwingLaserCharge(Player* player) {
 
         switch (laserStrength) {
             case LASERS_SINGLE:
-                gDPSetPrimColor(gMasterDisp++, 0x00, 0x00, 255, 192, 192, 128);
-                gDPSetEnvColor(gMasterDisp++, 255, 64, 64, 128);
+                gDPSetPrimColor(gMasterDisp++, 0x00, 0x00, 255, Player_IsVitzy(player->num) ? 255 : 192,
+                                192, 128);
+                gDPSetEnvColor(gMasterDisp++, 255, Player_IsVitzy(player->num) ? 255 : 64,
+                               Player_IsVitzy(player->num) ? 0 : 64, 128);
                 if (player->alternateView && (gLevelMode == LEVELMODE_ON_RAILS)) {
                     Matrix_MultVec3f(gCalcMatrix, &spB8, &sp94);
                 } else {
@@ -1170,8 +1213,10 @@ void Display_ArwingLaserCharge(Player* player) {
             case LASERS_TWIN:
             case LASERS_HYPER:
                 if (laserStrength == LASERS_TWIN) {
-                    gDPSetPrimColor(gMasterDisp++, 0x00, 0x00, 255, 192, 192, 128);
-                    gDPSetEnvColor(gMasterDisp++, 255, 64, 64, 128);
+                    gDPSetPrimColor(gMasterDisp++, 0x00, 0x00, 255, Player_IsVitzy(player->num) ? 255 : 192,
+                                192, 128);
+                    gDPSetEnvColor(gMasterDisp++, 255, Player_IsVitzy(player->num) ? 255 : 64,
+                               Player_IsVitzy(player->num) ? 0 : 64, 128);
                 } else {
                     gDPSetPrimColor(gMasterDisp++, 0x00, 0x00, 128, 255, 255, 160);
                     gDPSetEnvColor(gMasterDisp++, 128, 128, 255, 160);

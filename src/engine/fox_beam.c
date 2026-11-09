@@ -1,4 +1,5 @@
 #include "global.h"
+#include "assets/vitzy_fighter.h"
 #include "assets/ast_landmaster.h"
 #include "assets/ast_aquas.h"
 #include "assets/ast_great_fox.h"
@@ -1102,7 +1103,7 @@ void PlayerShot_DrawLaser(PlayerShot* shot) {
     f32 twinLaserSeparation;
     Gfx* dList;
 
-    dList = D_101AED0;
+    dList = (Player_IsVitzy(shot->sourceId) && (shot->unk_58 == 0)) ? (Gfx*) gVitzyLaserDL : D_101AED0;
     if (gCamCount < 4) {
         RCP_SetupDL_21();
         twinLaserSeparation = 9.0f;
@@ -1160,7 +1161,7 @@ void PlayerShot_DrawLaser(PlayerShot* shot) {
                     Matrix_Scale(gGfxMatrix, width, width, length, MTXF_APPLY);
                     Matrix_RotateY(gGfxMatrix, M_PI, MTXF_APPLY);
                     Matrix_SetGfxMtx(&gMasterDisp);
-                    gSPDisplayList(gMasterDisp++, D_101AED0);
+                    gSPDisplayList(gMasterDisp++, dList);
                     break;
                 case 1:
                     Matrix_Translate(gGfxMatrix, 0.0f, 0.f, 150.0f, MTXF_APPLY);
@@ -1471,6 +1472,12 @@ void PlayerShot_DrawShot(PlayerShot* shot) {
                             case 3:
                                 gDPSetEnvColor(gMasterDisp++, 32, 32, 255, 255);
                                 break;
+                        }
+                    } else if (Player_IsVitzy(shot->sourceId)) {
+                        if (gLaserStrength[shot->sourceId] == LASERS_HYPER) {
+                            gDPSetEnvColor(gMasterDisp++, 0, 128, 255, 255);
+                        } else {
+                            gDPSetEnvColor(gMasterDisp++, 255, 255, 0, 255);
                         }
                     } else {
                         gDPSetEnvColor(gMasterDisp++, 255, 0, 0, 255);

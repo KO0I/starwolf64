@@ -55,7 +55,8 @@ typedef enum EngineGlowColor {
     /* 0 */ EG_RED,
     /* 1 */ EG_BLUE,
     /* 2 */ EG_GREEN,
-    /* 3 */ EG_ORANGE
+    /* 3 */ EG_ORANGE,
+    /* 4 */ EG_PINK
 } EngineGlowColor;
 
 typedef enum LevelMode {

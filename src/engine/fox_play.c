@@ -3013,6 +3013,10 @@ void Play_Init(void) {
     Play_InitLevel();
 }
 
+bool Player_IsVitzy(s32 playerNum) {
+    return !gVersusMode && gExpertMode && (playerNum == 0);
+}
+
 void Player_SetupArwingShot(Player* player, PlayerShot* shot, f32 arg2, f32 arg3, PlayerShotId shotId, f32 speed) {
     Vec3f sp44;
     Vec3f sp38;

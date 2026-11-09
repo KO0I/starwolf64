@@ -2353,11 +2353,11 @@ void Title_Arwing_DrawEngineGlow(TitleTeam teamIdx) {
     if (sTitleArwing[teamIdx].unk_40 == 1) {
         var_fa0 = -30.0f;
         var_fv1 = 0.02f;
-        gDPSetEnvColor(gMasterDisp++, 128, 128, 255, 255);
+        gDPSetEnvColor(gMasterDisp++, 255, 128, 216, 255);
     } else {
         var_fa0 = -65.0f;
         var_fv1 = 0.2f;
-        gDPSetEnvColor(gMasterDisp++, 0, 0, 255, 255);
+        gDPSetEnvColor(gMasterDisp++, 255, 80, 192, 255);
     }
 
     engineGlowScale = sTitleArwing[teamIdx].unk_44;

@@ -444,6 +444,7 @@ bool Play_CheckMedalStatus(u16);
 void Play_dummy_MuteSfx(void);
 s32 Play_GetMaxShields(void);
 void Play_PlaySfxFirstPlayer(f32*, u32);
+bool Player_IsVitzy(s32 playerNum);
 void Player_SetupArwingShot(Player* player, PlayerShot* shot, f32 arg2, f32 arg3, PlayerShotId shotId, f32 speed);
 void Play_Setup(void);
 void Play_InitEnvironment(void);

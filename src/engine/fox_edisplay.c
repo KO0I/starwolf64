@@ -6,6 +6,7 @@
 #include "prevent_bss_reordering.h"
 #include "global.h"
 #include "wolfen.h"
+#include "assets/vitzy_fighter.h"
 #include "sf64object.h"
 #include "assets/ast_katina.h"
 #include "assets/ast_venom_1.h"
@@ -476,6 +477,14 @@ void Actor_DrawEngineAndContrails(Actor* this) {
     f32 temp1;
     f32 sp54;
     s32 pad[5];
+    bool wolfen = (this->obj.id == OBJ_ACTOR_TEAM_ARWING) ||
+                  ((this->obj.id == OBJ_ACTOR_ALLRANGE) && (this->aiType >= AI360_FOX) &&
+                   (this->aiType <= AI360_PEPPY)) ||
+                  ((this->obj.id == OBJ_ACTOR_CUTSCENE) && (this->animFrame == ACTOR_CS_TEAM_ARWING)) ||
+                  ((this->obj.id == OBJ_ACTOR_EVENT) &&
+                   ((this->eventType == EVID_TEAMMATE) || (this->eventType == EVID_ME_SLIPPY)));
+    bool vitzy = (Player_IsVitzy(0) && wolfen && (this->iwork[TEAM_FACE] == 1)) ||
+                 ((this->obj.id == OBJ_ACTOR_CUTSCENE) && (this->animFrame == ACTOR_CS_JAMES_ARWING));
 
     if ((this->iwork[11] != 0) && (this->obj.status == OBJ_ACTIVE)) {
         temp1 = 652.5f * 0.001f; // 0.65250003f;
@@ -498,7 +507,7 @@ void Actor_DrawEngineAndContrails(Actor* this) {
         Matrix_RotateY(gGfxMatrix, -gPlayer[gPlayerNum].camYaw, MTXF_APPLY);
         Matrix_RotateX(gGfxMatrix, gPlayer[gPlayerNum].camPitch, MTXF_APPLY);
         Matrix_SetGfxMtx(&gMasterDisp);
-        Display_DrawEngineGlow(EG_GREEN);
+        Display_DrawEngineGlow(vitzy || (wolfen && (gLevelType == LEVELTYPE_SPACE)) ? EG_PINK : EG_GREEN);
         Matrix_Pop(&gGfxMatrix);
     }
 
@@ -537,6 +546,11 @@ f32 D_edisplay_800CFCA0[] = {
 
 void Actor_DrawEngineGlow(Actor* actor, EngineGlowColor color) {
     f32 scale;
+
+    if ((gLevelType == LEVELTYPE_SPACE) && (actor->obj.id == OBJ_ACTOR_ALLRANGE) &&
+        (actor->aiType >= AI360_WOLF) && (actor->aiType <= AI360_ANDREW)) {
+        color = EG_PINK;
+    }
 
     if ((actor->iwork[11] != 0) && (actor->obj.status == OBJ_ACTIVE)) {
         scale = 0.63f;
@@ -600,6 +614,8 @@ void ActorTeamArwing_Draw(ActorTeamArwing* this) {
                 gActorTeamArwing.upperLeftFlapYrot = gActorTeamArwing.bottomLeftFlapYrot = 0.0f;
         }
         Display_ArwingWings(&gActorTeamArwing);
+    } else if (Player_IsVitzy(0) && (this->iwork[TEAM_FACE] == 1)) {
+        gSPDisplayList(gMasterDisp++, gVitzyHullDL);
     } else if (gLevelType == LEVELTYPE_PLANET) {
         gSPDisplayList(gMasterDisp++, D_ENMY_PLANET_40018A0);
     } else if (gPlayer[0].wingPosition == 2) {

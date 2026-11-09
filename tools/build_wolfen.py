@@ -272,6 +272,7 @@ class Builder:
             source = self.original_arwing if stem == 'ast_arwing' else self.segments[stem]
             stream = commands(source, offset)
             cache, vertex_pointer = {}, None
+            owners, required_loads = {}, set()
             selected = {}
             active = None
             for index, (w0, w1) in enumerate(stream):
@@ -280,12 +281,14 @@ class Builder:
                     active, vertex_pointer = index, w1 & 0xFFFFFF
                     for i in range(w0 >> 10 & 63):
                         cache[(w0 >> 17 & 127) + i] = self.source_position(stem, struct.unpack_from('>hhh', source, vertex_pointer + i * 16))
+                        owners[(w0 >> 17 & 127) + i] = index
                 elif opcode in (0xB1, 0xBF):
                     for packed in ((w0 & 0xFFFFFF, w1) if opcode == 0xB1 else (w1,)):
                         ids = [(packed >> shift & 255) // 2 for shift in (16, 8, 0)]
                         points = [cache[i] for i in ids]
                         if keep(vertex_pointer, points, ids):
                             selected.setdefault(active, []).append((index, packed))
+                            required_loads.update(owners[i] for i in ids)
                             triangles.append([transform(matrix, v) for v in points])
             # Keep complete texture setup sequences only for materials with
             # surviving triangles, including tile commands before SetTextureImage.
@@ -310,13 +313,13 @@ class Builder:
                 for index, packed in entries:
                     selected_triangles.setdefault(index, []).append(packed)
             for index, (w0, w1) in enumerate(stream):
-                if index not in material_indices:
+                if index not in material_indices and index not in required_loads:
                     continue
                 opcode = w0 >> 24
                 if opcode == 0xB8:
                     continue
                 if opcode == 4:
-                    if index not in selected:
+                    if index not in required_loads:
                         continue
                     count, start = w0 >> 10 & 63, w0 >> 17 & 127
                     address, path = self.vertex(stem, w1, count, matrix)
@@ -512,6 +515,8 @@ class Builder:
         build_lod(self, crc64)
         from wolf_character import build_character
         build_character(self)
+        from vitzy_fighter import build_fighter
+        build_fighter(self)
         return wing_parts
 
     def patched_rom(self):
@@ -535,6 +540,8 @@ class Builder:
         return out
 
     def verify(self, patched):
+        from vitzy_fighter import verify_fighter
+        verify_fighter(self)
         title = self.segments['ast_title']
         before_character = self.character.original['ast_title']
         from wolf_logo import SIZE as logo_size, verify_title_logo
@@ -581,7 +588,7 @@ class Builder:
             if data[4:8] != b'TLDO':
                 continue
             offset = 88
-            count = 0
+            loaded = set()
             while offset < len(data):
                 w0, w1 = struct.unpack_from('<II', data, offset)
                 opcode = w0 >> 24
@@ -592,10 +599,11 @@ class Builder:
                         raise ValueError(f'Unresolved resource in {name}')
                     offset += 8
                     if opcode == 0x32:
-                        count = w0 >> 12 & 255
+                        count, end = w0 >> 12 & 255, w0 >> 1 & 127
+                        loaded.update(range(end - count, end))
                 elif opcode in (0xBF, 0xB1):
                     for packed in ((w0 & 0xFFFFFF, w1) if opcode == 0xB1 else (w1,)):
-                        if any((packed >> bit & 255) // 2 >= count for bit in (16, 8, 0)):
+                        if any((packed >> bit & 255) // 2 not in loaded for bit in (16, 8, 0)):
                             raise ValueError(f'Invalid triangle in {name}')
         for stem, segment, target in self.mesh_targets + self.lod_targets:
             data = self.segments[stem]
