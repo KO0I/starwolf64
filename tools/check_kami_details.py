@@ -35,8 +35,10 @@ def inspect(resources, path):
                         rgb = [(pixel >> shift & 31) * 255 / 31 for shift in (11, 6, 1)]
                         if max(rgb) < 8:
                             texture = 'black_eye_details'
-                        elif rgb[0] > 200 and rgb[1] < 90:
+                        elif rgb[0] > 200 and rgb[1] < 90 and rgb[2] < 140:
                             texture = 'red_nose'
+                        elif rgb[0] > 240 and rgb[1] < 100 and rgb[2] > 145:
+                            texture = 'pink_horn_bands'
                         elif rgb[1] > rgb[0] and rgb[2] > rgb[0]:
                             texture = 'teal_snout'
             elif opcode == 0x31:
@@ -63,7 +65,8 @@ def inspect(resources, path):
                 group = groups.setdefault(texture, [])
                 group.append(vertices[ids])
     assert not stack and scale == 1., 'Kami details leaked a modelview transform'
-    expected = {'teal_snout': 10, 'red_nose': 2, 'black_eye_details': 22}
+    expected = {'teal_snout': 10, 'red_nose': 2, 'black_eye_details': 28}
+    assert len(groups.get('pink_horn_bands', [])) >= 4, f'{path}: horn bands are missing'
     for name, count in expected.items():
         faces = np.array(groups[name])
         assert len(faces) == count, f'{path}: missing {name} triangles'
@@ -87,7 +90,7 @@ def main():
         destination.parent.mkdir(parents=True, exist_ok=True)
         destination.write_text(json.dumps(result, indent=2) + '\n')
         for variant, parts in result.items():
-            print(f'{variant}: 12 snout/nose + 6 lash + 16 lower-eyeliner triangles survive native packing; '
+            print(f'{variant}: 12 snout/nose + 12 lash + 16 lower-eyeliner triangles survive native packing; '
                   f'smallest eye triangle {parts["black_eye_details"]["min_area"]:.5f}', flush=True)
     print('PASS: all three Kami heads retain their facial geometry and restore matrix state')
 

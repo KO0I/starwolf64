@@ -17,7 +17,7 @@ def append_accessor(glb, values, kind):
 
 
 def add_details(glb, pilot=False):
-    """Keep original triangles and append 34 triangles bound to the existing head."""
+    """Keep original triangles and append surface-fitted details to the existing head."""
     name = 'Kami_pilot_head' if pilot else 'Kami_head_without_headset'
     node_index = next(i for i, node in enumerate(glb.doc['nodes']) if node.get('name') == name)
     mesh = glb.doc['meshes'][glb.doc['nodes'][node_index]['mesh']]
@@ -140,6 +140,49 @@ def add_details(glb, pilot=False):
             tip = root + up * (eye_span * (.080 + index * .012)) + across * (outward * eye_span * .035)
             tip += forward * (eye_span * .015)
             eye_faces.append([root - width, root + width, tip])
+        for index, (root, normal) in enumerate(line[1:4]):
+            root = root + normal * (offset * 1.6)
+            width = across * (eye_span * .027)
+            outward = side if pilot else -side
+            tip = root - up * (eye_span * (.070 + (.012 if index == 1 else 0)))
+            tip += across * (outward * eye_span * (index - 1) * .016) + forward * (eye_span * .022)
+            eye_faces.append([root - width, tip, root + width])
     primitive('black_lashes_and_lower_liner', eye_faces, [.004, .004, .006], 1.)
+    def add_horn_bands():
+        bands = []
+        for triangle, uv, normal in zip(triangles, texture_coords, normals):
+            if pilot:
+                if triangle[:, 1].min() < eye_span * 2.8:
+                    continue
+                regions = [(.500, .749, 0., 342.5 / 512, 7.5 / 512)]
+            else:
+                if triangle[:, 0].min() < eye_span * 2 or triangle[:, 2].max() > -eye_span * .25:
+                    continue
+                regions = [(.027, .053, 1., .570, .0035), (.074, .100, -1., .445, .0035)]
+            for low, high, slope, center_band, half_band in regions:
+                polygon = [np.r_[coord, point, direction] for coord, point, direction in zip(uv, triangle, normal)]
+                for coefficients, boundary in [(np.array([1., 0.]), low), (np.array([-1., 0.]), -high),
+                                                (np.array([slope, 1.]), center_band - half_band),
+                                                (np.array([-slope, -1.]), -center_band - half_band)]:
+                    clipped = []
+                    for a, b in zip(polygon, polygon[1:] + polygon[:1]):
+                        da, db = a[:2] @ coefficients - boundary, b[:2] @ coefficients - boundary
+                        if da >= 0:
+                            clipped.append(a)
+                        if (da >= 0) != (db >= 0):
+                            clipped.append(a + (b - a) * da / (da - db))
+                    polygon = clipped
+                    if not polygon:
+                        break
+                for i in range(1, len(polygon) - 1):
+                    face = np.array([p[2:5] + p[5:8] / np.linalg.norm(p[5:8]) * offset
+                                     for p in [polygon[0], polygon[i], polygon[i + 1]]])
+                    packed = np.rint(face * 8)
+                    if np.linalg.norm(np.cross(packed[1] - packed[0], packed[2] - packed[0])) > 0:
+                        bands.append(face)
+        if not bands:
+            raise ValueError('Kami horn stripe did not intersect the horn surfaces')
+        primitive('clear_pink_horn_bands', bands, [1., .26, .62], .95)
+    add_horn_bands()
     return {'source_head_triangles': len(triangles), 'added_triangles': sum(generated.values()),
             'parts': generated, 'eye_span': float(eye_span), 'nose_root': center.tolist()}
