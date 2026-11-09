@@ -1,0 +1,79 @@
+newmtl ast_versus_28130_glove
+Kd 1 1 1
+Ka 0 0 0
+map_Kd -clamp on textures/ast_versus_28130_glove.png
+
+newmtl ast_versus_25C68_jacket
+Kd 1 1 1
+Ka 0 0 0
+map_Kd -clamp on textures/ast_versus_25C68_jacket.png
+
+newmtl ast_versus_26A38_metal
+Kd 1 1 1
+Ka 0 0 0
+map_Kd -clamp on textures/ast_versus_26A38_metal.png
+
+newmtl ast_versus_261A0_trousers
+Kd 1 1 1
+Ka 0 0 0
+map_Kd -clamp on textures/ast_versus_261A0_trousers.png
+
+newmtl ast_versus_E680_equipment
+Kd 1 1 1
+Ka 0 0 0
+map_Kd -clamp on textures/ast_versus_E680_equipment.png
+
+newmtl ast_versus_EA80_equipment
+Kd 1 1 1
+Ka 0 0 0
+map_Kd -clamp on textures/ast_versus_EA80_equipment.png
+
+newmtl ast_versus_28230_equipment
+Kd 1 1 1
+Ka 0 0 0
+map_Kd -clamp on textures/ast_versus_28230_equipment.png
+
+newmtl ast_versus_26CB8_eye_fur
+Kd 1 1 1
+Ka 0 0 0
+map_Kd -clamp on textures/ast_versus_26CB8_eye_fur.png
+
+newmtl ast_versus_26DB8_eye_fur
+Kd 1 1 1
+Ka 0 0 0
+map_Kd -clamp on textures/ast_versus_26DB8_eye_fur.png
+
+newmtl ast_versus_26AB8_fur
+Kd 1 1 1
+Ka 0 0 0
+map_Kd -clamp on textures/ast_versus_26AB8_fur.png
+
+newmtl ast_versus_26B38_fur
+Kd 1 1 1
+Ka 0 0 0
+map_Kd -clamp on textures/ast_versus_26B38_fur.png
+
+newmtl ast_versus_26BB8_fur
+Kd 1 1 1
+Ka 0 0 0
+map_Kd -clamp on textures/ast_versus_26BB8_fur.png
+
+newmtl ast_versus_26C38_fur
+Kd 1 1 1
+Ka 0 0 0
+map_Kd -clamp on textures/ast_versus_26C38_fur.png
+
+newmtl ast_versus_26EB8_fur
+Kd 1 1 1
+Ka 0 0 0
+map_Kd -clamp on textures/ast_versus_26EB8_fur.png
+
+newmtl ast_versus_27268_vest
+Kd 1 1 1
+Ka 0 0 0
+map_Kd -clamp on textures/ast_versus_27268_vest.png
+
+newmtl ast_versus_1C9B0_eye_fur
+Kd 1 1 1
+Ka 0 0 0
+map_Kd -clamp on textures/ast_versus_1C9B0_eye_fur.png

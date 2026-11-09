@@ -1,0 +1,21 @@
+{
+  "character": "Fox",
+  "segment": "ast_title",
+  "skeleton": "aFoxSkel",
+  "limbs": 22,
+  "mesh_limbs": 16,
+  "triangles": 461,
+  "textures": 16,
+  "materials": 16,
+  "animations": {
+    "aFoxRunningAnim": 60,
+    "aFoxAnim": 200,
+    "D_TITLE_602A710": 60,
+    "D_TITLE_601F8E0": 15,
+    "D_TITLE_60246F8": 10
+  },
+  "animation_fps": 30,
+  "units": "original N64 model units",
+  "root_motion": "source",
+  "notes": "Rigid animated limb hierarchy. Source root translation matches mode 0; fixed translation matches modes 1/5. Game runtime pose overrides and N64 lighting/combiners are not baked."
+}

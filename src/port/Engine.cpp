@@ -38,6 +38,7 @@
 #include <BlobFactory.h>
 #include <VertexFactory.h>
 #include "audio/GameAudio.h"
+#include "audio/CrewChatter.h"
 #include "port/patches/DisplayListPatch.h"
 #include "port/mods/PortEnhancements.h"
 
@@ -396,6 +397,7 @@ void GameEngine::HandleAudioThread() {
             AudioThread_CreateNextAudioBuffer(audio_buffer + i * (num_audio_samples * num_audio_channels),
                                               num_audio_samples);
         }
+        CrewChatter_Mix(audio_buffer, num_audio_samples * AUDIO_FRAMES_PER_UPDATE, num_audio_channels);
 #ifdef PIPE_DEBUG
         if (outfile.is_open()) {
             outfile.write(reinterpret_cast<char*>(audio_buffer),
@@ -414,6 +416,7 @@ void GameEngine::HandleAudioThread() {
 }
 
 void GameEngine::StartAudioFrame() {
+    CrewChatter_Commit();
     {
         std::unique_lock<std::mutex> Lock(audio.mutex);
         audio.processing = true;

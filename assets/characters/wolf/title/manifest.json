@@ -1,0 +1,20 @@
+{
+  "character": "Wolf",
+  "segment": "ast_title",
+  "skeleton": "aFoxSkel",
+  "limbs": 22,
+  "mesh_limbs": 16,
+  "triangles": 461,
+  "textures": 16,
+  "materials": 16,
+  "animations": {
+    "aFoxRunningAnim": 60,
+    "aFoxAnim": 200
+  },
+  "animation_fps": 30,
+  "units": "original N64 model units",
+  "notes": "Rigid animated limb hierarchy. Root motion fixed to skeleton origin as in mode 1/5. Game runtime pose overrides and N64 lighting/combiners are not baked.",
+  "appearance_source": "build-cmake/mods/wolfen.o2r",
+  "appearance_verified": "Reconstructed texture, display-list, and vertex resources match installed Wolf mod byte for byte.",
+  "rig": "Fox original rig with current Wolf skin and geometry edits; head remains WIP."
+}

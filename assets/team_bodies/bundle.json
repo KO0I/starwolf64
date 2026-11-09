@@ -1,0 +1,34 @@
+{
+  "characters": [
+    "peppy",
+    "slippy",
+    "falco"
+  ],
+  "variants": {
+    "title": "Detailed full-body title/cutscene model",
+    "on_foot": "Low-poly versus full-body model, including weapon"
+  },
+  "contents": {
+    "body.glb": "Self-contained textured model with rigid animated limb nodes, two title or three versus clips at 30 FPS",
+    "body.obj": "Static frame-zero mesh with body.mtl and external PNG textures",
+    "native/": "Unmodified native skeletons, limbs, display lists, vertices, textures and animation resources, plus dependency/hash manifests",
+    "preview.png": "Rendered directly from all six GLB exports",
+    "verification.json": "Geometry, hierarchy, animation and texture verification results"
+  },
+  "notes": [
+    "Preserves original N64 units and Y-up coordinates.",
+    "GLB animation uses a rigid node hierarchy rather than a weighted skin.",
+    "Root translation is fixed to the limb origin, matching game modes 1/5.",
+    "N64 lighting/combiners and runtime character pose overrides are not reproduced.",
+    "Native files retain complete original animation data."
+  ],
+  "reproduce": [
+    "python3 tools/extract_team_bodies.py",
+    "python3 tools/export_team_bodies.py",
+    "python3 tools/check_team_bodies.py"
+  ],
+  "dependencies": {
+    "extract_export": "Python standard library",
+    "verification_preview": "NumPy and Pillow"
+  }
+}

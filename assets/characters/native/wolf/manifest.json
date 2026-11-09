@@ -1,0 +1,1194 @@
+{
+  "character": "Wolf",
+  "source": "sf64.o2r",
+  "roots": [
+    "ast_title/aFoxSkel",
+    "ast_title/aFoxRunningAnim",
+    "ast_title/aFoxAnim",
+    "ast_versus/aVsOnFootFoxSkel",
+    "ast_versus/D_versus_301CCE4",
+    "ast_versus/D_versus_301CFEC",
+    "ast_versus/D_versus_301D3DC"
+  ],
+  "files": {
+    "ast_title/D_TITLE_601E430": {
+      "sha256": "2411898bbd5b551ada15a72b0fc70f7e59632d4f0fda85f39b6c0139447a387c",
+      "dependencies": [
+        "wolf_character/ast_title_1F200_glove",
+        "ast_title/ast_title_seg6_vtx_1E530",
+        "wolf_character/ast_title_1F400_glove",
+        "ast_title/ast_title_seg6_vtx_1E5B0",
+        "wolf_character/ast_title_1EA00_glove",
+        "ast_title/ast_title_seg6_vtx_1E650"
+      ],
+      "source": "wolfen.o2r"
+    },
+    "ast_title/D_TITLE_601E720": {
+      "sha256": "165dfb08a1566c2756ecdf5e4989a62ae499e01ce3adb91a718a72a4a5a24192",
+      "dependencies": [
+        "wolf_character/ast_title_1EA00_glove",
+        "ast_title/ast_title_seg6_vtx_1E820",
+        "wolf_character/ast_title_1F200_glove",
+        "ast_title/ast_title_seg6_vtx_1E900",
+        "wolf_character/ast_title_1F400_glove",
+        "ast_title/ast_title_seg6_vtx_1E9C0"
+      ],
+      "source": "wolfen.o2r"
+    },
+    "ast_title/aFoxAnim": {
+      "sha256": "582689b3c0684e262b554cd301f9d3d484ff32b9c30b8df5503932870e9b106d",
+      "dependencies": [],
+      "source": "sf64.o2r"
+    },
+    "ast_title/aFoxRunningAnim": {
+      "sha256": "fc538241226802cf36a2e287fdec086fb832979688e9780cd64eb0b25bf748ba",
+      "dependencies": [],
+      "source": "sf64.o2r"
+    },
+    "ast_title/aFoxSkel": {
+      "sha256": "333657b072bf085b4d0d22a7ab0e86509a69167c17d02b29b21675b9b8a12e81",
+      "dependencies": [
+        "ast_title/aFoxSkel_limb_0",
+        "ast_title/aFoxSkel_limb_1",
+        "ast_title/aFoxSkel_limb_2",
+        "ast_title/aFoxSkel_limb_3",
+        "ast_title/aFoxSkel_limb_4",
+        "ast_title/aFoxSkel_limb_5",
+        "ast_title/aFoxSkel_limb_6",
+        "ast_title/aFoxSkel_limb_7",
+        "ast_title/aFoxSkel_limb_8",
+        "ast_title/aFoxSkel_limb_9",
+        "ast_title/aFoxSkel_limb_10",
+        "ast_title/aFoxSkel_limb_11",
+        "ast_title/aFoxSkel_limb_12",
+        "ast_title/aFoxSkel_limb_13",
+        "ast_title/aFoxSkel_limb_14",
+        "ast_title/aFoxSkel_limb_15",
+        "ast_title/aFoxSkel_limb_16",
+        "ast_title/aFoxSkel_limb_17",
+        "ast_title/aFoxSkel_limb_18",
+        "ast_title/aFoxSkel_limb_19",
+        "ast_title/aFoxSkel_limb_20",
+        "ast_title/aFoxSkel_limb_21"
+      ],
+      "source": "sf64.o2r"
+    },
+    "ast_title/aFoxSkel_limb_0": {
+      "sha256": "bf377024d1c18f3dfa5ee89fa0257d7961c57dbdd516d528366b72902568b9d6",
+      "dependencies": [
+        "ast_title/aFoxSkel_limb_21"
+      ],
+      "source": "sf64.o2r"
+    },
+    "ast_title/aFoxSkel_limb_1": {
+      "sha256": "408dee84eee1ba413b1cf1041c6345592fc31b964597b0e2652197c97dad317f",
+      "dependencies": [
+        "ast_title/ast_title_seg6_gfx_43460"
+      ],
+      "source": "sf64.o2r"
+    },
+    "ast_title/aFoxSkel_limb_10": {
+      "sha256": "d510e78ecbbe572df099577b7a6d92a248a03e65fa7a3fee7a3a1de6edd926b8",
+      "dependencies": [
+        "ast_title/ast_title_seg6_gfx_41BF0",
+        "ast_title/aFoxSkel_limb_9"
+      ],
+      "source": "sf64.o2r"
+    },
+    "ast_title/aFoxSkel_limb_11": {
+      "sha256": "9196fc45e353ee6ca35cd246fddf06ece1b0bac9a7ee4a91cf85f3ebcc44a0e8",
+      "dependencies": [
+        "ast_title/ast_title_seg6_gfx_41900"
+      ],
+      "source": "sf64.o2r"
+    },
+    "ast_title/aFoxSkel_limb_12": {
+      "sha256": "c6c0ad44d706ea3eeaf049a37b46040c1d3bb38cda0dcc5e9c7c00babf098de8",
+      "dependencies": [
+        "ast_title/ast_title_seg6_gfx_41A20",
+        "ast_title/aFoxSkel_limb_11"
+      ],
+      "source": "sf64.o2r"
+    },
+    "ast_title/aFoxSkel_limb_13": {
+      "sha256": "ed87a20d4b3e02d57173c8e3c7e5e7d7fee58c25ce31bfa99ef74c10f7cf0cd2",
+      "dependencies": [
+        "ast_title/ast_title_seg6_gfx_41AF0",
+        "ast_title/aFoxSkel_limb_12"
+      ],
+      "source": "sf64.o2r"
+    },
+    "ast_title/aFoxSkel_limb_14": {
+      "sha256": "2d6c4a3eeb34c2e1e777ef416da2123cd9733fff09d8d9365ffd618eb74ef81d",
+      "dependencies": [
+        "ast_title/aFoxSkel_limb_1"
+      ],
+      "source": "sf64.o2r"
+    },
+    "ast_title/aFoxSkel_limb_15": {
+      "sha256": "2d4852ede185af187c884c49cac0cc6be031cd8ba77c2710e2bb0047d6aaf2e6",
+      "dependencies": [
+        "ast_title/aFoxSkel_limb_7"
+      ],
+      "source": "sf64.o2r"
+    },
+    "ast_title/aFoxSkel_limb_16": {
+      "sha256": "e964d4626caddc4e1ae7345e983fb3b3df06767dddf658f1fb00ad9f2a9a28e7",
+      "dependencies": [
+        "ast_title/aFoxSkel_limb_13"
+      ],
+      "source": "sf64.o2r"
+    },
+    "ast_title/aFoxSkel_limb_17": {
+      "sha256": "96ac2036d9f5f413b0cc2274361a91a53b32b4bfa95f1ca8b4f6b36896105e68",
+      "dependencies": [
+        "ast_title/aFoxSkel_limb_15",
+        "ast_title/aFoxSkel_limb_4"
+      ],
+      "source": "sf64.o2r"
+    },
+    "ast_title/aFoxSkel_limb_18": {
+      "sha256": "e4a702a66d26a411b725fe391b128d2be0b27cb0b3e4d2007cff428dc3399337",
+      "dependencies": [
+        "ast_title/aFoxSkel_limb_16",
+        "ast_title/aFoxSkel_limb_10"
+      ],
+      "source": "sf64.o2r"
+    },
+    "ast_title/aFoxSkel_limb_19": {
+      "sha256": "167716c2cc86e1d291a20087078eeedbb41995ed7c24e42a2f207aa3edee73df",
+      "dependencies": [
+        "ast_title/ast_title_seg6_gfx_20070",
+        "ast_title/aFoxSkel_limb_17",
+        "ast_title/aFoxSkel_limb_14"
+      ],
+      "source": "sf64.o2r"
+    },
+    "ast_title/aFoxSkel_limb_2": {
+      "sha256": "24fcb42b16fc65e0b1298e71a5b87409790c007c0966261bcc12a473623f4e79",
+      "dependencies": [
+        "ast_title/D_TITLE_601E430"
+      ],
+      "source": "sf64.o2r"
+    },
+    "ast_title/aFoxSkel_limb_20": {
+      "sha256": "37849281ae421ecba4b004258efc944e635bcfa9931905c8f5f588bba1b8b2d6",
+      "dependencies": [
+        "ast_title/ast_title_seg6_gfx_22440",
+        "ast_title/aFoxSkel_limb_18",
+        "ast_title/aFoxSkel_limb_19"
+      ],
+      "source": "sf64.o2r"
+    },
+    "ast_title/aFoxSkel_limb_21": {
+      "sha256": "e11a53c956fcb7f272d1def3d198fe78f216e14d9d1f61787753143fd4e27914",
+      "dependencies": [
+        "ast_title/ast_title_seg6_gfx_428E0",
+        "ast_title/aFoxSkel_limb_20"
+      ],
+      "source": "sf64.o2r"
+    },
+    "ast_title/aFoxSkel_limb_3": {
+      "sha256": "8854221c9ea7f12a03c321cfc6afe91ed1dcab42f873495272791af87f4f4d8e",
+      "dependencies": [
+        "ast_title/ast_title_seg6_gfx_42D70",
+        "ast_title/aFoxSkel_limb_2"
+      ],
+      "source": "sf64.o2r"
+    },
+    "ast_title/aFoxSkel_limb_4": {
+      "sha256": "b48bf1503935646fdbaae5dca58b36deb192e0b0031ac4cc6031d188daa62b66",
+      "dependencies": [
+        "ast_title/ast_title_seg6_gfx_42EA0",
+        "ast_title/aFoxSkel_limb_3"
+      ],
+      "source": "sf64.o2r"
+    },
+    "ast_title/aFoxSkel_limb_5": {
+      "sha256": "a10aa4b0dcd848c449aefbb2d736bd13c4985be1b14632663b8362b5f4614bb3",
+      "dependencies": [
+        "ast_title/D_TITLE_601E720"
+      ],
+      "source": "sf64.o2r"
+    },
+    "ast_title/aFoxSkel_limb_6": {
+      "sha256": "212b544befcbde46f486bc9bee9101bd30aefbf4b4787724be2424270ec4f0b9",
+      "dependencies": [
+        "ast_title/ast_title_seg6_gfx_43340",
+        "ast_title/aFoxSkel_limb_5"
+      ],
+      "source": "sf64.o2r"
+    },
+    "ast_title/aFoxSkel_limb_7": {
+      "sha256": "e883a0a3ca6bd169520be84a24edd7ebc4f28f50dd7d5f1978a8b03598139579",
+      "dependencies": [
+        "ast_title/ast_title_seg6_gfx_430F0",
+        "ast_title/aFoxSkel_limb_6"
+      ],
+      "source": "sf64.o2r"
+    },
+    "ast_title/aFoxSkel_limb_8": {
+      "sha256": "6afe06a97c78357e786f266f44b5262333334220a9f2bfd7eeb46a3be63f0c05",
+      "dependencies": [
+        "ast_title/ast_title_seg6_gfx_425C0"
+      ],
+      "source": "sf64.o2r"
+    },
+    "ast_title/aFoxSkel_limb_9": {
+      "sha256": "45f6bdcff3ca34ed2604c1a2cec5312a8e25d5e2d0d1240a6f76686e3f3ceca9",
+      "dependencies": [
+        "ast_title/ast_title_seg6_gfx_424F0",
+        "ast_title/aFoxSkel_limb_8"
+      ],
+      "source": "sf64.o2r"
+    },
+    "ast_title/ast_title_seg6_gfx_20070": {
+      "sha256": "7de8c8dd7d4eaed12f75f40c94f8a9727c8a212cca5079b811e75fc5e50779f5",
+      "dependencies": [
+        "wolf_character/ast_title_2DF30_mouth",
+        "ast_title/ast_title_seg6_vtx_20528",
+        "wolf_character/ast_title_28988_mouth",
+        "ast_title/ast_title_seg6_vtx_20588",
+        "wolf_character/ast_title_24340_fur",
+        "ast_title/ast_title_seg6_vtx_20728",
+        "ast_title/ast_title_seg6_vtx_20928",
+        "wolf_character/ast_title_25FA8_eye",
+        "wolf_character/ast_title_vtx_20AC8_19",
+        "wolf_character/ast_title_2DB30_fur",
+        "ast_title/ast_title_seg6_vtx_20C38",
+        "ast_title/ast_title_seg6_vtx_20E38",
+        "ast_title/ast_title_seg6_vtx_21018",
+        "wolf_character/ast_title_214F8_fur",
+        "ast_title/ast_title_seg6_vtx_210B8",
+        "ast_title/ast_title_seg6_vtx_212A8",
+        "ast_title/ast_title_seg6_vtx_21498"
+      ],
+      "source": "wolfen.o2r"
+    },
+    "ast_title/ast_title_seg6_gfx_22440": {
+      "sha256": "38cc16fc3a8a4de205a50f45fa8bb72416b91f7f377964176c5e18a5fdf4a69b",
+      "dependencies": [
+        "wolf_character/ast_title_23B40_jacket",
+        "wolf_character/ast_title_vtx_22600_20",
+        "wolf_character/ast_title_vtx_22800_20",
+        "wolf_character/ast_title_vtx_229F0_20",
+        "wolf_character/ast_title_23340_scarf",
+        "ast_title/ast_title_seg6_vtx_22A70",
+        "wolf_character/ast_title_22B40_chest",
+        "ast_title/ast_title_seg6_vtx_22AF0"
+      ],
+      "source": "wolfen.o2r"
+    },
+    "ast_title/ast_title_seg6_gfx_41900": {
+      "sha256": "4d2259063aae32ce51d25a7a21a84ff8c0a4300163b0971b3d491b8675f1b913",
+      "dependencies": [
+        "wolf_character/ast_title_426E0_metal",
+        "ast_title/ast_title_seg6_vtx_41990"
+      ],
+      "source": "wolfen.o2r"
+    },
+    "ast_title/ast_title_seg6_gfx_41A20": {
+      "sha256": "1463bf30c937c55291b81bae31f8b1df1b8fe5afeb6eb4926d04606091fd522d",
+      "dependencies": [
+        "wolf_character/ast_title_426E0_metal",
+        "ast_title/ast_title_seg6_vtx_41A90"
+      ],
+      "source": "wolfen.o2r"
+    },
+    "ast_title/ast_title_seg6_gfx_41AF0": {
+      "sha256": "c590a72a9be84f2034534102ec19ae7507bd7431c28062ac07857f0c37bbd4c2",
+      "dependencies": [
+        "wolf_character/ast_title_41CF0_trousers",
+        "ast_title/ast_title_seg6_vtx_41B70"
+      ],
+      "source": "wolfen.o2r"
+    },
+    "ast_title/ast_title_seg6_gfx_41BF0": {
+      "sha256": "392ef466b5999c33ba135d56edff0b57391580d6592acb87b73c4dfdf62c6b9d",
+      "dependencies": [
+        "wolf_character/ast_title_41CF0_trousers",
+        "ast_title/ast_title_seg6_vtx_41C70"
+      ],
+      "source": "wolfen.o2r"
+    },
+    "ast_title/ast_title_seg6_gfx_424F0": {
+      "sha256": "acfa115803cce196759f1aceeff9ef1b02615fa113ddeeb87180945e68ca8d20",
+      "dependencies": [
+        "wolf_character/ast_title_426E0_metal",
+        "ast_title/ast_title_seg6_vtx_42560"
+      ],
+      "source": "wolfen.o2r"
+    },
+    "ast_title/ast_title_seg6_gfx_425C0": {
+      "sha256": "4c85cf53822495044bade73cf16a5312eddd36b14df33f5581b51d66d0a7e8c1",
+      "dependencies": [
+        "wolf_character/ast_title_426E0_metal",
+        "ast_title/ast_title_seg6_vtx_42650"
+      ],
+      "source": "wolfen.o2r"
+    },
+    "ast_title/ast_title_seg6_gfx_428E0": {
+      "sha256": "6792cfbdc206c223be0b0b28799d56e44bbae61d44686cd1f690c0ad94d227f3",
+      "dependencies": [
+        "wolf_character/ast_title_26D28_metal",
+        "ast_title/ast_title_seg6_vtx_42A78",
+        "wolf_character/ast_title_2DB30_fur",
+        "ast_title/ast_title_seg6_vtx_42AD8",
+        "wolf_character/ast_title_214F8_fur",
+        "ast_title/ast_title_seg6_vtx_42B28",
+        "wolf_character/ast_title_41CF0_trousers",
+        "ast_title/ast_title_seg6_vtx_42B98"
+      ],
+      "source": "wolfen.o2r"
+    },
+    "ast_title/ast_title_seg6_gfx_42D70": {
+      "sha256": "6cbdd346c507d8ad1847b54669337b9370281eac66ee6ed202a3485a4876a7f2",
+      "dependencies": [
+        "wolf_character/ast_title_214F8_fur",
+        "ast_title/ast_title_seg6_vtx_42DF8"
+      ],
+      "source": "wolfen.o2r"
+    },
+    "ast_title/ast_title_seg6_gfx_42EA0": {
+      "sha256": "a74cd38378bcf8a20065045417e14176598435336c18ba050397e61e46228fc9",
+      "dependencies": [
+        "wolf_character/ast_title_23B40_jacket",
+        "wolf_character/ast_title_vtx_42F88_4",
+        "wolf_character/ast_title_21F10_metal",
+        "wolf_character/ast_title_vtx_43078_4"
+      ],
+      "source": "wolfen.o2r"
+    },
+    "ast_title/ast_title_seg6_gfx_430F0": {
+      "sha256": "894b6a274385d470fb85edae15851e439101777b35d68022d41c8f636bae8e2b",
+      "dependencies": [
+        "wolf_character/ast_title_23B40_jacket",
+        "wolf_character/ast_title_vtx_431D8_7",
+        "wolf_character/ast_title_21F10_metal",
+        "wolf_character/ast_title_vtx_432C8_7"
+      ],
+      "source": "wolfen.o2r"
+    },
+    "ast_title/ast_title_seg6_gfx_43340": {
+      "sha256": "2ee9efddb4a65ae07be862ac2a330b5eab06eadc0220b21f5e2a6e46e8fb3776",
+      "dependencies": [
+        "wolf_character/ast_title_214F8_fur",
+        "ast_title/ast_title_seg6_vtx_433C0"
+      ],
+      "source": "wolfen.o2r"
+    },
+    "ast_title/ast_title_seg6_gfx_43460": {
+      "sha256": "3e1451f5ba6dfa35f025ab959e170453779f81ddb733800a95e3226f8e03c8d5",
+      "dependencies": [
+        "wolf_character/ast_title_2DF30_mouth",
+        "ast_title/ast_title_seg6_vtx_43568",
+        "wolf_character/ast_title_2DB30_fur",
+        "ast_title/ast_title_seg6_vtx_435C8"
+      ],
+      "source": "wolfen.o2r"
+    },
+    "ast_title/ast_title_seg6_vtx_1E530": {
+      "sha256": "a7ef1b1f4a976ceef28c9e78db0127891847da01efa5586eaa7ef0067d43f976",
+      "dependencies": [],
+      "source": "sf64.o2r"
+    },
+    "ast_title/ast_title_seg6_vtx_1E5B0": {
+      "sha256": "b9050115e4db94a775d93893c4bb939b3677219c05ba7d4fd849838a02ea5313",
+      "dependencies": [],
+      "source": "sf64.o2r"
+    },
+    "ast_title/ast_title_seg6_vtx_1E650": {
+      "sha256": "c73679f859f4fe93e493d53b0fcf97dc0ea625c4bca7852939c82d2d24d01350",
+      "dependencies": [],
+      "source": "sf64.o2r"
+    },
+    "ast_title/ast_title_seg6_vtx_1E820": {
+      "sha256": "f35d187fad5810230cf78a7c5faab80f6f8783d6274d96cb5c5ffebfcb86cc70",
+      "dependencies": [],
+      "source": "sf64.o2r"
+    },
+    "ast_title/ast_title_seg6_vtx_1E900": {
+      "sha256": "1b19f186f5040bd29fe25e921f077daca954cfb9fe584ac3a4d56bf05338e694",
+      "dependencies": [],
+      "source": "sf64.o2r"
+    },
+    "ast_title/ast_title_seg6_vtx_1E9C0": {
+      "sha256": "83adb907a9fbb5da231f884c84fafaf26fea1f3fdc63ddf2e21cef26e24d4671",
+      "dependencies": [],
+      "source": "sf64.o2r"
+    },
+    "ast_title/ast_title_seg6_vtx_20528": {
+      "sha256": "984c824c64fa5fdf62455888f848213cdba3b984c30ab12160b8e10305d1814a",
+      "dependencies": [],
+      "source": "sf64.o2r"
+    },
+    "ast_title/ast_title_seg6_vtx_20588": {
+      "sha256": "1e63cc860c9d01116cf6b081a89d372f78c6c5d0ff089d7bea79bdfda4c32481",
+      "dependencies": [],
+      "source": "sf64.o2r"
+    },
+    "ast_title/ast_title_seg6_vtx_20728": {
+      "sha256": "8f316f324505db0306f34e538a7aa2d33cf0d3c31dab070fc9ccf4c40534c5e5",
+      "dependencies": [],
+      "source": "sf64.o2r"
+    },
+    "ast_title/ast_title_seg6_vtx_20928": {
+      "sha256": "88c3fada4189fedf5e3e20b79fd72001c56a519c69a3deb72495c6a935d80493",
+      "dependencies": [],
+      "source": "sf64.o2r"
+    },
+    "ast_title/ast_title_seg6_vtx_20C38": {
+      "sha256": "9f16debc313b98f32f3c6d219a28590e3e2a75f6d9c8ef7ce6027cb79fe2d67b",
+      "dependencies": [],
+      "source": "sf64.o2r"
+    },
+    "ast_title/ast_title_seg6_vtx_20E38": {
+      "sha256": "13f80b33ffd86c3c53c07dfcd9e8c9b5a09ea8a44b3a96251ee19e4d92a5f80f",
+      "dependencies": [],
+      "source": "sf64.o2r"
+    },
+    "ast_title/ast_title_seg6_vtx_21018": {
+      "sha256": "2f2d04e4d8f0bab1885ef7e3570d82c8020739392ee5ed5028f2ab6bee0a6368",
+      "dependencies": [],
+      "source": "sf64.o2r"
+    },
+    "ast_title/ast_title_seg6_vtx_210B8": {
+      "sha256": "2bd4bf41ec237ccdf3de0eb945b04cd2ed86d8a90cd96ece3b2a77f0602dcb0f",
+      "dependencies": [],
+      "source": "sf64.o2r"
+    },
+    "ast_title/ast_title_seg6_vtx_212A8": {
+      "sha256": "d599231ee661b1716062a4b4996119d7765281ad10e09f7d25aa08ddf62f9653",
+      "dependencies": [],
+      "source": "sf64.o2r"
+    },
+    "ast_title/ast_title_seg6_vtx_21498": {
+      "sha256": "d43d6019dcc054cd9bcc4d87465b7c43acf14b6157f18f54f0f4aa3d7919c5c5",
+      "dependencies": [],
+      "source": "sf64.o2r"
+    },
+    "ast_title/ast_title_seg6_vtx_22A70": {
+      "sha256": "73eab849c2780e6b6d03c23a843e247e87933a1ce5ad7896ba25697eae758151",
+      "dependencies": [],
+      "source": "sf64.o2r"
+    },
+    "ast_title/ast_title_seg6_vtx_22AF0": {
+      "sha256": "e21d0d476c0ef2dddc2505dea7b26b5a9d1a5989cdea5744e479f655546dc5d2",
+      "dependencies": [],
+      "source": "sf64.o2r"
+    },
+    "ast_title/ast_title_seg6_vtx_41990": {
+      "sha256": "d4c1dc856be85029f76e37b6f885d2619561e69296a60e527ebf7c4f1e725410",
+      "dependencies": [],
+      "source": "sf64.o2r"
+    },
+    "ast_title/ast_title_seg6_vtx_41A90": {
+      "sha256": "b233315924a03670c58f58dab6ac00b11d2b02ec0f2f404d2881e479664eb937",
+      "dependencies": [],
+      "source": "sf64.o2r"
+    },
+    "ast_title/ast_title_seg6_vtx_41B70": {
+      "sha256": "782108b51818dae5b17814bddb1e0d54db4461cdcdc19beb5fb2378edb60fabb",
+      "dependencies": [],
+      "source": "sf64.o2r"
+    },
+    "ast_title/ast_title_seg6_vtx_41C70": {
+      "sha256": "ff16bab1cfc7b3f5c7318ffcd9abaf153542fea3bc0fa8ee220bb6ce63a3cc66",
+      "dependencies": [],
+      "source": "sf64.o2r"
+    },
+    "ast_title/ast_title_seg6_vtx_42560": {
+      "sha256": "47fdce36aac046bc22a2b606c68ed34c54df854bb466564060c2a7466f8c6b9c",
+      "dependencies": [],
+      "source": "sf64.o2r"
+    },
+    "ast_title/ast_title_seg6_vtx_42650": {
+      "sha256": "12175b47becab0f98c8e029decca6e629d9f7db4b54ea0574d9ddb60986f9c36",
+      "dependencies": [],
+      "source": "sf64.o2r"
+    },
+    "ast_title/ast_title_seg6_vtx_42A78": {
+      "sha256": "876254d4e84db388896bd6073f4c36963f99f52d4d205ce1a8dd8cf4a1326e7e",
+      "dependencies": [],
+      "source": "sf64.o2r"
+    },
+    "ast_title/ast_title_seg6_vtx_42AD8": {
+      "sha256": "0e22bd12926f3ed49f494ac6349bf46812d7bf49bf98c2dac46bc9ebd7fce1bd",
+      "dependencies": [],
+      "source": "sf64.o2r"
+    },
+    "ast_title/ast_title_seg6_vtx_42B28": {
+      "sha256": "740b02321bbb04a80b315d5d1b03a0906c637d288db3f86f0fcc05c6394f9336",
+      "dependencies": [],
+      "source": "sf64.o2r"
+    },
+    "ast_title/ast_title_seg6_vtx_42B98": {
+      "sha256": "4580bce0e536980b0ebb996f0a21dcb1a03269dc9689e84ee7da9bc580f6886f",
+      "dependencies": [],
+      "source": "sf64.o2r"
+    },
+    "ast_title/ast_title_seg6_vtx_42DF8": {
+      "sha256": "6072f59bd2ff6ca4e7c41920449486e0521d68369331b4c68c00d00fc21e7292",
+      "dependencies": [],
+      "source": "sf64.o2r"
+    },
+    "ast_title/ast_title_seg6_vtx_433C0": {
+      "sha256": "e85783fe70276d7033ffd4b53df7d3ce793aa224f1c7a644a5844e7ae31e8149",
+      "dependencies": [],
+      "source": "sf64.o2r"
+    },
+    "ast_title/ast_title_seg6_vtx_43568": {
+      "sha256": "86c3d1769d93159ab5ccfb7f000533acf6b056a069269ede3bc954d321601d35",
+      "dependencies": [],
+      "source": "sf64.o2r"
+    },
+    "ast_title/ast_title_seg6_vtx_435C8": {
+      "sha256": "2558b15745480340dd2440b37ff5ad74523134852e312e00074cd5ab69cd5bc0",
+      "dependencies": [],
+      "source": "sf64.o2r"
+    },
+    "ast_versus/D_versus_301CCE4": {
+      "sha256": "147d47cd6ff9fcf9834101838a631b9e60468033207582111a3316c6700d9ff1",
+      "dependencies": [],
+      "source": "sf64.o2r"
+    },
+    "ast_versus/D_versus_301CFEC": {
+      "sha256": "2294155e17488291612f364985821ada8f51242780c62fae8335230126ab845f",
+      "dependencies": [],
+      "source": "sf64.o2r"
+    },
+    "ast_versus/D_versus_301D3DC": {
+      "sha256": "70f0e38f5d7cad073f1481e62226863523c0947141db887b507038578c62bd76",
+      "dependencies": [],
+      "source": "sf64.o2r"
+    },
+    "ast_versus/aVsOnFootFoxSkel": {
+      "sha256": "08a6eefe6cf390302f76dd2879a6b6b479e3605de649a1764cb908b8d0d128ba",
+      "dependencies": [
+        "ast_versus/aVsOnFootFoxSkel_limb_0",
+        "ast_versus/aVsOnFootFoxSkel_limb_1",
+        "ast_versus/aVsOnFootFoxSkel_limb_2",
+        "ast_versus/aVsOnFootFoxSkel_limb_3",
+        "ast_versus/aVsOnFootFoxSkel_limb_4",
+        "ast_versus/aVsOnFootFoxSkel_limb_5",
+        "ast_versus/aVsOnFootFoxSkel_limb_6",
+        "ast_versus/aVsOnFootFoxSkel_limb_7",
+        "ast_versus/aVsOnFootFoxSkel_limb_8",
+        "ast_versus/aVsOnFootFoxSkel_limb_9",
+        "ast_versus/aVsOnFootFoxSkel_limb_10",
+        "ast_versus/aVsOnFootFoxSkel_limb_11",
+        "ast_versus/aVsOnFootFoxSkel_limb_12",
+        "ast_versus/aVsOnFootFoxSkel_limb_13",
+        "ast_versus/aVsOnFootFoxSkel_limb_14",
+        "ast_versus/aVsOnFootFoxSkel_limb_15",
+        "ast_versus/aVsOnFootFoxSkel_limb_16",
+        "ast_versus/aVsOnFootFoxSkel_limb_17",
+        "ast_versus/aVsOnFootFoxSkel_limb_18"
+      ],
+      "source": "sf64.o2r"
+    },
+    "ast_versus/aVsOnFootFoxSkel_limb_0": {
+      "sha256": "b94cf8aae658a2498eb66bc34de4fc41169b6d5615ba7c91701a6ebcc6738f0e",
+      "dependencies": [
+        "ast_versus/aVsOnFootFoxSkel_limb_18"
+      ],
+      "source": "sf64.o2r"
+    },
+    "ast_versus/aVsOnFootFoxSkel_limb_1": {
+      "sha256": "08b825b9955bc77504a31774e0bdfced45b8de04471f0456bbf4343bc468baa0",
+      "dependencies": [],
+      "source": "sf64.o2r"
+    },
+    "ast_versus/aVsOnFootFoxSkel_limb_10": {
+      "sha256": "d7f5f36a1c3cbb25578270a5083a8bf173b11c329d7532dbf102ca525169cbc5",
+      "dependencies": [
+        "ast_versus/ast_versus_seg3_gfx_27D80"
+      ],
+      "source": "sf64.o2r"
+    },
+    "ast_versus/aVsOnFootFoxSkel_limb_11": {
+      "sha256": "ea896b07f0e9e324970ffc7d2a81c2233cc5082cac0035b297e64d10d786a9b2",
+      "dependencies": [
+        "ast_versus/ast_versus_seg3_gfx_27CB0",
+        "ast_versus/aVsOnFootFoxSkel_limb_10"
+      ],
+      "source": "sf64.o2r"
+    },
+    "ast_versus/aVsOnFootFoxSkel_limb_12": {
+      "sha256": "bc3820b37cc6016f1c57baeebade1308353a13b07012eb03239e14c3bf80f20b",
+      "dependencies": [
+        "ast_versus/aVsOnFootFoxSkel_limb_3"
+      ],
+      "source": "sf64.o2r"
+    },
+    "ast_versus/aVsOnFootFoxSkel_limb_13": {
+      "sha256": "8dece871bcc806a2a2ce8dfb5e9ac3204c0dbf04100cdc938525cab1721e13f9",
+      "dependencies": [
+        "ast_versus/aVsOnFootFoxSkel_limb_9"
+      ],
+      "source": "sf64.o2r"
+    },
+    "ast_versus/aVsOnFootFoxSkel_limb_14": {
+      "sha256": "323ea1de7cd191a2f83063111191b6b2e335a55159e3dc2cb920add022389e64",
+      "dependencies": [
+        "ast_versus/aVsOnFootFoxSkel_limb_12",
+        "ast_versus/aVsOnFootFoxSkel_limb_11"
+      ],
+      "source": "sf64.o2r"
+    },
+    "ast_versus/aVsOnFootFoxSkel_limb_15": {
+      "sha256": "d6192d2a8d73776292897229f9b60c34762ce8c33e11c6c7514afd73369f384e",
+      "dependencies": [
+        "ast_versus/aVsOnFootFoxSkel_limb_13",
+        "ast_versus/aVsOnFootFoxSkel_limb_6"
+      ],
+      "source": "sf64.o2r"
+    },
+    "ast_versus/aVsOnFootFoxSkel_limb_16": {
+      "sha256": "1c1cb284103b6f0fd9eb1134fc097065b0c2d5ff6ab087c05c3977882606ec25",
+      "dependencies": [
+        "ast_versus/ast_versus_seg3_gfx_26390",
+        "ast_versus/aVsOnFootFoxSkel_limb_14"
+      ],
+      "source": "sf64.o2r"
+    },
+    "ast_versus/aVsOnFootFoxSkel_limb_17": {
+      "sha256": "14ba6efa3648a8344c5ba885e3651190df3b7536428d2d4fb23ad4d08311030a",
+      "dependencies": [
+        "ast_versus/ast_versus_seg3_gfx_270C0",
+        "ast_versus/aVsOnFootFoxSkel_limb_15",
+        "ast_versus/aVsOnFootFoxSkel_limb_16"
+      ],
+      "source": "sf64.o2r"
+    },
+    "ast_versus/aVsOnFootFoxSkel_limb_18": {
+      "sha256": "5238387c1b2f2323cf38d8bde2869b7d21f17bf2e02a3a9e8a136d72cb69a641",
+      "dependencies": [
+        "ast_versus/ast_versus_seg3_gfx_1C7B0",
+        "ast_versus/aVsOnFootFoxSkel_limb_17"
+      ],
+      "source": "sf64.o2r"
+    },
+    "ast_versus/aVsOnFootFoxSkel_limb_2": {
+      "sha256": "d238855bcbd603a9484f55fdca695ce632a990d6eb6abadf892cc35002c7b491",
+      "dependencies": [
+        "ast_versus/ast_versus_seg3_gfx_27A70"
+      ],
+      "source": "sf64.o2r"
+    },
+    "ast_versus/aVsOnFootFoxSkel_limb_3": {
+      "sha256": "2710bf72bb5094028bbd1b00516539f6186627bae85817b278468e4565a4c24d",
+      "dependencies": [
+        "ast_versus/ast_versus_seg3_gfx_27BE0",
+        "ast_versus/aVsOnFootFoxSkel_limb_2"
+      ],
+      "source": "sf64.o2r"
+    },
+    "ast_versus/aVsOnFootFoxSkel_limb_4": {
+      "sha256": "c7de739cfae80e28bd3cff762cc8f02623c20e38c55f3a50c7c2cb89f21788f6",
+      "dependencies": [
+        "ast_versus/ast_versus_seg3_gfx_262F0"
+      ],
+      "source": "sf64.o2r"
+    },
+    "ast_versus/aVsOnFootFoxSkel_limb_5": {
+      "sha256": "d0bba1dc2f8ad1a53889ac2ee4ac34808ea033d0f6208cc5fef749680f69898b",
+      "dependencies": [
+        "ast_versus/ast_versus_seg3_gfx_26220",
+        "ast_versus/aVsOnFootFoxSkel_limb_4"
+      ],
+      "source": "sf64.o2r"
+    },
+    "ast_versus/aVsOnFootFoxSkel_limb_6": {
+      "sha256": "8b818ff5c2bf502816d7ad3ee7486148288a3fa9e830aa1d51c87dc85eb3e180",
+      "dependencies": [
+        "ast_versus/ast_versus_seg3_gfx_260C0",
+        "ast_versus/aVsOnFootFoxSkel_limb_5"
+      ],
+      "source": "sf64.o2r"
+    },
+    "ast_versus/aVsOnFootFoxSkel_limb_7": {
+      "sha256": "df2cf9b39b53d97dee6e6a42c97b650b6c54a60ca7b178e80384bb0c5fd4d4d0",
+      "dependencies": [
+        "ast_versus/ast_versus_seg3_gfx_25E70"
+      ],
+      "source": "sf64.o2r"
+    },
+    "ast_versus/aVsOnFootFoxSkel_limb_8": {
+      "sha256": "482b764a19fdee72cc0d06a47d9ec8f84e00f4213209609b1fb7790f9942432c",
+      "dependencies": [
+        "ast_versus/ast_versus_seg3_gfx_25F10",
+        "ast_versus/aVsOnFootFoxSkel_limb_7"
+      ],
+      "source": "sf64.o2r"
+    },
+    "ast_versus/aVsOnFootFoxSkel_limb_9": {
+      "sha256": "71f621a7833cf7140af8478e4f78cad5cc496963a510a5723d49d788862c53e5",
+      "dependencies": [
+        "ast_versus/ast_versus_seg3_gfx_25FE0",
+        "ast_versus/aVsOnFootFoxSkel_limb_8"
+      ],
+      "source": "sf64.o2r"
+    },
+    "ast_versus/ast_versus_seg3_gfx_1C7B0": {
+      "sha256": "e47b6c6d9db39d03030d6dc64597666d3aa3d21ff0e8cbd4db6a2dd0c81a86fc",
+      "dependencies": [
+        "wolf_character/ast_versus_1C9B0_eye_fur",
+        "ast_versus/ast_versus_seg3_vtx_1C880",
+        "wolf_character/ast_versus_261A0_trousers",
+        "ast_versus/ast_versus_seg3_vtx_1C910"
+      ],
+      "source": "wolfen.o2r"
+    },
+    "ast_versus/ast_versus_seg3_gfx_25E70": {
+      "sha256": "1fc7e89c598e58d3cee7f364d3c45ce9855bff9748d2401202ba05f3c25f45d2",
+      "dependencies": [
+        "wolf_character/ast_versus_26A38_metal",
+        "ast_versus/ast_versus_seg3_vtx_25ED0"
+      ],
+      "source": "wolfen.o2r"
+    },
+    "ast_versus/ast_versus_seg3_gfx_25F10": {
+      "sha256": "739d750f8f9f63ef15b6d5653d6f27100cadcb457c1b4bf26d01e71a30bf9d9e",
+      "dependencies": [
+        "wolf_character/ast_versus_26A38_metal",
+        "ast_versus/ast_versus_seg3_vtx_25F80"
+      ],
+      "source": "wolfen.o2r"
+    },
+    "ast_versus/ast_versus_seg3_gfx_25FE0": {
+      "sha256": "62282adb8bdd8766b57f72da9d67afde022d231c877591fc7e50b55b550dd0b2",
+      "dependencies": [
+        "wolf_character/ast_versus_261A0_trousers",
+        "ast_versus/ast_versus_seg3_vtx_26050"
+      ],
+      "source": "wolfen.o2r"
+    },
+    "ast_versus/ast_versus_seg3_gfx_260C0": {
+      "sha256": "0c73d2e4f32bf336c34a1fa8f464a17c8192dc91ae3debb479faa5c5204c6726",
+      "dependencies": [
+        "wolf_character/ast_versus_261A0_trousers",
+        "ast_versus/ast_versus_seg3_vtx_26130"
+      ],
+      "source": "wolfen.o2r"
+    },
+    "ast_versus/ast_versus_seg3_gfx_26220": {
+      "sha256": "1377544bbbaf462496cd8b47a65ee20d62163378cda717eb5b22432e5122a217",
+      "dependencies": [
+        "wolf_character/ast_versus_26A38_metal",
+        "ast_versus/ast_versus_seg3_vtx_26290"
+      ],
+      "source": "wolfen.o2r"
+    },
+    "ast_versus/ast_versus_seg3_gfx_262F0": {
+      "sha256": "ae7e5ea30629a3fbf0e09a85b4614134bdf64d589ba571d4829f77e8fe54cfaa",
+      "dependencies": [
+        "wolf_character/ast_versus_26A38_metal",
+        "ast_versus/ast_versus_seg3_vtx_26350"
+      ],
+      "source": "wolfen.o2r"
+    },
+    "ast_versus/ast_versus_seg3_gfx_26390": {
+      "sha256": "d7937e5aedd5cc40b75ed1e08bb160e4420aa08cd27caba264de657512204e93",
+      "dependencies": [
+        "wolf_character/ast_versus_26CB8_eye_fur",
+        "wolf_character/ast_versus_vtx_26668_16",
+        "wolf_character/ast_versus_26DB8_eye_fur",
+        "wolf_character/ast_versus_vtx_266F8_16",
+        "wolf_character/ast_versus_26A38_metal",
+        "ast_versus/ast_versus_seg3_vtx_26728",
+        "wolf_character/ast_versus_26AB8_fur",
+        "ast_versus/ast_versus_seg3_vtx_26798",
+        "wolf_character/ast_versus_26B38_fur",
+        "ast_versus/ast_versus_seg3_vtx_267F8",
+        "wolf_character/ast_versus_26BB8_fur",
+        "ast_versus/ast_versus_seg3_vtx_26828",
+        "wolf_character/ast_versus_26C38_fur",
+        "ast_versus/ast_versus_seg3_vtx_26898",
+        "wolf_character/ast_versus_26EB8_fur",
+        "ast_versus/ast_versus_seg3_vtx_26988",
+        "wolf_character/ast_versus_26EB8_fur",
+        "ast_versus/ast_versus_seg3_vtx_26A08"
+      ],
+      "source": "wolfen.o2r"
+    },
+    "ast_versus/ast_versus_seg3_gfx_270C0": {
+      "sha256": "f02f30f8aba97250c6cd49b51a29412854723ee40e5c9de371a641af5ca606c8",
+      "dependencies": [
+        "wolf_character/ast_versus_27268_vest",
+        "ast_versus/ast_versus_seg3_vtx_27188",
+        "wolf_character/ast_versus_25C68_jacket",
+        "ast_versus/ast_versus_seg3_vtx_271F8"
+      ],
+      "source": "wolfen.o2r"
+    },
+    "ast_versus/ast_versus_seg3_gfx_27A70": {
+      "sha256": "be6461d06cd4a8805a049fdf763c28082fbcc46d7055860f11a0a084c4384133",
+      "dependencies": [
+        "wolf_character/ast_versus_28130_glove",
+        "ast_versus/ast_versus_seg3_vtx_27AE8"
+      ],
+      "source": "wolfen.o2r"
+    },
+    "ast_versus/ast_versus_seg3_gfx_27BE0": {
+      "sha256": "6e9fcfd71b549292cf46296c4ecedd3618800111a9905f809bc8080687f8809e",
+      "dependencies": [
+        "wolf_character/ast_versus_25C68_jacket",
+        "ast_versus/ast_versus_seg3_vtx_27C50"
+      ],
+      "source": "wolfen.o2r"
+    },
+    "ast_versus/ast_versus_seg3_gfx_27CB0": {
+      "sha256": "be801a5cad5ce21d74ea6dcd42ad0bc2ace9c13b97ff02438c024c1c68f17910",
+      "dependencies": [
+        "wolf_character/ast_versus_25C68_jacket",
+        "ast_versus/ast_versus_seg3_vtx_27D20"
+      ],
+      "source": "wolfen.o2r"
+    },
+    "ast_versus/ast_versus_seg3_gfx_27D80": {
+      "sha256": "11ca30db502d1a874cbea4b024b457110109628bcd4c94a767f9170d3369b7a2",
+      "dependencies": [
+        "wolf_character/ast_versus_E680_equipment",
+        "ast_versus/ast_versus_seg3_vtx_27EF0",
+        "wolf_character/ast_versus_EA80_equipment",
+        "ast_versus/ast_versus_seg3_vtx_27F30",
+        "wolf_character/ast_versus_28230_equipment",
+        "ast_versus/ast_versus_seg3_vtx_27FC0",
+        "wolf_character/ast_versus_28130_glove",
+        "ast_versus/ast_versus_seg3_vtx_28050"
+      ],
+      "source": "wolfen.o2r"
+    },
+    "ast_versus/ast_versus_seg3_vtx_1C880": {
+      "sha256": "6244106c4d3c6c17b0c2c5daa1719e944d3e6dd41e16683227bb21adf68fb7b3",
+      "dependencies": [],
+      "source": "sf64.o2r"
+    },
+    "ast_versus/ast_versus_seg3_vtx_1C910": {
+      "sha256": "d050b0812edc47aea30f979b4398807c5bc51edf080e801d11d10dc117512ac6",
+      "dependencies": [],
+      "source": "sf64.o2r"
+    },
+    "ast_versus/ast_versus_seg3_vtx_25ED0": {
+      "sha256": "38eb673e640f9a0e9857e6285fece7c8f7e4d4147b07b1968322536fc6cc56fd",
+      "dependencies": [],
+      "source": "sf64.o2r"
+    },
+    "ast_versus/ast_versus_seg3_vtx_25F80": {
+      "sha256": "66c2a1d8208e0512e8d1a98c4f7b16c3d1c65ac31404ba2cef8610b05ed877d3",
+      "dependencies": [],
+      "source": "sf64.o2r"
+    },
+    "ast_versus/ast_versus_seg3_vtx_26050": {
+      "sha256": "c8e05e3a648ecfcf5fbcab195e4d164219639cecda70c571a8e702b9e8e30c5e",
+      "dependencies": [],
+      "source": "sf64.o2r"
+    },
+    "ast_versus/ast_versus_seg3_vtx_26130": {
+      "sha256": "e07fc8c6ac65e36b096fe9e43a820da2d31104b1e427222f92002e5cf33d2891",
+      "dependencies": [],
+      "source": "sf64.o2r"
+    },
+    "ast_versus/ast_versus_seg3_vtx_26290": {
+      "sha256": "396444b2ee29f954dcebe13b15f4b5d03ac59b8eaa8615bc969c59d82201a710",
+      "dependencies": [],
+      "source": "sf64.o2r"
+    },
+    "ast_versus/ast_versus_seg3_vtx_26350": {
+      "sha256": "4f4249726766bc28408019234de47c75c9b0cf2133793ccbae5559f3fb40474b",
+      "dependencies": [],
+      "source": "sf64.o2r"
+    },
+    "ast_versus/ast_versus_seg3_vtx_26728": {
+      "sha256": "48f20c3a66e0ebd5d3b9b814d3ccff1735ab489902b53e43a7fb6f84fe885b01",
+      "dependencies": [],
+      "source": "sf64.o2r"
+    },
+    "ast_versus/ast_versus_seg3_vtx_26798": {
+      "sha256": "e2490a29cb2fd1d04fcecd5950e5e110153125fee7f445583dc7a109d88d431c",
+      "dependencies": [],
+      "source": "sf64.o2r"
+    },
+    "ast_versus/ast_versus_seg3_vtx_267F8": {
+      "sha256": "a97434b0680476dfc3905976c1fb11493aa849bd5ec25f5a0b83321ff9ffda36",
+      "dependencies": [],
+      "source": "sf64.o2r"
+    },
+    "ast_versus/ast_versus_seg3_vtx_26828": {
+      "sha256": "0dde1d891492016ea742489dc6c5d66f877cae03031ceb3557578b1999b8513e",
+      "dependencies": [],
+      "source": "sf64.o2r"
+    },
+    "ast_versus/ast_versus_seg3_vtx_26898": {
+      "sha256": "e3d412a4fe5b207d39673ebe3c6ef798c2ed7d87ba8576c1a7bfb13f8633faeb",
+      "dependencies": [],
+      "source": "sf64.o2r"
+    },
+    "ast_versus/ast_versus_seg3_vtx_26988": {
+      "sha256": "f99ed8cca34406325b331be96796d3c43c7f6dda8c23a2cc7f06e19705fcd9b8",
+      "dependencies": [],
+      "source": "sf64.o2r"
+    },
+    "ast_versus/ast_versus_seg3_vtx_26A08": {
+      "sha256": "debef112a5668b9c7a37c0b1691c239e927b3f08cf8ab523fdcccdd73a852a3b",
+      "dependencies": [],
+      "source": "sf64.o2r"
+    },
+    "ast_versus/ast_versus_seg3_vtx_27188": {
+      "sha256": "ba3a8f0babc49357fede86ae20f122dfd533e2175dd2833554f3d8fc1fc6f82f",
+      "dependencies": [],
+      "source": "sf64.o2r"
+    },
+    "ast_versus/ast_versus_seg3_vtx_271F8": {
+      "sha256": "a3b25b2bb6aca92d82dee294e3d9c269cea95ce355fcca7493a2e682769b1982",
+      "dependencies": [],
+      "source": "sf64.o2r"
+    },
+    "ast_versus/ast_versus_seg3_vtx_27AE8": {
+      "sha256": "c0d7d68e0a5f46ff934dd2821208296b0a99bdb49af0576ff57b7f06f0adda21",
+      "dependencies": [],
+      "source": "sf64.o2r"
+    },
+    "ast_versus/ast_versus_seg3_vtx_27C50": {
+      "sha256": "04369e0e03cf86cd03ac158cdd85b1cabc1077aaff7c33087bd72a61d97c38c4",
+      "dependencies": [],
+      "source": "sf64.o2r"
+    },
+    "ast_versus/ast_versus_seg3_vtx_27D20": {
+      "sha256": "fbe45ad73be8bfb7a009c0c22f95f823daae024f375eec6a31faf41ff87ad438",
+      "dependencies": [],
+      "source": "sf64.o2r"
+    },
+    "ast_versus/ast_versus_seg3_vtx_27EF0": {
+      "sha256": "05e2d23e69d4a55c37a5ecb6606a14bc34ca9587055723feffb956f517399f14",
+      "dependencies": [],
+      "source": "sf64.o2r"
+    },
+    "ast_versus/ast_versus_seg3_vtx_27F30": {
+      "sha256": "a1087b42e8a0e627564dd083fbf9ce5c9e7e198e7e1879321cf1eb85062e10e6",
+      "dependencies": [],
+      "source": "sf64.o2r"
+    },
+    "ast_versus/ast_versus_seg3_vtx_27FC0": {
+      "sha256": "58fab4264ccff39fd0401c44b0c69eca06fec2dac08fe3a8a1a0b8195915548e",
+      "dependencies": [],
+      "source": "sf64.o2r"
+    },
+    "ast_versus/ast_versus_seg3_vtx_28050": {
+      "sha256": "0bb80b4652fda8c7a6e1ffb8b97f5934ecb5163a40155cf611c93bcc5184924b",
+      "dependencies": [],
+      "source": "sf64.o2r"
+    },
+    "wolf_character/ast_title_1EA00_glove": {
+      "sha256": "5905aee12c7a391307426e057226af94fb2567d45384cab138237cd0c66843fc",
+      "dependencies": [],
+      "source": "wolfen.o2r"
+    },
+    "wolf_character/ast_title_1F200_glove": {
+      "sha256": "e89a28aedd38975c607247f359c891636a1ef2bd5bf707b63f7108c7e3642314",
+      "dependencies": [],
+      "source": "wolfen.o2r"
+    },
+    "wolf_character/ast_title_1F400_glove": {
+      "sha256": "f0f5b87a916af5170f8e3b885344e24b33c8a140f5efa9285021116e952acf7a",
+      "dependencies": [],
+      "source": "wolfen.o2r"
+    },
+    "wolf_character/ast_title_214F8_fur": {
+      "sha256": "66d5d2ba93c533bf5f2eedd8213025a2a724b3aa03492b180ea77b13aaf8796a",
+      "dependencies": [],
+      "source": "wolfen.o2r"
+    },
+    "wolf_character/ast_title_21F10_metal": {
+      "sha256": "4343eb82f2d8aa932e2e5da9aff554ecbbb9ea64695ecd7a1c25f3dd1b66a369",
+      "dependencies": [],
+      "source": "wolfen.o2r"
+    },
+    "wolf_character/ast_title_22B40_chest": {
+      "sha256": "cd4534ce7e451fe7783291d80cb16da075d2b20dec2e3ffb650a51417384876f",
+      "dependencies": [],
+      "source": "wolfen.o2r"
+    },
+    "wolf_character/ast_title_23340_scarf": {
+      "sha256": "61241edd4d0d6c2c04a7b514b383bae9da128010f595342e6847094ef5bf5e77",
+      "dependencies": [],
+      "source": "wolfen.o2r"
+    },
+    "wolf_character/ast_title_23B40_jacket": {
+      "sha256": "2c6e3660e7a4c7156e903e9894357601d2c518a95de72f838b494e469c42df3e",
+      "dependencies": [],
+      "source": "wolfen.o2r"
+    },
+    "wolf_character/ast_title_24340_fur": {
+      "sha256": "471101fc1a92429b437d0b8ede0d6e6de1b007e7ff4f00665804cc0c69792209",
+      "dependencies": [],
+      "source": "wolfen.o2r"
+    },
+    "wolf_character/ast_title_25FA8_eye": {
+      "sha256": "397a2f619a8dbdd0fa1a75817e2a8e7c020177ebba96b58643a953a259d5e381",
+      "dependencies": [],
+      "source": "wolfen.o2r"
+    },
+    "wolf_character/ast_title_26D28_metal": {
+      "sha256": "179c271c7f73d2542b667f72ef0853999fb7d8217e976b69e0b387eef7d24d4d",
+      "dependencies": [],
+      "source": "wolfen.o2r"
+    },
+    "wolf_character/ast_title_28988_mouth": {
+      "sha256": "3c31c2eda23db39ccf60363302c683540be3fef832fb3ed3e8ed6b85cd979251",
+      "dependencies": [],
+      "source": "wolfen.o2r"
+    },
+    "wolf_character/ast_title_2DB30_fur": {
+      "sha256": "c867ea2092f21f6b9106cde0681c431b9693da1f79fdcb073a4d5dceadabda74",
+      "dependencies": [],
+      "source": "wolfen.o2r"
+    },
+    "wolf_character/ast_title_2DF30_mouth": {
+      "sha256": "332da231e961ab3cdf80a47e3b15dc96ebb06598d484b5ce50cdf9055b9bf893",
+      "dependencies": [],
+      "source": "wolfen.o2r"
+    },
+    "wolf_character/ast_title_41CF0_trousers": {
+      "sha256": "28826a9b38c51e85c0cb2ed2f627ff31db9b42a2e15e0555dbe33e5893c918c5",
+      "dependencies": [],
+      "source": "wolfen.o2r"
+    },
+    "wolf_character/ast_title_426E0_metal": {
+      "sha256": "09806d4f0c89ee5b754099bcc33287302b7dff2f3cd317facb4019c5d603fa8c",
+      "dependencies": [],
+      "source": "wolfen.o2r"
+    },
+    "wolf_character/ast_title_vtx_20AC8_19": {
+      "sha256": "0a0a14c488517cf5d508180467e9331f5b5c886b05ab1f4d527ad6f6b4333945",
+      "dependencies": [],
+      "source": "wolfen.o2r"
+    },
+    "wolf_character/ast_title_vtx_22600_20": {
+      "sha256": "90efe239262306f465d474aa741def29c8eb298724d7cd202e39c4724870c68a",
+      "dependencies": [],
+      "source": "wolfen.o2r"
+    },
+    "wolf_character/ast_title_vtx_22800_20": {
+      "sha256": "eaf761b2a4266fd080762a63b875eab495224c3c97d4fd87f42dda6b5df2eac5",
+      "dependencies": [],
+      "source": "wolfen.o2r"
+    },
+    "wolf_character/ast_title_vtx_229F0_20": {
+      "sha256": "54a8929501d4f04146b38848dc589c8f9e3b4384007be7008f068cbe32a99014",
+      "dependencies": [],
+      "source": "wolfen.o2r"
+    },
+    "wolf_character/ast_title_vtx_42F88_4": {
+      "sha256": "a607607d7c8f113ae2c1f0baaf765beac4161818d31de98a337dbae441d90e44",
+      "dependencies": [],
+      "source": "wolfen.o2r"
+    },
+    "wolf_character/ast_title_vtx_43078_4": {
+      "sha256": "d1b56f3c63c40fdb16e95440667e3b7d843e0faaa1d80d206e3eaea79d80de05",
+      "dependencies": [],
+      "source": "wolfen.o2r"
+    },
+    "wolf_character/ast_title_vtx_431D8_7": {
+      "sha256": "cb3b0515376f41b2543aba3ba75509b564fabfe1a4336f16af4201ea08f9f60b",
+      "dependencies": [],
+      "source": "wolfen.o2r"
+    },
+    "wolf_character/ast_title_vtx_432C8_7": {
+      "sha256": "4e93e0f4cc37e5121c0709d444d3c8d1d6514691272f2c1c3c2e59a97e04d17a",
+      "dependencies": [],
+      "source": "wolfen.o2r"
+    },
+    "wolf_character/ast_versus_1C9B0_eye_fur": {
+      "sha256": "a200a5fef41d94c1ca88ea57b8d3cf68da7a175c33c8af3e59adb78fe7cd518d",
+      "dependencies": [],
+      "source": "wolfen.o2r"
+    },
+    "wolf_character/ast_versus_25C68_jacket": {
+      "sha256": "a20bc598390dfb2cc373c0d1a6b45b9043951a970d128a2d8b453fa2eb1985b5",
+      "dependencies": [],
+      "source": "wolfen.o2r"
+    },
+    "wolf_character/ast_versus_261A0_trousers": {
+      "sha256": "61b5166655472e93d0b3fe62173e29443b48b77825e46d2e304e666e6693fdb6",
+      "dependencies": [],
+      "source": "wolfen.o2r"
+    },
+    "wolf_character/ast_versus_26A38_metal": {
+      "sha256": "f5c69f054a953e2ecd181ade39997767ad85047918c8dbda6f37999d1c63c6bd",
+      "dependencies": [],
+      "source": "wolfen.o2r"
+    },
+    "wolf_character/ast_versus_26AB8_fur": {
+      "sha256": "0c621b32d078c467afe59c221934f56bf53ce20bcce0519866e598c6dd1793e0",
+      "dependencies": [],
+      "source": "wolfen.o2r"
+    },
+    "wolf_character/ast_versus_26B38_fur": {
+      "sha256": "923319559d7ea6f9d338c595c97d66cfbf31382618844372bbf08cda550aac8d",
+      "dependencies": [],
+      "source": "wolfen.o2r"
+    },
+    "wolf_character/ast_versus_26BB8_fur": {
+      "sha256": "63463eda53a1c519adb3da84baf6cf6dff0199342598528f4dd50ae59105a230",
+      "dependencies": [],
+      "source": "wolfen.o2r"
+    },
+    "wolf_character/ast_versus_26C38_fur": {
+      "sha256": "04697c38677f494a22420e41e30d60a5df70abc69f41357ee90babec58ee313a",
+      "dependencies": [],
+      "source": "wolfen.o2r"
+    },
+    "wolf_character/ast_versus_26CB8_eye_fur": {
+      "sha256": "8e1a8cf61b50c95525cae6f275457676ad2a1c1c3cd8eef86f4f61d3c13667c5",
+      "dependencies": [],
+      "source": "wolfen.o2r"
+    },
+    "wolf_character/ast_versus_26DB8_eye_fur": {
+      "sha256": "dca2db740cd908ab16803696c1da2d43dea9885563a4ef5e4e06b2813178d72e",
+      "dependencies": [],
+      "source": "wolfen.o2r"
+    },
+    "wolf_character/ast_versus_26EB8_fur": {
+      "sha256": "483e6221bd8f5c0c1125d86e7257d1e7cf27a74ece5a941990dd3edf7d5bb6f1",
+      "dependencies": [],
+      "source": "wolfen.o2r"
+    },
+    "wolf_character/ast_versus_27268_vest": {
+      "sha256": "08f52c56460ed344ab09ea89e8a13fddc4da60326e06f8e40f3c41557071596d",
+      "dependencies": [],
+      "source": "wolfen.o2r"
+    },
+    "wolf_character/ast_versus_28130_glove": {
+      "sha256": "7d34d919f261cec468b66ff560e710c3d739b8171b471a96662a9934e0bacddf",
+      "dependencies": [],
+      "source": "wolfen.o2r"
+    },
+    "wolf_character/ast_versus_28230_equipment": {
+      "sha256": "d8232ad0acdba694c9fbab8376c77b9d6a6d2c78b35ac0abb7c1522ea9b4cd1d",
+      "dependencies": [],
+      "source": "wolfen.o2r"
+    },
+    "wolf_character/ast_versus_E680_equipment": {
+      "sha256": "6f49bb0e3f8c7e72e2ea831532eb7a0c2a0c49842146041459117a7cbf6e4397",
+      "dependencies": [],
+      "source": "wolfen.o2r"
+    },
+    "wolf_character/ast_versus_EA80_equipment": {
+      "sha256": "9fcbfc5e031b0534ec51fa3a9b9b3fed2d4c1e1367f177d8faa1846494c16604",
+      "dependencies": [],
+      "source": "wolfen.o2r"
+    },
+    "wolf_character/ast_versus_vtx_26668_16": {
+      "sha256": "a843db7cb4f69a596fce8e8c983630c0c6f443e2d685d2566b25f72a840467e4",
+      "dependencies": [],
+      "source": "wolfen.o2r"
+    },
+    "wolf_character/ast_versus_vtx_266F8_16": {
+      "sha256": "856f37d055f4f6960e08ef1251b05f2c4de00d7908dde3d84a57f6b05471e7bc",
+      "dependencies": [],
+      "source": "wolfen.o2r"
+    }
+  }
+}

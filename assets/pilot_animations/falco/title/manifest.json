@@ -1,0 +1,19 @@
+{
+  "character": "Falco",
+  "segment": "ast_title",
+  "skeleton": "aFalcoSkel",
+  "limbs": 22,
+  "mesh_limbs": 16,
+  "triangles": 480,
+  "textures": 14,
+  "materials": 14,
+  "animations": {
+    "aFalcoRunningAnim": 60,
+    "aFalcoAnim": 200,
+    "D_TITLE_601E424": 60
+  },
+  "animation_fps": 30,
+  "units": "original N64 model units",
+  "root_motion": "source",
+  "notes": "Rigid animated limb hierarchy. Source root translation matches mode 0; fixed translation matches modes 1/5. Game runtime pose overrides and N64 lighting/combiners are not baked."
+}

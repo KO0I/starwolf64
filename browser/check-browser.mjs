@@ -1,0 +1,190 @@
+import {spawn} from 'node:child_process';
+import {mkdir,writeFile} from 'node:fs/promises';
+import {fileURLToPath} from 'node:url';
+const url=process.argv[2]||'http://127.0.0.1:8643/';
+const output=fileURLToPath(new URL('./runtime/browser-check/',import.meta.url));
+await mkdir(output,{recursive:true});
+const chrome=spawn('/usr/bin/chromium',['--headless','--no-sandbox','--disable-dev-shm-usage','--use-angle=swiftshader','--enable-unsafe-swiftshader','--remote-debugging-port=9230','--user-data-dir='+output+'chrome',url],{stdio:'ignore'});
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+let ws,call;
+function assert(value,message){if(!value)throw Error(message)}
+function measureLayout(){
+ const screen=document.querySelector('#screen').getBoundingClientRect(),controls=document.querySelector('#controls').getBoundingClientRect();
+ return {below:controls.top>=screen.bottom-1,overflow:document.documentElement.scrollWidth>innerWidth,header:document.querySelector('header').getBoundingClientRect().height,font:document.fonts.check('15px Arwing'),screenWidth:screen.width,viewportWidth:innerWidth};
+}
+function measureLaunch(){
+ const screen=document.querySelector('#screen'),splash=document.querySelector('#splash'),button=document.querySelector('#connect');
+ const colors=[...getComputedStyle(button).backgroundImage.matchAll(/rgb\((\d+), (\d+), (\d+)\)/g)];
+ return {state:screen.dataset.state,splash:!splash.hidden&&splash.complete&&splash.naturalWidth>0&&getComputedStyle(splash).display!=='none',label:button.textContent,disabled:button.disabled,gray:colors.length>0&&colors.every(c=>c[1]===c[2]&&c[2]===c[3]),pickerPulse:getComputedStyle(document.querySelector('.rom-picker')).animationName,buttonPulse:getComputedStyle(button).animationName};
+}
+try{
+ let targets;
+ for(let i=0;i<60;i++){try{targets=await(await fetch('http://127.0.0.1:9230/json/list')).json();if(targets.some(t=>t.type==='page'))break}catch{}await sleep(200)}
+ ws=new WebSocket(targets.find(t=>t.type==='page').webSocketDebuggerUrl);
+ await new Promise((resolve,reject)=>{ws.onopen=resolve;ws.onerror=reject});
+ let next=0;const pending=new Map(),errors=[];
+ ws.onmessage=e=>{const m=JSON.parse(e.data);if(m.id){const p=pending.get(m.id);pending.delete(m.id);m.error?p.reject(m.error):p.resolve(m.result)}else if(m.method==='Runtime.exceptionThrown')errors.push(m.params.exceptionDetails.text)};
+ call=(method,params={})=>new Promise((resolve,reject)=>{const id=++next;pending.set(id,{resolve,reject});ws.send(JSON.stringify({id,method,params}))});
+ const evaluate=async expression=>{const r=await call('Runtime.evaluate',{expression,returnByValue:true,awaitPromise:true,userGesture:true});if(r.exceptionDetails)throw Error(JSON.stringify(r.exceptionDetails));return r.result.value};
+ await call('Runtime.enable');await call('Page.enable');
+ await call('Emulation.setDeviceMetricsOverride',{width:1280,height:900,deviceScaleFactor:1,mobile:false});
+ for(let i=0;i<50;i++){if(await evaluate("!!document.querySelector('#connect')"))break;await sleep(200)}
+ const html=await(await fetch(url)).text();
+ const build=html.match(/STARWOLF_build='([a-f0-9]+)'/)?.[1]||'local';
+ const patchResponse=await fetch(new URL('./wolfen.patch.json?v='+build,url));
+ assert(patchResponse.ok,'The patch is missing');
+ const patch=await patchResponse.json();
+ assert(patch.format==='starwolf64-delta-v1','Expected a delta patch');
+ for(const name of ['game.z64','wolfen.z64']){
+  assert((await fetch(new URL('./'+name,url),{method:'HEAD'})).status===404,'A full ROM is publicly served: '+name);
+ }
+ await call('Network.enable');
+ const uploads=[];
+ const originalMessage=ws.onmessage;
+ ws.onmessage=event=>{
+  const message=JSON.parse(event.data);
+  if(message.method==='Network.requestWillBeSent'&&message.params.request.url.startsWith('http')&&message.params.request.method!=='GET'){
+   uploads.push({method:message.params.request.method,url:message.params.request.url});
+  }
+  originalMessage(event);
+ };
+ let ready=false;
+ for(let i=0;i<100;i++){
+  try{ready=await evaluate("crossOriginIsolated&&!!document.querySelector('#rom-file')&&!document.querySelector('#rom-file').disabled");}catch{}
+  if(ready)break;
+  await sleep(200);
+ }
+ assert(ready,'Threaded emulation was not enabled by headers or the service worker');
+ const launchView=()=>evaluate('('+measureLaunch.toString()+')()');
+ for(let i=0;i<50;i++){if((await launchView()).splash)break;await sleep(100)}
+ let launch=await launchView();
+ assert(launch.state==='awaiting-rom'&&launch.splash&&launch.label==='Launch'&&launch.disabled&&launch.gray&&launch.pickerPulse==='blue-green-pulse'&&launch.buttonPulse==='none','Initial launch screen failed: '+JSON.stringify(launch));
+ await call('Emulation.setEmulatedMedia',{features:[{name:'prefers-reduced-motion',value:'reduce'}]});
+ assert((await launchView()).pickerPulse==='none','Reduced motion did not stop the upload pulse');
+ await call('Emulation.setEmulatedMedia',{features:[]});
+ for(const [name,width,height,mobile]of [['desktop',1280,900,false],['phone',390,844,true]]){
+  await call('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile});await sleep(100);
+  const layout=await evaluate('('+measureLayout.toString()+')()');
+  assert(layout.below&&!layout.overflow&&(await launchView()).splash,'Splash layout failed: '+name);
+  const shot=await call('Page.captureScreenshot',{format:'png'});await writeFile(output+'splash-'+name+'.png',Buffer.from(shot.data,'base64'));
+ }
+ await call('Emulation.setDeviceMetricsOverride',{width:1280,height:900,deviceScaleFactor:1,mobile:false});
+ await evaluate("(()=>{const transfer=new DataTransfer();transfer.items.add(new File(['invalid'],'wrong.z64'));const input=document.querySelector('#rom-file');input.files=transfer.files;input.dispatchEvent(new Event('change'))})()");
+ for(let i=0;i<80;i++){if(await evaluate("document.querySelector('#status').textContent.includes('US v1.1')"))break;await sleep(100)}
+ assert(await evaluate("document.querySelector('#connect').disabled&&!window.EJS_gameUrl"),'An invalid ROM enabled playback');
+ launch=await launchView();
+ assert(launch.state==='awaiting-rom'&&launch.splash&&launch.pickerPulse==='blue-green-pulse'&&launch.buttonPulse==='none','Invalid ROM lost the upload prompt');
+ const document=await call('DOM.getDocument');
+ const input=await call('DOM.querySelector',{nodeId:document.root.nodeId,selector:'#rom-file'});
+ if(process.argv[4]){
+  await call('DOM.setFileInputFiles',{nodeId:input.nodeId,files:[process.argv[4]]});
+  for(let i=0;i<100;i++){
+   if(await evaluate("document.querySelector('#status').textContent.includes('no other files')"))break;
+   await sleep(100);
+  }
+  assert(await evaluate("document.querySelector('#status').textContent.includes('no other files')&&document.querySelector('#connect').disabled&&!window.EJS_gameUrl"),'A ZIP containing an executable was not rejected');
+ }
+ const baseRom=process.argv[3]||fileURLToPath(new URL('../Star Fox 64 (U) (V1.1) [!].z64',import.meta.url));
+ await call('DOM.setFileInputFiles',{nodeId:input.nodeId,files:[baseRom]});
+ let selected=false;
+ for(let i=0;i<120;i++){
+  selected=await evaluate("document.querySelector('#status').textContent==='Ready to play'&&!document.querySelector('#connect').disabled");
+  if(selected)break;
+  await sleep(200);
+ }
+ assert(selected,'ROM selection failed: '+await evaluate("document.querySelector('#status').textContent"));
+ launch=await launchView();
+ assert(launch.state==='ready'&&launch.splash&&launch.label==='Launch'&&!launch.disabled&&launch.pickerPulse==='none'&&launch.buttonPulse==='blue-green-pulse','Ready launch screen failed: '+JSON.stringify(launch));
+ await call('Emulation.setEmulatedMedia',{features:[{name:'prefers-reduced-motion',value:'reduce'}]});
+ assert((await launchView()).buttonPulse==='none','Reduced motion did not stop the Launch pulse');
+ await call('Emulation.setEmulatedMedia',{features:[]});
+ const readyShot=await call('Page.captureScreenshot',{format:'png'});await writeFile(output+'launch-ready-desktop.png',Buffer.from(readyShot.data,'base64'));
+ const targetHash=await evaluate("(async()=>{const bytes=await(await fetch(EJS_gameUrl)).arrayBuffer();const digest=new Uint8Array(await crypto.subtle.digest('SHA-256',bytes));return Array.from(digest,x=>x.toString(16).padStart(2,'0')).join('')})()");
+ assert(targetHash===patch.target.sha256,'The patched game does not match the verified build');
+ console.log('Local ROM patch verified',JSON.stringify({bytes:patchResponse.headers.get('content-length'),targetHash}));
+ launch=await evaluate("document.querySelector('#connect').click();("+measureLaunch.toString()+")()");
+ assert(launch.state==='loading'&&launch.splash&&launch.disabled&&launch.pickerPulse==='none'&&launch.buttonPulse==='none','Launch must keep the splash visible and stop pulsing while loading');
+ let state;
+ for(let i=0;i<180;i++){await sleep(500);state=await evaluate("({status:document.querySelector('#status').textContent,started:!!window.EJS_emulator?.started,canvas:!!document.querySelector('#game canvas'),threads:window.crossOriginIsolated})");if(state.started&&state.canvas)break}
+ console.log('Local emulator',JSON.stringify(state));assert(state.started&&state.canvas&&state.threads,'Emulator failed to boot');
+ launch=await launchView();
+ assert(launch.state==='running'&&!launch.splash&&launch.disabled&&launch.buttonPulse==='none','Game start did not dismiss the splash');
+ await sleep(6000);
+ await evaluate("(()=>{const gm=EJS_emulator.gameManager,original=gm.simulateInput.bind(gm);window.inputProof=[];gm.simulateInput=(...args)=>{inputProof.push(args);return original(...args)}})()");
+ await evaluate("document.querySelector('[data-action=fire]').click()");
+ await sleep(200);
+ assert(await evaluate("inputProof.some(c=>c[1]===0&&c[2]===1)&&inputProof.some(c=>c[1]===0&&c[2]===0)"),'Fire press/release did not reach the core');
+ await evaluate("document.querySelector('[data-action=start]').click()");
+ await sleep(1000);
+ await evaluate("document.querySelector('#disconnect').click()");
+ assert(await evaluate("EJS_emulator.paused"),'Pause failed');
+ launch=await launchView();
+ assert(launch.state==='paused'&&!launch.splash&&launch.label==='Resume'&&launch.buttonPulse==='none','Pause restored the launch prompt');
+ await evaluate("document.querySelector('#connect').click()");
+ assert(await evaluate("!EJS_emulator.paused"),'Resume failed');
+ launch=await launchView();
+ assert(launch.state==='running'&&!launch.splash&&launch.buttonPulse==='none','Resume restored the launch prompt');
+ const audio=await evaluate("({state:EJS_emulator.Module.AL?.currentCtx?.audioCtx?.state,muted:EJS_emulator.muted,canvas:[EJS_emulator.canvas.width,EJS_emulator.canvas.height]})");
+ console.log('Audio/render',JSON.stringify(audio));
+ assert(audio.state==='running','Emulator audio context is not running');
+ const chatterStatus=await evaluate("window.STARWOLF_chatter.stats");
+ console.log('Crew chatter live state',JSON.stringify(chatterStatus));
+ assert(chatterStatus.ready&&Number.isInteger(chatterStatus.ramBase)&&!chatterStatus.error,'Chatter did not load banks and locate real N64 RAM');
+ const chatterProof=await evaluate(`(async()=>{
+   const gm=EJS_emulator.gameManager, heap=gm.Module.HEAPU8, base=STARWOLF_chatter.stats.ramBase;
+   gm.functions.toggleMainLoop(0);
+   await new Promise(r=>setTimeout(r,100));
+   const ram=new DataView(heap.buffer,base), offsets=[0x1CD944,0x1CD948,0x1CD9C0,0x1CD9E0,0x178340,0xC5D68,0x177D68,0x17829C,0x1782D8,0x178308,0x177834,0x177854];
+   const saved=offsets.map(offset=>[offset,heap.slice(base+offset,base+offset+4)]);
+   const scratch=0x3FFE00, savedText=heap.slice(base+scratch,base+scratch+64), before={...STARWOLF_chatter.stats.voices};
+   try {
+     for(let i=0;i<20;i++)ram.setUint16((scratch+2*i)^2,24+i%26,true);
+     ram.setUint16((scratch+40)^2,0,true);
+     ram.setUint32(0x178308,0x80000000+scratch,true);
+     ram.setInt32(0x17829C,4,true);ram.setInt32(0x177834,7,true);ram.setInt32(0x177854,0,true);
+     for(const [speaker,name]of [[0,'wolf'],[10,'panther'],[20,'kami'],[30,'krystal'],[400,'vitzy']]){
+       ram.setFloat32(0x177D68,speaker,true);ram.setInt32(0x1782D8,1,true);
+       await new Promise(r=>setTimeout(r,280));
+       if((STARWOLF_chatter.stats.voices[name]||0)<=(before[name]||0))throw Error(name+' did not play');
+     }
+     ram.setInt32(0x177834,4,true);ram.setInt32(0x1CD944,0,true);ram.setInt32(0x1CD948,1,true);
+     ram.setInt32(0x1CD9C0,0,true);ram.setInt32(0x178340,0,true);ram.setFloat32(0x1CD9E0,210,true);
+     await new Promise(r=>setTimeout(r,280));
+     if((STARWOLF_chatter.stats.voices.narrator||0)<=(before.narrator||0))throw Error('Prologue narrator did not play');
+     ram.setInt32(0x1CD944,3,true);ram.setInt32(0x17829C,0,true);
+     await new Promise(r=>setTimeout(r,50));
+     if(STARWOLF_chatter.stats.playing)throw Error('Skipping prologue did not stop narrator');
+     ram.setInt32(0x177834,7,true);ram.setInt32(0x17829C,4,true);
+     await new Promise(r=>setTimeout(r,280));
+     const counts={...STARWOLF_chatter.stats.voices};
+     await new Promise(r=>setTimeout(r,250));
+     if(JSON.stringify(counts)!==JSON.stringify(STARWOLF_chatter.stats.voices))throw Error('Unchanged text repeated');
+     ram.setInt32(0x177854,100,true);ram.setInt32(0x1782D8,2,true);
+     await new Promise(r=>setTimeout(r,100));
+     if(STARWOLF_chatter.stats.playing)throw Error('In-game pause did not stop chatter');
+     ram.setInt32(0x177854,0,true);heap[base+(0xC5D69^3)]=0;ram.setInt32(0x1782D8,3,true);
+     await new Promise(r=>setTimeout(r,150));
+     if(JSON.stringify(counts)!==JSON.stringify(STARWOLF_chatter.stats.voices)||STARWOLF_chatter.stats.playing)throw Error('Voice volume zero did not mute chatter');
+     return {voices:counts,paused:!STARWOLF_chatter.stats.playing,voiceVolumeMute:true};
+   } finally {
+     saved.forEach(([offset,bytes])=>heap.set(bytes,base+offset));heap.set(savedText,base+scratch);
+     STARWOLF_chatter.stop();gm.functions.toggleMainLoop(1);
+   }
+ })()`);
+ console.log('Crew chatter actual Web Audio',JSON.stringify(chatterProof));
+ assert(chatterProof?.paused&&Object.keys(chatterProof.voices).length===6,'Six-voice playback failed');
+
+ for(const [name,width,height,mobile]of [['desktop',1280,900,false],['phone',390,844,true],['landscape',844,390,true]]){
+  await call('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile});await sleep(300);
+  const layout=await evaluate('('+measureLayout.toString()+')()');console.log(name,JSON.stringify(layout));
+  assert(layout.below&&!layout.overflow&&layout.header<=38&&layout.font,'Layout failed: '+name);
+  assert(await evaluate("[...document.querySelectorAll('.ejs_virtualGamepad_parent,.ejs_menu_bar')].every(e=>getComputedStyle(e).display==='none')"),'Controls overlap the viewscreen');
+  const shot=await call('Page.captureScreenshot',{format:'png'});await writeFile(output+'emulator-'+name+'.png',Buffer.from(shot.data,'base64'));
+ }
+ assert(!uploads.length,'Unexpected network upload: '+JSON.stringify(uploads));
+ assert(!errors.length,'Browser errors: '+errors.join(','));
+ console.log('PASS: splash and Launch states, blue-green pulses, reduced motion, patch-only hosting, ROM validation, real emulator boot, input, audio, six chatter banks including narrator, pause/resume, desktop/mobile layouts, and no uploads.');
+}finally{
+ if(call)try{await call('Runtime.evaluate',{expression:"window.EJS_emulator?.started && EJS_emulator.pause()",userGesture:true})}catch{}
+ ws?.close();chrome.kill('SIGTERM');
+}

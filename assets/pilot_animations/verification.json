@@ -1,0 +1,50 @@
+[
+  {
+    "path": "assets/pilot_animations/fox/title/body.glb",
+    "triangles": 461,
+    "animations": 5,
+    "verified": true
+  },
+  {
+    "path": "assets/pilot_animations/fox/on_foot/body.glb",
+    "triangles": 122,
+    "animations": 3,
+    "verified": true
+  },
+  {
+    "path": "assets/pilot_animations/falco/title/body.glb",
+    "triangles": 480,
+    "animations": 3,
+    "verified": true
+  },
+  {
+    "path": "assets/pilot_animations/falco/on_foot/body.glb",
+    "triangles": 112,
+    "animations": 3,
+    "verified": true
+  },
+  {
+    "path": "assets/pilot_animations/peppy/title/body.glb",
+    "triangles": 507,
+    "animations": 3,
+    "verified": true
+  },
+  {
+    "path": "assets/pilot_animations/peppy/on_foot/body.glb",
+    "triangles": 124,
+    "animations": 3,
+    "verified": true
+  },
+  {
+    "path": "assets/pilot_animations/slippy/title/body.glb",
+    "triangles": 453,
+    "animations": 3,
+    "verified": true
+  },
+  {
+    "path": "assets/pilot_animations/slippy/on_foot/body.glb",
+    "triangles": 108,
+    "animations": 3,
+    "verified": true
+  }
+]

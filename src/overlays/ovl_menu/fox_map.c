@@ -17,6 +17,9 @@
 #include "assets/ast_font_3d.h"
 #include "port/interpolation/FrameInterpolation.h"
 #include "port/mods/PortEnhancements.h"
+#include "port/audio/CrewChatter.h"
+
+extern u8 sVolumeSettings[3];
 
 extern bool gBackToMap;
 
@@ -2188,6 +2191,16 @@ void Map_Prologue_Draw(void) {
     // Prologue text
     Message_DisplayScrollingText(&gMasterDisp, gMsg_ID_1, sPrologueTextXpos, sPrologueTextYpos, 218, 70,
                                  Message_GetCharCount(gMsg_ID_1));
+
+    if ((sMapSubState == 1) && (sMapTimer3 == 0) && (gFillScreenAlpha == 0) &&
+        (sPrologueTextYpos < 218.0f) && (sPrologueTextYpos > -355.0f)) {
+        u16* text = LOAD_ASSET(gMsg_ID_1);
+        s32 count = Message_GetCharCount(text);
+        s32 progress = (s32) ((230.0f - sPrologueTextYpos) * count / 585.0f);
+        progress = CLAMP(progress, 0, count);
+        CrewChatter_Observe(1000, text, progress, progress > 0 ? text[progress - 1] : MSGCHAR_END,
+                            sVolumeSettings[AUDIO_TYPE_VOICE] / 99.0f);
+    }
 
     RCP_SetupDL(&gMasterDisp, SETUPDL_76_OPTIONAL);
     gDPSetPrimColor(gMasterDisp++, 0, 0, 255, 255, 255, 255);

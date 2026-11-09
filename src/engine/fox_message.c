@@ -1,5 +1,8 @@
 #include "global.h"
 #include "mods.h"
+#include "port/audio/CrewChatter.h"
+
+extern u8 sVolumeSettings[3];
 
 u16* Message_PtrFromId(u16 msgId) {
     s32 i;
@@ -14,18 +17,34 @@ u16* Message_PtrFromId(u16 msgId) {
     return NULL;
 }
 
+static u16 Message_VoiceId(u16 msgId) {
+    switch ((s32) gRadioMsgRadioId) {
+        case RCID_FOX:
+        case RCID_FOX_RED:
+        case RCID_FALCO:
+        case RCID_FALCO_RED:
+        case RCID_SLIPPY:
+        case RCID_SLIPPY_RED:
+        case RCID_PEPPY:
+        case RCID_PEPPY_RED:
+        case RCID_FOX_EXPERT:
+            return 0;
+        default:
+            return msgId;
+    }
+}
+
 u16 Message_IdFromPtr(u16* msgPtr) {
-    s32 i;
     MsgLookup* lookup = (MsgLookup*) LOAD_ASSET(gMsgLookup);
 
     while (lookup->msgPtr != NULL) {
         if (GameEngine_OTRSigCheck(msgPtr)) {
             if (strcmp(((char*) msgPtr) + 7, lookup->path) == 0) {
-                return lookup->msgId;
+                return Message_VoiceId(lookup->msgId);
             }
         } else {
             if (lookup->msgPtr == msgPtr) {
-                return lookup->msgId;
+                return Message_VoiceId(lookup->msgId);
             }
         }
         lookup++;
@@ -74,6 +93,7 @@ bool Message_DisplayText(Gfx** gfxPtr, u16* msgPtr, s32 xPos, s32 yPos, s32 len)
     s32 yChar = yPos;
     s32 i;
     bool print;
+    bool radioLine = (msgPtr == gRadioMsg);
 
     msgPtr = LOAD_ASSET(msgPtr);
     gDPSetPrimColor((*gfxPtr)++, 0x00, 0x00, 255, 255, 255, 255);
@@ -121,6 +141,12 @@ bool Message_DisplayText(Gfx** gfxPtr, u16* msgPtr, s32 xPos, s32 yPos, s32 len)
             case MSGCHAR_HSP:
             case MSGCHAR_NXT:
                 break;
+        }
+    }
+    if (radioLine && !((gPlayState == PLAY_PAUSE) && (gGameState != GSTATE_ENDING))) {
+        if (CrewChatter_Observe((s32) gRadioMsgRadioId, msgPtr, i, i > 0 ? msgPtr[i - 1] : MSGCHAR_END,
+                                sVolumeSettings[AUDIO_TYPE_VOICE] / 99.0f)) {
+            gRadioMouthTimer = 2;
         }
     }
     return print;

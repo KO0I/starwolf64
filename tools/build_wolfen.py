@@ -184,7 +184,7 @@ class Builder:
         self.segments = {}
         self.table_indices = {}
         self.assets = {}
-        for stem in ('ast_arwing', 'ast_star_wolf', 'ast_common', 'ast_enmy_planet', 'ast_enmy_space', 'ast_versus', 'ast_title'):
+        for stem in ('ast_arwing', 'ast_star_wolf', 'ast_common', 'ast_enmy_planet', 'ast_enmy_space', 'ast_versus', 'ast_title', 'ast_vs_menu'):
             virtual, entries = manifest(stem)
             for i in range(64):
                 v, start, end, compressed = struct.unpack_from('>IIII', rom, TABLE + i * 16)
@@ -515,8 +515,16 @@ class Builder:
         build_lod(self, crc64)
         from medusa import install_medusa
         install_medusa(self, crc64)
+        from wolf_portraits import replace_portraits
+        replace_portraits(self)
+        from wolf_identity import replace_name_cards
+        replace_name_cards(self)
         from wolf_character import build_character
         build_character(self)
+        from wolf_dialogue import replace_dialogue, replace_identity, mute_changed_dialogue
+        replace_dialogue(self)
+        replace_identity(self)
+        mute_changed_dialogue(self)
         from vitzy_fighter import build_fighter
         build_fighter(self)
         return wing_parts
@@ -538,6 +546,8 @@ class Builder:
             struct.pack_into('>IIII', out, entry, virtual, start, len(out), 0)
         self.character.patch_rom(out)
         self.medusa.patch_rom(out)
+        from wolf_dialogue import patch_dialogue_voice
+        patch_dialogue_voice(self, out)
         out.extend(b'\0' * (0x1000000 - len(out)))
         struct.pack_into('>II', out, 0x10, *cartridge_crc(out))
         return out
@@ -546,7 +556,12 @@ class Builder:
         from vitzy_fighter import verify_fighter
         verify_fighter(self)
         title = self.segments['ast_title']
-        before_character = self.character.original['ast_title']
+        from wolf_identity import verify_name_cards
+        verify_name_cards(self)
+        before_character = bytearray(self.character.original['ast_title'])
+        for stem, _, offset, original, _ in self.name_cards:
+            if stem == 'ast_title':
+                before_character[offset:offset + len(original)] = original
         from wolf_logo import SIZE as logo_size, verify_title_logo
         verify_title_logo(self)
         if len(before_character) != len(self.original_title) or before_character[logo_size:0x14140] != self.original_title[logo_size:0x14140] or before_character[0x147C0:] != self.original_title[0x147C0:]:
@@ -560,6 +575,9 @@ class Builder:
             raise ValueError('Native/browser intro title mismatch')
         self.character.verify(patched)
         self.medusa.verify(patched)
+        from wolf_dialogue import verify_dialogue, verify_dialogue_voice
+        verify_dialogue(self, patched)
+        verify_dialogue_voice(self, patched)
         # Wolf owns the two Fox head lists; teammate heads and flight rigs stay intact.
         protected = [(0x3960, 0x9B60), (0x131F0, 0x14BF0), (0x16B30, len(self.output))]
         for start, end in protected:
@@ -639,7 +657,8 @@ class Builder:
         for offset, (_, replacement) in ROM_PATCHES.items():
             if struct.unpack_from('>I', patched, offset)[0] != replacement:
                 raise ValueError('Browser flight color/position patch missing')
-        common = self.segments['ast_common']
+        from wolf_portraits import verify_portraits
+        common = verify_portraits(self)
         if common[:0x1AF98] != self.original_common[:0x1AF98] or common[0x1B198:] != self.original_common[0x1B198:]:
             raise ValueError('An unrelated common asset, including hyper lasers, changed')
         pixels = struct.unpack_from('>256H', common, 0x1AF98)
@@ -667,6 +686,12 @@ def main():
     with zipfile.ZipFile(args.assets) as base:
         builder = Builder(original, base)
         sides = builder.build()
+        chatter = ROOT / "assets/audio/chatter/bank.bin"
+        data = chatter.read_bytes()
+        if data[:4] != b"CHT1":
+            raise ValueError("Missing or invalid crew chatter bank")
+        header = base.read("ast_audio/ast_audio_v1_sequence_DEA20")[:64]
+        builder.resources["audio/crew_chatter"] = header + struct.pack("<I", len(data)) + data
         rom = builder.patched_rom()
         builder.verify(rom)
         browser_page = ROOT / 'browser/index.html'
@@ -711,7 +736,10 @@ def main():
         print(f'Pilot lift {HEAD_LIFT:g}, cockpit drop {COCKPIT_DROP:g}, exhaust Y {HULL_Y:g}, Wolfen rear plate. Wolf character installed, head WIP. Wing joints: {sides}. Asset space {builder.cursor - 0x9B70:#x}/{0x131F0 - 0x9B70:#x} bytes.')
         print(f'Mesh triangles: { {name: len(mesh) for name, mesh in builder.geometry.items()} }')
         print(f'Self-contained LOD bytes: {builder.lod_usage}')
+        print(f'Medusa: {builder.medusa.triangle_count} hull triangles, upright fin removed, scale {builder.medusa.scale:.6f}, length {builder.medusa.rendered_bounds[1][2] - builder.medusa.rendered_bounds[0][2]}, green MEDUSA name, small Star Wolf marks, {builder.medusa.window_count} emissive windows, two deck light pools, {builder.medusa.engine_triangles} nozzle triangles, {builder.medusa.cursor:#x}/{0xDFB0:#x} hull bytes.')
         print(f'Wolf character: {len(builder.character.draws)} display lists, {len(builder.character.materials)} private materials, {builder.character.changed_vertices} shaped/patch vertices. Original rigs and teammate assets preserved.')
+        print(f'Wolf cockpit head: {builder.character.cockpit_triangles} triangles; all 5 Fox portrait slots replaced.')
+        print(f'Crew portraits: {len(builder.crew_portrait_changes)} textures installed for Panther, Krystal and Kami, including radio mouth frames, versus menus and map status.')
 
 
 if __name__ == '__main__':

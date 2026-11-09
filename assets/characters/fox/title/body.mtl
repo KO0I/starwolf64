@@ -1,0 +1,79 @@
+newmtl D_TITLE_602DF30
+Kd 1 1 1
+Ka 0 0 0
+map_Kd -clamp on textures/D_TITLE_602DF30.png
+
+newmtl D_TITLE_602DB30
+Kd 1 1 1
+Ka 0 0 0
+map_Kd -clamp on textures/D_TITLE_602DB30.png
+
+newmtl D_TITLE_601F200
+Kd 1 1 1
+Ka 0 0 0
+map_Kd -clamp on textures/D_TITLE_601F200.png
+
+newmtl D_TITLE_601F400
+Kd 1 1 1
+Ka 0 0 0
+map_Kd -clamp on textures/D_TITLE_601F400.png
+
+newmtl D_TITLE_601EA00
+Kd 1 1 1
+Ka 0 0 0
+map_Kd -clamp on textures/D_TITLE_601EA00.png
+
+newmtl D_TITLE_60214F8
+Kd 1 1 1
+Ka 0 0 0
+map_Kd -clamp on textures/D_TITLE_60214F8.png
+
+newmtl D_TITLE_6023B40
+Kd 1 1 1
+Ka 0 0 0
+map_Kd -clamp on textures/D_TITLE_6023B40.png
+
+newmtl D_TITLE_6021F10
+Kd 1 1 1
+Ka 0 0 0
+map_Kd -clamp on textures/D_TITLE_6021F10.png
+
+newmtl D_TITLE_60426E0
+Kd 1 1 1
+Ka 0 0 0
+map_Kd -clamp on textures/D_TITLE_60426E0.png
+
+newmtl D_TITLE_6041CF0
+Kd 1 1 1
+Ka 0 0 0
+map_Kd -clamp on textures/D_TITLE_6041CF0.png
+
+newmtl D_TITLE_6028988
+Kd 1 1 1
+Ka 0 0 0
+map_Kd -clamp on textures/D_TITLE_6028988.png
+
+newmtl D_TITLE_6024340
+Kd 1 1 1
+Ka 0 0 0
+map_Kd -clamp on textures/D_TITLE_6024340.png
+
+newmtl D_TITLE_6025FA8
+Kd 1 1 1
+Ka 0 0 0
+map_Kd -clamp on textures/D_TITLE_6025FA8.png
+
+newmtl D_TITLE_6023340
+Kd 1 1 1
+Ka 0 0 0
+map_Kd -clamp on textures/D_TITLE_6023340.png
+
+newmtl D_TITLE_6022B40
+Kd 1 1 1
+Ka 0 0 0
+map_Kd -clamp on textures/D_TITLE_6022B40.png
+
+newmtl D_TITLE_6026D28
+Kd 1 1 1
+Ka 0 0 0
+map_Kd -clamp on textures/D_TITLE_6026D28.png

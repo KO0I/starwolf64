@@ -1,0 +1,62 @@
+[
+  {
+    "path": "assets/characters/fox/title/body.glb",
+    "triangles": 461,
+    "animations": 2,
+    "verified": true
+  },
+  {
+    "path": "assets/characters/fox/on_foot/body.glb",
+    "triangles": 122,
+    "animations": 3,
+    "verified": true
+  },
+  {
+    "path": "assets/characters/peppy/title/body.glb",
+    "triangles": 507,
+    "animations": 2,
+    "verified": true
+  },
+  {
+    "path": "assets/characters/peppy/on_foot/body.glb",
+    "triangles": 124,
+    "animations": 3,
+    "verified": true
+  },
+  {
+    "path": "assets/characters/slippy/title/body.glb",
+    "triangles": 453,
+    "animations": 2,
+    "verified": true
+  },
+  {
+    "path": "assets/characters/slippy/on_foot/body.glb",
+    "triangles": 108,
+    "animations": 3,
+    "verified": true
+  },
+  {
+    "path": "assets/characters/falco/title/body.glb",
+    "triangles": 480,
+    "animations": 2,
+    "verified": true
+  },
+  {
+    "path": "assets/characters/falco/on_foot/body.glb",
+    "triangles": 112,
+    "animations": 3,
+    "verified": true
+  },
+  {
+    "path": "assets/characters/wolf/title/body.glb",
+    "triangles": 461,
+    "animations": 2,
+    "verified": true
+  },
+  {
+    "path": "assets/characters/wolf/on_foot/body.glb",
+    "triangles": 122,
+    "animations": 3,
+    "verified": true
+  }
+]

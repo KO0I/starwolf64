@@ -1,0 +1,79 @@
+newmtl ast_title_2DF30_mouth
+Kd 1 1 1
+Ka 0 0 0
+map_Kd -clamp on textures/ast_title_2DF30_mouth.png
+
+newmtl ast_title_2DB30_fur
+Kd 1 1 1
+Ka 0 0 0
+map_Kd -clamp on textures/ast_title_2DB30_fur.png
+
+newmtl ast_title_1F200_glove
+Kd 1 1 1
+Ka 0 0 0
+map_Kd -clamp on textures/ast_title_1F200_glove.png
+
+newmtl ast_title_1F400_glove
+Kd 1 1 1
+Ka 0 0 0
+map_Kd -clamp on textures/ast_title_1F400_glove.png
+
+newmtl ast_title_1EA00_glove
+Kd 1 1 1
+Ka 0 0 0
+map_Kd -clamp on textures/ast_title_1EA00_glove.png
+
+newmtl ast_title_214F8_fur
+Kd 1 1 1
+Ka 0 0 0
+map_Kd -clamp on textures/ast_title_214F8_fur.png
+
+newmtl ast_title_23B40_jacket
+Kd 1 1 1
+Ka 0 0 0
+map_Kd -clamp on textures/ast_title_23B40_jacket.png
+
+newmtl ast_title_21F10_metal
+Kd 1 1 1
+Ka 0 0 0
+map_Kd -clamp on textures/ast_title_21F10_metal.png
+
+newmtl ast_title_426E0_metal
+Kd 1 1 1
+Ka 0 0 0
+map_Kd -clamp on textures/ast_title_426E0_metal.png
+
+newmtl ast_title_41CF0_trousers
+Kd 1 1 1
+Ka 0 0 0
+map_Kd -clamp on textures/ast_title_41CF0_trousers.png
+
+newmtl ast_title_28988_mouth
+Kd 1 1 1
+Ka 0 0 0
+map_Kd -clamp on textures/ast_title_28988_mouth.png
+
+newmtl ast_title_24340_fur
+Kd 1 1 1
+Ka 0 0 0
+map_Kd -clamp on textures/ast_title_24340_fur.png
+
+newmtl ast_title_25FA8_eye
+Kd 1 1 1
+Ka 0 0 0
+map_Kd -clamp on textures/ast_title_25FA8_eye.png
+
+newmtl ast_title_23340_scarf
+Kd 1 1 1
+Ka 0 0 0
+map_Kd -clamp on textures/ast_title_23340_scarf.png
+
+newmtl ast_title_22B40_chest
+Kd 1 1 1
+Ka 0 0 0
+map_Kd -clamp on textures/ast_title_22B40_chest.png
+
+newmtl ast_title_26D28_metal
+Kd 1 1 1
+Ka 0 0 0
+map_Kd -clamp on textures/ast_title_26D28_metal.png

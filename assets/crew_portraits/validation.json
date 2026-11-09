@@ -1,0 +1,53 @@
+[
+  {
+    "character": "panther",
+    "mouth_difference_bbox": [
+      16,
+      31,
+      29,
+      36
+    ],
+    "changed_pixels": 65,
+    "non_mouth_changed_pixels": 0,
+    "png_dimensions": [
+      44,
+      44
+    ],
+    "binary_bytes": 3872,
+    "rgba5551_roundtrip": "PASS"
+  },
+  {
+    "character": "krystal",
+    "mouth_difference_bbox": [
+      17,
+      32,
+      27,
+      36
+    ],
+    "changed_pixels": 33,
+    "non_mouth_changed_pixels": 0,
+    "png_dimensions": [
+      44,
+      44
+    ],
+    "binary_bytes": 3872,
+    "rgba5551_roundtrip": "PASS"
+  },
+  {
+    "character": "kami",
+    "mouth_difference_bbox": [
+      18,
+      32,
+      27,
+      36
+    ],
+    "changed_pixels": 33,
+    "non_mouth_changed_pixels": 0,
+    "png_dimensions": [
+      44,
+      44
+    ],
+    "binary_bytes": 3872,
+    "rgba5551_roundtrip": "PASS"
+  }
+]

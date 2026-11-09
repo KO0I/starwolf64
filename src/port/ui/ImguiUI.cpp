@@ -233,6 +233,10 @@ void DrawSpeakerPositionEditor() {
 void DrawSettingsMenu(){
     if(UIWidgets::BeginMenu("Settings")){
         if (UIWidgets::BeginMenu("Audio")) {
+            UIWidgets::CVarCheckbox("Crew chatter", "gCrewChatter", {
+                .tooltip = "Play character syllables as crew dialogue appears. Disable for silent crew dialogue.",
+                .defaultValue = true,
+            });
             UIWidgets::CVarSliderFloat("Master Volume", "gGameMasterVolume", 0.0f, 1.0f, 1.0f, {
                 .format = "%.0f%%",
                 .isPercentage = true,
@@ -747,14 +751,14 @@ void DrawCheatsMenu() {
         UIWidgets::CVarCheckbox("Self destruct button", "gHit64SelfDestruct", {
                 .tooltip = "Press Down on the D-PAD to instantly self destruct."
             });
-        UIWidgets::CVarCheckbox("Start with Falco dead", "gHit64FalcoDead", {
-                .tooltip = "Start the level with with Falco dead."
+        UIWidgets::CVarCheckbox("Start with Panther dead", "gHit64FalcoDead", {
+                .tooltip = "Start the level with Panther dead."
             });
-        UIWidgets::CVarCheckbox("Start with Slippy dead", "gHit64SlippyDead", {
-                .tooltip = "Start the level with with Slippy dead."
+        UIWidgets::CVarCheckbox("Start with Kami dead", "gHit64SlippyDead", {
+                .tooltip = "Start the level with Kami dead."
             });
-        UIWidgets::CVarCheckbox("Start with Peppy dead", "gHit64PeppyDead", {
-                .tooltip = "Start the level with with Peppy dead."
+        UIWidgets::CVarCheckbox("Start with Krystal dead", "gHit64PeppyDead", {
+                .tooltip = "Start the level with Krystal dead."
             });
         
         UIWidgets::CVarCheckbox("Score Editor", "gScoreEditor", { .tooltip = "Enable the score editor" });

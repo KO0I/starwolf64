@@ -1,0 +1,54 @@
+newmtl D_versus_3026A38
+Kd 1 1 1
+Ka 0 0 0
+map_Kd -clamp on textures/D_versus_3026A38.png
+
+newmtl D_versus_30226D0
+Kd 1 1 1
+Ka 0 0 0
+map_Kd -clamp on textures/D_versus_30226D0.png
+
+newmtl D_versus_3023F68
+Kd 1 1 1
+Ka 0 0 0
+map_Kd -clamp on textures/D_versus_3023F68.png
+
+newmtl D_versus_3025C68
+Kd 1 1 1
+Ka 0 0 0
+map_Kd -clamp on textures/D_versus_3025C68.png
+
+newmtl D_versus_300E280
+Kd 1 1 1
+Ka 0 0 0
+map_Kd -clamp on textures/D_versus_300E280.png
+
+newmtl D_versus_300E680
+Kd 1 1 1
+Ka 0 0 0
+map_Kd -clamp on textures/D_versus_300E680.png
+
+newmtl D_versus_300EA80
+Kd 1 1 1
+Ka 0 0 0
+map_Kd -clamp on textures/D_versus_300EA80.png
+
+newmtl D_versus_3026AB8
+Kd 1 1 1
+Ka 0 0 0
+map_Kd -clamp on textures/D_versus_3026AB8.png
+
+newmtl D_versus_3022DE0
+Kd 1 1 1
+Ka 0 0 0
+map_Kd -clamp on textures/D_versus_3022DE0.png
+
+newmtl D_versus_3022E60
+Kd 1 1 1
+Ka 0 0 0
+map_Kd -clamp on textures/D_versus_3022E60.png
+
+newmtl D_versus_3023238
+Kd 1 1 1
+Ka 0 0 0
+map_Kd -clamp on textures/D_versus_3023238.png

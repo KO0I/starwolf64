@@ -1,0 +1,38 @@
+{
+  "characters": [
+    "fox",
+    "peppy",
+    "slippy",
+    "falco",
+    "wolf"
+  ],
+  "variants": {
+    "title": "Detailed full-body title/cutscene model",
+    "on_foot": "Low-poly versus full-body model with weapon"
+  },
+  "formats": {
+    "body.glb": "Self-contained textured model with animated rigid limb nodes, at 30 FPS",
+    "body.obj": "Static frame-zero mesh with body.mtl and external PNG textures",
+    "native/": "Dependency-complete original resources for Fox, Peppy, Slippy and Falco; installed-mod resources over the base assets for Wolf"
+  },
+  "wolf": "Current installed Wolf skin on Fox rig, verified byte-for-byte against build-cmake/mods/wolfen.o2r. Head remains WIP.",
+  "notes": [
+    "Preserves original N64 units and Y-up coordinates.",
+    "GLB uses rigid animated limb nodes rather than a weighted skin.",
+    "Root translation is fixed to the limb origin, matching game modes 1/5.",
+    "N64 lighting/combiners and runtime character pose overrides are not reproduced.",
+    "Native assets preserve original animation data."
+  ],
+  "reproduce": [
+    "python3 tools/export_team_bodies.py",
+    "python3 tools/extract_team_bodies.py",
+    "python3 tools/check_team_bodies.py"
+  ],
+  "verification": {
+    "models": 10,
+    "animation_clips": 25,
+    "native_resources": 820,
+    "preview": "preview.png",
+    "results": "verification.json"
+  }
+}

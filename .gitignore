@@ -60,3 +60,10 @@ src/cn/
 
 properties.h
 mods*/
+/browser/.venv/
+
+/browser/runtime/
+
+!tools/build_crew_chatter.py
+
+!assets/audio/chatter/bank.bin

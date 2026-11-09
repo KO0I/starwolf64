@@ -1,0 +1,38 @@
+[
+  {
+    "path": "assets/team_bodies/peppy/title/body.glb",
+    "triangles": 507,
+    "animations": 2,
+    "verified": true
+  },
+  {
+    "path": "assets/team_bodies/peppy/on_foot/body.glb",
+    "triangles": 124,
+    "animations": 3,
+    "verified": true
+  },
+  {
+    "path": "assets/team_bodies/slippy/title/body.glb",
+    "triangles": 453,
+    "animations": 2,
+    "verified": true
+  },
+  {
+    "path": "assets/team_bodies/slippy/on_foot/body.glb",
+    "triangles": 108,
+    "animations": 3,
+    "verified": true
+  },
+  {
+    "path": "assets/team_bodies/falco/title/body.glb",
+    "triangles": 480,
+    "animations": 2,
+    "verified": true
+  },
+  {
+    "path": "assets/team_bodies/falco/on_foot/body.glb",
+    "triangles": 112,
+    "animations": 3,
+    "verified": true
+  }
+]

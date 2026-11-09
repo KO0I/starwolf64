@@ -1,0 +1,18 @@
+{
+  "character": "Peppy",
+  "segment": "ast_versus",
+  "skeleton": "aVsOnFootPeppySkel",
+  "limbs": 24,
+  "mesh_limbs": 16,
+  "triangles": 124,
+  "textures": 12,
+  "materials": 12,
+  "animations": {
+    "D_versus_301D568": 30,
+    "D_versus_301D888": 30,
+    "D_versus_301DD6C": 30
+  },
+  "animation_fps": 30,
+  "units": "original N64 model units",
+  "notes": "Rigid animated limb hierarchy. Root motion fixed to skeleton origin as in mode 1/5. Game runtime pose overrides and N64 lighting/combiners are not baked."
+}

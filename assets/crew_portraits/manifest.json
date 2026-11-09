@@ -1,0 +1,98 @@
+{
+  "width": 44,
+  "height": 44,
+  "format": "RGBA16 (R5G5B5A1)",
+  "endianness": "big",
+  "layout": "row-major, top-to-bottom",
+  "bytes_per_frame": 3872,
+  "alpha": "opaque",
+  "frame_order": [
+    "closed",
+    "talking"
+  ],
+  "target_slot_mapping": null,
+  "in_game_tested": false,
+  "sources": [
+    {
+      "url": "https://github.com/HarbourMasters/Starship/blob/main/src/engine/fox_radio.c",
+      "git_blob_sha": "e60f80c1ee55744dfee2518c93d56c61d626e4da",
+      "evidence": "Radio draws RGBA16 portraits at 44x44; base and base+1 are rest and talking."
+    },
+    {
+      "url": "https://github.com/HarbourMasters/Starship/blob/main/assets/yaml/us/rev1/ast_star_wolf.yaml",
+      "git_blob_sha": "763aaa0516eb53aed194e033ba24668caf199549",
+      "evidence": "US rev1 texture declarations specify RGBA16, width 44, height 44."
+    }
+  ],
+  "characters": {
+    "panther": {
+      "mouth_patch_rect_xyxy": [
+        16,
+        31,
+        29,
+        36
+      ],
+      "changed_pixels": 65,
+      "frames": [
+        {
+          "frame": "closed",
+          "png": "native/panther_closed.rgba16.png",
+          "raw": "rgba16/panther_closed.rgba16.bin",
+          "sha256_rgba16": "b04af03407beefe0279f89094da142a003bc716ac891e7d38d41f6dee9896763"
+        },
+        {
+          "frame": "talking",
+          "png": "native/panther_talking.rgba16.png",
+          "raw": "rgba16/panther_talking.rgba16.bin",
+          "sha256_rgba16": "961fcb6363520a6b717d28c0ee271111394ef34d08a757113220c6e5312270a3"
+        }
+      ]
+    },
+    "krystal": {
+      "mouth_patch_rect_xyxy": [
+        17,
+        32,
+        27,
+        36
+      ],
+      "changed_pixels": 33,
+      "frames": [
+        {
+          "frame": "closed",
+          "png": "native/krystal_closed.rgba16.png",
+          "raw": "rgba16/krystal_closed.rgba16.bin",
+          "sha256_rgba16": "d1217a894cf3a9d962224b7293a06639d4d39faa09a58b5a10ca30cf04d16931"
+        },
+        {
+          "frame": "talking",
+          "png": "native/krystal_talking.rgba16.png",
+          "raw": "rgba16/krystal_talking.rgba16.bin",
+          "sha256_rgba16": "ddedae6f9b7e11021044c6ca29c918143da098043f1d6fd96713c6b83a56c1ee"
+        }
+      ]
+    },
+    "kami": {
+      "mouth_patch_rect_xyxy": [
+        18,
+        32,
+        27,
+        36
+      ],
+      "changed_pixels": 33,
+      "frames": [
+        {
+          "frame": "closed",
+          "png": "native/kami_closed.rgba16.png",
+          "raw": "rgba16/kami_closed.rgba16.bin",
+          "sha256_rgba16": "c77944ee220c41452900f5a88a9faa18ee2ae251667cdd9144a8ecdb7d90296c"
+        },
+        {
+          "frame": "talking",
+          "png": "native/kami_talking.rgba16.png",
+          "raw": "rgba16/kami_talking.rgba16.bin",
+          "sha256_rgba16": "cc8e2d9bb7e7d814a9c927fc568f2370984b9abc217b8a8f7e4c5b88679c7d9a"
+        }
+      ]
+    }
+  }
+}

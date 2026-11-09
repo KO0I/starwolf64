@@ -1,0 +1,18 @@
+{
+  "character": "Slippy",
+  "segment": "ast_versus",
+  "skeleton": "aVsOnFootSlippySkel",
+  "limbs": 18,
+  "mesh_limbs": 12,
+  "triangles": 108,
+  "textures": 11,
+  "materials": 11,
+  "animations": {
+    "D_versus_301DEA4": 30,
+    "D_versus_301E19C": 30,
+    "D_versus_301E560": 30
+  },
+  "animation_fps": 30,
+  "units": "original N64 model units",
+  "notes": "Rigid animated limb hierarchy. Root motion fixed to skeleton origin as in mode 1/5. Game runtime pose overrides and N64 lighting/combiners are not baked."
+}

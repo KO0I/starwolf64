@@ -1,0 +1,19 @@
+{
+  "character": "Peppy",
+  "segment": "ast_versus",
+  "skeleton": "aVsOnFootPeppySkel",
+  "limbs": 24,
+  "mesh_limbs": 16,
+  "triangles": 124,
+  "textures": 12,
+  "materials": 12,
+  "animations": {
+    "D_versus_301D568": 30,
+    "D_versus_301D888": 30,
+    "D_versus_301DD6C": 30
+  },
+  "animation_fps": 30,
+  "units": "original N64 model units",
+  "root_motion": "fixed",
+  "notes": "Rigid animated limb hierarchy. Source root translation matches mode 0; fixed translation matches modes 1/5. Game runtime pose overrides and N64 lighting/combiners are not baked."
+}

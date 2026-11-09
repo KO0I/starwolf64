@@ -1,0 +1,5224 @@
+{
+  "rom": "Star Fox 64 (U) (V1.1) [!].z64",
+  "rom_sha1": "09f0d105f476b00efa5303a3ebc42e60a7753b7a",
+  "count": 95,
+  "unique_payloads": 78,
+  "portrait_slots": 76,
+  "static_slots": 3,
+  "unused_slots": 11,
+  "distinct_character_frames": 60,
+  "standard_slots": 79,
+  "additional_gallery_images": 16,
+  "rom_payloads_verified": 101,
+  "script_audit": {
+    "script_tables": 14,
+    "radio_requests": [
+      {
+        "segment": "ast_andross",
+        "script": "D_ANDROSS_C037E3C",
+        "offset": "0x37b24",
+        "radio_id": 55,
+        "message_id": 8250
+      },
+      {
+        "segment": "ast_andross",
+        "script": "D_ANDROSS_C037E3C",
+        "offset": "0x37b30",
+        "radio_id": 55,
+        "message_id": 8255
+      },
+      {
+        "segment": "ast_andross",
+        "script": "D_ANDROSS_C037E3C",
+        "offset": "0x37b40",
+        "radio_id": 55,
+        "message_id": 8260
+      },
+      {
+        "segment": "ast_andross",
+        "script": "D_ANDROSS_C037E3C",
+        "offset": "0x37b48",
+        "radio_id": 55,
+        "message_id": 8265
+      },
+      {
+        "segment": "ast_andross",
+        "script": "D_ANDROSS_C037E3C",
+        "offset": "0x37b5c",
+        "radio_id": 50,
+        "message_id": 19325
+      },
+      {
+        "segment": "ast_aquas",
+        "script": "D_AQ_60308B8",
+        "offset": "0x30074",
+        "radio_id": 20,
+        "message_id": 15050
+      },
+      {
+        "segment": "ast_aquas",
+        "script": "D_AQ_60308B8",
+        "offset": "0x3007c",
+        "radio_id": 30,
+        "message_id": 15051
+      },
+      {
+        "segment": "ast_aquas",
+        "script": "D_AQ_60308B8",
+        "offset": "0x30084",
+        "radio_id": 10,
+        "message_id": 15052
+      },
+      {
+        "segment": "ast_aquas",
+        "script": "D_AQ_60308B8",
+        "offset": "0x30098",
+        "radio_id": 20,
+        "message_id": 15053
+      },
+      {
+        "segment": "ast_aquas",
+        "script": "D_AQ_60308B8",
+        "offset": "0x300a0",
+        "radio_id": 30,
+        "message_id": 15054
+      },
+      {
+        "segment": "ast_aquas",
+        "script": "D_AQ_60308B8",
+        "offset": "0x300a8",
+        "radio_id": 20,
+        "message_id": 15060
+      },
+      {
+        "segment": "ast_aquas",
+        "script": "D_AQ_60308B8",
+        "offset": "0x300b0",
+        "radio_id": 10,
+        "message_id": 15052
+      },
+      {
+        "segment": "ast_aquas",
+        "script": "D_AQ_60308B8",
+        "offset": "0x302e0",
+        "radio_id": 0,
+        "message_id": 15030
+      },
+      {
+        "segment": "ast_aquas",
+        "script": "D_AQ_60308B8",
+        "offset": "0x302e8",
+        "radio_id": 10,
+        "message_id": 15250
+      },
+      {
+        "segment": "ast_aquas",
+        "script": "D_AQ_60308B8",
+        "offset": "0x302f0",
+        "radio_id": 30,
+        "message_id": 15040
+      },
+      {
+        "segment": "ast_aquas",
+        "script": "D_AQ_60308B8",
+        "offset": "0x302f8",
+        "radio_id": 20,
+        "message_id": 15045
+      },
+      {
+        "segment": "ast_aquas",
+        "script": "D_AQ_60308B8",
+        "offset": "0x30308",
+        "radio_id": 20,
+        "message_id": 15251
+      },
+      {
+        "segment": "ast_aquas",
+        "script": "D_AQ_60308B8",
+        "offset": "0x3031c",
+        "radio_id": 30,
+        "message_id": 8210
+      },
+      {
+        "segment": "ast_aquas",
+        "script": "D_AQ_60308B8",
+        "offset": "0x30324",
+        "radio_id": 20,
+        "message_id": 20316
+      },
+      {
+        "segment": "ast_aquas",
+        "script": "D_AQ_60308B8",
+        "offset": "0x30334",
+        "radio_id": 0,
+        "message_id": 15010
+      },
+      {
+        "segment": "ast_aquas",
+        "script": "D_AQ_60308B8",
+        "offset": "0x30438",
+        "radio_id": 20,
+        "message_id": 6055
+      },
+      {
+        "segment": "ast_aquas",
+        "script": "D_AQ_60308B8",
+        "offset": "0x30440",
+        "radio_id": 30,
+        "message_id": 2110
+      },
+      {
+        "segment": "ast_aquas",
+        "script": "D_AQ_60308B8",
+        "offset": "0x30548",
+        "radio_id": 20,
+        "message_id": 20302
+      },
+      {
+        "segment": "ast_area_6",
+        "script": "D_A6_6027F50",
+        "offset": "0x26218",
+        "radio_id": 0,
+        "message_id": 7012
+      },
+      {
+        "segment": "ast_area_6",
+        "script": "D_A6_6027F50",
+        "offset": "0x2622c",
+        "radio_id": 30,
+        "message_id": 7013
+      },
+      {
+        "segment": "ast_area_6",
+        "script": "D_A6_6027F50",
+        "offset": "0x26240",
+        "radio_id": 20,
+        "message_id": 7014
+      },
+      {
+        "segment": "ast_area_6",
+        "script": "D_A6_6027F50",
+        "offset": "0x265b4",
+        "radio_id": 90,
+        "message_id": 20230
+      },
+      {
+        "segment": "ast_area_6",
+        "script": "D_A6_6027F50",
+        "offset": "0x26654",
+        "radio_id": 30,
+        "message_id": 7066
+      },
+      {
+        "segment": "ast_area_6",
+        "script": "D_A6_6027F50",
+        "offset": "0x2669c",
+        "radio_id": 30,
+        "message_id": 9150
+      },
+      {
+        "segment": "ast_area_6",
+        "script": "D_A6_6027F50",
+        "offset": "0x266c4",
+        "radio_id": 30,
+        "message_id": 5230
+      },
+      {
+        "segment": "ast_area_6",
+        "script": "D_A6_6027F50",
+        "offset": "0x2670c",
+        "radio_id": 10,
+        "message_id": 7065
+      },
+      {
+        "segment": "ast_area_6",
+        "script": "D_A6_6027F50",
+        "offset": "0x26780",
+        "radio_id": 10,
+        "message_id": 20301
+      },
+      {
+        "segment": "ast_area_6",
+        "script": "D_A6_6027F50",
+        "offset": "0x267f4",
+        "radio_id": 90,
+        "message_id": 7054
+      },
+      {
+        "segment": "ast_area_6",
+        "script": "D_A6_6027F50",
+        "offset": "0x26898",
+        "radio_id": 180,
+        "message_id": 7096
+      },
+      {
+        "segment": "ast_area_6",
+        "script": "D_A6_6027F50",
+        "offset": "0x268a0",
+        "radio_id": 120,
+        "message_id": 7094
+      },
+      {
+        "segment": "ast_area_6",
+        "script": "D_A6_6027F50",
+        "offset": "0x268a8",
+        "radio_id": 180,
+        "message_id": 7099
+      },
+      {
+        "segment": "ast_area_6",
+        "script": "D_A6_6027F50",
+        "offset": "0x268b0",
+        "radio_id": 120,
+        "message_id": 7097
+      },
+      {
+        "segment": "ast_area_6",
+        "script": "D_A6_6027F50",
+        "offset": "0x268b8",
+        "radio_id": 120,
+        "message_id": 7098
+      },
+      {
+        "segment": "ast_area_6",
+        "script": "D_A6_6027F50",
+        "offset": "0x268ec",
+        "radio_id": 55,
+        "message_id": 20274
+      },
+      {
+        "segment": "ast_area_6",
+        "script": "D_A6_6027F50",
+        "offset": "0x268f4",
+        "radio_id": 55,
+        "message_id": 20276
+      },
+      {
+        "segment": "ast_area_6",
+        "script": "D_A6_6027F50",
+        "offset": "0x26904",
+        "radio_id": 55,
+        "message_id": 20277
+      },
+      {
+        "segment": "ast_area_6",
+        "script": "D_A6_6027F50",
+        "offset": "0x26910",
+        "radio_id": 55,
+        "message_id": 20275
+      },
+      {
+        "segment": "ast_area_6",
+        "script": "D_A6_6027F50",
+        "offset": "0x2691c",
+        "radio_id": 55,
+        "message_id": 20273
+      },
+      {
+        "segment": "ast_area_6",
+        "script": "D_A6_6027F50",
+        "offset": "0x269d0",
+        "radio_id": 20,
+        "message_id": 7050
+      },
+      {
+        "segment": "ast_area_6",
+        "script": "D_A6_6027F50",
+        "offset": "0x269e4",
+        "radio_id": 30,
+        "message_id": 7051
+      },
+      {
+        "segment": "ast_area_6",
+        "script": "D_A6_6027F50",
+        "offset": "0x26a20",
+        "radio_id": 20,
+        "message_id": 7070
+      },
+      {
+        "segment": "ast_area_6",
+        "script": "D_A6_6027F50",
+        "offset": "0x26a6c",
+        "radio_id": 20,
+        "message_id": 9152
+      },
+      {
+        "segment": "ast_area_6",
+        "script": "D_A6_6027F50",
+        "offset": "0x26aac",
+        "radio_id": 20,
+        "message_id": 9170
+      },
+      {
+        "segment": "ast_area_6",
+        "script": "D_A6_6027F50",
+        "offset": "0x26b74",
+        "radio_id": 10,
+        "message_id": 20319
+      },
+      {
+        "segment": "ast_area_6",
+        "script": "D_A6_6027F50",
+        "offset": "0x26b84",
+        "radio_id": 30,
+        "message_id": 20321
+      },
+      {
+        "segment": "ast_area_6",
+        "script": "D_A6_6027F50",
+        "offset": "0x26b94",
+        "radio_id": 20,
+        "message_id": 20320
+      },
+      {
+        "segment": "ast_area_6",
+        "script": "D_A6_6027F50",
+        "offset": "0x26c44",
+        "radio_id": 120,
+        "message_id": 7052
+      },
+      {
+        "segment": "ast_area_6",
+        "script": "D_A6_6027F50",
+        "offset": "0x26c4c",
+        "radio_id": 180,
+        "message_id": 7053
+      },
+      {
+        "segment": "ast_area_6",
+        "script": "D_A6_6027F50",
+        "offset": "0x26e9c",
+        "radio_id": 20,
+        "message_id": 7061
+      },
+      {
+        "segment": "ast_area_6",
+        "script": "D_A6_6027F50",
+        "offset": "0x26eb0",
+        "radio_id": 10,
+        "message_id": 7064
+      },
+      {
+        "segment": "ast_area_6",
+        "script": "D_A6_6027F50",
+        "offset": "0x271bc",
+        "radio_id": 0,
+        "message_id": 7043
+      },
+      {
+        "segment": "ast_area_6",
+        "script": "D_A6_6027F50",
+        "offset": "0x27254",
+        "radio_id": 10,
+        "message_id": 9190
+      },
+      {
+        "segment": "ast_area_6",
+        "script": "D_A6_6027F50",
+        "offset": "0x2727c",
+        "radio_id": 10,
+        "message_id": 7020
+      },
+      {
+        "segment": "ast_area_6",
+        "script": "D_A6_6027F50",
+        "offset": "0x272cc",
+        "radio_id": 10,
+        "message_id": 20262
+      },
+      {
+        "segment": "ast_area_6",
+        "script": "D_A6_6027F50",
+        "offset": "0x272f0",
+        "radio_id": 10,
+        "message_id": 2090
+      },
+      {
+        "segment": "ast_area_6",
+        "script": "D_A6_6027F50",
+        "offset": "0x272fc",
+        "radio_id": 180,
+        "message_id": 7095
+      },
+      {
+        "segment": "ast_corneria",
+        "script": "D_CO_603D9E8",
+        "offset": "0x3bc00",
+        "radio_id": 30,
+        "message_id": 20236
+      },
+      {
+        "segment": "ast_corneria",
+        "script": "D_CO_603D9E8",
+        "offset": "0x3bd74",
+        "radio_id": 10,
+        "message_id": 2165
+      },
+      {
+        "segment": "ast_corneria",
+        "script": "D_CO_603D9E8",
+        "offset": "0x3bf3c",
+        "radio_id": 10,
+        "message_id": 9190
+      },
+      {
+        "segment": "ast_corneria",
+        "script": "D_CO_603D9E8",
+        "offset": "0x3bfbc",
+        "radio_id": 10,
+        "message_id": 2090
+      },
+      {
+        "segment": "ast_corneria",
+        "script": "D_CO_603D9E8",
+        "offset": "0x3bfe8",
+        "radio_id": 10,
+        "message_id": 2095
+      },
+      {
+        "segment": "ast_corneria",
+        "script": "D_CO_603D9E8",
+        "offset": "0x3c004",
+        "radio_id": 10,
+        "message_id": 2095
+      },
+      {
+        "segment": "ast_corneria",
+        "script": "D_CO_603D9E8",
+        "offset": "0x3c030",
+        "radio_id": 10,
+        "message_id": 2095
+      },
+      {
+        "segment": "ast_corneria",
+        "script": "D_CO_603D9E8",
+        "offset": "0x3c214",
+        "radio_id": 10,
+        "message_id": 2181
+      },
+      {
+        "segment": "ast_corneria",
+        "script": "D_CO_603D9E8",
+        "offset": "0x3c238",
+        "radio_id": 0,
+        "message_id": 2185
+      },
+      {
+        "segment": "ast_corneria",
+        "script": "D_CO_603D9E8",
+        "offset": "0x3c25c",
+        "radio_id": 10,
+        "message_id": 2188
+      },
+      {
+        "segment": "ast_corneria",
+        "script": "D_CO_603D9E8",
+        "offset": "0x3c414",
+        "radio_id": 20,
+        "message_id": 2062
+      },
+      {
+        "segment": "ast_corneria",
+        "script": "D_CO_603D9E8",
+        "offset": "0x3c478",
+        "radio_id": 20,
+        "message_id": 2336
+      },
+      {
+        "segment": "ast_corneria",
+        "script": "D_CO_603D9E8",
+        "offset": "0x3c518",
+        "radio_id": 90,
+        "message_id": 20230
+      },
+      {
+        "segment": "ast_corneria",
+        "script": "D_CO_603D9E8",
+        "offset": "0x3c6b8",
+        "radio_id": 30,
+        "message_id": 2110
+      },
+      {
+        "segment": "ast_corneria",
+        "script": "D_CO_603D9E8",
+        "offset": "0x3c834",
+        "radio_id": 30,
+        "message_id": 7013
+      },
+      {
+        "segment": "ast_corneria",
+        "script": "D_CO_603D9E8",
+        "offset": "0x3c878",
+        "radio_id": 20,
+        "message_id": 2200
+      },
+      {
+        "segment": "ast_corneria",
+        "script": "D_CO_603D9E8",
+        "offset": "0x3c8a0",
+        "radio_id": 20,
+        "message_id": 2200
+      },
+      {
+        "segment": "ast_corneria",
+        "script": "D_CO_603D9E8",
+        "offset": "0x3c8b4",
+        "radio_id": 10,
+        "message_id": 2210
+      },
+      {
+        "segment": "ast_corneria",
+        "script": "D_CO_603D9E8",
+        "offset": "0x3ccd0",
+        "radio_id": 30,
+        "message_id": 20267
+      },
+      {
+        "segment": "ast_corneria",
+        "script": "D_CO_603D9E8",
+        "offset": "0x3ccf8",
+        "radio_id": 30,
+        "message_id": 2061
+      },
+      {
+        "segment": "ast_corneria",
+        "script": "D_CO_603D9E8",
+        "offset": "0x3cde0",
+        "radio_id": 30,
+        "message_id": 2115
+      },
+      {
+        "segment": "ast_corneria",
+        "script": "D_CO_603D9E8",
+        "offset": "0x3cdf8",
+        "radio_id": 30,
+        "message_id": 2118
+      },
+      {
+        "segment": "ast_corneria",
+        "script": "D_CO_603D9E8",
+        "offset": "0x3ce08",
+        "radio_id": 0,
+        "message_id": 2055
+      },
+      {
+        "segment": "ast_corneria",
+        "script": "D_CO_603D9E8",
+        "offset": "0x3ce20",
+        "radio_id": 10,
+        "message_id": 2058
+      },
+      {
+        "segment": "ast_corneria",
+        "script": "D_CO_603D9E8",
+        "offset": "0x3cf94",
+        "radio_id": 10,
+        "message_id": 2337
+      },
+      {
+        "segment": "ast_corneria",
+        "script": "D_CO_603D9E8",
+        "offset": "0x3cfcc",
+        "radio_id": 10,
+        "message_id": 2167
+      },
+      {
+        "segment": "ast_corneria",
+        "script": "D_CO_603D9E8",
+        "offset": "0x3cff4",
+        "radio_id": 30,
+        "message_id": 20235
+      },
+      {
+        "segment": "ast_corneria",
+        "script": "D_CO_603D9E8",
+        "offset": "0x3d014",
+        "radio_id": 10,
+        "message_id": 2166
+      },
+      {
+        "segment": "ast_corneria",
+        "script": "D_CO_603D9E8",
+        "offset": "0x3d28c",
+        "radio_id": 10,
+        "message_id": 2180
+      },
+      {
+        "segment": "ast_corneria",
+        "script": "D_CO_603D9E8",
+        "offset": "0x3d868",
+        "radio_id": 30,
+        "message_id": 20236
+      },
+      {
+        "segment": "ast_macbeth",
+        "script": "D_MA_60381D8",
+        "offset": "0x3699c",
+        "radio_id": 190,
+        "message_id": 17370
+      },
+      {
+        "segment": "ast_macbeth",
+        "script": "D_MA_60381D8",
+        "offset": "0x369a4",
+        "radio_id": 190,
+        "message_id": 17410
+      },
+      {
+        "segment": "ast_macbeth",
+        "script": "D_MA_60381D8",
+        "offset": "0x369cc",
+        "radio_id": 10,
+        "message_id": 9100
+      },
+      {
+        "segment": "ast_macbeth",
+        "script": "D_MA_60381D8",
+        "offset": "0x369fc",
+        "radio_id": 10,
+        "message_id": 9130
+      },
+      {
+        "segment": "ast_macbeth",
+        "script": "D_MA_60381D8",
+        "offset": "0x36a30",
+        "radio_id": 10,
+        "message_id": 2337
+      },
+      {
+        "segment": "ast_macbeth",
+        "script": "D_MA_60381D8",
+        "offset": "0x36a68",
+        "radio_id": 10,
+        "message_id": 18035
+      },
+      {
+        "segment": "ast_macbeth",
+        "script": "D_MA_60381D8",
+        "offset": "0x36b40",
+        "radio_id": 0,
+        "message_id": 17010
+      },
+      {
+        "segment": "ast_macbeth",
+        "script": "D_MA_60381D8",
+        "offset": "0x36b48",
+        "radio_id": 190,
+        "message_id": 17360
+      },
+      {
+        "segment": "ast_macbeth",
+        "script": "D_MA_60381D8",
+        "offset": "0x36b60",
+        "radio_id": 10,
+        "message_id": 17100
+      },
+      {
+        "segment": "ast_macbeth",
+        "script": "D_MA_60381D8",
+        "offset": "0x36b78",
+        "radio_id": 30,
+        "message_id": 17110
+      },
+      {
+        "segment": "ast_macbeth",
+        "script": "D_MA_60381D8",
+        "offset": "0x36b90",
+        "radio_id": 30,
+        "message_id": 17120
+      },
+      {
+        "segment": "ast_macbeth",
+        "script": "D_MA_60381D8",
+        "offset": "0x36b98",
+        "radio_id": 190,
+        "message_id": 17380
+      },
+      {
+        "segment": "ast_macbeth",
+        "script": "D_MA_60381D8",
+        "offset": "0x36bdc",
+        "radio_id": 10,
+        "message_id": 20250
+      },
+      {
+        "segment": "ast_macbeth",
+        "script": "D_MA_60381D8",
+        "offset": "0x36c20",
+        "radio_id": 40,
+        "message_id": 16135
+      },
+      {
+        "segment": "ast_macbeth",
+        "script": "D_MA_60381D8",
+        "offset": "0x36c70",
+        "radio_id": 40,
+        "message_id": 17140
+      },
+      {
+        "segment": "ast_macbeth",
+        "script": "D_MA_60381D8",
+        "offset": "0x3725c",
+        "radio_id": 10,
+        "message_id": 9100
+      },
+      {
+        "segment": "ast_macbeth",
+        "script": "D_MA_60381D8",
+        "offset": "0x372a0",
+        "radio_id": 10,
+        "message_id": 9130
+      },
+      {
+        "segment": "ast_macbeth",
+        "script": "D_MA_60381D8",
+        "offset": "0x372c8",
+        "radio_id": 10,
+        "message_id": 9160
+      },
+      {
+        "segment": "ast_macbeth",
+        "script": "D_MA_60381D8",
+        "offset": "0x372f8",
+        "radio_id": 20,
+        "message_id": 9110
+      },
+      {
+        "segment": "ast_macbeth",
+        "script": "D_MA_60381D8",
+        "offset": "0x3733c",
+        "radio_id": 20,
+        "message_id": 9140
+      },
+      {
+        "segment": "ast_macbeth",
+        "script": "D_MA_60381D8",
+        "offset": "0x37364",
+        "radio_id": 20,
+        "message_id": 9170
+      },
+      {
+        "segment": "ast_macbeth",
+        "script": "D_MA_60381D8",
+        "offset": "0x37394",
+        "radio_id": 30,
+        "message_id": 9120
+      },
+      {
+        "segment": "ast_macbeth",
+        "script": "D_MA_60381D8",
+        "offset": "0x373d8",
+        "radio_id": 30,
+        "message_id": 9150
+      },
+      {
+        "segment": "ast_macbeth",
+        "script": "D_MA_60381D8",
+        "offset": "0x37400",
+        "radio_id": 30,
+        "message_id": 9180
+      },
+      {
+        "segment": "ast_macbeth",
+        "script": "D_MA_60381D8",
+        "offset": "0x37658",
+        "radio_id": 20,
+        "message_id": 20272
+      },
+      {
+        "segment": "ast_macbeth",
+        "script": "D_MA_60381D8",
+        "offset": "0x37660",
+        "radio_id": 20,
+        "message_id": 17474
+      },
+      {
+        "segment": "ast_macbeth",
+        "script": "D_MA_60381D8",
+        "offset": "0x37738",
+        "radio_id": 190,
+        "message_id": 17400
+      },
+      {
+        "segment": "ast_macbeth",
+        "script": "D_MA_60381D8",
+        "offset": "0x377f4",
+        "radio_id": 40,
+        "message_id": 17130
+      },
+      {
+        "segment": "ast_macbeth",
+        "script": "D_MA_60381D8",
+        "offset": "0x37854",
+        "radio_id": 10,
+        "message_id": 17131
+      },
+      {
+        "segment": "ast_macbeth",
+        "script": "D_MA_60381D8",
+        "offset": "0x37890",
+        "radio_id": 40,
+        "message_id": 6027
+      },
+      {
+        "segment": "ast_macbeth",
+        "script": "D_MA_60381D8",
+        "offset": "0x37978",
+        "radio_id": 30,
+        "message_id": 4030
+      },
+      {
+        "segment": "ast_macbeth",
+        "script": "D_MA_60381D8",
+        "offset": "0x37b60",
+        "radio_id": 10,
+        "message_id": 17020
+      },
+      {
+        "segment": "ast_macbeth",
+        "script": "D_MA_60381D8",
+        "offset": "0x37b7c",
+        "radio_id": 30,
+        "message_id": 17030
+      },
+      {
+        "segment": "ast_macbeth",
+        "script": "D_MA_60381D8",
+        "offset": "0x37bf8",
+        "radio_id": 30,
+        "message_id": 3040
+      },
+      {
+        "segment": "ast_macbeth",
+        "script": "D_MA_60381D8",
+        "offset": "0x37c50",
+        "radio_id": 20,
+        "message_id": 2062
+      },
+      {
+        "segment": "ast_macbeth",
+        "script": "D_MA_60381D8",
+        "offset": "0x37ca8",
+        "radio_id": 20,
+        "message_id": 9170
+      },
+      {
+        "segment": "ast_macbeth",
+        "script": "D_MA_60381D8",
+        "offset": "0x37cdc",
+        "radio_id": 90,
+        "message_id": 20230
+      },
+      {
+        "segment": "ast_macbeth",
+        "script": "D_MA_60381D8",
+        "offset": "0x3805c",
+        "radio_id": 190,
+        "message_id": 17473
+      },
+      {
+        "segment": "ast_meteo",
+        "script": "D_ME_602F3AC",
+        "offset": "0x2cb48",
+        "radio_id": 30,
+        "message_id": 20238
+      },
+      {
+        "segment": "ast_meteo",
+        "script": "D_ME_602F3AC",
+        "offset": "0x2cc68",
+        "radio_id": 30,
+        "message_id": 3050
+      },
+      {
+        "segment": "ast_meteo",
+        "script": "D_ME_602F3AC",
+        "offset": "0x2cc84",
+        "radio_id": 10,
+        "message_id": 3100
+      },
+      {
+        "segment": "ast_meteo",
+        "script": "D_ME_602F3AC",
+        "offset": "0x2cca0",
+        "radio_id": 20,
+        "message_id": 3020
+      },
+      {
+        "segment": "ast_meteo",
+        "script": "D_ME_602F3AC",
+        "offset": "0x2d06c",
+        "radio_id": 20,
+        "message_id": 3110
+      },
+      {
+        "segment": "ast_meteo",
+        "script": "D_ME_602F3AC",
+        "offset": "0x2d100",
+        "radio_id": 20,
+        "message_id": 20320
+      },
+      {
+        "segment": "ast_meteo",
+        "script": "D_ME_602F3AC",
+        "offset": "0x2d10c",
+        "radio_id": 20,
+        "message_id": 3120
+      },
+      {
+        "segment": "ast_meteo",
+        "script": "D_ME_602F3AC",
+        "offset": "0x2e4cc",
+        "radio_id": 90,
+        "message_id": 20230
+      },
+      {
+        "segment": "ast_meteo",
+        "script": "D_ME_602F3AC",
+        "offset": "0x2e4d8",
+        "radio_id": 90,
+        "message_id": 20230
+      },
+      {
+        "segment": "ast_meteo",
+        "script": "D_ME_602F3AC",
+        "offset": "0x2e5d8",
+        "radio_id": 10,
+        "message_id": 20315
+      },
+      {
+        "segment": "ast_meteo",
+        "script": "D_ME_602F3AC",
+        "offset": "0x2e5ec",
+        "radio_id": 20,
+        "message_id": 20316
+      },
+      {
+        "segment": "ast_meteo",
+        "script": "D_ME_602F3AC",
+        "offset": "0x2e600",
+        "radio_id": 30,
+        "message_id": 20317
+      },
+      {
+        "segment": "ast_meteo",
+        "script": "D_ME_602F3AC",
+        "offset": "0x2e67c",
+        "radio_id": 30,
+        "message_id": 3025
+      },
+      {
+        "segment": "ast_meteo",
+        "script": "D_ME_602F3AC",
+        "offset": "0x2e698",
+        "radio_id": 30,
+        "message_id": 3026
+      },
+      {
+        "segment": "ast_meteo",
+        "script": "D_ME_602F3AC",
+        "offset": "0x2e6a8",
+        "radio_id": 90,
+        "message_id": 20230
+      },
+      {
+        "segment": "ast_meteo",
+        "script": "D_ME_602F3AC",
+        "offset": "0x2eaf4",
+        "radio_id": 30,
+        "message_id": 20269
+      },
+      {
+        "segment": "ast_meteo",
+        "script": "D_ME_602F3AC",
+        "offset": "0x2eb14",
+        "radio_id": 90,
+        "message_id": 20230
+      },
+      {
+        "segment": "ast_meteo",
+        "script": "D_ME_602F3AC",
+        "offset": "0x2eeac",
+        "radio_id": 30,
+        "message_id": 3040
+      },
+      {
+        "segment": "ast_meteo",
+        "script": "D_ME_602F3AC",
+        "offset": "0x2eec8",
+        "radio_id": 30,
+        "message_id": 3041
+      },
+      {
+        "segment": "ast_meteo",
+        "script": "D_ME_602F3AC",
+        "offset": "0x2eee4",
+        "radio_id": 20,
+        "message_id": 3042
+      },
+      {
+        "segment": "ast_meteo",
+        "script": "D_ME_602F3AC",
+        "offset": "0x2ef00",
+        "radio_id": 30,
+        "message_id": 2118
+      },
+      {
+        "segment": "ast_meteo",
+        "script": "D_ME_602F3AC",
+        "offset": "0x2ef1c",
+        "radio_id": 30,
+        "message_id": 20304
+      },
+      {
+        "segment": "ast_meteo",
+        "script": "D_ME_602F3AC",
+        "offset": "0x2ef64",
+        "radio_id": 30,
+        "message_id": 20236
+      },
+      {
+        "segment": "ast_meteo",
+        "script": "D_ME_602F3AC",
+        "offset": "0x2ef78",
+        "radio_id": 20,
+        "message_id": 3020
+      },
+      {
+        "segment": "ast_meteo",
+        "script": "D_ME_602F3AC",
+        "offset": "0x2ef98",
+        "radio_id": 30,
+        "message_id": 20239
+      },
+      {
+        "segment": "ast_meteo",
+        "script": "D_ME_602F3AC",
+        "offset": "0x2f078",
+        "radio_id": 30,
+        "message_id": 2110
+      },
+      {
+        "segment": "ast_meteo",
+        "script": "D_ME_602F3AC",
+        "offset": "0x2f090",
+        "radio_id": 30,
+        "message_id": 2110
+      },
+      {
+        "segment": "ast_meteo",
+        "script": "D_ME_602F3AC",
+        "offset": "0x2f294",
+        "radio_id": 20,
+        "message_id": 20313
+      },
+      {
+        "segment": "ast_meteo",
+        "script": "D_ME_602F3AC",
+        "offset": "0x2f2a8",
+        "radio_id": 30,
+        "message_id": 20314
+      },
+      {
+        "segment": "ast_meteo",
+        "script": "D_ME_602F3AC",
+        "offset": "0x2f2e8",
+        "radio_id": 30,
+        "message_id": 7066
+      },
+      {
+        "segment": "ast_meteo",
+        "script": "D_ME_602F3AC",
+        "offset": "0x2f39c",
+        "radio_id": 30,
+        "message_id": 5230
+      },
+      {
+        "segment": "ast_sector_x",
+        "script": "D_SX_60320D0",
+        "offset": "0x2ffec",
+        "radio_id": 10,
+        "message_id": 5110
+      },
+      {
+        "segment": "ast_sector_x",
+        "script": "D_SX_60320D0",
+        "offset": "0x303d4",
+        "radio_id": 30,
+        "message_id": 8130
+      },
+      {
+        "segment": "ast_sector_x",
+        "script": "D_SX_60320D0",
+        "offset": "0x305c4",
+        "radio_id": 10,
+        "message_id": 5010
+      },
+      {
+        "segment": "ast_sector_x",
+        "script": "D_SX_60320D0",
+        "offset": "0x306a4",
+        "radio_id": 0,
+        "message_id": 5000
+      },
+      {
+        "segment": "ast_sector_x",
+        "script": "D_SX_60320D0",
+        "offset": "0x306ec",
+        "radio_id": 10,
+        "message_id": 5060
+      },
+      {
+        "segment": "ast_sector_x",
+        "script": "D_SX_60320D0",
+        "offset": "0x30724",
+        "radio_id": 30,
+        "message_id": 5100
+      },
+      {
+        "segment": "ast_sector_x",
+        "script": "D_SX_60320D0",
+        "offset": "0x307a8",
+        "radio_id": 10,
+        "message_id": 5130
+      },
+      {
+        "segment": "ast_sector_x",
+        "script": "D_SX_60320D0",
+        "offset": "0x308cc",
+        "radio_id": 10,
+        "message_id": 5310
+      },
+      {
+        "segment": "ast_sector_x",
+        "script": "D_SX_60320D0",
+        "offset": "0x30924",
+        "radio_id": 30,
+        "message_id": 14180
+      },
+      {
+        "segment": "ast_sector_x",
+        "script": "D_SX_60320D0",
+        "offset": "0x30960",
+        "radio_id": 10,
+        "message_id": 5380
+      },
+      {
+        "segment": "ast_sector_x",
+        "script": "D_SX_60320D0",
+        "offset": "0x30994",
+        "radio_id": 30,
+        "message_id": 5400
+      },
+      {
+        "segment": "ast_sector_x",
+        "script": "D_SX_60320D0",
+        "offset": "0x309b0",
+        "radio_id": 20,
+        "message_id": 5410
+      },
+      {
+        "segment": "ast_sector_x",
+        "script": "D_SX_60320D0",
+        "offset": "0x309d0",
+        "radio_id": 30,
+        "message_id": 5430
+      },
+      {
+        "segment": "ast_sector_x",
+        "script": "D_SX_60320D0",
+        "offset": "0x30a8c",
+        "radio_id": 30,
+        "message_id": 5050
+      },
+      {
+        "segment": "ast_sector_x",
+        "script": "D_SX_60320D0",
+        "offset": "0x30ab8",
+        "radio_id": 10,
+        "message_id": 5470
+      },
+      {
+        "segment": "ast_sector_x",
+        "script": "D_SX_60320D0",
+        "offset": "0x30c60",
+        "radio_id": 30,
+        "message_id": 5460
+      },
+      {
+        "segment": "ast_sector_x",
+        "script": "D_SX_60320D0",
+        "offset": "0x30ef4",
+        "radio_id": 30,
+        "message_id": 7066
+      },
+      {
+        "segment": "ast_sector_x",
+        "script": "D_SX_60320D0",
+        "offset": "0x30f74",
+        "radio_id": 30,
+        "message_id": 5220
+      },
+      {
+        "segment": "ast_sector_x",
+        "script": "D_SX_60320D0",
+        "offset": "0x30fa0",
+        "radio_id": 30,
+        "message_id": 5230
+      },
+      {
+        "segment": "ast_sector_x",
+        "script": "D_SX_60320D0",
+        "offset": "0x30ffc",
+        "radio_id": 10,
+        "message_id": 5300
+      },
+      {
+        "segment": "ast_sector_x",
+        "script": "D_SX_60320D0",
+        "offset": "0x31064",
+        "radio_id": 10,
+        "message_id": 5350
+      },
+      {
+        "segment": "ast_sector_x",
+        "script": "D_SX_60320D0",
+        "offset": "0x31084",
+        "radio_id": 10,
+        "message_id": 5360
+      },
+      {
+        "segment": "ast_sector_x",
+        "script": "D_SX_60320D0",
+        "offset": "0x311d4",
+        "radio_id": 170,
+        "message_id": 5311
+      },
+      {
+        "segment": "ast_sector_x",
+        "script": "D_SX_60320D0",
+        "offset": "0x31208",
+        "radio_id": 0,
+        "message_id": 5312
+      },
+      {
+        "segment": "ast_sector_x",
+        "script": "D_SX_60320D0",
+        "offset": "0x31234",
+        "radio_id": 170,
+        "message_id": 5313
+      },
+      {
+        "segment": "ast_sector_x",
+        "script": "D_SX_60320D0",
+        "offset": "0x31414",
+        "radio_id": 170,
+        "message_id": 5314
+      },
+      {
+        "segment": "ast_sector_x",
+        "script": "D_SX_60320D0",
+        "offset": "0x31588",
+        "radio_id": 20,
+        "message_id": 20260
+      },
+      {
+        "segment": "ast_sector_x",
+        "script": "D_SX_60320D0",
+        "offset": "0x31594",
+        "radio_id": 0,
+        "message_id": 5505
+      },
+      {
+        "segment": "ast_sector_x",
+        "script": "D_SX_60320D0",
+        "offset": "0x315b8",
+        "radio_id": 20,
+        "message_id": 5506
+      },
+      {
+        "segment": "ast_sector_x",
+        "script": "D_SX_60320D0",
+        "offset": "0x31b48",
+        "radio_id": 90,
+        "message_id": 20230
+      },
+      {
+        "segment": "ast_sector_x",
+        "script": "D_SX_60320D0",
+        "offset": "0x31c4c",
+        "radio_id": 90,
+        "message_id": 20230
+      },
+      {
+        "segment": "ast_sector_y",
+        "script": "D_SY_6032E18",
+        "offset": "0x30be8",
+        "radio_id": 0,
+        "message_id": 14020
+      },
+      {
+        "segment": "ast_sector_y",
+        "script": "D_SY_6032E18",
+        "offset": "0x30e50",
+        "radio_id": 10,
+        "message_id": 14030
+      },
+      {
+        "segment": "ast_sector_y",
+        "script": "D_SY_6032E18",
+        "offset": "0x30ebc",
+        "radio_id": 30,
+        "message_id": 14040
+      },
+      {
+        "segment": "ast_sector_y",
+        "script": "D_SY_6032E18",
+        "offset": "0x30f2c",
+        "radio_id": 20,
+        "message_id": 14045
+      },
+      {
+        "segment": "ast_sector_y",
+        "script": "D_SY_6032E18",
+        "offset": "0x30f5c",
+        "radio_id": 30,
+        "message_id": 14050
+      },
+      {
+        "segment": "ast_sector_y",
+        "script": "D_SY_6032E18",
+        "offset": "0x30f80",
+        "radio_id": 10,
+        "message_id": 14060
+      },
+      {
+        "segment": "ast_sector_y",
+        "script": "D_SY_6032E18",
+        "offset": "0x30fa0",
+        "radio_id": 30,
+        "message_id": 14070
+      },
+      {
+        "segment": "ast_sector_y",
+        "script": "D_SY_6032E18",
+        "offset": "0x310a8",
+        "radio_id": 0,
+        "message_id": 14020
+      },
+      {
+        "segment": "ast_sector_y",
+        "script": "D_SY_6032E18",
+        "offset": "0x311d4",
+        "radio_id": 10,
+        "message_id": 14080
+      },
+      {
+        "segment": "ast_sector_y",
+        "script": "D_SY_6032E18",
+        "offset": "0x311f4",
+        "radio_id": 30,
+        "message_id": 14100
+      },
+      {
+        "segment": "ast_sector_y",
+        "script": "D_SY_6032E18",
+        "offset": "0x31340",
+        "radio_id": 95,
+        "message_id": 7054
+      },
+      {
+        "segment": "ast_sector_y",
+        "script": "D_SY_6032E18",
+        "offset": "0x31754",
+        "radio_id": 20,
+        "message_id": 14140
+      },
+      {
+        "segment": "ast_sector_y",
+        "script": "D_SY_6032E18",
+        "offset": "0x31780",
+        "radio_id": 20,
+        "message_id": 14150
+      },
+      {
+        "segment": "ast_sector_y",
+        "script": "D_SY_6032E18",
+        "offset": "0x317c8",
+        "radio_id": 20,
+        "message_id": 14160
+      },
+      {
+        "segment": "ast_sector_y",
+        "script": "D_SY_6032E18",
+        "offset": "0x31e14",
+        "radio_id": 10,
+        "message_id": 14170
+      },
+      {
+        "segment": "ast_sector_y",
+        "script": "D_SY_6032E18",
+        "offset": "0x31e2c",
+        "radio_id": 0,
+        "message_id": 7043
+      },
+      {
+        "segment": "ast_sector_y",
+        "script": "D_SY_6032E18",
+        "offset": "0x325d4",
+        "radio_id": 30,
+        "message_id": 14180
+      },
+      {
+        "segment": "ast_sector_y",
+        "script": "D_SY_6032E18",
+        "offset": "0x328f0",
+        "radio_id": 20,
+        "message_id": 14190
+      },
+      {
+        "segment": "ast_sector_y",
+        "script": "D_SY_6032E18",
+        "offset": "0x32a3c",
+        "radio_id": 90,
+        "message_id": 20230
+      },
+      {
+        "segment": "ast_sector_y",
+        "script": "D_SY_6032E18",
+        "offset": "0x32aa8",
+        "radio_id": 90,
+        "message_id": 20278
+      },
+      {
+        "segment": "ast_sector_y",
+        "script": "D_SY_6032E18",
+        "offset": "0x32c80",
+        "radio_id": 30,
+        "message_id": 3050
+      },
+      {
+        "segment": "ast_sector_y",
+        "script": "D_SY_6032E18",
+        "offset": "0x32c94",
+        "radio_id": 30,
+        "message_id": 14110
+      },
+      {
+        "segment": "ast_sector_y",
+        "script": "D_SY_6032E18",
+        "offset": "0x32cc0",
+        "radio_id": 30,
+        "message_id": 14120
+      },
+      {
+        "segment": "ast_sector_y",
+        "script": "D_SY_6032E18",
+        "offset": "0x32ce0",
+        "radio_id": 10,
+        "message_id": 14130
+      },
+      {
+        "segment": "ast_solar",
+        "script": "D_SO_6020DD0",
+        "offset": "0x20158",
+        "radio_id": 30,
+        "message_id": 10050
+      },
+      {
+        "segment": "ast_solar",
+        "script": "D_SO_6020DD0",
+        "offset": "0x20210",
+        "radio_id": 20,
+        "message_id": 10323
+      },
+      {
+        "segment": "ast_solar",
+        "script": "D_SO_6020DD0",
+        "offset": "0x20650",
+        "radio_id": 90,
+        "message_id": 20230
+      },
+      {
+        "segment": "ast_solar",
+        "script": "D_SO_6020DD0",
+        "offset": "0x206b4",
+        "radio_id": 90,
+        "message_id": 20230
+      },
+      {
+        "segment": "ast_solar",
+        "script": "D_SO_6020DD0",
+        "offset": "0x2075c",
+        "radio_id": 20,
+        "message_id": 10070
+      },
+      {
+        "segment": "ast_solar",
+        "script": "D_SO_6020DD0",
+        "offset": "0x20798",
+        "radio_id": 20,
+        "message_id": 10080
+      },
+      {
+        "segment": "ast_solar",
+        "script": "D_SO_6020DD0",
+        "offset": "0x20804",
+        "radio_id": 170,
+        "message_id": 10200
+      },
+      {
+        "segment": "ast_solar",
+        "script": "D_SO_6020DD0",
+        "offset": "0x20840",
+        "radio_id": 0,
+        "message_id": 10210
+      },
+      {
+        "segment": "ast_solar",
+        "script": "D_SO_6020DD0",
+        "offset": "0x20874",
+        "radio_id": 170,
+        "message_id": 10220
+      },
+      {
+        "segment": "ast_solar",
+        "script": "D_SO_6020DD0",
+        "offset": "0x20928",
+        "radio_id": 170,
+        "message_id": 10230
+      },
+      {
+        "segment": "ast_solar",
+        "script": "D_SO_6020DD0",
+        "offset": "0x20968",
+        "radio_id": 10,
+        "message_id": 10321
+      },
+      {
+        "segment": "ast_solar",
+        "script": "D_SO_6020DD0",
+        "offset": "0x209f8",
+        "radio_id": 10,
+        "message_id": 10322
+      },
+      {
+        "segment": "ast_solar",
+        "script": "D_SO_6020DD0",
+        "offset": "0x20a4c",
+        "radio_id": 10,
+        "message_id": 10020
+      },
+      {
+        "segment": "ast_solar",
+        "script": "D_SO_6020DD0",
+        "offset": "0x20a9c",
+        "radio_id": 20,
+        "message_id": 10060
+      },
+      {
+        "segment": "ast_solar",
+        "script": "D_SO_6020DD0",
+        "offset": "0x20aec",
+        "radio_id": 30,
+        "message_id": 10324
+      },
+      {
+        "segment": "ast_solar",
+        "script": "D_SO_6020DD0",
+        "offset": "0x20b3c",
+        "radio_id": 30,
+        "message_id": 10255
+      },
+      {
+        "segment": "ast_solar",
+        "script": "D_SO_6020DD0",
+        "offset": "0x20b94",
+        "radio_id": 30,
+        "message_id": 20269
+      },
+      {
+        "segment": "ast_solar",
+        "script": "D_SO_6020DD0",
+        "offset": "0x20bb4",
+        "radio_id": 90,
+        "message_id": 20230
+      },
+      {
+        "segment": "ast_titania",
+        "script": "D_TI_600631C",
+        "offset": "0x5050",
+        "radio_id": 30,
+        "message_id": 4080
+      },
+      {
+        "segment": "ast_titania",
+        "script": "D_TI_600631C",
+        "offset": "0x5060",
+        "radio_id": 20,
+        "message_id": 9152
+      },
+      {
+        "segment": "ast_titania",
+        "script": "D_TI_600631C",
+        "offset": "0x5068",
+        "radio_id": 0,
+        "message_id": 4082
+      },
+      {
+        "segment": "ast_titania",
+        "script": "D_TI_600631C",
+        "offset": "0x507c",
+        "radio_id": 10,
+        "message_id": 4083
+      },
+      {
+        "segment": "ast_titania",
+        "script": "D_TI_600631C",
+        "offset": "0x508c",
+        "radio_id": 0,
+        "message_id": 4010
+      },
+      {
+        "segment": "ast_titania",
+        "script": "D_TI_600631C",
+        "offset": "0x5094",
+        "radio_id": 90,
+        "message_id": 4011
+      },
+      {
+        "segment": "ast_titania",
+        "script": "D_TI_600631C",
+        "offset": "0x50a8",
+        "radio_id": 30,
+        "message_id": 4012
+      },
+      {
+        "segment": "ast_titania",
+        "script": "D_TI_600631C",
+        "offset": "0x50bc",
+        "radio_id": 10,
+        "message_id": 4013
+      },
+      {
+        "segment": "ast_titania",
+        "script": "D_TI_600631C",
+        "offset": "0x5104",
+        "radio_id": 10,
+        "message_id": 4020
+      },
+      {
+        "segment": "ast_titania",
+        "script": "D_TI_600631C",
+        "offset": "0x5128",
+        "radio_id": 0,
+        "message_id": 4022
+      },
+      {
+        "segment": "ast_titania",
+        "script": "D_TI_600631C",
+        "offset": "0x5150",
+        "radio_id": 10,
+        "message_id": 4023
+      },
+      {
+        "segment": "ast_titania",
+        "script": "D_TI_600631C",
+        "offset": "0x5188",
+        "radio_id": 10,
+        "message_id": 4021
+      },
+      {
+        "segment": "ast_titania",
+        "script": "D_TI_600631C",
+        "offset": "0x51b8",
+        "radio_id": 30,
+        "message_id": 4024
+      },
+      {
+        "segment": "ast_titania",
+        "script": "D_TI_600631C",
+        "offset": "0x51cc",
+        "radio_id": 10,
+        "message_id": 4031
+      },
+      {
+        "segment": "ast_titania",
+        "script": "D_TI_600631C",
+        "offset": "0x53d8",
+        "radio_id": 10,
+        "message_id": 9100
+      },
+      {
+        "segment": "ast_titania",
+        "script": "D_TI_600631C",
+        "offset": "0x5400",
+        "radio_id": 10,
+        "message_id": 9130
+      },
+      {
+        "segment": "ast_titania",
+        "script": "D_TI_600631C",
+        "offset": "0x5458",
+        "radio_id": 10,
+        "message_id": 2090
+      },
+      {
+        "segment": "ast_titania",
+        "script": "D_TI_600631C",
+        "offset": "0x5498",
+        "radio_id": 10,
+        "message_id": 20262
+      },
+      {
+        "segment": "ast_titania",
+        "script": "D_TI_600631C",
+        "offset": "0x584c",
+        "radio_id": 30,
+        "message_id": 20290
+      },
+      {
+        "segment": "ast_titania",
+        "script": "D_TI_600631C",
+        "offset": "0x5860",
+        "radio_id": 10,
+        "message_id": 8045
+      },
+      {
+        "segment": "ast_titania",
+        "script": "D_TI_600631C",
+        "offset": "0x5878",
+        "radio_id": 30,
+        "message_id": 4075
+      },
+      {
+        "segment": "ast_titania",
+        "script": "D_TI_600631C",
+        "offset": "0x5880",
+        "radio_id": 30,
+        "message_id": 4050
+      },
+      {
+        "segment": "ast_titania",
+        "script": "D_TI_600631C",
+        "offset": "0x58d8",
+        "radio_id": 30,
+        "message_id": 4040
+      },
+      {
+        "segment": "ast_titania",
+        "script": "D_TI_600631C",
+        "offset": "0x58fc",
+        "radio_id": 30,
+        "message_id": 20239
+      },
+      {
+        "segment": "ast_titania",
+        "script": "D_TI_600631C",
+        "offset": "0x5e60",
+        "radio_id": 30,
+        "message_id": 4030
+      },
+      {
+        "segment": "ast_titania",
+        "script": "D_TI_600631C",
+        "offset": "0x5f7c",
+        "radio_id": 30,
+        "message_id": 20283
+      },
+      {
+        "segment": "ast_titania",
+        "script": "D_TI_600631C",
+        "offset": "0x5f94",
+        "radio_id": 30,
+        "message_id": 20238
+      },
+      {
+        "segment": "ast_titania",
+        "script": "D_TI_600631C",
+        "offset": "0x5fc4",
+        "radio_id": 90,
+        "message_id": 20230
+      },
+      {
+        "segment": "ast_training",
+        "script": "D_TR_6009B34",
+        "offset": "0x9504",
+        "radio_id": 90,
+        "message_id": 20326
+      },
+      {
+        "segment": "ast_training",
+        "script": "D_TR_6009B34",
+        "offset": "0x9514",
+        "radio_id": 90,
+        "message_id": 20327
+      },
+      {
+        "segment": "ast_training",
+        "script": "D_TR_6009B34",
+        "offset": "0x9524",
+        "radio_id": 350,
+        "message_id": 23000
+      },
+      {
+        "segment": "ast_training",
+        "script": "D_TR_6009B34",
+        "offset": "0x9534",
+        "radio_id": 350,
+        "message_id": 23001
+      },
+      {
+        "segment": "ast_training",
+        "script": "D_TR_6009B34",
+        "offset": "0x9544",
+        "radio_id": 350,
+        "message_id": 23002
+      },
+      {
+        "segment": "ast_training",
+        "script": "D_TR_6009B34",
+        "offset": "0x9554",
+        "radio_id": 350,
+        "message_id": 23003
+      },
+      {
+        "segment": "ast_training",
+        "script": "D_TR_6009B34",
+        "offset": "0x9564",
+        "radio_id": 350,
+        "message_id": 23004
+      },
+      {
+        "segment": "ast_training",
+        "script": "D_TR_6009B34",
+        "offset": "0x9574",
+        "radio_id": 350,
+        "message_id": 23005
+      },
+      {
+        "segment": "ast_training",
+        "script": "D_TR_6009B34",
+        "offset": "0x9584",
+        "radio_id": 350,
+        "message_id": 23006
+      },
+      {
+        "segment": "ast_training",
+        "script": "D_TR_6009B34",
+        "offset": "0x9594",
+        "radio_id": 350,
+        "message_id": 23007
+      },
+      {
+        "segment": "ast_training",
+        "script": "D_TR_6009B34",
+        "offset": "0x95a4",
+        "radio_id": 350,
+        "message_id": 23008
+      },
+      {
+        "segment": "ast_training",
+        "script": "D_TR_6009B34",
+        "offset": "0x95b4",
+        "radio_id": 350,
+        "message_id": 23009
+      },
+      {
+        "segment": "ast_training",
+        "script": "D_TR_6009B34",
+        "offset": "0x95c4",
+        "radio_id": 350,
+        "message_id": 23010
+      },
+      {
+        "segment": "ast_training",
+        "script": "D_TR_6009B34",
+        "offset": "0x95d4",
+        "radio_id": 350,
+        "message_id": 23011
+      },
+      {
+        "segment": "ast_training",
+        "script": "D_TR_6009B34",
+        "offset": "0x95e4",
+        "radio_id": 350,
+        "message_id": 23012
+      },
+      {
+        "segment": "ast_training",
+        "script": "D_TR_6009B34",
+        "offset": "0x95f4",
+        "radio_id": 350,
+        "message_id": 23013
+      },
+      {
+        "segment": "ast_training",
+        "script": "D_TR_6009B34",
+        "offset": "0x9604",
+        "radio_id": 350,
+        "message_id": 23014
+      },
+      {
+        "segment": "ast_training",
+        "script": "D_TR_6009B34",
+        "offset": "0x9614",
+        "radio_id": 350,
+        "message_id": 23015
+      },
+      {
+        "segment": "ast_training",
+        "script": "D_TR_6009B34",
+        "offset": "0x9624",
+        "radio_id": 350,
+        "message_id": 23016
+      },
+      {
+        "segment": "ast_training",
+        "script": "D_TR_6009B34",
+        "offset": "0x9634",
+        "radio_id": 350,
+        "message_id": 23017
+      },
+      {
+        "segment": "ast_training",
+        "script": "D_TR_6009B34",
+        "offset": "0x9644",
+        "radio_id": 350,
+        "message_id": 23018
+      },
+      {
+        "segment": "ast_training",
+        "script": "D_TR_6009B34",
+        "offset": "0x9654",
+        "radio_id": 350,
+        "message_id": 23019
+      },
+      {
+        "segment": "ast_training",
+        "script": "D_TR_6009B34",
+        "offset": "0x9664",
+        "radio_id": 350,
+        "message_id": 23020
+      },
+      {
+        "segment": "ast_training",
+        "script": "D_TR_6009B34",
+        "offset": "0x9674",
+        "radio_id": 350,
+        "message_id": 23021
+      },
+      {
+        "segment": "ast_training",
+        "script": "D_TR_6009B34",
+        "offset": "0x9684",
+        "radio_id": 350,
+        "message_id": 23022
+      },
+      {
+        "segment": "ast_training",
+        "script": "D_TR_6009B34",
+        "offset": "0x96a4",
+        "radio_id": 90,
+        "message_id": 20329
+      },
+      {
+        "segment": "ast_training",
+        "script": "D_TR_6009B34",
+        "offset": "0x96b4",
+        "radio_id": 350,
+        "message_id": 23023
+      },
+      {
+        "segment": "ast_training",
+        "script": "D_TR_6009B34",
+        "offset": "0x96c4",
+        "radio_id": 350,
+        "message_id": 23024
+      },
+      {
+        "segment": "ast_training",
+        "script": "D_TR_6009B34",
+        "offset": "0x96d4",
+        "radio_id": 350,
+        "message_id": 23025
+      },
+      {
+        "segment": "ast_training",
+        "script": "D_TR_6009B34",
+        "offset": "0x96e4",
+        "radio_id": 350,
+        "message_id": 23026
+      },
+      {
+        "segment": "ast_training",
+        "script": "D_TR_6009B34",
+        "offset": "0x96f4",
+        "radio_id": 90,
+        "message_id": 20328
+      },
+      {
+        "segment": "ast_training",
+        "script": "D_TR_6009B34",
+        "offset": "0x9704",
+        "radio_id": 350,
+        "message_id": 23027
+      },
+      {
+        "segment": "ast_training",
+        "script": "D_TR_6009B34",
+        "offset": "0x9714",
+        "radio_id": 350,
+        "message_id": 23005
+      },
+      {
+        "segment": "ast_training",
+        "script": "D_TR_6009B34",
+        "offset": "0x971c",
+        "radio_id": 350,
+        "message_id": 23023
+      },
+      {
+        "segment": "ast_venom_1",
+        "script": "aVe1EventScript",
+        "offset": "0x19b70",
+        "radio_id": 10,
+        "message_id": 8050
+      },
+      {
+        "segment": "ast_venom_1",
+        "script": "aVe1EventScript",
+        "offset": "0x19bd0",
+        "radio_id": 20,
+        "message_id": 8040
+      },
+      {
+        "segment": "ast_venom_1",
+        "script": "aVe1EventScript",
+        "offset": "0x1a2dc",
+        "radio_id": 10,
+        "message_id": 8100
+      },
+      {
+        "segment": "ast_venom_1",
+        "script": "aVe1EventScript",
+        "offset": "0x1a2f0",
+        "radio_id": 20,
+        "message_id": 8110
+      },
+      {
+        "segment": "ast_venom_1",
+        "script": "aVe1EventScript",
+        "offset": "0x1a30c",
+        "radio_id": 20,
+        "message_id": 8120
+      },
+      {
+        "segment": "ast_venom_1",
+        "script": "aVe1EventScript",
+        "offset": "0x1a320",
+        "radio_id": 30,
+        "message_id": 8130
+      },
+      {
+        "segment": "ast_venom_1",
+        "script": "aVe1EventScript",
+        "offset": "0x1a334",
+        "radio_id": 10,
+        "message_id": 8140
+      },
+      {
+        "segment": "ast_venom_1",
+        "script": "aVe1EventScript",
+        "offset": "0x1a34c",
+        "radio_id": 0,
+        "message_id": 8010
+      },
+      {
+        "segment": "ast_venom_1",
+        "script": "aVe1EventScript",
+        "offset": "0x1a360",
+        "radio_id": 10,
+        "message_id": 8020
+      },
+      {
+        "segment": "ast_venom_1",
+        "script": "aVe1EventScript",
+        "offset": "0x1a374",
+        "radio_id": 30,
+        "message_id": 5420
+      },
+      {
+        "segment": "ast_venom_1",
+        "script": "aVe1EventScript",
+        "offset": "0x1a388",
+        "radio_id": 10,
+        "message_id": 8045
+      },
+      {
+        "segment": "ast_venom_1",
+        "script": "aVe1EventScript",
+        "offset": "0x1a3a8",
+        "radio_id": 30,
+        "message_id": 8030
+      },
+      {
+        "segment": "ast_venom_1",
+        "script": "aVe1EventScript",
+        "offset": "0x1a3c4",
+        "radio_id": 20,
+        "message_id": 8040
+      },
+      {
+        "segment": "ast_venom_1",
+        "script": "aVe1EventScript",
+        "offset": "0x1a3e0",
+        "radio_id": 20,
+        "message_id": 20272
+      },
+      {
+        "segment": "ast_venom_1",
+        "script": "aVe1EventScript",
+        "offset": "0x1a738",
+        "radio_id": 0,
+        "message_id": 8010
+      },
+      {
+        "segment": "ast_venom_1",
+        "script": "aVe1EventScript",
+        "offset": "0x1a740",
+        "radio_id": 20,
+        "message_id": 8040
+      },
+      {
+        "segment": "ast_venom_1",
+        "script": "aVe1EventScript",
+        "offset": "0x1a748",
+        "radio_id": 10,
+        "message_id": 8060
+      },
+      {
+        "segment": "ast_venom_1",
+        "script": "aVe1EventScript",
+        "offset": "0x1a750",
+        "radio_id": 30,
+        "message_id": 8070
+      },
+      {
+        "segment": "ast_venom_1",
+        "script": "aVe1EventScript",
+        "offset": "0x1a758",
+        "radio_id": 20,
+        "message_id": 8080
+      },
+      {
+        "segment": "ast_venom_1",
+        "script": "aVe1EventScript",
+        "offset": "0x1a760",
+        "radio_id": 0,
+        "message_id": 8205
+      },
+      {
+        "segment": "ast_venom_1",
+        "script": "aVe1EventScript",
+        "offset": "0x1a768",
+        "radio_id": 30,
+        "message_id": 8210
+      },
+      {
+        "segment": "ast_venom_1",
+        "script": "aVe1EventScript",
+        "offset": "0x1a770",
+        "radio_id": 40,
+        "message_id": 8250
+      },
+      {
+        "segment": "ast_venom_1",
+        "script": "aVe1EventScript",
+        "offset": "0x1a778",
+        "radio_id": 40,
+        "message_id": 8255
+      },
+      {
+        "segment": "ast_venom_1",
+        "script": "aVe1EventScript",
+        "offset": "0x1a780",
+        "radio_id": 40,
+        "message_id": 8260
+      },
+      {
+        "segment": "ast_venom_1",
+        "script": "aVe1EventScript",
+        "offset": "0x1a788",
+        "radio_id": 40,
+        "message_id": 8265
+      },
+      {
+        "segment": "ast_venom_1",
+        "script": "aVe1EventScript",
+        "offset": "0x1a790",
+        "radio_id": 30,
+        "message_id": 8300
+      },
+      {
+        "segment": "ast_venom_1",
+        "script": "aVe1EventScript",
+        "offset": "0x1a798",
+        "radio_id": 20,
+        "message_id": 8310
+      },
+      {
+        "segment": "ast_venom_1",
+        "script": "aVe1EventScript",
+        "offset": "0x1a7a0",
+        "radio_id": 10,
+        "message_id": 8320
+      },
+      {
+        "segment": "ast_venom_1",
+        "script": "aVe1EventScript",
+        "offset": "0x1a890",
+        "radio_id": 30,
+        "message_id": 20304
+      },
+      {
+        "segment": "ast_venom_1",
+        "script": "aVe1EventScript",
+        "offset": "0x1a8a4",
+        "radio_id": 20,
+        "message_id": 20305
+      },
+      {
+        "segment": "ast_venom_1",
+        "script": "aVe1EventScript",
+        "offset": "0x1a8b8",
+        "radio_id": 10,
+        "message_id": 20306
+      },
+      {
+        "segment": "ast_venom_1",
+        "script": "aVe1EventScript",
+        "offset": "0x1a8cc",
+        "radio_id": 10,
+        "message_id": 20301
+      },
+      {
+        "segment": "ast_venom_1",
+        "script": "aVe1EventScript",
+        "offset": "0x1aa00",
+        "radio_id": 30,
+        "message_id": 8070
+      },
+      {
+        "segment": "ast_venom_1",
+        "script": "aVe1EventScript",
+        "offset": "0x1aa34",
+        "radio_id": 30,
+        "message_id": 2115
+      },
+      {
+        "segment": "ast_venom_1",
+        "script": "aVe1EventScript",
+        "offset": "0x1aa50",
+        "radio_id": 30,
+        "message_id": 3040
+      },
+      {
+        "segment": "ast_venom_1",
+        "script": "aVe1EventScript",
+        "offset": "0x1aa6c",
+        "radio_id": 30,
+        "message_id": 4075
+      },
+      {
+        "segment": "ast_venom_1",
+        "script": "aVe1EventScript",
+        "offset": "0x1aa88",
+        "radio_id": 30,
+        "message_id": 4080
+      },
+      {
+        "segment": "ast_venom_1",
+        "script": "aVe1EventScript",
+        "offset": "0x1ac4c",
+        "radio_id": 10,
+        "message_id": 8060
+      },
+      {
+        "segment": "ast_venom_1",
+        "script": "aVe1EventScript",
+        "offset": "0x1acd8",
+        "radio_id": 20,
+        "message_id": 21081
+      },
+      {
+        "segment": "ast_venom_1",
+        "script": "aVe1EventScript",
+        "offset": "0x1ad1c",
+        "radio_id": 30,
+        "message_id": 10040
+      },
+      {
+        "segment": "ast_venom_1",
+        "script": "aVe1EventScript",
+        "offset": "0x1ad38",
+        "radio_id": 20,
+        "message_id": 3042
+      },
+      {
+        "segment": "ast_venom_1",
+        "script": "aVe1EventScript",
+        "offset": "0x1ad54",
+        "radio_id": 10,
+        "message_id": 20315
+      },
+      {
+        "segment": "ast_venom_1",
+        "script": "aVe1EventScript",
+        "offset": "0x1ad70",
+        "radio_id": 20,
+        "message_id": 20316
+      },
+      {
+        "segment": "ast_venom_1",
+        "script": "aVe1EventScript",
+        "offset": "0x1ad8c",
+        "radio_id": 30,
+        "message_id": 20317
+      },
+      {
+        "segment": "ast_venom_1",
+        "script": "aVe1EventScript",
+        "offset": "0x1afa4",
+        "radio_id": 55,
+        "message_id": 20276
+      },
+      {
+        "segment": "ast_venom_1",
+        "script": "aVe1EventScript",
+        "offset": "0x1afb0",
+        "radio_id": 55,
+        "message_id": 20277
+      },
+      {
+        "segment": "ast_venom_1",
+        "script": "aVe1EventScript",
+        "offset": "0x1aff4",
+        "radio_id": 20,
+        "message_id": 20300
+      },
+      {
+        "segment": "ast_venom_1",
+        "script": "aVe1EventScript",
+        "offset": "0x1b010",
+        "radio_id": 10,
+        "message_id": 2090
+      },
+      {
+        "segment": "ast_venom_1",
+        "script": "aVe1EventScript",
+        "offset": "0x1b02c",
+        "radio_id": 10,
+        "message_id": 6050
+      },
+      {
+        "segment": "ast_venom_1",
+        "script": "aVe1EventScript",
+        "offset": "0x1b048",
+        "radio_id": 10,
+        "message_id": 14200
+      },
+      {
+        "segment": "ast_venom_1",
+        "script": "aVe1EventScript",
+        "offset": "0x1b080",
+        "radio_id": 10,
+        "message_id": 20271
+      },
+      {
+        "segment": "ast_venom_1",
+        "script": "aVe1EventScript",
+        "offset": "0x1b0b8",
+        "radio_id": 90,
+        "message_id": 20230
+      },
+      {
+        "segment": "ast_zoness",
+        "script": "D_ZO_602AAC0",
+        "offset": "0x28e3c",
+        "radio_id": 0,
+        "message_id": 6010
+      },
+      {
+        "segment": "ast_zoness",
+        "script": "D_ZO_602AAC0",
+        "offset": "0x28e44",
+        "radio_id": 30,
+        "message_id": 6011
+      },
+      {
+        "segment": "ast_zoness",
+        "script": "D_ZO_602AAC0",
+        "offset": "0x28e4c",
+        "radio_id": 10,
+        "message_id": 6013
+      },
+      {
+        "segment": "ast_zoness",
+        "script": "D_ZO_602AAC0",
+        "offset": "0x28e54",
+        "radio_id": 20,
+        "message_id": 6012
+      },
+      {
+        "segment": "ast_zoness",
+        "script": "D_ZO_602AAC0",
+        "offset": "0x28e5c",
+        "radio_id": 10,
+        "message_id": 6014
+      },
+      {
+        "segment": "ast_zoness",
+        "script": "D_ZO_602AAC0",
+        "offset": "0x28fc8",
+        "radio_id": 30,
+        "message_id": 6038
+      },
+      {
+        "segment": "ast_zoness",
+        "script": "D_ZO_602AAC0",
+        "offset": "0x29014",
+        "radio_id": 40,
+        "message_id": 6025
+      },
+      {
+        "segment": "ast_zoness",
+        "script": "D_ZO_602AAC0",
+        "offset": "0x29050",
+        "radio_id": 40,
+        "message_id": 6029
+      },
+      {
+        "segment": "ast_zoness",
+        "script": "D_ZO_602AAC0",
+        "offset": "0x29074",
+        "radio_id": 10,
+        "message_id": 6026
+      },
+      {
+        "segment": "ast_zoness",
+        "script": "D_ZO_602AAC0",
+        "offset": "0x290ec",
+        "radio_id": 40,
+        "message_id": 6027
+      },
+      {
+        "segment": "ast_zoness",
+        "script": "D_ZO_602AAC0",
+        "offset": "0x29134",
+        "radio_id": 10,
+        "message_id": 6045
+      },
+      {
+        "segment": "ast_zoness",
+        "script": "D_ZO_602AAC0",
+        "offset": "0x291cc",
+        "radio_id": 10,
+        "message_id": 6050
+      },
+      {
+        "segment": "ast_zoness",
+        "script": "D_ZO_602AAC0",
+        "offset": "0x2922c",
+        "radio_id": 10,
+        "message_id": 6051
+      },
+      {
+        "segment": "ast_zoness",
+        "script": "D_ZO_602AAC0",
+        "offset": "0x29264",
+        "radio_id": 10,
+        "message_id": 9130
+      },
+      {
+        "segment": "ast_zoness",
+        "script": "D_ZO_602AAC0",
+        "offset": "0x292a0",
+        "radio_id": 10,
+        "message_id": 2095
+      },
+      {
+        "segment": "ast_zoness",
+        "script": "D_ZO_602AAC0",
+        "offset": "0x29344",
+        "radio_id": 20,
+        "message_id": 6055
+      },
+      {
+        "segment": "ast_zoness",
+        "script": "D_ZO_602AAC0",
+        "offset": "0x29574",
+        "radio_id": 0,
+        "message_id": 6030
+      },
+      {
+        "segment": "ast_zoness",
+        "script": "D_ZO_602AAC0",
+        "offset": "0x2964c",
+        "radio_id": 20,
+        "message_id": 6028
+      },
+      {
+        "segment": "ast_zoness",
+        "script": "D_ZO_602AAC0",
+        "offset": "0x29878",
+        "radio_id": 10,
+        "message_id": 11060
+      },
+      {
+        "segment": "ast_zoness",
+        "script": "D_ZO_602AAC0",
+        "offset": "0x298b8",
+        "radio_id": 10,
+        "message_id": 9430
+      },
+      {
+        "segment": "ast_zoness",
+        "script": "D_ZO_602AAC0",
+        "offset": "0x298fc",
+        "radio_id": 40,
+        "message_id": 6041
+      },
+      {
+        "segment": "ast_zoness",
+        "script": "D_ZO_602AAC0",
+        "offset": "0x29978",
+        "radio_id": 40,
+        "message_id": 6042
+      },
+      {
+        "segment": "ast_zoness",
+        "script": "D_ZO_602AAC0",
+        "offset": "0x29f60",
+        "radio_id": 20,
+        "message_id": 6020
+      },
+      {
+        "segment": "ast_zoness",
+        "script": "D_ZO_602AAC0",
+        "offset": "0x29f7c",
+        "radio_id": 10,
+        "message_id": 6021
+      },
+      {
+        "segment": "ast_zoness",
+        "script": "D_ZO_602AAC0",
+        "offset": "0x29f94",
+        "radio_id": 30,
+        "message_id": 6036
+      },
+      {
+        "segment": "ast_zoness",
+        "script": "D_ZO_602AAC0",
+        "offset": "0x29fac",
+        "radio_id": 10,
+        "message_id": 8100
+      },
+      {
+        "segment": "ast_zoness",
+        "script": "D_ZO_602AAC0",
+        "offset": "0x29fc4",
+        "radio_id": 30,
+        "message_id": 6066
+      },
+      {
+        "segment": "ast_zoness",
+        "script": "D_ZO_602AAC0",
+        "offset": "0x29fdc",
+        "radio_id": 20,
+        "message_id": 6067
+      },
+      {
+        "segment": "ast_zoness",
+        "script": "D_ZO_602AAC0",
+        "offset": "0x2a338",
+        "radio_id": 90,
+        "message_id": 20230
+      },
+      {
+        "segment": "ast_zoness",
+        "script": "D_ZO_602AAC0",
+        "offset": "0x2a424",
+        "radio_id": 20,
+        "message_id": 9110
+      },
+      {
+        "segment": "ast_zoness",
+        "script": "D_ZO_602AAC0",
+        "offset": "0x2a464",
+        "radio_id": 20,
+        "message_id": 9140
+      },
+      {
+        "segment": "ast_zoness",
+        "script": "D_ZO_602AAC0",
+        "offset": "0x2a4a8",
+        "radio_id": 20,
+        "message_id": 9152
+      },
+      {
+        "segment": "ast_zoness",
+        "script": "D_ZO_602AAC0",
+        "offset": "0x2a4c0",
+        "radio_id": 20,
+        "message_id": 9170
+      },
+      {
+        "segment": "ast_zoness",
+        "script": "D_ZO_602AAC0",
+        "offset": "0x2a524",
+        "radio_id": 0,
+        "message_id": 6024
+      },
+      {
+        "segment": "ast_zoness",
+        "script": "D_ZO_602AAC0",
+        "offset": "0x2a554",
+        "radio_id": 40,
+        "message_id": 16135
+      },
+      {
+        "segment": "ast_zoness",
+        "script": "D_ZO_602AAC0",
+        "offset": "0x2a754",
+        "radio_id": 30,
+        "message_id": 2140
+      },
+      {
+        "segment": "ast_zoness",
+        "script": "D_ZO_602AAC0",
+        "offset": "0x2a790",
+        "radio_id": 40,
+        "message_id": 16140
+      },
+      {
+        "segment": "ast_zoness",
+        "script": "D_ZO_602AAC0",
+        "offset": "0x2a824",
+        "radio_id": 30,
+        "message_id": 2115
+      }
+    ],
+    "gameplay_pepper_requests": 0,
+    "area6_boss_requests": [
+      {
+        "segment": "ast_area_6",
+        "script": "D_A6_6027F50",
+        "offset": "0x268a0",
+        "radio_id": 120,
+        "message_id": 7094
+      },
+      {
+        "segment": "ast_area_6",
+        "script": "D_A6_6027F50",
+        "offset": "0x268b0",
+        "radio_id": 120,
+        "message_id": 7097
+      },
+      {
+        "segment": "ast_area_6",
+        "script": "D_A6_6027F50",
+        "offset": "0x268b8",
+        "radio_id": 120,
+        "message_id": 7098
+      },
+      {
+        "segment": "ast_area_6",
+        "script": "D_A6_6027F50",
+        "offset": "0x26c44",
+        "radio_id": 120,
+        "message_id": 7052
+      }
+    ]
+  },
+  "supplemental_rom_components": [
+    {
+      "name": "aMapRadioCharFalcoTex",
+      "symbol": "aMapRadioCharFalcoTex",
+      "segment": "ast_map",
+      "address": "0x06032440",
+      "segment_offset": "0x32440",
+      "label": "Falco / map icon",
+      "frame": null,
+      "status": "used",
+      "kind": "map",
+      "width": 28,
+      "height": 28,
+      "source": "rom",
+      "file": "png/aMapRadioCharFalcoTex.png",
+      "sha256": "6b38fe2ebf07f86ee39da2a231e2fa0591705ca3d44caa52e27923a5de0b140e",
+      "references": [
+        "src/overlays/ovl_menu/fox_map.c:6120"
+      ],
+      "duplicates": [],
+      "usage_evidence": "Used by the map, ending, or options renderer; assembled display-list tiles have no direct C texture references."
+    },
+    {
+      "name": "aMapRadioCharPeppyTex",
+      "symbol": "aMapRadioCharPeppyTex",
+      "segment": "ast_map",
+      "address": "0x06032A60",
+      "segment_offset": "0x32a60",
+      "label": "Peppy / map icon",
+      "frame": null,
+      "status": "used",
+      "kind": "map",
+      "width": 28,
+      "height": 28,
+      "source": "rom",
+      "file": "png/aMapRadioCharPeppyTex.png",
+      "sha256": "2d8e5c32de4efa2dba8c47ab0be4221c69730bd0d39abbd3b319ce7e92416833",
+      "references": [
+        "src/overlays/ovl_menu/fox_map.c:6120"
+      ],
+      "duplicates": [],
+      "usage_evidence": "Used by the map, ending, or options renderer; assembled display-list tiles have no direct C texture references."
+    },
+    {
+      "name": "aMapRadioCharSlippyTex",
+      "symbol": "aMapRadioCharSlippyTex",
+      "segment": "ast_map",
+      "address": "0x06044180",
+      "segment_offset": "0x44180",
+      "label": "Slippy / map icon",
+      "frame": null,
+      "status": "used",
+      "kind": "map",
+      "width": 28,
+      "height": 28,
+      "source": "rom",
+      "file": "png/aMapRadioCharSlippyTex.png",
+      "sha256": "f61ebe893080fb773c6dab0a41e80f966513f8c1ba5d4855f88703691fd050ed",
+      "references": [
+        "src/overlays/ovl_menu/fox_map.c:6120"
+      ],
+      "duplicates": [],
+      "usage_evidence": "Used by the map, ending, or options renderer; assembled display-list tiles have no direct C texture references."
+    },
+    {
+      "name": "D_MAP_6044820",
+      "symbol": "D_MAP_6044820",
+      "segment": "ast_map",
+      "address": "0x06044820",
+      "segment_offset": "0x44820",
+      "label": "Fox / briefing / closed",
+      "frame": null,
+      "status": "used",
+      "kind": "map",
+      "width": 92,
+      "height": 51,
+      "source": "rom",
+      "file": "png/D_MAP_6044820.png",
+      "sha256": "9ba448ce61d6f30355bcc245ce4b737743c3ddfa9e5d3b49dff4918fcd3fde5c",
+      "references": [
+        "src/overlays/ovl_menu/fox_map.c:6136"
+      ],
+      "duplicates": [],
+      "usage_evidence": "Used by the map, ending, or options renderer; assembled display-list tiles have no direct C texture references."
+    },
+    {
+      "name": "D_MAP_6046CD0",
+      "symbol": "D_MAP_6046CD0",
+      "segment": "ast_map",
+      "address": "0x06046CD0",
+      "segment_offset": "0x46cd0",
+      "label": "Fox / briefing / mouth patch",
+      "frame": null,
+      "status": "used",
+      "kind": "component",
+      "width": 32,
+      "height": 34,
+      "source": "rom",
+      "file": "png/D_MAP_6046CD0.png",
+      "sha256": "2bdb7cc1b543abc38e08ea50ceabe47da7f53af32ebff38d52fa807dbc1271c0",
+      "references": [
+        "src/overlays/ovl_menu/fox_map.c:6139"
+      ],
+      "duplicates": [],
+      "usage_evidence": "Used by the map, ending, or options renderer; assembled display-list tiles have no direct C texture references."
+    },
+    {
+      "name": "D_MAP_6058120",
+      "symbol": "D_MAP_6058120",
+      "segment": "ast_map",
+      "address": "0x06058120",
+      "segment_offset": "0x58120",
+      "label": "General Pepper / briefing / frame 1 / tile",
+      "frame": null,
+      "status": "used",
+      "kind": "map",
+      "width": 64,
+      "height": 32,
+      "source": "rom",
+      "file": "png/D_MAP_6058120.png",
+      "sha256": "b88925df27e6b097d6f1deba42eb7ca0662f00a062e5479b5df5d838dea6d917",
+      "references": [],
+      "duplicates": [],
+      "usage_evidence": "Used by the map, ending, or options renderer; assembled display-list tiles have no direct C texture references."
+    },
+    {
+      "name": "D_MAP_6059120",
+      "symbol": "D_MAP_6059120",
+      "segment": "ast_map",
+      "address": "0x06059120",
+      "segment_offset": "0x59120",
+      "label": "General Pepper / briefing / frame 1 / tile",
+      "frame": null,
+      "status": "used",
+      "kind": "map",
+      "width": 64,
+      "height": 32,
+      "source": "rom",
+      "file": "png/D_MAP_6059120.png",
+      "sha256": "cbbb7108510ffc15f8da7991a86f3fa37e49d43c0895245e764cde99ffe345cf",
+      "references": [],
+      "duplicates": [],
+      "usage_evidence": "Used by the map, ending, or options renderer; assembled display-list tiles have no direct C texture references."
+    },
+    {
+      "name": "D_MAP_6056120",
+      "symbol": "D_MAP_6056120",
+      "segment": "ast_map",
+      "address": "0x06056120",
+      "segment_offset": "0x56120",
+      "label": "General Pepper / briefing / frame 1 / tile",
+      "frame": null,
+      "status": "used",
+      "kind": "map",
+      "width": 64,
+      "height": 32,
+      "source": "rom",
+      "file": "png/D_MAP_6056120.png",
+      "sha256": "109a56ab1f53cc440f575d8d12e9f32ad51c04640b5c7763ba6dbf0d582dbee7",
+      "references": [],
+      "duplicates": [],
+      "usage_evidence": "Used by the map, ending, or options renderer; assembled display-list tiles have no direct C texture references."
+    },
+    {
+      "name": "D_MAP_6057120",
+      "symbol": "D_MAP_6057120",
+      "segment": "ast_map",
+      "address": "0x06057120",
+      "segment_offset": "0x57120",
+      "label": "General Pepper / briefing / frame 1 / tile",
+      "frame": null,
+      "status": "used",
+      "kind": "map",
+      "width": 64,
+      "height": 32,
+      "source": "rom",
+      "file": "png/D_MAP_6057120.png",
+      "sha256": "81bbd31c161ab20bc6d7f6b9170777f3337c71b8d17425ca3a1dc6c802e77c8d",
+      "references": [],
+      "duplicates": [],
+      "usage_evidence": "Used by the map, ending, or options renderer; assembled display-list tiles have no direct C texture references."
+    },
+    {
+      "name": "D_MAP_6054F20",
+      "symbol": "D_MAP_6054F20",
+      "segment": "ast_map",
+      "address": "0x06054F20",
+      "segment_offset": "0x54f20",
+      "label": "General Pepper / briefing / frame 2 / tile",
+      "frame": null,
+      "status": "used",
+      "kind": "map",
+      "width": 64,
+      "height": 32,
+      "source": "rom",
+      "file": "png/D_MAP_6054F20.png",
+      "sha256": "3f44f638e00b478de27df40414e3316e5c7c0d0b21c84730038371a0daf32d2c",
+      "references": [],
+      "duplicates": [],
+      "usage_evidence": "Used by the map, ending, or options renderer; assembled display-list tiles have no direct C texture references."
+    },
+    {
+      "name": "D_MAP_6051F20",
+      "symbol": "D_MAP_6051F20",
+      "segment": "ast_map",
+      "address": "0x06051F20",
+      "segment_offset": "0x51f20",
+      "label": "General Pepper / briefing / frame 2 / tile",
+      "frame": null,
+      "status": "used",
+      "kind": "map",
+      "width": 64,
+      "height": 32,
+      "source": "rom",
+      "file": "png/D_MAP_6051F20.png",
+      "sha256": "29f5c03ec9d5c5a5eb6e4210db8af9432ac3e537ef5ff90eb8c1f864d744f981",
+      "references": [],
+      "duplicates": [],
+      "usage_evidence": "Used by the map, ending, or options renderer; assembled display-list tiles have no direct C texture references."
+    },
+    {
+      "name": "D_MAP_6052F20",
+      "symbol": "D_MAP_6052F20",
+      "segment": "ast_map",
+      "address": "0x06052F20",
+      "segment_offset": "0x52f20",
+      "label": "General Pepper / briefing / frame 2 / tile",
+      "frame": null,
+      "status": "used",
+      "kind": "map",
+      "width": 64,
+      "height": 32,
+      "source": "rom",
+      "file": "png/D_MAP_6052F20.png",
+      "sha256": "160ca459de94caca2d7b8e8f3d8319a6b4f7ec47b6feac439cc8a01c1ffd4ac4",
+      "references": [],
+      "duplicates": [],
+      "usage_evidence": "Used by the map, ending, or options renderer; assembled display-list tiles have no direct C texture references."
+    },
+    {
+      "name": "D_MAP_6053F20",
+      "symbol": "D_MAP_6053F20",
+      "segment": "ast_map",
+      "address": "0x06053F20",
+      "segment_offset": "0x53f20",
+      "label": "General Pepper / briefing / frame 2 / tile",
+      "frame": null,
+      "status": "used",
+      "kind": "map",
+      "width": 64,
+      "height": 32,
+      "source": "rom",
+      "file": "png/D_MAP_6053F20.png",
+      "sha256": "846ee0aa51e1e18506208e517770264a58fa431dd4bb01742fd0c3576e828cee",
+      "references": [],
+      "duplicates": [],
+      "usage_evidence": "Used by the map, ending, or options renderer; assembled display-list tiles have no direct C texture references."
+    },
+    {
+      "name": "D_END_7000118",
+      "symbol": "D_END_7000118",
+      "segment": "ast_ending",
+      "address": "0x07000118",
+      "segment_offset": "0x118",
+      "label": "Andross / ending / tile",
+      "frame": null,
+      "status": "used",
+      "kind": "map",
+      "width": 32,
+      "height": 64,
+      "source": "rom",
+      "file": "png/D_END_7000118.png",
+      "sha256": "94a8bff58b32186325a82164e11d9e093e84b2d775ef417dd49a1bba60fe8821",
+      "references": [],
+      "duplicates": [],
+      "usage_evidence": "Used by the map, ending, or options renderer; assembled display-list tiles have no direct C texture references."
+    },
+    {
+      "name": "D_END_7001118",
+      "symbol": "D_END_7001118",
+      "segment": "ast_ending",
+      "address": "0x07001118",
+      "segment_offset": "0x1118",
+      "label": "Andross / ending / tile",
+      "frame": null,
+      "status": "used",
+      "kind": "map",
+      "width": 32,
+      "height": 64,
+      "source": "rom",
+      "file": "png/D_END_7001118.png",
+      "sha256": "44302b5d5e0632eae32416839adfcde260638f2a92b4c3517a78053cb16c4ca7",
+      "references": [],
+      "duplicates": [],
+      "usage_evidence": "Used by the map, ending, or options renderer; assembled display-list tiles have no direct C texture references."
+    },
+    {
+      "name": "aMapPrologue2Tex",
+      "symbol": "aMapPrologue2Tex",
+      "segment": "ast_map",
+      "address": "0x06035780",
+      "segment_offset": "0x35780",
+      "label": "Prologue 2 / Andross and Pepper",
+      "frame": null,
+      "status": "used",
+      "kind": "artwork",
+      "width": 96,
+      "height": 52,
+      "source": "rom",
+      "file": "png/aMapPrologue2Tex.png",
+      "sha256": "99ff2bbf6216c0c4e409099ba0223e0205f264e5275fee46c22615e519a2e64b",
+      "references": [
+        "src/overlays/ovl_menu/fox_map.c:2183"
+      ],
+      "duplicates": [],
+      "usage_evidence": "Used by the map, ending, or options renderer; assembled display-list tiles have no direct C texture references."
+    },
+    {
+      "name": "aMapPrologue3Tex",
+      "symbol": "aMapPrologue3Tex",
+      "segment": "ast_map",
+      "address": "0x06033080",
+      "segment_offset": "0x33080",
+      "label": "Prologue 3 / original Star Fox",
+      "frame": null,
+      "status": "used",
+      "kind": "artwork",
+      "width": 96,
+      "height": 52,
+      "source": "rom",
+      "file": "png/aMapPrologue3Tex.png",
+      "sha256": "ad81893dd01e63076970a17d454a4c833c56890a0da7c23599886ec689a3f0ee",
+      "references": [
+        "src/overlays/ovl_menu/fox_map.c:2183"
+      ],
+      "duplicates": [],
+      "usage_evidence": "Used by the map, ending, or options renderer; assembled display-list tiles have no direct C texture references."
+    },
+    {
+      "name": "aMapPrologue6Tex",
+      "symbol": "aMapPrologue6Tex",
+      "segment": "ast_map",
+      "address": "0x06037E80",
+      "segment_offset": "0x37e80",
+      "label": "Prologue 6 / Andross",
+      "frame": null,
+      "status": "used",
+      "kind": "artwork",
+      "width": 96,
+      "height": 52,
+      "source": "rom",
+      "file": "png/aMapPrologue6Tex.png",
+      "sha256": "c3641416722bb5ff874922fbae5d28f8317bb59e4fe35c2a4a91b1e5c7faff4b",
+      "references": [
+        "src/overlays/ovl_menu/fox_map.c:2184"
+      ],
+      "duplicates": [],
+      "usage_evidence": "Used by the map, ending, or options renderer; assembled display-list tiles have no direct C texture references."
+    },
+    {
+      "name": "aMapPrologue7Tex",
+      "symbol": "aMapPrologue7Tex",
+      "segment": "ast_map",
+      "address": "0x0603CC80",
+      "segment_offset": "0x3cc80",
+      "label": "Prologue 7 / Star Fox team",
+      "frame": null,
+      "status": "used",
+      "kind": "artwork",
+      "width": 96,
+      "height": 52,
+      "source": "rom",
+      "file": "png/aMapPrologue7Tex.png",
+      "sha256": "186d2bfb295b8f9b14ff3c28c1baac68cbb051e203c047023d6b94fed09b0940",
+      "references": [
+        "src/overlays/ovl_menu/fox_map.c:2184"
+      ],
+      "duplicates": [],
+      "usage_evidence": "Used by the map, ending, or options renderer; assembled display-list tiles have no direct C texture references."
+    },
+    {
+      "name": "ending_expert_reward",
+      "symbol": "gEndingExpertReward",
+      "segment": "ast_ending_expert",
+      "address": "0x08000000",
+      "segment_offset": "0x0",
+      "label": "Expert ending / team artwork",
+      "frame": null,
+      "status": "used",
+      "kind": "artwork",
+      "width": 316,
+      "height": 240,
+      "source": "rom",
+      "file": "png/ending_expert_reward.png",
+      "sha256": "10ac996d6ac18a07a55de192d0a9ff9b1f866be17aafb39c57c79548c7613349",
+      "references": [
+        "src/overlays/ovl_ending/fox_end2.c:156"
+      ],
+      "duplicates": [],
+      "usage_evidence": "Used by the map, ending, or options renderer; assembled display-list tiles have no direct C texture references."
+    },
+    {
+      "name": "ending_normal_reward",
+      "symbol": "gEndingNormalReward",
+      "segment": "ast_ending_expert",
+      "address": "0x08025080",
+      "segment_offset": "0x25080",
+      "label": "Normal ending / character collage",
+      "frame": null,
+      "status": "used",
+      "kind": "artwork",
+      "width": 316,
+      "height": 240,
+      "source": "rom",
+      "file": "png/ending_normal_reward.png",
+      "sha256": "8357d88ca3f194e8a5d57d5fc8fefbe19541b5f829c6a360f52875d70b1caf8f",
+      "references": [
+        "src/overlays/ovl_ending/fox_end2.c:154"
+      ],
+      "duplicates": [],
+      "usage_evidence": "Used by the map, ending, or options renderer; assembled display-list tiles have no direct C texture references."
+    },
+    {
+      "name": "D_OPT_800E170",
+      "symbol": "D_OPT_800E170",
+      "segment": "ast_option",
+      "address": "0x0800E170",
+      "segment_offset": "0xe170",
+      "label": "Invoice / team card",
+      "frame": null,
+      "status": "used",
+      "kind": "artwork",
+      "width": 188,
+      "height": 60,
+      "source": "rom",
+      "file": "png/D_OPT_800E170.png",
+      "sha256": "f8bcc750a1d6ecccd5897d79f69af07d507f866134e215a7d1555ea483d6f2fb",
+      "references": [
+        "src/overlays/ovl_menu/fox_option.c:4603"
+      ],
+      "duplicates": [],
+      "usage_evidence": "Used by the map, ending, or options renderer; assembled display-list tiles have no direct C texture references."
+    }
+  ],
+  "textures": [
+    {
+      "symbol": "D_VS_MENU_7007FC0",
+      "name": "D_VS_MENU_7007FC0",
+      "segment": "ast_vs_menu",
+      "address": "0x07007FC0",
+      "segment_offset": "0x007FC0",
+      "dma_index": 44,
+      "compressed_rom_start": "0xABDF30",
+      "sha256": "05eb5f583c211fde3935cc642e70103c59d6ac7433d46d8e3348acf7249ed7a5",
+      "references": [],
+      "file": "png/D_VS_MENU_7007FC0.png",
+      "kind": "portrait",
+      "label": "Falco / versus menu",
+      "frame": 2,
+      "status": "unused",
+      "usage_evidence": "No source references and no mapping in the portrait renderer.",
+      "duplicates": [
+        "D_10041C0"
+      ]
+    },
+    {
+      "symbol": "D_VS_MENU_7009E00",
+      "name": "D_VS_MENU_7009E00",
+      "segment": "ast_vs_menu",
+      "address": "0x07009E00",
+      "segment_offset": "0x009E00",
+      "dma_index": 44,
+      "compressed_rom_start": "0xABDF30",
+      "sha256": "fba7597e54993ebbb11ac6010e24a0afabb94068df94161ab63177b0a712cb69",
+      "references": [],
+      "file": "png/D_VS_MENU_7009E00.png",
+      "kind": "portrait",
+      "label": "Fox / versus menu",
+      "frame": 2,
+      "status": "unused",
+      "usage_evidence": "No source references and no mapping in the portrait renderer.",
+      "duplicates": [
+        "D_1006000"
+      ]
+    },
+    {
+      "symbol": "D_D007A70",
+      "name": "D_D007A70",
+      "segment": "ast_allies",
+      "address": "0x0D007A70",
+      "segment_offset": "0x007A70",
+      "dma_index": 17,
+      "compressed_rom_start": "0x8EDA60",
+      "sha256": "699d12b6618254f9a9e66aa83b198052c569059ca003c721d571fee61ff20fa6",
+      "references": [
+        "src/engine/fox_radio.c:411"
+      ],
+      "file": "png/D_D007A70.png",
+      "kind": "portrait",
+      "label": "General Pepper / gameplay",
+      "frame": 1,
+      "status": "unused",
+      "usage_evidence": "Radio ID 70 has a renderer mapping, but no C callers or requests in the 14 ROM script tables.",
+      "duplicates": [
+        "D_GREAT_FOX_E00FF40"
+      ]
+    },
+    {
+      "symbol": "D_D008990",
+      "name": "D_D008990",
+      "segment": "ast_allies",
+      "address": "0x0D008990",
+      "segment_offset": "0x008990",
+      "dma_index": 17,
+      "compressed_rom_start": "0x8EDA60",
+      "sha256": "5ec1e236ed789e5ef95fcc4434ddb02624cb2aaaa7b9cb465d6d29408fb050e8",
+      "references": [
+        "src/engine/fox_radio.c:414"
+      ],
+      "file": "png/D_D008990.png",
+      "kind": "portrait",
+      "label": "General Pepper / gameplay",
+      "frame": 2,
+      "status": "unused",
+      "usage_evidence": "Radio ID 70 has a renderer mapping, but no C callers or requests in the 14 ROM script tables.",
+      "duplicates": [
+        "D_GREAT_FOX_E010E60"
+      ]
+    },
+    {
+      "symbol": "D_KA_6009CB0",
+      "name": "D_KA_6009CB0",
+      "segment": "ast_katina",
+      "address": "0x06009CB0",
+      "segment_offset": "0x009CB0",
+      "dma_index": 38,
+      "compressed_rom_start": "0xA420E0",
+      "sha256": "a4fce8eb3eb1574636cbcb4afaa9ca0f76d9d14f9f25b50faf196a6a24c41f9a",
+      "references": [],
+      "file": "png/D_KA_6009CB0.png",
+      "kind": "portrait",
+      "label": "Katina pilot / alternate Bill",
+      "frame": 1,
+      "status": "unused",
+      "usage_evidence": "No source references and no mapping in the portrait renderer.",
+      "duplicates": []
+    },
+    {
+      "symbol": "D_KA_600ABD0",
+      "name": "D_KA_600ABD0",
+      "segment": "ast_katina",
+      "address": "0x0600ABD0",
+      "segment_offset": "0x00ABD0",
+      "dma_index": 38,
+      "compressed_rom_start": "0xA420E0",
+      "sha256": "4557ffa7e8539a40f3d287af95caa041c580d3ab10bc6fa5122f14f608eda1c8",
+      "references": [],
+      "file": "png/D_KA_600ABD0.png",
+      "kind": "portrait",
+      "label": "Katina pilot / alternate Bill",
+      "frame": 2,
+      "status": "unused",
+      "usage_evidence": "No source references and no mapping in the portrait renderer.",
+      "duplicates": []
+    },
+    {
+      "symbol": "D_VS_MENU_700BC40",
+      "name": "D_VS_MENU_700BC40",
+      "segment": "ast_vs_menu",
+      "address": "0x0700BC40",
+      "segment_offset": "0x00BC40",
+      "dma_index": 44,
+      "compressed_rom_start": "0xABDF30",
+      "sha256": "cd6828d6ad2000705fad1ce5c26d32f0edf9076175bab1c7aa10a55333930e1e",
+      "references": [],
+      "file": "png/D_VS_MENU_700BC40.png",
+      "kind": "portrait",
+      "label": "Peppy / versus menu",
+      "frame": 2,
+      "status": "unused",
+      "usage_evidence": "No source references and no mapping in the portrait renderer.",
+      "duplicates": [
+        "D_100C9E0"
+      ]
+    },
+    {
+      "symbol": "D_FO_6008150",
+      "name": "D_FO_6008150",
+      "segment": "ast_fortuna",
+      "address": "0x06008150",
+      "segment_offset": "0x008150",
+      "dma_index": 34,
+      "compressed_rom_start": "0x9F3B70",
+      "sha256": "efefd262ff165c7b1e919ea23aca8becbfa672dd8c5ddc77710b7f8b90f96286",
+      "references": [],
+      "file": "png/D_FO_6008150.png",
+      "kind": "portrait",
+      "label": "ROB 64 / Fortuna",
+      "frame": 1,
+      "status": "unused",
+      "usage_evidence": "No source references and no mapping in the portrait renderer.",
+      "duplicates": [
+        "D_1009C80",
+        "D_GREAT_FOX_E00E100"
+      ]
+    },
+    {
+      "symbol": "D_FO_6009070",
+      "name": "D_FO_6009070",
+      "segment": "ast_fortuna",
+      "address": "0x06009070",
+      "segment_offset": "0x009070",
+      "dma_index": 34,
+      "compressed_rom_start": "0x9F3B70",
+      "sha256": "e3cd35085a62ea8bbb712f13e3f2db2c6a49b5ba54d298ae118839d9693f3662",
+      "references": [],
+      "file": "png/D_FO_6009070.png",
+      "kind": "portrait",
+      "label": "ROB 64 / Fortuna",
+      "frame": 2,
+      "status": "unused",
+      "usage_evidence": "No source references and no mapping in the portrait renderer.",
+      "duplicates": [
+        "D_100ABA0",
+        "D_GREAT_FOX_E00F020"
+      ]
+    },
+    {
+      "symbol": "D_100F740",
+      "name": "D_100F740",
+      "segment": "ast_common",
+      "address": "0x0100F740",
+      "segment_offset": "0x00F740",
+      "dma_index": 6,
+      "compressed_rom_start": "0x873CB0",
+      "sha256": "8a603341f3d4c5287294510581abe063bbcb81a70924fd406fede42781a1e85a",
+      "references": [],
+      "file": "png/D_100F740.png",
+      "kind": "static",
+      "label": "Radio static / alternate",
+      "frame": null,
+      "status": "unused",
+      "usage_evidence": "No source references and no mapping in the portrait renderer.",
+      "duplicates": []
+    },
+    {
+      "symbol": "D_VS_MENU_700DA80",
+      "name": "D_VS_MENU_700DA80",
+      "segment": "ast_vs_menu",
+      "address": "0x0700DA80",
+      "segment_offset": "0x00DA80",
+      "dma_index": 44,
+      "compressed_rom_start": "0xABDF30",
+      "sha256": "fa7c8741cdefa62c9d8188a07916ecb2550962b094eb81ec86e02142a69c4be1",
+      "references": [],
+      "file": "png/D_VS_MENU_700DA80.png",
+      "kind": "portrait",
+      "label": "Slippy / versus menu",
+      "frame": 2,
+      "status": "unused",
+      "usage_evidence": "No source references and no mapping in the portrait renderer.",
+      "duplicates": [
+        "D_100E820"
+      ]
+    },
+    {
+      "symbol": "D_STAR_WOLF_F000000",
+      "name": "D_STAR_WOLF_F000000",
+      "segment": "ast_star_wolf",
+      "address": "0x0F000000",
+      "segment_offset": "0x000000",
+      "dma_index": 16,
+      "compressed_rom_start": "0x8D92C0",
+      "sha256": "048422a81febb189f323532c810eeb9ca2b94970946460d97a0b3b854ed6679a",
+      "references": [
+        "src/engine/fox_radio.c:279"
+      ],
+      "file": "png/D_STAR_WOLF_F000000.png",
+      "kind": "portrait",
+      "label": "Andrew",
+      "frame": 1,
+      "status": "used",
+      "usage_evidence": "Referenced by the radio, menu, or HUD renderer. Event-script calls are included in the manifest.",
+      "duplicates": []
+    },
+    {
+      "symbol": "D_STAR_WOLF_F000F20",
+      "name": "D_STAR_WOLF_F000F20",
+      "segment": "ast_star_wolf",
+      "address": "0x0F000F20",
+      "segment_offset": "0x000F20",
+      "dma_index": 16,
+      "compressed_rom_start": "0x8D92C0",
+      "sha256": "49fedc1f9c9f994569c9a9c7dab941dec16ab05348bad5393eebd3d0e7211e2b",
+      "references": [
+        "src/engine/fox_radio.c:282"
+      ],
+      "file": "png/D_STAR_WOLF_F000F20.png",
+      "kind": "portrait",
+      "label": "Andrew",
+      "frame": 2,
+      "status": "used",
+      "usage_evidence": "Referenced by the radio, menu, or HUD renderer. Event-script calls are included in the manifest.",
+      "duplicates": []
+    },
+    {
+      "symbol": "D_STAR_WOLF_F001E40",
+      "name": "D_STAR_WOLF_F001E40",
+      "segment": "ast_star_wolf",
+      "address": "0x0F001E40",
+      "segment_offset": "0x001E40",
+      "dma_index": 16,
+      "compressed_rom_start": "0x8D92C0",
+      "sha256": "77259efb78a1a91f0587bdabcaf993f55418ce7069a50ae5d1cc534e911f83d4",
+      "references": [
+        "src/engine/fox_radio.c:303"
+      ],
+      "file": "png/D_STAR_WOLF_F001E40.png",
+      "kind": "portrait",
+      "label": "Andrew / Venom 2",
+      "frame": 1,
+      "status": "used",
+      "usage_evidence": "Referenced by the radio, menu, or HUD renderer. Event-script calls are included in the manifest.",
+      "duplicates": []
+    },
+    {
+      "symbol": "D_STAR_WOLF_F002D60",
+      "name": "D_STAR_WOLF_F002D60",
+      "segment": "ast_star_wolf",
+      "address": "0x0F002D60",
+      "segment_offset": "0x002D60",
+      "dma_index": 16,
+      "compressed_rom_start": "0x8D92C0",
+      "sha256": "57bf4f727f83b79238fc036aecd97a18c19e6ffec28496dccacdcdb6952ae555",
+      "references": [
+        "src/engine/fox_radio.c:306"
+      ],
+      "file": "png/D_STAR_WOLF_F002D60.png",
+      "kind": "portrait",
+      "label": "Andrew / Venom 2",
+      "frame": 2,
+      "status": "used",
+      "usage_evidence": "Referenced by the radio, menu, or HUD renderer. Event-script calls are included in the manifest.",
+      "duplicates": []
+    },
+    {
+      "symbol": "D_D000170",
+      "name": "D_D000170",
+      "segment": "ast_allies",
+      "address": "0x0D000170",
+      "segment_offset": "0x000170",
+      "dma_index": 17,
+      "compressed_rom_start": "0x8EDA60",
+      "sha256": "f31716331ef8d68dfc7106e970ba9facc4b4c06e44c6a65d3c8d023eb740fe15",
+      "references": [
+        "src/engine/fox_radio.c:384"
+      ],
+      "file": "png/D_D000170.png",
+      "kind": "portrait",
+      "label": "Andross",
+      "frame": 1,
+      "status": "used",
+      "usage_evidence": "Referenced by the radio, menu, or HUD renderer. Event-script calls are included in the manifest.",
+      "duplicates": [
+        "D_A6_6000B60"
+      ]
+    },
+    {
+      "symbol": "D_D001090",
+      "name": "D_D001090",
+      "segment": "ast_allies",
+      "address": "0x0D001090",
+      "segment_offset": "0x001090",
+      "dma_index": 17,
+      "compressed_rom_start": "0x8EDA60",
+      "sha256": "cb3b05e304ffa5955e8d0bd6a1da4f9cc2315fc0e1a291e4df59f6676dafb032",
+      "references": [
+        "src/engine/fox_radio.c:392"
+      ],
+      "file": "png/D_D001090.png",
+      "kind": "portrait",
+      "label": "Andross",
+      "frame": 2,
+      "status": "used",
+      "usage_evidence": "Referenced by the radio, menu, or HUD renderer. Event-script calls are included in the manifest.",
+      "duplicates": [
+        "D_A6_6001A80"
+      ]
+    },
+    {
+      "symbol": "D_A6_6000B60",
+      "name": "D_A6_6000B60",
+      "segment": "ast_area_6",
+      "address": "0x06000B60",
+      "segment_offset": "0x000B60",
+      "dma_index": 29,
+      "compressed_rom_start": "0x9ACB00",
+      "sha256": "f31716331ef8d68dfc7106e970ba9facc4b4c06e44c6a65d3c8d023eb740fe15",
+      "references": [
+        "src/engine/fox_radio.c:386"
+      ],
+      "file": "png/D_A6_6000B60.png",
+      "kind": "portrait",
+      "label": "Andross / Area 6",
+      "frame": 1,
+      "status": "used",
+      "usage_evidence": "Referenced by the radio, menu, or HUD renderer. Event-script calls are included in the manifest.",
+      "duplicates": [
+        "D_D000170"
+      ]
+    },
+    {
+      "symbol": "D_A6_6001A80",
+      "name": "D_A6_6001A80",
+      "segment": "ast_area_6",
+      "address": "0x06001A80",
+      "segment_offset": "0x001A80",
+      "dma_index": 29,
+      "compressed_rom_start": "0x9ACB00",
+      "sha256": "cb3b05e304ffa5955e8d0bd6a1da4f9cc2315fc0e1a291e4df59f6676dafb032",
+      "references": [
+        "src/engine/fox_radio.c:394"
+      ],
+      "file": "png/D_A6_6001A80.png",
+      "kind": "portrait",
+      "label": "Andross / Area 6",
+      "frame": 2,
+      "status": "used",
+      "usage_evidence": "Referenced by the radio, menu, or HUD renderer. Event-script calls are included in the manifest.",
+      "duplicates": [
+        "D_D001090"
+      ]
+    },
+    {
+      "symbol": "D_A6_60047E0",
+      "name": "D_A6_60047E0",
+      "segment": "ast_area_6",
+      "address": "0x060047E0",
+      "segment_offset": "0x0047E0",
+      "dma_index": 29,
+      "compressed_rom_start": "0x9ACB00",
+      "sha256": "8585a4ae955fbecc154225a7a42367ebbfa04439092d8091b909738429ed9e7a",
+      "references": [
+        "src/engine/fox_radio.c:327"
+      ],
+      "file": "png/D_A6_60047E0.png",
+      "kind": "portrait",
+      "label": "Area 6 boss",
+      "frame": 1,
+      "status": "used",
+      "usage_evidence": "Referenced by the radio, menu, or HUD renderer. Event-script calls are included in the manifest.",
+      "duplicates": []
+    },
+    {
+      "symbol": "D_A6_6005700",
+      "name": "D_A6_6005700",
+      "segment": "ast_area_6",
+      "address": "0x06005700",
+      "segment_offset": "0x005700",
+      "dma_index": 29,
+      "compressed_rom_start": "0x9ACB00",
+      "sha256": "eca00960b36df6bf3b8780e474058e58b6bf5627749508840989025218c3c228",
+      "references": [
+        "src/engine/fox_radio.c:330"
+      ],
+      "file": "png/D_A6_6005700.png",
+      "kind": "portrait",
+      "label": "Area 6 boss",
+      "frame": 2,
+      "status": "used",
+      "usage_evidence": "Referenced by the radio, menu, or HUD renderer. Event-script calls are included in the manifest.",
+      "duplicates": []
+    },
+    {
+      "symbol": "D_D001FB0",
+      "name": "D_D001FB0",
+      "segment": "ast_allies",
+      "address": "0x0D001FB0",
+      "segment_offset": "0x001FB0",
+      "dma_index": 17,
+      "compressed_rom_start": "0x8EDA60",
+      "sha256": "3483f7607b90949abf1823dfad3f02a711b9ab18839c99bf2fc57e73bb2f45d6",
+      "references": [
+        "src/engine/fox_radio.c:405"
+      ],
+      "file": "png/D_D001FB0.png",
+      "kind": "portrait",
+      "label": "Bill",
+      "frame": 1,
+      "status": "used",
+      "usage_evidence": "Referenced by the radio, menu, or HUD renderer. Event-script calls are included in the manifest.",
+      "duplicates": []
+    },
+    {
+      "symbol": "D_D002ED0",
+      "name": "D_D002ED0",
+      "segment": "ast_allies",
+      "address": "0x0D002ED0",
+      "segment_offset": "0x002ED0",
+      "dma_index": 17,
+      "compressed_rom_start": "0x8EDA60",
+      "sha256": "8577065e5e1fd1a67c3abfe7d279a0ccff9fde4f997f01f3d8c3192ebb1dbad8",
+      "references": [
+        "src/engine/fox_radio.c:408"
+      ],
+      "file": "png/D_D002ED0.png",
+      "kind": "portrait",
+      "label": "Bill",
+      "frame": 2,
+      "status": "used",
+      "usage_evidence": "Referenced by the radio, menu, or HUD renderer. Event-script calls are included in the manifest.",
+      "duplicates": []
+    },
+    {
+      "symbol": "D_A6_60029A0",
+      "name": "D_A6_60029A0",
+      "segment": "ast_area_6",
+      "address": "0x060029A0",
+      "segment_offset": "0x0029A0",
+      "dma_index": 29,
+      "compressed_rom_start": "0x9ACB00",
+      "sha256": "18d8c318646283dc9998986500ef8df492574bbc1cbc9265e2cfc5282879a637",
+      "references": [
+        "src/engine/fox_radio.c:333"
+      ],
+      "file": "png/D_A6_60029A0.png",
+      "kind": "portrait",
+      "label": "Caiman / Area 6",
+      "frame": 1,
+      "status": "used",
+      "usage_evidence": "Referenced by the radio, menu, or HUD renderer. Event-script calls are included in the manifest.",
+      "duplicates": []
+    },
+    {
+      "symbol": "D_A6_60038C0",
+      "name": "D_A6_60038C0",
+      "segment": "ast_area_6",
+      "address": "0x060038C0",
+      "segment_offset": "0x0038C0",
+      "dma_index": 29,
+      "compressed_rom_start": "0x9ACB00",
+      "sha256": "4fe758d5aaa4c9b60d4269d3def7b6850029cbc7be4de857262f1be31bde1509",
+      "references": [
+        "src/engine/fox_radio.c:336"
+      ],
+      "file": "png/D_A6_60038C0.png",
+      "kind": "portrait",
+      "label": "Caiman / Area 6",
+      "frame": 2,
+      "status": "used",
+      "usage_evidence": "Referenced by the radio, menu, or HUD renderer. Event-script calls are included in the manifest.",
+      "duplicates": []
+    },
+    {
+      "symbol": "D_CO_6026420",
+      "name": "D_CO_6026420",
+      "segment": "ast_corneria",
+      "address": "0x06026420",
+      "segment_offset": "0x026420",
+      "dma_index": 18,
+      "compressed_rom_start": "0x8F4EB0",
+      "sha256": "beac1d0d9544e0343b294adee2a756af4afc93be9f852333156632d359a0fcfa",
+      "references": [
+        "src/engine/fox_radio.c:309"
+      ],
+      "file": "png/D_CO_6026420.png",
+      "kind": "portrait",
+      "label": "Corneria boss 1",
+      "frame": 1,
+      "status": "used",
+      "usage_evidence": "Referenced by the radio, menu, or HUD renderer. Event-script calls are included in the manifest.",
+      "duplicates": []
+    },
+    {
+      "symbol": "D_CO_6027340",
+      "name": "D_CO_6027340",
+      "segment": "ast_corneria",
+      "address": "0x06027340",
+      "segment_offset": "0x027340",
+      "dma_index": 18,
+      "compressed_rom_start": "0x8F4EB0",
+      "sha256": "52be9c9746f52181b78b879c6cebddf51eedc9cd8af4c448587fcd2c565388e4",
+      "references": [
+        "src/engine/fox_radio.c:312"
+      ],
+      "file": "png/D_CO_6027340.png",
+      "kind": "portrait",
+      "label": "Corneria boss 1",
+      "frame": 2,
+      "status": "used",
+      "usage_evidence": "Referenced by the radio, menu, or HUD renderer. Event-script calls are included in the manifest.",
+      "duplicates": []
+    },
+    {
+      "symbol": "D_CO_60245E0",
+      "name": "D_CO_60245E0",
+      "segment": "ast_corneria",
+      "address": "0x060245E0",
+      "segment_offset": "0x0245E0",
+      "dma_index": 18,
+      "compressed_rom_start": "0x8F4EB0",
+      "sha256": "fa668368d84f141dbbb05402f5fa90697600a911209da960c27afe87ffc42301",
+      "references": [
+        "src/engine/fox_radio.c:315"
+      ],
+      "file": "png/D_CO_60245E0.png",
+      "kind": "portrait",
+      "label": "Corneria boss 2",
+      "frame": 1,
+      "status": "used",
+      "usage_evidence": "Referenced by the radio, menu, or HUD renderer. Event-script calls are included in the manifest.",
+      "duplicates": []
+    },
+    {
+      "symbol": "D_CO_6025500",
+      "name": "D_CO_6025500",
+      "segment": "ast_corneria",
+      "address": "0x06025500",
+      "segment_offset": "0x025500",
+      "dma_index": 18,
+      "compressed_rom_start": "0x8F4EB0",
+      "sha256": "5b0241c561ba22ddf17d1e756c1fafa44a2c379ca63e671735728007419bae9d",
+      "references": [
+        "src/engine/fox_radio.c:318"
+      ],
+      "file": "png/D_CO_6025500.png",
+      "kind": "portrait",
+      "label": "Corneria boss 2",
+      "frame": 2,
+      "status": "used",
+      "usage_evidence": "Referenced by the radio, menu, or HUD renderer. Event-script calls are included in the manifest.",
+      "duplicates": []
+    },
+    {
+      "symbol": "aFalcoPortraitTex",
+      "name": "aFalcoPortraitTex",
+      "segment": "ast_common",
+      "address": "0x010032A0",
+      "segment_offset": "0x0032A0",
+      "dma_index": 6,
+      "compressed_rom_start": "0x873CB0",
+      "sha256": "bfd9a1a730d800cba72cf4f12f9e9e0815970ad005fbddf464ec3191e7e9a43f",
+      "references": [
+        "src/engine/fox_hud.c:1006",
+        "src/engine/fox_hud.c:2832",
+        "src/engine/fox_radio.c:228"
+      ],
+      "file": "png/aFalcoPortraitTex.png",
+      "kind": "portrait",
+      "label": "Falco",
+      "frame": 1,
+      "status": "used",
+      "usage_evidence": "Referenced by the radio, menu, or HUD renderer. Event-script calls are included in the manifest.",
+      "duplicates": [
+        "aVsFalcoFaceTex"
+      ]
+    },
+    {
+      "symbol": "D_10041C0",
+      "name": "D_10041C0",
+      "segment": "ast_common",
+      "address": "0x010041C0",
+      "segment_offset": "0x0041C0",
+      "dma_index": 6,
+      "compressed_rom_start": "0x873CB0",
+      "sha256": "05eb5f583c211fde3935cc642e70103c59d6ac7433d46d8e3348acf7249ed7a5",
+      "references": [
+        "src/engine/fox_radio.c:234"
+      ],
+      "file": "png/D_10041C0.png",
+      "kind": "portrait",
+      "label": "Falco",
+      "frame": 2,
+      "status": "used",
+      "usage_evidence": "Referenced by the radio, menu, or HUD renderer. Event-script calls are included in the manifest.",
+      "duplicates": [
+        "D_VS_MENU_7007FC0"
+      ]
+    },
+    {
+      "symbol": "aVsFalcoFaceTex",
+      "name": "aVsFalcoFaceTex",
+      "segment": "ast_vs_menu",
+      "address": "0x070070A0",
+      "segment_offset": "0x0070A0",
+      "dma_index": 44,
+      "compressed_rom_start": "0xABDF30",
+      "sha256": "bfd9a1a730d800cba72cf4f12f9e9e0815970ad005fbddf464ec3191e7e9a43f",
+      "references": [
+        "src/overlays/ovl_menu/fox_option.c:2804"
+      ],
+      "file": "png/aVsFalcoFaceTex.png",
+      "kind": "portrait",
+      "label": "Falco / versus menu",
+      "frame": 1,
+      "status": "used",
+      "usage_evidence": "Referenced by the radio, menu, or HUD renderer. Event-script calls are included in the manifest.",
+      "duplicates": [
+        "aFalcoPortraitTex"
+      ]
+    },
+    {
+      "symbol": "aFoxPortraitTex",
+      "name": "aFoxPortraitTex",
+      "segment": "ast_common",
+      "address": "0x010050E0",
+      "segment_offset": "0x0050E0",
+      "dma_index": 6,
+      "compressed_rom_start": "0x873CB0",
+      "sha256": "03290cdfbe508ebfb296dd1ce59e1c20a22a2923aed7e7752168be7faed8646a",
+      "references": [
+        "src/engine/fox_hud.c:1006",
+        "src/engine/fox_hud.c:2829",
+        "src/engine/fox_radio.c:210"
+      ],
+      "file": "png/aFoxPortraitTex.png",
+      "kind": "portrait",
+      "label": "Fox",
+      "frame": 1,
+      "status": "used",
+      "usage_evidence": "Referenced by the radio, menu, or HUD renderer. Event-script calls are included in the manifest.",
+      "duplicates": [
+        "aVsFoxFaceTex"
+      ]
+    },
+    {
+      "symbol": "D_1006000",
+      "name": "D_1006000",
+      "segment": "ast_common",
+      "address": "0x01006000",
+      "segment_offset": "0x006000",
+      "dma_index": 6,
+      "compressed_rom_start": "0x873CB0",
+      "sha256": "fba7597e54993ebbb11ac6010e24a0afabb94068df94161ab63177b0a712cb69",
+      "references": [
+        "src/engine/fox_radio.c:216"
+      ],
+      "file": "png/D_1006000.png",
+      "kind": "portrait",
+      "label": "Fox",
+      "frame": 2,
+      "status": "used",
+      "usage_evidence": "Referenced by the radio, menu, or HUD renderer. Event-script calls are included in the manifest.",
+      "duplicates": [
+        "D_VS_MENU_7009E00"
+      ]
+    },
+    {
+      "symbol": "D_1006F20",
+      "name": "D_1006F20",
+      "segment": "ast_common",
+      "address": "0x01006F20",
+      "segment_offset": "0x006F20",
+      "dma_index": 6,
+      "compressed_rom_start": "0x873CB0",
+      "sha256": "8b1394d023eaac53d525df4880bd657c1b05b8c5efb0c5edcd17807033d5a589",
+      "references": [
+        "src/engine/fox_radio.c:219"
+      ],
+      "file": "png/D_1006F20.png",
+      "kind": "portrait",
+      "label": "Fox / Expert",
+      "frame": 1,
+      "status": "used",
+      "usage_evidence": "Referenced by the radio, menu, or HUD renderer. Event-script calls are included in the manifest.",
+      "duplicates": []
+    },
+    {
+      "symbol": "D_1007E40",
+      "name": "D_1007E40",
+      "segment": "ast_common",
+      "address": "0x01007E40",
+      "segment_offset": "0x007E40",
+      "dma_index": 6,
+      "compressed_rom_start": "0x873CB0",
+      "sha256": "120140e3ab3f90db30877170e38b407cc6d51f9555c2eda37f506e3dc89f3c3c",
+      "references": [
+        "src/engine/fox_radio.c:222"
+      ],
+      "file": "png/D_1007E40.png",
+      "kind": "portrait",
+      "label": "Fox / Expert",
+      "frame": 2,
+      "status": "used",
+      "usage_evidence": "Referenced by the radio, menu, or HUD renderer. Event-script calls are included in the manifest.",
+      "duplicates": []
+    },
+    {
+      "symbol": "aVsFoxFaceTex",
+      "name": "aVsFoxFaceTex",
+      "segment": "ast_vs_menu",
+      "address": "0x07008EE0",
+      "segment_offset": "0x008EE0",
+      "dma_index": 44,
+      "compressed_rom_start": "0xABDF30",
+      "sha256": "03290cdfbe508ebfb296dd1ce59e1c20a22a2923aed7e7752168be7faed8646a",
+      "references": [
+        "src/overlays/ovl_menu/fox_option.c:2801"
+      ],
+      "file": "png/aVsFoxFaceTex.png",
+      "kind": "portrait",
+      "label": "Fox / versus menu",
+      "frame": 1,
+      "status": "used",
+      "usage_evidence": "Referenced by the radio, menu, or HUD renderer. Event-script calls are included in the manifest.",
+      "duplicates": [
+        "aFoxPortraitTex"
+      ]
+    },
+    {
+      "symbol": "D_GREAT_FOX_E00FF40",
+      "name": "D_GREAT_FOX_E00FF40",
+      "segment": "ast_great_fox",
+      "address": "0x0E00FF40",
+      "segment_offset": "0x00FF40",
+      "dma_index": 15,
+      "compressed_rom_start": "0x8C7430",
+      "sha256": "699d12b6618254f9a9e66aa83b198052c569059ca003c721d571fee61ff20fa6",
+      "references": [
+        "src/engine/fox_radio.c:423"
+      ],
+      "file": "png/D_GREAT_FOX_E00FF40.png",
+      "kind": "portrait",
+      "label": "General Pepper / title",
+      "frame": 1,
+      "status": "used",
+      "usage_evidence": "Referenced by the radio, menu, or HUD renderer. Event-script calls are included in the manifest.",
+      "duplicates": [
+        "D_D007A70"
+      ]
+    },
+    {
+      "symbol": "D_GREAT_FOX_E010E60",
+      "name": "D_GREAT_FOX_E010E60",
+      "segment": "ast_great_fox",
+      "address": "0x0E010E60",
+      "segment_offset": "0x010E60",
+      "dma_index": 15,
+      "compressed_rom_start": "0x8C7430",
+      "sha256": "5ec1e236ed789e5ef95fcc4434ddb02624cb2aaaa7b9cb465d6d29408fb050e8",
+      "references": [
+        "src/engine/fox_radio.c:426"
+      ],
+      "file": "png/D_GREAT_FOX_E010E60.png",
+      "kind": "portrait",
+      "label": "General Pepper / title",
+      "frame": 2,
+      "status": "used",
+      "usage_evidence": "Referenced by the radio, menu, or HUD renderer. Event-script calls are included in the manifest.",
+      "duplicates": [
+        "D_D008990"
+      ]
+    },
+    {
+      "symbol": "D_D005C30",
+      "name": "D_D005C30",
+      "segment": "ast_allies",
+      "address": "0x0D005C30",
+      "segment_offset": "0x005C30",
+      "dma_index": 17,
+      "compressed_rom_start": "0x8EDA60",
+      "sha256": "0fdf03669a1e645b5eec14b1e8868086f5317c1dbfc85a1431cbe30c3c97dbe8",
+      "references": [
+        "src/engine/fox_radio.c:399"
+      ],
+      "file": "png/D_D005C30.png",
+      "kind": "portrait",
+      "label": "James",
+      "frame": 1,
+      "status": "used",
+      "usage_evidence": "Referenced by the radio, menu, or HUD renderer. Event-script calls are included in the manifest.",
+      "duplicates": []
+    },
+    {
+      "symbol": "D_D006B50",
+      "name": "D_D006B50",
+      "segment": "ast_allies",
+      "address": "0x0D006B50",
+      "segment_offset": "0x006B50",
+      "dma_index": 17,
+      "compressed_rom_start": "0x8EDA60",
+      "sha256": "18b2708659046d64841a2fac45a67aa0095ff5fdd622d62dd54d8600bf4f584d",
+      "references": [
+        "src/engine/fox_radio.c:402"
+      ],
+      "file": "png/D_D006B50.png",
+      "kind": "portrait",
+      "label": "James",
+      "frame": 2,
+      "status": "used",
+      "usage_evidence": "Referenced by the radio, menu, or HUD renderer. Event-script calls are included in the manifest.",
+      "duplicates": []
+    },
+    {
+      "symbol": "D_D003DF0",
+      "name": "D_D003DF0",
+      "segment": "ast_allies",
+      "address": "0x0D003DF0",
+      "segment_offset": "0x003DF0",
+      "dma_index": 17,
+      "compressed_rom_start": "0x8EDA60",
+      "sha256": "5f765f6141ed1ed297bf992ca9395424eb7ba8f18c6210aac0591093199a04e1",
+      "references": [
+        "src/engine/fox_radio.c:377"
+      ],
+      "file": "png/D_D003DF0.png",
+      "kind": "portrait",
+      "label": "Katt",
+      "frame": 1,
+      "status": "used",
+      "usage_evidence": "Referenced by the radio, menu, or HUD renderer. Event-script calls are included in the manifest.",
+      "duplicates": []
+    },
+    {
+      "symbol": "D_D004D10",
+      "name": "D_D004D10",
+      "segment": "ast_allies",
+      "address": "0x0D004D10",
+      "segment_offset": "0x004D10",
+      "dma_index": 17,
+      "compressed_rom_start": "0x8EDA60",
+      "sha256": "163606c25e504d68f5a27e3432256fabdc4161c98ba8019b39e770f89bc1d5a3",
+      "references": [
+        "src/engine/fox_radio.c:380"
+      ],
+      "file": "png/D_D004D10.png",
+      "kind": "portrait",
+      "label": "Katt",
+      "frame": 2,
+      "status": "used",
+      "usage_evidence": "Referenced by the radio, menu, or HUD renderer. Event-script calls are included in the manifest.",
+      "duplicates": []
+    },
+    {
+      "symbol": "D_STAR_WOLF_F007900",
+      "name": "D_STAR_WOLF_F007900",
+      "segment": "ast_star_wolf",
+      "address": "0x0F007900",
+      "segment_offset": "0x007900",
+      "dma_index": 16,
+      "compressed_rom_start": "0x8D92C0",
+      "sha256": "2eb83b58374ba0960ecab737f3d657e7af6302e670af2c20f9c9e9f780783da2",
+      "references": [
+        "src/engine/fox_radio.c:273"
+      ],
+      "file": "png/D_STAR_WOLF_F007900.png",
+      "kind": "portrait",
+      "label": "Leon",
+      "frame": 1,
+      "status": "used",
+      "usage_evidence": "Referenced by the radio, menu, or HUD renderer. Event-script calls are included in the manifest.",
+      "duplicates": []
+    },
+    {
+      "symbol": "D_STAR_WOLF_F008820",
+      "name": "D_STAR_WOLF_F008820",
+      "segment": "ast_star_wolf",
+      "address": "0x0F008820",
+      "segment_offset": "0x008820",
+      "dma_index": 16,
+      "compressed_rom_start": "0x8D92C0",
+      "sha256": "b6d262f712e2e1b81c4b83779f063fc52db5e5d1cf7d5f93cc51da5a4831dee0",
+      "references": [
+        "src/engine/fox_radio.c:276"
+      ],
+      "file": "png/D_STAR_WOLF_F008820.png",
+      "kind": "portrait",
+      "label": "Leon",
+      "frame": 2,
+      "status": "used",
+      "usage_evidence": "Referenced by the radio, menu, or HUD renderer. Event-script calls are included in the manifest.",
+      "duplicates": []
+    },
+    {
+      "symbol": "D_STAR_WOLF_F009740",
+      "name": "D_STAR_WOLF_F009740",
+      "segment": "ast_star_wolf",
+      "address": "0x0F009740",
+      "segment_offset": "0x009740",
+      "dma_index": 16,
+      "compressed_rom_start": "0x8D92C0",
+      "sha256": "f29f8ec640a144b9a3f4c180caf316e3b67d8838728bbbb375f33b2fef8aefed",
+      "references": [
+        "src/engine/fox_radio.c:297"
+      ],
+      "file": "png/D_STAR_WOLF_F009740.png",
+      "kind": "portrait",
+      "label": "Leon / Venom 2",
+      "frame": 1,
+      "status": "used",
+      "usage_evidence": "Referenced by the radio, menu, or HUD renderer. Event-script calls are included in the manifest.",
+      "duplicates": []
+    },
+    {
+      "symbol": "D_STAR_WOLF_F00A660",
+      "name": "D_STAR_WOLF_F00A660",
+      "segment": "ast_star_wolf",
+      "address": "0x0F00A660",
+      "segment_offset": "0x00A660",
+      "dma_index": 16,
+      "compressed_rom_start": "0x8D92C0",
+      "sha256": "e6b2dd95fd67568eee0fc9c74d596871d24d599e0efdf0cb964e49d77cd5c1e7",
+      "references": [
+        "src/engine/fox_radio.c:300"
+      ],
+      "file": "png/D_STAR_WOLF_F00A660.png",
+      "kind": "portrait",
+      "label": "Leon / Venom 2",
+      "frame": 2,
+      "status": "used",
+      "usage_evidence": "Referenced by the radio, menu, or HUD renderer. Event-script calls are included in the manifest.",
+      "duplicates": []
+    },
+    {
+      "symbol": "D_MA_6010C20",
+      "name": "D_MA_6010C20",
+      "segment": "ast_macbeth",
+      "address": "0x06010C20",
+      "segment_offset": "0x010C20",
+      "dma_index": 39,
+      "compressed_rom_start": "0xA490F0",
+      "sha256": "84fddffa79eeb93b98d8d4181ce99b5d2cbecc94fc1816f961a4bd9a60f2f7d8",
+      "references": [
+        "src/engine/fox_radio.c:357"
+      ],
+      "file": "png/D_MA_6010C20.png",
+      "kind": "portrait",
+      "label": "Macbeth boss",
+      "frame": 1,
+      "status": "used",
+      "usage_evidence": "Referenced by the radio, menu, or HUD renderer. Event-script calls are included in the manifest.",
+      "duplicates": []
+    },
+    {
+      "symbol": "D_MA_6011B40",
+      "name": "D_MA_6011B40",
+      "segment": "ast_macbeth",
+      "address": "0x06011B40",
+      "segment_offset": "0x011B40",
+      "dma_index": 39,
+      "compressed_rom_start": "0xA490F0",
+      "sha256": "1a30ff633d489c1ed49147e1f111f85f007d5032b42ad278163e236c70c55dfe",
+      "references": [
+        "src/engine/fox_radio.c:360"
+      ],
+      "file": "png/D_MA_6011B40.png",
+      "kind": "portrait",
+      "label": "Macbeth boss",
+      "frame": 2,
+      "status": "used",
+      "usage_evidence": "Referenced by the radio, menu, or HUD renderer. Event-script calls are included in the manifest.",
+      "duplicates": []
+    },
+    {
+      "symbol": "D_ME_601C8E0",
+      "name": "D_ME_601C8E0",
+      "segment": "ast_meteo",
+      "address": "0x0601C8E0",
+      "segment_offset": "0x01C8E0",
+      "dma_index": 19,
+      "compressed_rom_start": "0x912380",
+      "sha256": "6e04d35f44cb4e75d75cd311cfd15c0cc8fdbc564cdc26f1710a578384cc5252",
+      "references": [
+        "src/engine/fox_radio.c:321"
+      ],
+      "file": "png/D_ME_601C8E0.png",
+      "kind": "portrait",
+      "label": "Meteo boss",
+      "frame": 1,
+      "status": "used",
+      "usage_evidence": "Referenced by the radio, menu, or HUD renderer. Event-script calls are included in the manifest.",
+      "duplicates": []
+    },
+    {
+      "symbol": "D_ME_601D800",
+      "name": "D_ME_601D800",
+      "segment": "ast_meteo",
+      "address": "0x0601D800",
+      "segment_offset": "0x01D800",
+      "dma_index": 19,
+      "compressed_rom_start": "0x912380",
+      "sha256": "e143a4f835a809ffaeca936cb53556bd28f835f5ade882b90a58490b63fe849c",
+      "references": [
+        "src/engine/fox_radio.c:324"
+      ],
+      "file": "png/D_ME_601D800.png",
+      "kind": "portrait",
+      "label": "Meteo boss",
+      "frame": 2,
+      "status": "used",
+      "usage_evidence": "Referenced by the radio, menu, or HUD renderer. Event-script calls are included in the manifest.",
+      "duplicates": []
+    },
+    {
+      "symbol": "aPeppyPortraitTex",
+      "name": "aPeppyPortraitTex",
+      "segment": "ast_common",
+      "address": "0x0100BAC0",
+      "segment_offset": "0x00BAC0",
+      "dma_index": 6,
+      "compressed_rom_start": "0x873CB0",
+      "sha256": "af16d8d2890e39d981d12edce044f11740f8b3ee3d404352c0018aaa84a8e2f2",
+      "references": [
+        "src/engine/fox_hud.c:1006",
+        "src/engine/fox_hud.c:2830",
+        "src/engine/fox_radio.c:252"
+      ],
+      "file": "png/aPeppyPortraitTex.png",
+      "kind": "portrait",
+      "label": "Peppy",
+      "frame": 1,
+      "status": "used",
+      "usage_evidence": "Referenced by the radio, menu, or HUD renderer. Event-script calls are included in the manifest.",
+      "duplicates": [
+        "aVsPeppyFaceTex"
+      ]
+    },
+    {
+      "symbol": "D_100C9E0",
+      "name": "D_100C9E0",
+      "segment": "ast_common",
+      "address": "0x0100C9E0",
+      "segment_offset": "0x00C9E0",
+      "dma_index": 6,
+      "compressed_rom_start": "0x873CB0",
+      "sha256": "cd6828d6ad2000705fad1ce5c26d32f0edf9076175bab1c7aa10a55333930e1e",
+      "references": [
+        "src/engine/fox_radio.c:258"
+      ],
+      "file": "png/D_100C9E0.png",
+      "kind": "portrait",
+      "label": "Peppy",
+      "frame": 2,
+      "status": "used",
+      "usage_evidence": "Referenced by the radio, menu, or HUD renderer. Event-script calls are included in the manifest.",
+      "duplicates": [
+        "D_VS_MENU_700BC40"
+      ]
+    },
+    {
+      "symbol": "aVsPeppyFaceTex",
+      "name": "aVsPeppyFaceTex",
+      "segment": "ast_vs_menu",
+      "address": "0x0700AD20",
+      "segment_offset": "0x00AD20",
+      "dma_index": 44,
+      "compressed_rom_start": "0xABDF30",
+      "sha256": "af16d8d2890e39d981d12edce044f11740f8b3ee3d404352c0018aaa84a8e2f2",
+      "references": [
+        "src/overlays/ovl_menu/fox_option.c:2802"
+      ],
+      "file": "png/aVsPeppyFaceTex.png",
+      "kind": "portrait",
+      "label": "Peppy / versus menu",
+      "frame": 1,
+      "status": "used",
+      "usage_evidence": "Referenced by the radio, menu, or HUD renderer. Event-script calls are included in the manifest.",
+      "duplicates": [
+        "aPeppyPortraitTex"
+      ]
+    },
+    {
+      "symbol": "D_STAR_WOLF_F003C80",
+      "name": "D_STAR_WOLF_F003C80",
+      "segment": "ast_star_wolf",
+      "address": "0x0F003C80",
+      "segment_offset": "0x003C80",
+      "dma_index": 16,
+      "compressed_rom_start": "0x8D92C0",
+      "sha256": "f4b81d100b064f37f8913bf8bb1066a299ea0c471c45ea85b62936a1e8b237c4",
+      "references": [
+        "src/engine/fox_radio.c:267"
+      ],
+      "file": "png/D_STAR_WOLF_F003C80.png",
+      "kind": "portrait",
+      "label": "Pigma",
+      "frame": 1,
+      "status": "used",
+      "usage_evidence": "Referenced by the radio, menu, or HUD renderer. Event-script calls are included in the manifest.",
+      "duplicates": []
+    },
+    {
+      "symbol": "D_STAR_WOLF_F004BA0",
+      "name": "D_STAR_WOLF_F004BA0",
+      "segment": "ast_star_wolf",
+      "address": "0x0F004BA0",
+      "segment_offset": "0x004BA0",
+      "dma_index": 16,
+      "compressed_rom_start": "0x8D92C0",
+      "sha256": "3f7d1bd3a509638845d3d7222386983e394cc46a541c943aa6606fe9169f9185",
+      "references": [
+        "src/engine/fox_radio.c:270"
+      ],
+      "file": "png/D_STAR_WOLF_F004BA0.png",
+      "kind": "portrait",
+      "label": "Pigma",
+      "frame": 2,
+      "status": "used",
+      "usage_evidence": "Referenced by the radio, menu, or HUD renderer. Event-script calls are included in the manifest.",
+      "duplicates": []
+    },
+    {
+      "symbol": "D_STAR_WOLF_F005AC0",
+      "name": "D_STAR_WOLF_F005AC0",
+      "segment": "ast_star_wolf",
+      "address": "0x0F005AC0",
+      "segment_offset": "0x005AC0",
+      "dma_index": 16,
+      "compressed_rom_start": "0x8D92C0",
+      "sha256": "493759ed50acbf23e268a8d20118150ae915f38cdecf8001e9ed7c7c537b8c8b",
+      "references": [
+        "src/engine/fox_radio.c:291"
+      ],
+      "file": "png/D_STAR_WOLF_F005AC0.png",
+      "kind": "portrait",
+      "label": "Pigma / Venom 2",
+      "frame": 1,
+      "status": "used",
+      "usage_evidence": "Referenced by the radio, menu, or HUD renderer. Event-script calls are included in the manifest.",
+      "duplicates": []
+    },
+    {
+      "symbol": "D_STAR_WOLF_F0069E0",
+      "name": "D_STAR_WOLF_F0069E0",
+      "segment": "ast_star_wolf",
+      "address": "0x0F0069E0",
+      "segment_offset": "0x0069E0",
+      "dma_index": 16,
+      "compressed_rom_start": "0x8D92C0",
+      "sha256": "d7c7799b0d2ef7e8fd90ba9e35520a63f8815456551e8f1a3824fe1d07ca2a8c",
+      "references": [
+        "src/engine/fox_radio.c:294"
+      ],
+      "file": "png/D_STAR_WOLF_F0069E0.png",
+      "kind": "portrait",
+      "label": "Pigma / Venom 2",
+      "frame": 2,
+      "status": "used",
+      "usage_evidence": "Referenced by the radio, menu, or HUD renderer. Event-script calls are included in the manifest.",
+      "duplicates": []
+    },
+    {
+      "symbol": "D_1009C80",
+      "name": "D_1009C80",
+      "segment": "ast_common",
+      "address": "0x01009C80",
+      "segment_offset": "0x009C80",
+      "dma_index": 6,
+      "compressed_rom_start": "0x873CB0",
+      "sha256": "efefd262ff165c7b1e919ea23aca8becbfa672dd8c5ddc77710b7f8b90f96286",
+      "references": [
+        "src/engine/fox_radio.c:367"
+      ],
+      "file": "png/D_1009C80.png",
+      "kind": "portrait",
+      "label": "ROB 64",
+      "frame": 1,
+      "status": "used",
+      "usage_evidence": "Referenced by the radio, menu, or HUD renderer. Event-script calls are included in the manifest.",
+      "duplicates": [
+        "D_FO_6008150",
+        "D_GREAT_FOX_E00E100"
+      ]
+    },
+    {
+      "symbol": "D_100ABA0",
+      "name": "D_100ABA0",
+      "segment": "ast_common",
+      "address": "0x0100ABA0",
+      "segment_offset": "0x00ABA0",
+      "dma_index": 6,
+      "compressed_rom_start": "0x873CB0",
+      "sha256": "e3cd35085a62ea8bbb712f13e3f2db2c6a49b5ba54d298ae118839d9693f3662",
+      "references": [
+        "src/engine/fox_radio.c:374"
+      ],
+      "file": "png/D_100ABA0.png",
+      "kind": "portrait",
+      "label": "ROB 64",
+      "frame": 2,
+      "status": "used",
+      "usage_evidence": "Referenced by the radio, menu, or HUD renderer. Event-script calls are included in the manifest.",
+      "duplicates": [
+        "D_FO_6009070",
+        "D_GREAT_FOX_E00F020"
+      ]
+    },
+    {
+      "symbol": "D_GREAT_FOX_E00E100",
+      "name": "D_GREAT_FOX_E00E100",
+      "segment": "ast_great_fox",
+      "address": "0x0E00E100",
+      "segment_offset": "0x00E100",
+      "dma_index": 15,
+      "compressed_rom_start": "0x8C7430",
+      "sha256": "efefd262ff165c7b1e919ea23aca8becbfa672dd8c5ddc77710b7f8b90f96286",
+      "references": [
+        "src/engine/fox_radio.c:417"
+      ],
+      "file": "png/D_GREAT_FOX_E00E100.png",
+      "kind": "portrait",
+      "label": "ROB 64 / title",
+      "frame": 1,
+      "status": "used",
+      "usage_evidence": "Referenced by the radio, menu, or HUD renderer. Event-script calls are included in the manifest.",
+      "duplicates": [
+        "D_1009C80",
+        "D_FO_6008150"
+      ]
+    },
+    {
+      "symbol": "D_GREAT_FOX_E00F020",
+      "name": "D_GREAT_FOX_E00F020",
+      "segment": "ast_great_fox",
+      "address": "0x0E00F020",
+      "segment_offset": "0x00F020",
+      "dma_index": 15,
+      "compressed_rom_start": "0x8C7430",
+      "sha256": "e3cd35085a62ea8bbb712f13e3f2db2c6a49b5ba54d298ae118839d9693f3662",
+      "references": [
+        "src/engine/fox_radio.c:420"
+      ],
+      "file": "png/D_GREAT_FOX_E00F020.png",
+      "kind": "portrait",
+      "label": "ROB 64 / title",
+      "frame": 2,
+      "status": "used",
+      "usage_evidence": "Referenced by the radio, menu, or HUD renderer. Event-script calls are included in the manifest.",
+      "duplicates": [
+        "D_100ABA0",
+        "D_FO_6009070"
+      ]
+    },
+    {
+      "symbol": "D_1008D60",
+      "name": "D_1008D60",
+      "segment": "ast_common",
+      "address": "0x01008D60",
+      "segment_offset": "0x008D60",
+      "dma_index": 6,
+      "compressed_rom_start": "0x873CB0",
+      "sha256": "27291cc24b1cb9f79053062040bb4e37e5d4009967316e7d046295e07473b58e",
+      "references": [
+        "src/engine/fox_radio.c:443"
+      ],
+      "file": "png/D_1008D60.png",
+      "kind": "static",
+      "label": "Radio static / gameplay",
+      "frame": null,
+      "status": "used",
+      "usage_evidence": "Referenced by the radio, menu, or HUD renderer. Event-script calls are included in the manifest.",
+      "duplicates": [
+        "gTitleRadioStatic"
+      ]
+    },
+    {
+      "symbol": "gTitleRadioStatic",
+      "name": "gTitleRadioStatic",
+      "segment": "ast_title",
+      "address": "0x0600C6A0",
+      "segment_offset": "0x00C6A0",
+      "dma_index": 41,
+      "compressed_rom_start": "0xA65A00",
+      "sha256": "27291cc24b1cb9f79053062040bb4e37e5d4009967316e7d046295e07473b58e",
+      "references": [
+        "src/engine/fox_radio.c:447"
+      ],
+      "file": "png/gTitleRadioStatic.png",
+      "kind": "static",
+      "label": "Radio static / title",
+      "frame": null,
+      "status": "used",
+      "usage_evidence": "Referenced by the radio, menu, or HUD renderer. Event-script calls are included in the manifest.",
+      "duplicates": [
+        "D_1008D60"
+      ]
+    },
+    {
+      "symbol": "D_SX_6020FB0",
+      "name": "D_SX_6020FB0",
+      "segment": "ast_sector_x",
+      "address": "0x06020FB0",
+      "segment_offset": "0x020FB0",
+      "dma_index": 26,
+      "compressed_rom_start": "0x968DB0",
+      "sha256": "ccbdc86d5fe2923a27e7468fa49ba272122d9756b8e3369d0df630d3f617ee97",
+      "references": [
+        "src/engine/fox_radio.c:345"
+      ],
+      "file": "png/D_SX_6020FB0.png",
+      "kind": "portrait",
+      "label": "Sector X boss",
+      "frame": 1,
+      "status": "used",
+      "usage_evidence": "Referenced by the radio, menu, or HUD renderer. Event-script calls are included in the manifest.",
+      "duplicates": []
+    },
+    {
+      "symbol": "D_SX_6021ED0",
+      "name": "D_SX_6021ED0",
+      "segment": "ast_sector_x",
+      "address": "0x06021ED0",
+      "segment_offset": "0x021ED0",
+      "dma_index": 26,
+      "compressed_rom_start": "0x968DB0",
+      "sha256": "5a8c06db5741b67bf08a9562e3bea048d48844b2f2b26553eeb1d268585ac6d3",
+      "references": [
+        "src/engine/fox_radio.c:348"
+      ],
+      "file": "png/D_SX_6021ED0.png",
+      "kind": "portrait",
+      "label": "Sector X boss",
+      "frame": 2,
+      "status": "used",
+      "usage_evidence": "Referenced by the radio, menu, or HUD renderer. Event-script calls are included in the manifest.",
+      "duplicates": []
+    },
+    {
+      "symbol": "D_SY_6018F30",
+      "name": "D_SY_6018F30",
+      "segment": "ast_sector_y",
+      "address": "0x06018F30",
+      "segment_offset": "0x018F30",
+      "dma_index": 35,
+      "compressed_rom_start": "0x9FCA60",
+      "sha256": "5be7a13779c953f252cdf244ad69ba3877fe2df80c40b7bdf2702e6bf9f80525",
+      "references": [
+        "src/engine/fox_radio.c:351"
+      ],
+      "file": "png/D_SY_6018F30.png",
+      "kind": "portrait",
+      "label": "Sector Y boss",
+      "frame": 1,
+      "status": "used",
+      "usage_evidence": "Referenced by the radio, menu, or HUD renderer. Event-script calls are included in the manifest.",
+      "duplicates": []
+    },
+    {
+      "symbol": "D_SY_6019E50",
+      "name": "D_SY_6019E50",
+      "segment": "ast_sector_y",
+      "address": "0x06019E50",
+      "segment_offset": "0x019E50",
+      "dma_index": 35,
+      "compressed_rom_start": "0x9FCA60",
+      "sha256": "31f9238acc27906157c29ca364da0ad0d54fc5d94935ba9fa81538af11708d32",
+      "references": [
+        "src/engine/fox_radio.c:354"
+      ],
+      "file": "png/D_SY_6019E50.png",
+      "kind": "portrait",
+      "label": "Sector Y boss",
+      "frame": 2,
+      "status": "used",
+      "usage_evidence": "Referenced by the radio, menu, or HUD renderer. Event-script calls are included in the manifest.",
+      "duplicates": []
+    },
+    {
+      "symbol": "aSlippyPortraitTex",
+      "name": "aSlippyPortraitTex",
+      "segment": "ast_common",
+      "address": "0x0100D900",
+      "segment_offset": "0x00D900",
+      "dma_index": 6,
+      "compressed_rom_start": "0x873CB0",
+      "sha256": "f3ca4fa1446ecacb8c19ca170eef4d8f53a2dd97c3d942d149d7c9d9dbf1734d",
+      "references": [
+        "src/engine/fox_hud.c:1006",
+        "src/engine/fox_hud.c:2831",
+        "src/engine/fox_radio.c:240"
+      ],
+      "file": "png/aSlippyPortraitTex.png",
+      "kind": "portrait",
+      "label": "Slippy",
+      "frame": 1,
+      "status": "used",
+      "usage_evidence": "Referenced by the radio, menu, or HUD renderer. Event-script calls are included in the manifest.",
+      "duplicates": [
+        "aVsSlippyFaceTex"
+      ]
+    },
+    {
+      "symbol": "D_100E820",
+      "name": "D_100E820",
+      "segment": "ast_common",
+      "address": "0x0100E820",
+      "segment_offset": "0x00E820",
+      "dma_index": 6,
+      "compressed_rom_start": "0x873CB0",
+      "sha256": "fa7c8741cdefa62c9d8188a07916ecb2550962b094eb81ec86e02142a69c4be1",
+      "references": [
+        "src/engine/fox_radio.c:246"
+      ],
+      "file": "png/D_100E820.png",
+      "kind": "portrait",
+      "label": "Slippy",
+      "frame": 2,
+      "status": "used",
+      "usage_evidence": "Referenced by the radio, menu, or HUD renderer. Event-script calls are included in the manifest.",
+      "duplicates": [
+        "D_VS_MENU_700DA80"
+      ]
+    },
+    {
+      "symbol": "aVsSlippyFaceTex",
+      "name": "aVsSlippyFaceTex",
+      "segment": "ast_vs_menu",
+      "address": "0x0700CB60",
+      "segment_offset": "0x00CB60",
+      "dma_index": 44,
+      "compressed_rom_start": "0xABDF30",
+      "sha256": "f3ca4fa1446ecacb8c19ca170eef4d8f53a2dd97c3d942d149d7c9d9dbf1734d",
+      "references": [
+        "src/overlays/ovl_menu/fox_option.c:2803"
+      ],
+      "file": "png/aVsSlippyFaceTex.png",
+      "kind": "portrait",
+      "label": "Slippy / versus menu",
+      "frame": 1,
+      "status": "used",
+      "usage_evidence": "Referenced by the radio, menu, or HUD renderer. Event-script calls are included in the manifest.",
+      "duplicates": [
+        "aSlippyPortraitTex"
+      ]
+    },
+    {
+      "symbol": "D_TR_6000900",
+      "name": "D_TR_6000900",
+      "segment": "ast_training",
+      "address": "0x06000900",
+      "segment_offset": "0x000900",
+      "dma_index": 53,
+      "compressed_rom_start": "0xB43B40",
+      "sha256": "39767d2212a7f44c7f9ec954141320a2e505a2d219a8c9e9cfe930b85227ebc1",
+      "references": [
+        "src/engine/fox_radio.c:429"
+      ],
+      "file": "png/D_TR_6000900.png",
+      "kind": "portrait",
+      "label": "Training instructor",
+      "frame": 1,
+      "status": "used",
+      "usage_evidence": "Referenced by the radio, menu, or HUD renderer. Event-script calls are included in the manifest.",
+      "duplicates": []
+    },
+    {
+      "symbol": "D_TR_6001820",
+      "name": "D_TR_6001820",
+      "segment": "ast_training",
+      "address": "0x06001820",
+      "segment_offset": "0x001820",
+      "dma_index": 53,
+      "compressed_rom_start": "0xB43B40",
+      "sha256": "33dd1e8f3be4f77c9851d59eefac09a8a476e9ff1fa0e3aae5523a6d5d10b74c",
+      "references": [
+        "src/engine/fox_radio.c:432"
+      ],
+      "file": "png/D_TR_6001820.png",
+      "kind": "portrait",
+      "label": "Training instructor",
+      "frame": 2,
+      "status": "used",
+      "usage_evidence": "Referenced by the radio, menu, or HUD renderer. Event-script calls are included in the manifest.",
+      "duplicates": []
+    },
+    {
+      "symbol": "D_STAR_WOLF_F00B580",
+      "name": "D_STAR_WOLF_F00B580",
+      "segment": "ast_star_wolf",
+      "address": "0x0F00B580",
+      "segment_offset": "0x00B580",
+      "dma_index": 16,
+      "compressed_rom_start": "0x8D92C0",
+      "sha256": "7e8eb1ce72ceb090c8ebfa172493d85045032a712c6b4b48a134de23d77a173a",
+      "references": [
+        "src/engine/fox_radio.c:261"
+      ],
+      "file": "png/D_STAR_WOLF_F00B580.png",
+      "kind": "portrait",
+      "label": "Wolf",
+      "frame": 1,
+      "status": "used",
+      "usage_evidence": "Referenced by the radio, menu, or HUD renderer. Event-script calls are included in the manifest.",
+      "duplicates": []
+    },
+    {
+      "symbol": "D_STAR_WOLF_F00C4A0",
+      "name": "D_STAR_WOLF_F00C4A0",
+      "segment": "ast_star_wolf",
+      "address": "0x0F00C4A0",
+      "segment_offset": "0x00C4A0",
+      "dma_index": 16,
+      "compressed_rom_start": "0x8D92C0",
+      "sha256": "672290521ac71d7f51fbfa074c2f89f391e92d4581e3edbfa2de10310da2b6b8",
+      "references": [
+        "src/engine/fox_radio.c:264"
+      ],
+      "file": "png/D_STAR_WOLF_F00C4A0.png",
+      "kind": "portrait",
+      "label": "Wolf",
+      "frame": 2,
+      "status": "used",
+      "usage_evidence": "Referenced by the radio, menu, or HUD renderer. Event-script calls are included in the manifest.",
+      "duplicates": []
+    },
+    {
+      "symbol": "D_STAR_WOLF_F00D3C0",
+      "name": "D_STAR_WOLF_F00D3C0",
+      "segment": "ast_star_wolf",
+      "address": "0x0F00D3C0",
+      "segment_offset": "0x00D3C0",
+      "dma_index": 16,
+      "compressed_rom_start": "0x8D92C0",
+      "sha256": "4c83491b1655db0773f1772576dfaa00a69264baafbe0fe83a00f14047389efd",
+      "references": [
+        "src/engine/fox_radio.c:285"
+      ],
+      "file": "png/D_STAR_WOLF_F00D3C0.png",
+      "kind": "portrait",
+      "label": "Wolf / Venom 2",
+      "frame": 1,
+      "status": "used",
+      "usage_evidence": "Referenced by the radio, menu, or HUD renderer. Event-script calls are included in the manifest.",
+      "duplicates": []
+    },
+    {
+      "symbol": "D_STAR_WOLF_F00E2E0",
+      "name": "D_STAR_WOLF_F00E2E0",
+      "segment": "ast_star_wolf",
+      "address": "0x0F00E2E0",
+      "segment_offset": "0x00E2E0",
+      "dma_index": 16,
+      "compressed_rom_start": "0x8D92C0",
+      "sha256": "85ecc1a8ea03c860f89c11b5325a00d460f3c984902f45ecc07ab40cc05f30fc",
+      "references": [
+        "src/engine/fox_radio.c:288"
+      ],
+      "file": "png/D_STAR_WOLF_F00E2E0.png",
+      "kind": "portrait",
+      "label": "Wolf / Venom 2",
+      "frame": 2,
+      "status": "used",
+      "usage_evidence": "Referenced by the radio, menu, or HUD renderer. Event-script calls are included in the manifest.",
+      "duplicates": []
+    },
+    {
+      "symbol": "D_ZO_6014510",
+      "name": "D_ZO_6014510",
+      "segment": "ast_zoness",
+      "address": "0x06014510",
+      "segment_offset": "0x014510",
+      "dma_index": 37,
+      "compressed_rom_start": "0xA2A270",
+      "sha256": "4d8fae7ea63bc4103c04e25c30cf2ab4e80a46f50da639e458f02e065003c026",
+      "references": [
+        "src/engine/fox_radio.c:339"
+      ],
+      "file": "png/D_ZO_6014510.png",
+      "kind": "portrait",
+      "label": "Zoness boss",
+      "frame": 1,
+      "status": "used",
+      "usage_evidence": "Referenced by the radio, menu, or HUD renderer. Event-script calls are included in the manifest.",
+      "duplicates": []
+    },
+    {
+      "symbol": "D_ZO_6015430",
+      "name": "D_ZO_6015430",
+      "segment": "ast_zoness",
+      "address": "0x06015430",
+      "segment_offset": "0x015430",
+      "dma_index": 37,
+      "compressed_rom_start": "0xA2A270",
+      "sha256": "54a58a002b74c3812c855c9c50ccc2c520d0675fd87ce1b079a4b4e12bcbce15",
+      "references": [
+        "src/engine/fox_radio.c:342"
+      ],
+      "file": "png/D_ZO_6015430.png",
+      "kind": "portrait",
+      "label": "Zoness boss",
+      "frame": 2,
+      "status": "used",
+      "usage_evidence": "Referenced by the radio, menu, or HUD renderer. Event-script calls are included in the manifest.",
+      "duplicates": []
+    },
+    {
+      "name": "aMapRadioCharFalcoTex",
+      "symbol": "aMapRadioCharFalcoTex",
+      "segment": "ast_map",
+      "address": "0x06032440",
+      "segment_offset": "0x32440",
+      "label": "Falco / map icon",
+      "frame": null,
+      "status": "used",
+      "kind": "map",
+      "width": 28,
+      "height": 28,
+      "source": "rom",
+      "file": "png/aMapRadioCharFalcoTex.png",
+      "sha256": "6b38fe2ebf07f86ee39da2a231e2fa0591705ca3d44caa52e27923a5de0b140e",
+      "references": [
+        "src/overlays/ovl_menu/fox_map.c:6120"
+      ],
+      "duplicates": [],
+      "usage_evidence": "Used by the map, ending, or options renderer; assembled display-list tiles have no direct C texture references."
+    },
+    {
+      "name": "aMapRadioCharPeppyTex",
+      "symbol": "aMapRadioCharPeppyTex",
+      "segment": "ast_map",
+      "address": "0x06032A60",
+      "segment_offset": "0x32a60",
+      "label": "Peppy / map icon",
+      "frame": null,
+      "status": "used",
+      "kind": "map",
+      "width": 28,
+      "height": 28,
+      "source": "rom",
+      "file": "png/aMapRadioCharPeppyTex.png",
+      "sha256": "2d8e5c32de4efa2dba8c47ab0be4221c69730bd0d39abbd3b319ce7e92416833",
+      "references": [
+        "src/overlays/ovl_menu/fox_map.c:6120"
+      ],
+      "duplicates": [],
+      "usage_evidence": "Used by the map, ending, or options renderer; assembled display-list tiles have no direct C texture references."
+    },
+    {
+      "name": "aMapRadioCharSlippyTex",
+      "symbol": "aMapRadioCharSlippyTex",
+      "segment": "ast_map",
+      "address": "0x06044180",
+      "segment_offset": "0x44180",
+      "label": "Slippy / map icon",
+      "frame": null,
+      "status": "used",
+      "kind": "map",
+      "width": 28,
+      "height": 28,
+      "source": "rom",
+      "file": "png/aMapRadioCharSlippyTex.png",
+      "sha256": "f61ebe893080fb773c6dab0a41e80f966513f8c1ba5d4855f88703691fd050ed",
+      "references": [
+        "src/overlays/ovl_menu/fox_map.c:6120"
+      ],
+      "duplicates": [],
+      "usage_evidence": "Used by the map, ending, or options renderer; assembled display-list tiles have no direct C texture references."
+    },
+    {
+      "name": "D_MAP_6044820",
+      "symbol": "D_MAP_6044820",
+      "segment": "ast_map",
+      "address": "0x06044820",
+      "segment_offset": "0x44820",
+      "label": "Fox / briefing / closed",
+      "frame": null,
+      "status": "used",
+      "kind": "map",
+      "width": 92,
+      "height": 51,
+      "source": "rom",
+      "file": "png/D_MAP_6044820.png",
+      "sha256": "9ba448ce61d6f30355bcc245ce4b737743c3ddfa9e5d3b49dff4918fcd3fde5c",
+      "references": [
+        "src/overlays/ovl_menu/fox_map.c:6136"
+      ],
+      "duplicates": [],
+      "usage_evidence": "Used by the map, ending, or options renderer; assembled display-list tiles have no direct C texture references."
+    },
+    {
+      "name": "D_MAP_6046CD0",
+      "symbol": "D_MAP_6046CD0",
+      "segment": "ast_map",
+      "address": "0x06046CD0",
+      "segment_offset": "0x46cd0",
+      "label": "Fox / briefing / mouth patch",
+      "frame": null,
+      "status": "used",
+      "kind": "component",
+      "width": 32,
+      "height": 34,
+      "source": "rom",
+      "file": "png/D_MAP_6046CD0.png",
+      "sha256": "2bdb7cc1b543abc38e08ea50ceabe47da7f53af32ebff38d52fa807dbc1271c0",
+      "references": [
+        "src/overlays/ovl_menu/fox_map.c:6139"
+      ],
+      "duplicates": [],
+      "usage_evidence": "Used by the map, ending, or options renderer; assembled display-list tiles have no direct C texture references."
+    },
+    {
+      "name": "map_fox_talking_assembled",
+      "symbol": "map_fox_talking_assembled",
+      "segment": "ast_map",
+      "address": "Base + overlay at 47, 0",
+      "label": "Fox / briefing / talking",
+      "frame": null,
+      "status": "used",
+      "kind": "map",
+      "source": "assembled",
+      "width": 92,
+      "height": 51,
+      "file": "png/map_fox_talking_assembled.png",
+      "sha256": "e47b3550160567fd482c9c17b519973843a9aa25fc81ef9e3410ccae342e52b1",
+      "references": [
+        "src/overlays/ovl_menu/fox_map.c:6136"
+      ],
+      "duplicates": [],
+      "components": [
+        {
+          "symbol": "D_MAP_6044820",
+          "x": 0,
+          "y": 0
+        },
+        {
+          "symbol": "D_MAP_6046CD0",
+          "x": 47,
+          "y": 0
+        }
+      ],
+      "usage_evidence": "Assembled as drawn by the game: base panel, then mouth overlay at x+47, y+0."
+    },
+    {
+      "name": "map_general_pepper_frame_1",
+      "symbol": "map_general_pepper_frame_1",
+      "segment": "ast_map",
+      "address": "Assembled ROM tiles",
+      "label": "General Pepper / briefing / frame 1",
+      "frame": null,
+      "status": "used",
+      "kind": "map",
+      "source": "assembled",
+      "width": 128,
+      "height": 64,
+      "file": "png/map_general_pepper_frame_1.png",
+      "sha256": "b8861779301ebbdffb531ec99548e047d5b67fc56bbf1712e94f94242d00676c",
+      "references": [],
+      "duplicates": [],
+      "components": [
+        {
+          "symbol": "D_MAP_6058120",
+          "x": 0,
+          "y": 0
+        },
+        {
+          "symbol": "D_MAP_6059120",
+          "x": 64,
+          "y": 0
+        },
+        {
+          "symbol": "D_MAP_6056120",
+          "x": 0,
+          "y": 32
+        },
+        {
+          "symbol": "D_MAP_6057120",
+          "x": 64,
+          "y": 32
+        }
+      ],
+      "usage_evidence": "Original bitmap tiles reconstructed in display-list order. Tile symbols and positions are preserved in the manifest."
+    },
+    {
+      "name": "map_general_pepper_frame_2",
+      "symbol": "map_general_pepper_frame_2",
+      "segment": "ast_map",
+      "address": "Assembled ROM tiles",
+      "label": "General Pepper / briefing / frame 2",
+      "frame": null,
+      "status": "used",
+      "kind": "map",
+      "source": "assembled",
+      "width": 128,
+      "height": 64,
+      "file": "png/map_general_pepper_frame_2.png",
+      "sha256": "de375a184c651f132eb45dd57c2cd09234123e5c4627ee547d69ed635558170f",
+      "references": [],
+      "duplicates": [],
+      "components": [
+        {
+          "symbol": "D_MAP_6054F20",
+          "x": 0,
+          "y": 0
+        },
+        {
+          "symbol": "D_MAP_6051F20",
+          "x": 64,
+          "y": 0
+        },
+        {
+          "symbol": "D_MAP_6052F20",
+          "x": 0,
+          "y": 32
+        },
+        {
+          "symbol": "D_MAP_6053F20",
+          "x": 64,
+          "y": 32
+        }
+      ],
+      "usage_evidence": "Original bitmap tiles reconstructed in display-list order. Tile symbols and positions are preserved in the manifest."
+    },
+    {
+      "name": "ending_andross_assembled",
+      "symbol": "ending_andross_assembled",
+      "segment": "ast_ending",
+      "address": "Assembled ROM tiles",
+      "label": "Andross / ending",
+      "frame": null,
+      "status": "used",
+      "kind": "ending",
+      "source": "assembled",
+      "width": 64,
+      "height": 64,
+      "file": "png/ending_andross_assembled.png",
+      "sha256": "71c2f5a20e131895e04d9adffa896223f9ef1737936c260d46f367a61a2519dd",
+      "references": [],
+      "duplicates": [],
+      "components": [
+        {
+          "symbol": "D_END_7000118",
+          "x": 0,
+          "y": 0
+        },
+        {
+          "symbol": "D_END_7001118",
+          "x": 32,
+          "y": 0
+        }
+      ],
+      "usage_evidence": "Original bitmap tiles reconstructed in display-list order. Tile symbols and positions are preserved in the manifest."
+    },
+    {
+      "name": "aMapPrologue2Tex",
+      "symbol": "aMapPrologue2Tex",
+      "segment": "ast_map",
+      "address": "0x06035780",
+      "segment_offset": "0x35780",
+      "label": "Prologue 2 / Andross and Pepper",
+      "frame": null,
+      "status": "used",
+      "kind": "artwork",
+      "width": 96,
+      "height": 52,
+      "source": "rom",
+      "file": "png/aMapPrologue2Tex.png",
+      "sha256": "99ff2bbf6216c0c4e409099ba0223e0205f264e5275fee46c22615e519a2e64b",
+      "references": [
+        "src/overlays/ovl_menu/fox_map.c:2183"
+      ],
+      "duplicates": [],
+      "usage_evidence": "Used by the map, ending, or options renderer; assembled display-list tiles have no direct C texture references."
+    },
+    {
+      "name": "aMapPrologue3Tex",
+      "symbol": "aMapPrologue3Tex",
+      "segment": "ast_map",
+      "address": "0x06033080",
+      "segment_offset": "0x33080",
+      "label": "Prologue 3 / original Star Fox",
+      "frame": null,
+      "status": "used",
+      "kind": "artwork",
+      "width": 96,
+      "height": 52,
+      "source": "rom",
+      "file": "png/aMapPrologue3Tex.png",
+      "sha256": "ad81893dd01e63076970a17d454a4c833c56890a0da7c23599886ec689a3f0ee",
+      "references": [
+        "src/overlays/ovl_menu/fox_map.c:2183"
+      ],
+      "duplicates": [],
+      "usage_evidence": "Used by the map, ending, or options renderer; assembled display-list tiles have no direct C texture references."
+    },
+    {
+      "name": "aMapPrologue6Tex",
+      "symbol": "aMapPrologue6Tex",
+      "segment": "ast_map",
+      "address": "0x06037E80",
+      "segment_offset": "0x37e80",
+      "label": "Prologue 6 / Andross",
+      "frame": null,
+      "status": "used",
+      "kind": "artwork",
+      "width": 96,
+      "height": 52,
+      "source": "rom",
+      "file": "png/aMapPrologue6Tex.png",
+      "sha256": "c3641416722bb5ff874922fbae5d28f8317bb59e4fe35c2a4a91b1e5c7faff4b",
+      "references": [
+        "src/overlays/ovl_menu/fox_map.c:2184"
+      ],
+      "duplicates": [],
+      "usage_evidence": "Used by the map, ending, or options renderer; assembled display-list tiles have no direct C texture references."
+    },
+    {
+      "name": "aMapPrologue7Tex",
+      "symbol": "aMapPrologue7Tex",
+      "segment": "ast_map",
+      "address": "0x0603CC80",
+      "segment_offset": "0x3cc80",
+      "label": "Prologue 7 / Star Fox team",
+      "frame": null,
+      "status": "used",
+      "kind": "artwork",
+      "width": 96,
+      "height": 52,
+      "source": "rom",
+      "file": "png/aMapPrologue7Tex.png",
+      "sha256": "186d2bfb295b8f9b14ff3c28c1baac68cbb051e203c047023d6b94fed09b0940",
+      "references": [
+        "src/overlays/ovl_menu/fox_map.c:2184"
+      ],
+      "duplicates": [],
+      "usage_evidence": "Used by the map, ending, or options renderer; assembled display-list tiles have no direct C texture references."
+    },
+    {
+      "name": "ending_expert_reward",
+      "symbol": "gEndingExpertReward",
+      "segment": "ast_ending_expert",
+      "address": "0x08000000",
+      "segment_offset": "0x0",
+      "label": "Expert ending / team artwork",
+      "frame": null,
+      "status": "used",
+      "kind": "artwork",
+      "width": 316,
+      "height": 240,
+      "source": "rom",
+      "file": "png/ending_expert_reward.png",
+      "sha256": "10ac996d6ac18a07a55de192d0a9ff9b1f866be17aafb39c57c79548c7613349",
+      "references": [
+        "src/overlays/ovl_ending/fox_end2.c:156"
+      ],
+      "duplicates": [],
+      "usage_evidence": "Used by the map, ending, or options renderer; assembled display-list tiles have no direct C texture references."
+    },
+    {
+      "name": "ending_normal_reward",
+      "symbol": "gEndingNormalReward",
+      "segment": "ast_ending_expert",
+      "address": "0x08025080",
+      "segment_offset": "0x25080",
+      "label": "Normal ending / character collage",
+      "frame": null,
+      "status": "used",
+      "kind": "artwork",
+      "width": 316,
+      "height": 240,
+      "source": "rom",
+      "file": "png/ending_normal_reward.png",
+      "sha256": "8357d88ca3f194e8a5d57d5fc8fefbe19541b5f829c6a360f52875d70b1caf8f",
+      "references": [
+        "src/overlays/ovl_ending/fox_end2.c:154"
+      ],
+      "duplicates": [],
+      "usage_evidence": "Used by the map, ending, or options renderer; assembled display-list tiles have no direct C texture references."
+    },
+    {
+      "name": "D_OPT_800E170",
+      "symbol": "D_OPT_800E170",
+      "segment": "ast_option",
+      "address": "0x0800E170",
+      "segment_offset": "0xe170",
+      "label": "Invoice / team card",
+      "frame": null,
+      "status": "used",
+      "kind": "artwork",
+      "width": 188,
+      "height": 60,
+      "source": "rom",
+      "file": "png/D_OPT_800E170.png",
+      "sha256": "f8bcc750a1d6ecccd5897d79f69af07d507f866134e215a7d1555ea483d6f2fb",
+      "references": [
+        "src/overlays/ovl_menu/fox_option.c:4603"
+      ],
+      "duplicates": [],
+      "usage_evidence": "Used by the map, ending, or options renderer; assembled display-list tiles have no direct C texture references."
+    }
+  ]
+}

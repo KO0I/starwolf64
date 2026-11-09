@@ -1,0 +1,19 @@
+{
+  "character": "Slippy",
+  "segment": "ast_title",
+  "skeleton": "aSlippySkel",
+  "limbs": 20,
+  "mesh_limbs": 14,
+  "triangles": 453,
+  "textures": 12,
+  "materials": 13,
+  "animations": {
+    "aSlippyRunningAnim": 60,
+    "aSlippyAnim": 200,
+    "D_TITLE_6020058": 40
+  },
+  "animation_fps": 30,
+  "units": "original N64 model units",
+  "root_motion": "source",
+  "notes": "Rigid animated limb hierarchy. Source root translation matches mode 0; fixed translation matches modes 1/5. Game runtime pose overrides and N64 lighting/combiners are not baked."
+}

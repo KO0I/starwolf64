@@ -1,0 +1,17 @@
+{
+  "character": "Peppy",
+  "segment": "ast_title",
+  "skeleton": "aPeppySkel",
+  "limbs": 22,
+  "mesh_limbs": 16,
+  "triangles": 507,
+  "textures": 15,
+  "materials": 15,
+  "animations": {
+    "aPeppyRunningAnim": 60,
+    "aPeppyAnim": 200
+  },
+  "animation_fps": 30,
+  "units": "original N64 model units",
+  "notes": "Rigid animated limb hierarchy. Root motion fixed to skeleton origin as in mode 1/5. Game runtime pose overrides and N64 lighting/combiners are not baked."
+}
