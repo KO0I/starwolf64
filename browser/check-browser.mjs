@@ -3,11 +3,12 @@ import {mkdir,readFile,writeFile} from 'node:fs/promises';
 import {readRomFile} from './rom-file.mjs';
 import {decompressMio0} from './rom-patch.mjs';
 import {fileURLToPath} from 'node:url';
-const verifyArgs=process.argv.slice(2).filter(value=>value!=='--kami-closeup');
+const iosCore=process.argv.includes('--ios-core');
+const verifyArgs=process.argv.slice(2).filter(value=>!['--kami-closeup','--ios-core'].includes(value));
 const url=verifyArgs[0]||'http://127.0.0.1:8643/';
 const output=fileURLToPath(new URL('./runtime/browser-check/',import.meta.url));
 await mkdir(output,{recursive:true});
-const chrome=spawn('/usr/bin/chromium',['--headless','--no-sandbox','--disable-dev-shm-usage','--use-angle=swiftshader','--enable-unsafe-swiftshader','--remote-debugging-port=9230','--user-data-dir='+output+'chrome',url],{stdio:'ignore'});
+const chrome=spawn('/usr/bin/chromium',[...(iosCore?['--user-agent=Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1']:[]),'--headless','--no-sandbox','--disable-dev-shm-usage','--use-angle=swiftshader','--enable-unsafe-swiftshader','--remote-debugging-port=9230','--user-data-dir='+output+'chrome',url],{stdio:'ignore'});
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 let ws,call;
 function assert(value,message){if(!value)throw Error(message)}
@@ -124,6 +125,9 @@ try{
  assert(launch.state==='loading'&&launch.splash&&launch.disabled&&launch.pickerPulse==='none'&&launch.buttonPulse==='none','Launch must keep the splash visible and stop pulsing while loading');
  let state;
  for(let i=0;i<180;i++){await sleep(500);state=await evaluate("({status:document.querySelector('#status').textContent,started:!!window.EJS_emulator?.started,canvas:!!document.querySelector('#game canvas'),threads:window.crossOriginIsolated})");if(state.started&&state.canvas)break}
+ const selectedCore=await evaluate('EJS_emulator.getCore()');
+ assert(selectedCore===(iosCore?'parallel_n64':'mupen64plus_next'),'Unexpected N64 core: '+selectedCore);
+ console.log('Selected core',selectedCore,iosCore?'iOS selection under Chromium':'desktop');
  console.log('Local emulator',JSON.stringify(state));assert(state.started&&state.canvas&&state.threads,'Emulator failed to boot');
  launch=await launchView();
  assert(launch.state==='running'&&!launch.splash&&launch.disabled&&launch.buttonPulse==='none','Game start did not dismiss the splash');
