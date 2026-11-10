@@ -1,0 +1,395 @@
+{
+  "version": 1,
+  "sampleRate": 32000,
+  "characters": [
+    {
+      "name": "wolf",
+      "speakers": [
+        0,
+        5
+      ],
+      "grains": [
+        {
+          "start": 0,
+          "frames": 3392
+        },
+        {
+          "start": 3392,
+          "frames": 3392
+        },
+        {
+          "start": 6784,
+          "frames": 3392
+        },
+        {
+          "start": 10176,
+          "frames": 3392
+        },
+        {
+          "start": 13568,
+          "frames": 3392
+        },
+        {
+          "start": 16960,
+          "frames": 3392
+        },
+        {
+          "start": 20352,
+          "frames": 3392
+        },
+        {
+          "start": 23744,
+          "frames": 3392
+        }
+      ],
+      "gapSeconds": 0.0575,
+      "pitchSemitones": -3,
+      "bassShelfDb": 5,
+      "tempo": 1,
+      "sha256": "ec59acf43e863f906ad9c628f23d0adfade8f534416e56c51a3b4e503d260513"
+    },
+    {
+      "name": "panther",
+      "speakers": [
+        10,
+        15
+      ],
+      "grains": [
+        {
+          "start": 0,
+          "frames": 3392
+        },
+        {
+          "start": 3392,
+          "frames": 3392
+        },
+        {
+          "start": 6784,
+          "frames": 3392
+        },
+        {
+          "start": 10176,
+          "frames": 3392
+        },
+        {
+          "start": 13568,
+          "frames": 3392
+        },
+        {
+          "start": 16960,
+          "frames": 3392
+        },
+        {
+          "start": 20352,
+          "frames": 3392
+        },
+        {
+          "start": 23744,
+          "frames": 3392
+        }
+      ],
+      "gapSeconds": 0.0575,
+      "pitchSemitones": -10,
+      "bassShelfDb": 5,
+      "tempo": 1,
+      "sha256": "53d7a089ec76208982dd077e5d26cf08afb13c00fb73ac8864660c426fe908cd"
+    },
+    {
+      "name": "kami",
+      "speakers": [
+        20,
+        25
+      ],
+      "grains": [
+        {
+          "start": 0,
+          "frames": 3400
+        },
+        {
+          "start": 3400,
+          "frames": 3400
+        },
+        {
+          "start": 6800,
+          "frames": 3400
+        },
+        {
+          "start": 10200,
+          "frames": 3400
+        },
+        {
+          "start": 13600,
+          "frames": 3400
+        },
+        {
+          "start": 17000,
+          "frames": 3400
+        },
+        {
+          "start": 20400,
+          "frames": 3400
+        },
+        {
+          "start": 23800,
+          "frames": 3400
+        }
+      ],
+      "gapSeconds": 0.059375,
+      "pitchSemitones": -3,
+      "bassShelfDb": 0,
+      "tempo": 0.8,
+      "sha256": "599ba18d9028d9828e74c123ce99b1ab6e6a38ebad73221841642bb2b8429601"
+    },
+    {
+      "name": "krystal",
+      "speakers": [
+        30,
+        35
+      ],
+      "grains": [
+        {
+          "start": 0,
+          "frames": 3584
+        },
+        {
+          "start": 3584,
+          "frames": 3584
+        },
+        {
+          "start": 7168,
+          "frames": 3584
+        },
+        {
+          "start": 10752,
+          "frames": 3584
+        },
+        {
+          "start": 14336,
+          "frames": 3584
+        },
+        {
+          "start": 17920,
+          "frames": 3584
+        },
+        {
+          "start": 21504,
+          "frames": 3584
+        },
+        {
+          "start": 25088,
+          "frames": 3584
+        }
+      ],
+      "gapSeconds": 0.0545,
+      "pitchSemitones": 0,
+      "bassShelfDb": 0,
+      "tempo": 1,
+      "sha256": "8ca22538df13a035e5dd0c1d8d1fa7022307a544f3d8eac9fba103f00e9e61bc"
+    },
+    {
+      "name": "vitzy",
+      "speakers": [
+        400
+      ],
+      "grains": [
+        {
+          "start": 0,
+          "frames": 3360
+        },
+        {
+          "start": 3360,
+          "frames": 3360
+        },
+        {
+          "start": 6720,
+          "frames": 3360
+        },
+        {
+          "start": 10080,
+          "frames": 3360
+        },
+        {
+          "start": 13440,
+          "frames": 3360
+        },
+        {
+          "start": 16800,
+          "frames": 3360
+        },
+        {
+          "start": 20160,
+          "frames": 3360
+        },
+        {
+          "start": 23520,
+          "frames": 3360
+        }
+      ],
+      "gapSeconds": 0.0525,
+      "pitchSemitones": 0,
+      "bassShelfDb": 0,
+      "tempo": 1,
+      "sha256": "e65c89883a3c627a6de696b645d3b2a8700ce9af5fc9149d4b81b49dedec790b"
+    },
+    {
+      "name": "narrator",
+      "speakers": [
+        1000
+      ],
+      "grains": [
+        {
+          "start": 0,
+          "frames": 3840
+        },
+        {
+          "start": 3840,
+          "frames": 3840
+        },
+        {
+          "start": 7680,
+          "frames": 3840
+        },
+        {
+          "start": 11520,
+          "frames": 3840
+        },
+        {
+          "start": 15360,
+          "frames": 3840
+        },
+        {
+          "start": 19200,
+          "frames": 3840
+        },
+        {
+          "start": 23040,
+          "frames": 3840
+        },
+        {
+          "start": 26880,
+          "frames": 3840
+        }
+      ],
+      "gapSeconds": 0.07,
+      "pitchSemitones": 0,
+      "bassShelfDb": 0,
+      "tempo": 1,
+      "sha256": "23fcb79d48cddd2a851527e4b7de67c96a6fab4cdb68e0e88a3cf6264212012d"
+    }
+  ],
+  "sources": {
+    "wolf": {
+      "message_id": 19200,
+      "speaker": "RCID_WOLF",
+      "subtitle": "Don't get too cocky, Star Fox!",
+      "resource": "ast_audio/ast_audio_v1_sample_126B0",
+      "sequence": "sequences/01_voice.m64",
+      "sequence_sha256": "55d5bdc76b568467bf818cfe225fbaf5168153857f698eab85e445c5e915e98e",
+      "bank_routine": "0x4AAD",
+      "voice_table_entry": "0x483D",
+      "layer": "0x4AE0",
+      "soundfont": 18,
+      "instrument": 1,
+      "note": 39,
+      "tuning": 0.21875,
+      "source_wav": "audio_data/samples/voice/ast_audio_v1_sample_126B0.wav",
+      "source_wav_sha256": "8aff133fa24b212d5b0e3d591e0bb7b3b6c98cae3c583a003c59a57a5ba511e6",
+      "pitch_shift_semitones": -3,
+      "bass_shelf_db": 5,
+      "bass_shelf_hz": 200
+    },
+    "panther": {
+      "message_id": 2030,
+      "speaker": "RCID_PEPPY",
+      "caller": "src/overlays/ovl_i1/fox_co.c",
+      "bank_offset": "0xaca",
+      "table_offset": "0x7ca",
+      "layer_offset": "0xb10",
+      "layer_bytes": "fc 00 82 c6 03 67 80 ae 7f ff",
+      "soundfont": 3,
+      "instrument": 3,
+      "segments": [
+        {
+          "resource": "ast_audio/ast_audio_v1_sample_4850",
+          "note": 39,
+          "tuning": 0.21875,
+          "exported_rate": 7000,
+          "effective_rate": 7000,
+          "wav_sha256": "66f2058b50396603f6e9e5d79b6552b4e442e15c7e35d39421e6843e008dab95"
+        }
+      ],
+      "pitch_shift_semitones": -10,
+      "bass_shelf_db": 5,
+      "bass_shelf_hz": 200
+    },
+    "kami": {
+      "source": "User-supplied recording",
+      "input_file": "source-vitzy.m4a",
+      "input_sha256": "0bd30390a62318c9d62b45ad44dd26d5ecec282f829abf4b2b14c083160e3647",
+      "original_audio": "source-kami.m4a",
+      "original_audio_sha256": "0bd30390a62318c9d62b45ad44dd26d5ecec282f829abf4b2b14c083160e3647",
+      "original_audio_packet_hash": "SHA256=f222ea636fbe30c78e388a2c6aaabb6533ba704c8a6ad8aff7e1fc1645c9359b",
+      "working_audio": "source-kami.wav",
+      "original_stream": {
+        "codec_name": "aac",
+        "sample_rate": "44100",
+        "channels": 2
+      },
+      "working_sample_rate": 32000,
+      "source_duration_seconds": 5.20334375,
+      "selection_periodicity_minimum": 0.75,
+      "pitch_shift_semitones": -3.0,
+      "tempo_multiplier": 0.8,
+      "reuses_source_of": "vitzy"
+    },
+    "krystal": {
+      "source": "Newly generated English female speech",
+      "voice": "en-GB-SoniaNeural",
+      "locale": "en-GB",
+      "tool": "edge-tts",
+      "text": "All right, team. Keep your eyes on the stars, and stay close. I am ready when you are. Let us move.",
+      "pitch_shift_semitones": 0,
+      "source_mp3_sha256": "82fbf7f68b540a2448f9b36c5b696f14f8e7d2ada61c10da0ae75de2503f6604"
+    },
+    "vitzy": {
+      "source": "User-supplied recording",
+      "input_file": "source-vitzy.m4a",
+      "input_sha256": "0bd30390a62318c9d62b45ad44dd26d5ecec282f829abf4b2b14c083160e3647",
+      "original_audio": "source-vitzy.m4a",
+      "original_audio_sha256": "0bd30390a62318c9d62b45ad44dd26d5ecec282f829abf4b2b14c083160e3647",
+      "original_audio_packet_hash": "SHA256=f222ea636fbe30c78e388a2c6aaabb6533ba704c8a6ad8aff7e1fc1645c9359b",
+      "working_audio": "source-vitzy.wav",
+      "original_stream": {
+        "codec_name": "aac",
+        "sample_rate": "44100",
+        "channels": 2
+      },
+      "working_sample_rate": 32000,
+      "source_duration_seconds": 5.20334375,
+      "selection_periodicity_minimum": 0.75,
+      "pitch_shift_semitones": 0
+    },
+    "narrator": {
+      "message_id": 1000,
+      "source": "Original prologue narrator",
+      "resource": "ast_audio/ast_audio_v1_sample_3100",
+      "wav_sha256": "0b7809048d509e4058a9cce8ed693c55f8fabde8a056d966f1f34e1eec95a246",
+      "sequence": "sequences/01_voice.m64",
+      "bank_offset": "0x673",
+      "layer_offset": "0x69c",
+      "soundfont": 1,
+      "instrument": 0,
+      "note": 39,
+      "tuning": 0.46875,
+      "source_sample_rate": 15000,
+      "pitch_shift_semitones": 0
+    }
+  },
+  "approvedPreviewHashes": {
+    "wolf": "5354b64673f44b71c079aa41a449f7f9f00c490056a68d880c195aad9b20f450",
+    "panther": "1b6467343749d4fc4c522a3487c1f1120ce470e3fc0a189335b306caee79ddbd",
+    "kami": "b5ad517c9e75c8f061dab37be4940214e9a827ec1bbbea9cbb24efeaf1854a8c",
+    "krystal": "5ce6bf16ae1c691d793e5ebdb8b60b381fad0ee9f41e408952952bbf0d0c6a63",
+    "vitzy": "0bbe21110756d195fb6560196e0e9c4eaf4db7b694e5a7096b2426366bd8ed51"
+  }
+}

@@ -15,8 +15,9 @@ header{height:34px;display:flex;align-items:center;justify-content:space-between
 h1{font-size:clamp(13px,2.5vw,19px);line-height:1;margin:0;font-weight:400;color:#e8e4e3;text-shadow:0 1px #000}
 #status{font-size:11px;color:#a6a4a4;text-align:right;overflow-wrap:anywhere}
 #status:before{content:"";display:inline-block;width:5px;height:5px;margin-right:7px;background:#d32a39;box-shadow:0 0 5px #db233a}
-#screen{width:100%;height:min(calc(100svh - 38px),calc((100vw - 12px)*.5625));max-height:945px;background:#000;border:2px solid;border-color:#35373a #151618 #711c29 #151618;box-shadow:0 1px 0 #050506,0 2px 0 #a4313e,inset 0 0 0 1px #000}
-#game{display:block;width:100%;height:100%;background:#000;object-fit:contain;outline:none}
+#screen{position:relative;overflow:hidden;width:100%;height:min(calc(100svh - 38px),calc((100vw - 12px)*.5625));max-height:945px;background:#000;border:2px solid;border-color:#35373a #151618 #711c29 #151618;box-shadow:0 1px 0 #050506,0 2px 0 #a4313e,inset 0 0 0 1px #000}
+#game{position:relative;z-index:0;display:block;width:100%;height:100%;background:#000;object-fit:contain;outline:none}
+#splash{position:absolute;inset:0;z-index:1;width:100%;height:100%;object-fit:contain;background:#000;pointer-events:none;user-select:none}
 #game:focus-visible{outline:1px solid #cf3c4b;outline-offset:-2px}
 #controls{padding:9px 10px 10px;border-top:1px solid #080808;background:linear-gradient(170deg,#252628 0,#121315 25%,#101113 70%,#1b1c1e)}
 .toolbar{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
@@ -56,16 +57,23 @@ main:fullscreen #screen{height:calc(100svh - 34px);max-height:none}
 #game .ejs_parent{width:100%!important;height:100%!important}
 #game *{font-family:Arwing,sans-serif!important}
 .rom-picker{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;font-size:12px}.rom-picker input{max-width:100%;min-width:0;font-size:12px;color:#c7c8c9}.rom-picker p{width:100%;margin:0;line-height:1.6;color:#aaa}.rom-picker a{color:#db8d95}
+.rom-picker{padding:10px;border:1px solid #34383d;background:#14171a}
+#connect:disabled{color:#aaa;border-color:#555 #161616 #161616 #3b3b3b;background:linear-gradient(#3b3b3b,#242424 16%,#171717 55%,#202020);box-shadow:inset 0 -1px #383838,1px 1px 1px #000;opacity:.65}
+#screen:is([data-state="awaiting-rom"],[data-state="checking-rom"])~#controls .rom-picker,
+#screen[data-state="ready"]~#controls #connect:not(:disabled){animation:blue-green-pulse 2.4s ease-in-out infinite}
+#screen[data-state="ready"]~#controls #connect:not(:disabled){color:#e4fff8;background:linear-gradient(#164454,#102d35 45%,#10352d);border-color:#4bbfff}
+@keyframes blue-green-pulse{0%,100%{border-color:#4bbfff;box-shadow:inset 0 0 12px #359cff24,0 0 9px #359cff55}50%{border-color:#43e5aa;box-shadow:inset 0 0 18px #35dfa533,0 0 16px #35dfa577}}
+@media(prefers-reduced-motion:reduce){#screen[data-state]~#controls .rom-picker,#screen[data-state]~#controls #connect:not(:disabled){animation:none}#screen:is([data-state="awaiting-rom"],[data-state="checking-rom"])~#controls .rom-picker,#screen[data-state="ready"]~#controls #connect:not(:disabled){border-color:#43d8be;box-shadow:0 0 9px #35c8b555}}
 </style>
 </head>
 <body>
 <main>
 <header><h1>A wolf in space</h1><span id="status" role="status">Choose your base ROM</span></header>
-<section id="screen" aria-label="Game viewscreen"><div id="game" tabindex="0" aria-label="Emulated game"></div></section>
+<section id="screen" data-state="awaiting-rom" aria-label="Game viewscreen"><div id="game" tabindex="0" aria-label="Emulated game"></div><img id="splash" src="./launch-background.jpg" alt="" aria-hidden="true" draggable="false"></section>
 <section id="controls" aria-label="Flight controls">
-<div class="rom-picker"><label for="rom-file">Choose base ROM</label><input id="rom-file" type="file" accept=".z64,.v64,.n64,.zip" aria-describedby="rom-help"><p id="rom-help">Star Fox 64, US v1.1. ROM or ZIP containing one ROM. Files stay on this device.</p><a href="./wolfen.patch.json?v=4155f0c65e3dee4c" download>Download mod patch</a></div>
+<div class="rom-picker"><label for="rom-file">Choose base ROM</label><input id="rom-file" type="file" accept=".z64,.v64,.n64,.zip" aria-describedby="rom-help"><p id="rom-help">Star Fox 64, US v1.1. ROM or ZIP containing one ROM. Files stay on this device.</p><a href="./wolfen.patch.json?v=ecd0381a153cd8e0" download>Download mod patch</a></div>
 <div class="toolbar">
-<button id="connect" type="button" disabled>Play</button>
+<button id="connect" type="button" disabled>Launch</button>
 <button data-action="start" type="button">Start / pause</button>
 <button id="sound" type="button">Mute</button>
 <button id="save" type="button" disabled>Save state</button>
@@ -98,7 +106,7 @@ main:fullscreen #screen{height:calc(100svh - 34px);max-height:none}
 <script>
 window.EJS_player='#game';
 window.EJS_core='mupen64plus_next';
-window.STARWOLF_build='4155f0c65e3dee4c';
+window.STARWOLF_build='ecd0381a153cd8e0';
 window.EJS_gameName='A wolf in space';
 window.EJS_pathtodata='https://cdn.emulatorjs.org/4.2.3/data/';
 window.EJS_color='#b62c34';
@@ -112,6 +120,6 @@ window.EJS_defaultControls={0:{},1:{},2:{},3:{}};
 window.EJS_defaultOptions={'virtual-gamepad':'disabled','save-save-interval':'30'};
 </script>
 <script src="./coi-serviceworker.js"></script>
-<script type="module" src="./client.js?v=identity-1"></script>
+<script type="module" src="./client.js?v=audio-3"></script>
 </body>
 </html>
