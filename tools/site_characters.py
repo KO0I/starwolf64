@@ -12,7 +12,7 @@ from build_wolfen import ROOT, END, HEAD_LIFT, COCKPIT_DROP, cartridge_crc, crc6
 from package_site_characters import DEFAULT, verify as verify_package
 from site_character_gfx import GLB, Compiler
 from site_character_bodies import Bodies
-from site_character_kami import add_details as add_kami_details
+from site_character_edits import apply_budget, triangle_count
 from site_character_storage import Storage
 from extract_team_bodies import dependencies
 
@@ -94,13 +94,24 @@ class SiteCharacters:
         low, high = self.bounds(wolf)
         center = (low + high) * 2.5
         for name, offset in HEAD_SLOTS.items():
-            glb = wolf if name == 'wolf' else self.read(f'heads/{name}/head.glb')
-            details = add_kami_details(glb, pilot=True) if name == 'kami' else None
+            source = f'heads/{name}/head.glb'
+            if name == 'kami':
+                derived = self.bodies.pilot_heads[name]
+                glb, details = derived['glb'], derived['generated_details']
+                source = 'characters/kami/title/body.glb'
+                reduction = None
+            else:
+                glb = wolf if name == 'wolf' else self.read(source)
+                details = None
+                reduction = apply_budget(glb, name, 'pilot')
             glb.doc.setdefault('asset', {}).setdefault('extras', {})['runtime_smooth_head_normals'] = True
-            low, high = self.bounds(glb)
+            trim = glb.doc.get('asset', {}).get('extras', {}).get('runtime_hair_trim')
+            low, high = np.asarray(trim['fit_bounds']) if trim else self.bounds(glb)
             scale = min(5.0, * (np.array([554., 623., 636.]) / (high - low)))
             if name == 'panther':
                 scale *= 1.1
+            if name in ('wolf', 'panther', 'krystal', 'kami'):
+                scale *= .9
             fit = np.eye(4)
             fit[:3, :3] *= scale
             fit[:3, 3] = center - (low + high) * .5 * scale
@@ -111,9 +122,11 @@ class SiteCharacters:
             before = bytes(self.builder.segments['ast_arwing'][offset:offset + 8])
             struct.pack_into('>II', self.builder.segments['ast_arwing'], offset, 0x06010000, address)
             self.head_patches.append((offset, before, address))
-            self.heads[name] = {'source': f'heads/{name}/head.glb', 'triangles': triangles,
+            if name in ('kami', 'krystal') and triangles > 512:
+                raise ValueError(f'{name} cockpit head exceeds 512 triangles')
+            self.heads[name] = {'source': source, 'triangles': triangles,
                                 'fit': fit.tolist(), 'path': path, 'address': address,
-                                'generated_details': details}
+                                'generated_details': details, 'triangle_reduction': reduction, 'hair_trim': trim}
             if name == 'vitzy':
                 if triangles > 216:
                     raise ValueError('Vitzy exceeds the supplied 216-triangle budget')
@@ -259,8 +272,12 @@ class SiteCharacters:
         with zipfile.ZipFile(DEFAULT) as archive:
             manifest_doc = json.loads(archive.read('manifest.json'))
         for name, head in self.heads.items():
-            added = (head['generated_details'] or {}).get('added_triangles', 0)
-            if head['triangles'] != manifest_doc['pilot_heads'][name]['triangles'] + added:
+            if name == 'kami':
+                expected = triangle_count(self.bodies.pilot_heads[name]['glb'])
+            else:
+                removed = (head['triangle_reduction'] or {}).get('removed_triangles', 0)
+                expected = manifest_doc['pilot_heads'][name]['triangles'] - removed
+            if head['triangles'] != expected:
                 raise ValueError(f'Reviewed head lost triangles: {name}')
         for offset, raw, path, native, header in self.head_compiler.blocks:
             if bytes(b.segments['ast_arwing'][offset:offset + len(raw)]) != raw:
@@ -287,7 +304,9 @@ class SiteCharacters:
                           'Viewer placement normalization is removed for runtime body units.',
                           'Rigid body clips drive the game skeletons; accessory-only tracks remain in the source pack.',
                           'Pilot meshes use the game head steering; facial animation clips remain in the source pack.',
-                          'Large atlases are reduced to the N64 texture memory budget.']}
+                          'Large atlases are reduced to the N64 texture memory budget.',
+                          'Verified runtime selections limit Krystal/Kami title bodies to 768 and cockpit heads to 512 triangles.',
+                          'Kami cockpit geometry is taken directly from her prepared title body head.']}
 
     def summary(self):
         return 'Wolf, Panther, Krystal, Kami; five reviewed pilot heads; Vitzy Bill cockpit'

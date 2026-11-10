@@ -52,6 +52,7 @@ def execute(message_ptr,radio_image=radio,rom_image=rom,speaker=90):
         elif opcode==37: registers[rt]=read((registers[rs]+signed)&0xFFFFFFFF,2)
         elif opcode==0 and word&63==0: registers[rd]=(registers[rt]<<((word>>6)&31))&0xFFFFFFFF
         elif opcode==0 and word&63==33: registers[rd]=(registers[rs]+registers[rt])&0xFFFFFFFF
+        elif opcode==0 and word&63==35: registers[rd]=(registers[rs]-registers[rt])&0xFFFFFFFF
         elif opcode==0 and word&63==43: registers[rd]=int(registers[rs]<registers[rt])
         elif opcode==0 and word&63==37: registers[rd]=registers[rs]|registers[rt]
         elif opcode==0 and word&63==8: pending=registers[rs]
@@ -129,14 +130,28 @@ assert struct.unpack_from(">I",rom,VOICE_RETURN_ROM)[0]>>26==2
 jump=struct.unpack_from(">I",rom,VOICE_RETURN_ROM)[0]
 stub_address=0x80000000|((jump&0x3FFFFFF)<<2)
 stub_offset=stub_address-RADIO_BASE
-for muted_ids in ((),(2050,2055),(1,254,255,256,2050,2055,21050)):
+filter_size=len(voice_filter(0,())[0])
+for muted_ids in ((),(2050,2055),(1,254,255,256,2050,2055,21050),
+                  tuple(range(2049,2057)),tuple(range(1795,2051)),tuple(range(1,257))):
     multiple=bytearray(radio)
-    instructions,table=voice_filter(stub_offset+88,muted_ids)
+    instructions,table=voice_filter(stub_offset+filter_size,muted_ids)
     code=instructions+table
     multiple[stub_offset:stub_offset+len(code)]=code
     for message_id in (2040,2050,2055,2058):
         expected=0 if message_id in muted_ids else message_id
         assert execute(by_id[message_id],multiple)==expected
+# Exercise both sides of each delta encoding boundary through the real lookup.
+entry_offset=0xCCAC+8*next(i for i,(message_id,_) in enumerate(entries) if message_id==2050)
+for delta in (239,240,255,256,3583,3584,3839,3840,65533):
+    target=delta+1
+    for muted_ids in ((1,target),(1,target-1)):
+        multiple=bytearray(radio)
+        instructions,table=voice_filter(stub_offset+filter_size,muted_ids)
+        code=instructions+table
+        multiple[stub_offset:stub_offset+len(code)]=code
+        struct.pack_into(">i",multiple,entry_offset,target)
+        expected=0 if target in muted_ids else target
+        assert execute(by_id[2050],multiple)==expected,(delta,muted_ids)
 # This proves the check catches the former behavior.
 unfiltered=bytearray(rom)
 struct.pack_into(">I",unfiltered,VOICE_RETURN_ROM,0x03E00008)

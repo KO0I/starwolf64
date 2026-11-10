@@ -11,6 +11,16 @@ PROLOGUE_TEXT = (
     "Now Pepper has launched an attack on Venom, home of the revolution. Andross and the people stand their ground as Cornerian warships close in to crush their uprising.\n\n"
     "With Venom under fire, Andross turns to Wolf O'Donnell and the Star Wolf team. Outnumbered and hunted, they launch into battle to break Pepper's assault and free Lylat from Cornerian rule."
 )
+LOCATION_PHRASING = {
+    1300: ('straight for', 'right to'),
+    4103: ("we'll head to", 'we head to'),
+    7012: ('Entering Corneria air\ndefense zone.', "Entering Corneria's\ndefense zone."),
+    7064: ('close to', 'near'),
+    7070: ('right there', 'just ahead'),
+    7093: ('air space', 'airspace'),
+    11200: ('here we come', 'here we go'),
+    16230: ('could', 'may'),
+}
 PROLOGUE_VOICE_OFFSET = 0x19534
 LINES = ("I see em' up ahead.", "Let's light up these", "fucking fascists!")
 ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!?-,.0123456789'():|"
@@ -79,6 +89,17 @@ def replace_dialogue(builder):
     if struct.unpack_from('>II', menu, PROLOGUE_VOICE_OFFSET) != (0x0C006B40, 0x240403E8):
         raise ValueError('Unexpected original prologue narration call')
     struct.pack_into('>I', menu, PROLOGUE_VOICE_OFFSET, 0)
+    title_cards = tuple(struct.pack('>IIIf', *card) for card in (
+        (0x06008990, 232, 19, 46.0),  # Enter Star Fox
+        (0x0600AD30, 168, 19, 77.0),  # Enter Star Wolf
+    ))
+    offsets = [menu.find(card) for card in title_cards]
+    if any(menu.count(card) != 1 for card in title_cards) or offsets[1] - offsets[0] != 3 * 16:
+        raise ValueError('Unexpected Corneria/Fortuna mission title table')
+    builder.level_title_changes = []
+    for offset, original, replacement in zip(offsets, title_cards, reversed(title_cards)):
+        menu[offset:offset + len(original)] = replacement
+        builder.level_title_changes.append((offset, original, replacement))
 
 
 def verify_dialogue(builder, patched):
@@ -113,9 +134,9 @@ def verify_dialogue(builder, patched):
     if struct.unpack_from('>II', menu, PROLOGUE_VOICE_OFFSET) != (0, 0x240403E8):
         raise ValueError('Browser prologue still plays the original narration')
     restored = bytearray(menu)
-    for offset, original, expected in builder.menu_color_changes:
+    for offset, original, expected in builder.menu_color_changes + builder.level_title_changes:
         if menu[offset:offset + len(expected)] != expected:
-            raise ValueError(f'Browser menu color mismatch at {offset:#x}')
+            raise ValueError(f'Browser menu mismatch at {offset:#x}')
         restored[offset:offset + len(original)] = original
     struct.pack_into('>I', restored, PROLOGUE_VOICE_OFFSET, 0x0C006B40)
     if restored != builder.dialogue_originals['ovl_menu']:
@@ -128,15 +149,29 @@ def verify_dialogue(builder, patched):
 
 
 def voice_filter(table_offset, message_ids):
-    """Map edited voice IDs to zero using byte deltas and escaped absolute IDs."""
-    table = bytearray()
+    """Map edited voice IDs to zero using deltas, consecutive runs and absolute IDs."""
+    from itertools import groupby
+    entries = []
     previous = 0
     for message_id in message_ids:
         if not previous < message_id < 0xFFFF:
             raise ValueError('Voice filter IDs must be sorted, unique and positive')
         delta = message_id - previous
-        table.extend(bytes((delta,)) if delta < 255 else b'\xff' + struct.pack('>H', message_id))
+        if delta < 0xF0:
+            entries.append(bytes((delta,)))
+        elif delta < 0xE00:
+            entries.append(bytes((0xF0 + (delta >> 8), delta & 0xFF)))
+        else:
+            entries.append(b'\xff' + struct.pack('>H', message_id))
         previous = message_id
+    table = bytearray()
+    for entry, group in groupby(entries):
+        count = sum(1 for _ in group)
+        if entry == b'\x01':
+            while count >= 3:
+                table.append(0xFE)
+                count -= 3
+        table.extend(entry * count)
     table.append(0)
     table_address = RADIO_BASE + table_offset
     words = (
@@ -144,26 +179,43 @@ def voice_filter(table_offset, message_ids):
         0x25080000 | (table_address & 0xFFFF),          # addiu t0, table low
         0x00005025,  # or t2, zero, zero
         0x91090000,  # loop: lbu t1, 0(t0)
-        0x1120000F,  # beq t1, zero, return
+        0x11200018,  # beq t1, zero, return
         0x25080001,  # delay: addiu t0, t0, 1
-        0x240B00FF,  # addiu t3, zero, 255
-        0x152B0008,  # bne t1, t3, delta
+        0x240B00F0,  # addiu t3, zero, 0xf0
+        0x012B582B,  # sltu t3, t1, t3
+        0x15600010,  # bne t3, zero, delta
+        0x240B00FF,  # delay: addiu t3, zero, 0xff
+        0x152B0007,  # bne t1, t3, wide_delta_or_run
         0x00000000,  # delay: nop
         0x910A0000,  # lbu t2, 0(t0)
         0x000A5200,  # sll t2, t2, 8
         0x91090001,  # lbu t1, 1(t0)
         0x01495025,  # or t2, t2, t1
-        0x25080002,  # addiu t0, t0, 2
-        0x10000002,  # beq zero, zero, compare
-        0x00000000,  # delay: nop
+        0x10000009,  # beq zero, zero, compare
+        0x25080002,  # delay: addiu t0, t0, 2
+        0x240B00FE,  # wide_delta_or_run: addiu t3, zero, 0xfe
+        0x112B000B,  # beq t1, t3, run
+        0x2529FF10,  # delay: addiu t1, t1, -0xf0
+        0x00094A00,  # sll t1, t1, 8
+        0x910B0000,  # lbu t3, 0(t0)
+        0x012B4825,  # or t1, t1, t3
+        0x25080001,  # addiu t0, t0, 1
         0x01495021,  # delta: addu t2, t2, t1
-        0x144AFFF1,  # compare: bne v0, t2, loop
+        0x144AFFE8,  # compare: bne v0, t2, loop
         0x00000000,  # delay: nop
-        0x00001025,  # or v0, zero, zero
+        0x00001025,  # mute: or v0, zero, zero
         0x03E00008,  # return: jr ra
         0x00000000,  # delay: nop
+        0x24090003,  # run: addiu t1, zero, 3
+        0x004A5823,  # subu t3, v0, t2
+        0x256BFFFF,  # addiu t3, t3, -1
+        0x0169582B,  # sltu t3, t3, t1
+        0x1560FFF8,  # bne t3, zero, mute
+        0x00000000,  # delay: nop
+        0x1000FFDD,  # beq zero, zero, loop
+        0x01495021,  # delay: addu t2, t2, t1
     )
-    return struct.pack('>22I', *words), bytes(table)
+    return struct.pack('>39I', *words), bytes(table)
 
 
 def crew_voice_filter(changed_filter_address):
@@ -346,8 +398,17 @@ def replace_identity(builder):
         changed = re.sub(r'\bSlippy\b', 'Kami', changed)
         changed = re.sub(r'\bPeppy\s+Hare\b', 'Krystal', changed)
         changed = re.sub(r'\bPeppy\b', 'Krystal', changed)
+        changed = re.sub(r"\b(?:Andross'|Andross\b|(?:General\s+)?Pepper\b)",
+                         lambda match: {"Andross": "Pepper", "Andross'": "Pepper's"}.get(match[0], "Andross"), changed)
         if message_id == 1:
             changed = PROLOGUE_TEXT
+        else:
+            changed = re.sub(r'\b(?:Corneria|Venom|Cornerian|Venomian)\b',
+                             lambda match: {'Corneria': 'Venom', 'Venom': 'Corneria',
+                                            'Cornerian': 'Venomian', 'Venomian': 'Cornerian'}[match[0]], changed)
+            if message_id in LOCATION_PHRASING:
+                before, after = LOCATION_PHRASING[message_id]
+                changed = changed.replace(before, after)
         if message_id == 4024:
             changed = changed.replace("Don't go too fast,", 'Not too fast,')
         if message_id in (20337, 20338):

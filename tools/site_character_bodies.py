@@ -12,6 +12,7 @@ from export_team_bodies import TITLE_ANIMS, VERSUS_ANIMS, matrix
 from package_site_characters import DEFAULT
 from site_character_gfx import GLB, Compiler
 from site_character_kami import add_details as add_kami_details
+from site_character_edits import apply_budget, edit_kami_body, body_head
 
 CREW = [('wolf', 'Fox', 'Fox'), ('panther', 'Falco', 'Falco'),
         ('krystal', 'Peppy', 'Fox'), ('kami', 'Slippy', 'Fox')]
@@ -88,6 +89,7 @@ class Bodies:
         self.builder = builder
         self.original = {stem: bytes(builder.segments[stem]) for stem in ('ast_title', 'ast_versus')}
         self.patches, self.compilers, self.rigs, self.animations = [], [], [], []
+        self.pilot_heads = {}
         self.hashes = {crc64(name): name for name in builder.base.namelist()}
 
     def allocate(self, stem, raw):
@@ -190,6 +192,8 @@ class Bodies:
                     material.setdefault('extras', {})['runtime_texture_region'] = [0, 0, .125, 1]
             focus_kami_face(glb)
             details = add_kami_details(glb)
+        reduction = apply_budget(glb, character, variant)
+        styling = edit_kami_body(glb, variant) if character == 'kami' else None
         for node in glb.doc['nodes']:
             if node.get('name', '').endswith('_placement'):
                 for field in ('matrix', 'translation', 'rotation', 'scale'):
@@ -221,6 +225,8 @@ class Bodies:
                 color['baseColorFactor'] = [1, .78, .08, 1]
                 neck[0]['material'] = len(glb.doc['materials'])
                 glb.doc['materials'].append(material)
+        if character == 'kami' and variant == 'title':
+            self.pilot_heads['kami'] = {'glb': body_head(glb), 'generated_details': details}
         nodes = glb.doc['nodes']
         bones = sorted((i for i, node in enumerate(nodes) if node.get('name', '').startswith('limb_')),
                        key=lambda i: int(nodes[i]['name'].split('_')[1]))
@@ -325,8 +331,11 @@ class Bodies:
                            ordinal >= 2 and variant == 'title')
         self.rigs.append({'character': character, 'variant': variant, 'limbs': len(bones),
                           'triangles': triangle_count, 'skeleton': skeleton_path,
-                          'generated_details': details})
-        if triangle_count != expected_triangles + (details['added_triangles'] if details else 0):
+                          'run_source': source,
+                          'generated_details': details, 'triangle_reduction': reduction, 'styling': styling})
+        expected_triangles += (details['added_triangles'] if details else 0)
+        expected_triangles -= (reduction['removed_triangles'] if reduction else 0)
+        if triangle_count != expected_triangles:
             raise ValueError('Reviewed body lost triangles')
 
     def build(self):
