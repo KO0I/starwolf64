@@ -205,6 +205,22 @@ class Bodies:
             for node in glb.doc['nodes']:
                 if node.get('name') == head:
                     node['scale'] = [value * 1.1 for value in node.get('scale', [1, 1, 1])]
+            if variant == 'title':
+                neck = [part for node in glb.doc['nodes'] if node.get('name') == 'limb_20'
+                        for part in glb.doc['meshes'][node['mesh']]['primitives']
+                        if glb.doc['materials'][part['material']].get('name') == 'D_TITLE_6028988']
+                if len(neck) != 1:
+                    raise ValueError('Expected one Panther neck material')
+                count = neck[0].get('indices', neck[0]['attributes']['POSITION'])
+                if glb.doc['accessors'][count]['count'] != 6:
+                    raise ValueError('Expected Panther neck material on two triangles')
+                material = copy.deepcopy(glb.doc['materials'][neck[0]['material']])
+                material['name'] = 'Panther_yellow_neck'
+                color = material['pbrMetallicRoughness']
+                color.pop('baseColorTexture')
+                color['baseColorFactor'] = [1, .78, .08, 1]
+                neck[0]['material'] = len(glb.doc['materials'])
+                glb.doc['materials'].append(material)
         nodes = glb.doc['nodes']
         bones = sorted((i for i, node in enumerate(nodes) if node.get('name', '').startswith('limb_')),
                        key=lambda i: int(nodes[i]['name'].split('_')[1]))

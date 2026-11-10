@@ -249,7 +249,10 @@ class Compiler:
                 command(0xB6000000 if material.get('doubleSided') else 0xB7000000, 0x2000)
                 ambient = material.get('extras', {}).get('ambient')
                 command(0xB6000000 if ambient is not None else 0xB7000000, 0x20000)
-                command(0xB9000002, int(material.get('alphaMode', 'OPAQUE') != 'OPAQUE'))
+                masked = material.get('alphaMode', 'OPAQUE') != 'OPAQUE'
+                # Alpha coverage must use texture alpha when threshold testing cutouts.
+                command(0xB900031D, 0x553078 if masked else 0x552078)
+                command(0xB9000002, int(masked))
                 command(0xF9000000, 128)
                 tile = cmt << 18 | int(math.log2(height)) << 14 | cms << 8 | int(math.log2(width)) << 4
                 command(0xBA000E02, 0x8000 if palette else 0)
