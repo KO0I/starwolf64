@@ -223,7 +223,7 @@ def crew_voice_filter(changed_filter_address):
     # the only other declared speaker below 36 and must pass unchanged.
     words = (
         0x3408FFFF,  # ori t0, zero, 0xffff
-        0x1048000F,  # beq v0, t0, return
+        0x10480010,  # beq v0, t0, return
         0x00000000,
         0x3C080000 | ((RADIO_SPEAKER_ADDRESS + 0x8000) >> 16),
         0x8D080000 | (RADIO_SPEAKER_ADDRESS & 0xFFFF),
@@ -239,10 +239,15 @@ def crew_voice_filter(changed_filter_address):
         0x08000000 | ((changed_filter_address & 0x0FFFFFFF) >> 2),
         0x00000000,
         0x00001025,  # mute: or v0, zero, zero
+        0x00000000,  # Keep the branch displacement from encoding MSGCHAR_NXT.
         0x03E00008,  # return: jr ra
         0x00000000,
     )
-    return struct.pack('>19I', *words)
+    code = struct.pack('>20I', *words)
+    # Original N64 radio code scans 60 characters even after a text terminator.
+    if 15 in struct.unpack('>40H', code):
+        raise ValueError('Crew gate encodes a radio next-page marker in text lookahead')
+    return code
 
 
 def lookup_entries(data):

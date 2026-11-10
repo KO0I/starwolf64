@@ -73,6 +73,11 @@ try {
     await click('#connect');
     await waitFor('!!window.EJS_emulator?.started', 'emulator boot');
     await sleep(7000);
+    if (playbackSession) {
+      const sessions = await evaluate('audioSessionAtCreation');
+      assert(sessions.length >= 2 && sessions.every(type => type === 'playback'),
+        'Game and chirp contexts must use media playback before creation: ' + JSON.stringify(sessions));
+    }
   };
   const measure = () => evaluate(`(async () => {
     const player = EJS_emulator, al = player.Module.AL.currentCtx, context = al.audioCtx;
@@ -165,11 +170,6 @@ try {
   } else {
     await evaluate(`localStorage.setItem('ejs-settings', JSON.stringify({volume: .4, muted: true}))`);
     await boot();
-    if (playbackSession) {
-      const sessions = await evaluate('audioSessionAtCreation');
-      assert(sessions.length >= 2 && sessions.every(type => type === 'playback'),
-        'Game and chirp contexts must use media playback before creation: ' + JSON.stringify(sessions));
-    }
     proof.savedMuteReset = await measure();
     console.log('Saved mute reset', JSON.stringify(proof.savedMuteReset));
     assert(audible(proof.savedMuteReset) && proof.savedMuteReset.stored.muted === false && proof.savedMuteReset.label === 'Mute', 'A fresh launch must ignore saved mute and start with audible sound');

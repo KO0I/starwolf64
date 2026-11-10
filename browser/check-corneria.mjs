@@ -35,7 +35,7 @@ try{
   frameLoad=table.getUint32(table.getUint32(p+4)+0x8378)===0x8C427A80;break;
  }}
  assert(frameLoad,'Unverified Corneria cutscene counter address');
- const state=()=>evaluate(`(()=>{const d=new DataView(EJS_emulator.gameManager.Module.HEAPU8.buffer,STARWOLF_chatter.stats.ramBase);return {game:d.getInt32(0x177834,true),play:d.getInt32(0x177854,true),radio:d.getInt32(0x17829C,true),speaker:d.getFloat32(0x177D68,true),glyph:d.getInt32(0x1782D8,true),map:d.getInt32(0x1CD944,true),csFrame:d.getInt32(0x177A80,true)}})()`);
+ const state=()=>evaluate(`(()=>{const d=new DataView(EJS_emulator.gameManager.Module.HEAPU8.buffer,STARWOLF_chatter.stats.ramBase);return {frame:d.getInt32(0x177DB0,true),timer:d.getInt32(0x1782AC,true),game:d.getInt32(0x177834,true),play:d.getInt32(0x177854,true),radio:d.getInt32(0x17829C,true),speaker:d.getFloat32(0x177D68,true),glyph:d.getInt32(0x1782D8,true),map:d.getInt32(0x1CD944,true),csFrame:d.getInt32(0x177A80,true)}})()`);
  const tap=async input=>{await evaluate(`EJS_emulator.gameManager.simulateInput(0,${input},1)`);await sleep(150);await evaluate(`EJS_emulator.gameManager.simulateInput(0,${input},0)`)};
  const shot=async name=>{const result=await call('Page.captureScreenshot',{format:'png'});await writeFile(output+name+'.png',Buffer.from(result.data,'base64'))};
  console.log('Initial',JSON.stringify(await state()));await shot('title');
@@ -52,6 +52,8 @@ try{
    if(sawKami&&Date.now()-afterKami>20000&&current.csFrame>=firstKami.csFrame+500&&current.speaker!==20){
     const first=samples.find(s=>s.speaker===20&&s.radio===4);
     assert(current.speaker!==20||current.radio!==4,'Kami check-in remained stuck');
+    assert(new Set(samples.slice(-5).map(sample=>sample.frame)).size>1,'Game frames stopped after Kami check-in');
+    assert(current.radio!==31&&current.radio!==32,'Kami entered an invalid next-page transition');
     await shot('after-kami');await writeFile(output+'proof.json',JSON.stringify({sawKami,first,last:current,samples},null,2));
     console.log('PASS: Corneria opening rendered Kami check-in and advanced beyond it',JSON.stringify(current));break;
    }
