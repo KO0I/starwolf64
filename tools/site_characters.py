@@ -122,7 +122,7 @@ class SiteCharacters:
             before = bytes(self.builder.segments['ast_arwing'][offset:offset + 8])
             struct.pack_into('>II', self.builder.segments['ast_arwing'], offset, 0x06010000, address)
             self.head_patches.append((offset, before, address))
-            if name in ('kami', 'krystal') and triangles > 512:
+            if name == 'kami' and triangles > 512:
                 raise ValueError(f'{name} cockpit head exceeds 512 triangles')
             self.heads[name] = {'source': source, 'triangles': triangles,
                                 'fit': fit.tolist(), 'path': path, 'address': address,
@@ -305,7 +305,8 @@ class SiteCharacters:
                           'Rigid body clips drive the game skeletons; accessory-only tracks remain in the source pack.',
                           'Pilot meshes use the game head steering; facial animation clips remain in the source pack.',
                           'Large atlases are reduced to the N64 texture memory budget.',
-                          'Verified runtime selections limit Krystal/Kami title bodies to 768 and cockpit heads to 512 triangles.',
+                          'Verified runtime selections limit Krystal/Kami title bodies to 768 and the Kami cockpit head to 512 triangles.',
+                          'Krystal cockpit geometry retains the original 520-triangle source head.',
                           'Kami cockpit geometry is taken directly from her prepared title body head.']}
 
     def summary(self):
