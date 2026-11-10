@@ -98,6 +98,8 @@ function syncSound() {
   sound.textContent = player?.muted || context?.state !== 'running' ? 'Enable sound' : 'Mute';
 }
 function resumeAudio() {
+  // Safari's default Web Audio session follows the phone's silent switch.
+  if (navigator.audioSession) navigator.audioSession.type = 'playback';
   chatter.resume();
   const context = emulator()?.Module?.AL?.currentCtx?.audioCtx;
   if (context && context.state !== 'running') context.resume().catch(() => {});
@@ -147,7 +149,7 @@ window.EJS_onLoadState = () => { chatter.stop(); clear(); status.textContent = '
 window.EJS_onSaveState = () => { status.textContent = 'State saved'; };
 play.onclick = () => {
   if (loading || active || !romUrl) return;
-  chatter.resume();
+  resumeAudio();
   if (emulator()?.started) {emulator().play(); running(); return;}
   loading = true; play.disabled = true; fileInput.disabled = true;
   screen.dataset.state = 'loading';
