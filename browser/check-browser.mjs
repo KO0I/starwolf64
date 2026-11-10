@@ -19,7 +19,7 @@ function measureLayout(){
 function measureLaunch(){
  const screen=document.querySelector('#screen'),splash=document.querySelector('#splash'),button=document.querySelector('#connect');
  const colors=[...getComputedStyle(button).backgroundImage.matchAll(/rgb\((\d+), (\d+), (\d+)\)/g)];
- return {state:screen.dataset.state,splash:!splash.hidden&&splash.complete&&splash.naturalWidth>0&&getComputedStyle(splash).display!=='none',label:button.textContent,disabled:button.disabled,gray:colors.length>0&&colors.every(c=>c[1]===c[2]&&c[2]===c[3]),pickerPulse:getComputedStyle(document.querySelector('.rom-picker')).animationName,buttonPulse:getComputedStyle(button).animationName};
+ return {state:screen.dataset.state,pickerVisible:document.querySelector('.rom-picker').getClientRects().length>0,splash:!splash.hidden&&splash.complete&&splash.naturalWidth>0&&getComputedStyle(splash).display!=='none',label:button.textContent,disabled:button.disabled,gray:colors.length>0&&colors.every(c=>c[1]===c[2]&&c[2]===c[3]),pickerPulse:getComputedStyle(document.querySelector('.rom-picker')).animationName,buttonPulse:getComputedStyle(button).animationName};
 }
 try{
  const startupFiles = [
@@ -77,7 +77,7 @@ try{
  const launchView=()=>evaluate('('+measureLaunch.toString()+')()');
  for(let i=0;i<50;i++){if((await launchView()).splash)break;await sleep(100)}
  let launch=await launchView();
- assert(launch.state==='awaiting-rom'&&launch.splash&&launch.label==='Launch'&&launch.disabled&&launch.gray&&launch.pickerPulse==='blue-green-pulse'&&launch.buttonPulse==='none','Initial launch screen failed: '+JSON.stringify(launch));
+ assert(launch.state==='awaiting-rom'&&launch.pickerVisible&&launch.splash&&launch.label==='Launch'&&launch.disabled&&launch.gray&&launch.pickerPulse==='blue-green-pulse'&&launch.buttonPulse==='none','Initial launch screen failed: '+JSON.stringify(launch));
  await call('Emulation.setEmulatedMedia',{features:[{name:'prefers-reduced-motion',value:'reduce'}]});
  assert((await launchView()).pickerPulse==='none','Reduced motion did not stop the upload pulse');
  await call('Emulation.setEmulatedMedia',{features:[]});
@@ -92,7 +92,7 @@ try{
  for(let i=0;i<80;i++){if(await evaluate("document.querySelector('#status').textContent.includes('US v1.1')"))break;await sleep(100)}
  assert(await evaluate("document.querySelector('#connect').disabled&&!window.EJS_gameUrl"),'An invalid ROM enabled playback');
  launch=await launchView();
- assert(launch.state==='awaiting-rom'&&launch.splash&&launch.pickerPulse==='blue-green-pulse'&&launch.buttonPulse==='none','Invalid ROM lost the upload prompt');
+ assert(launch.state==='awaiting-rom'&&launch.pickerVisible&&launch.splash&&launch.pickerPulse==='blue-green-pulse'&&launch.buttonPulse==='none','Invalid ROM lost the upload prompt');
  const document=await call('DOM.getDocument');
  const input=await call('DOM.querySelector',{nodeId:document.root.nodeId,selector:'#rom-file'});
  if(verifyArgs[2]){
@@ -113,7 +113,7 @@ try{
  }
  assert(selected,'ROM selection failed: '+await evaluate("document.querySelector('#status').textContent"));
  launch=await launchView();
- assert(launch.state==='ready'&&launch.splash&&launch.label==='Launch'&&!launch.disabled&&launch.pickerPulse==='none'&&launch.buttonPulse==='blue-green-pulse','Ready launch screen failed: '+JSON.stringify(launch));
+ assert(launch.state==='ready'&&!launch.pickerVisible&&launch.splash&&launch.label==='Launch'&&!launch.disabled&&launch.pickerPulse==='none'&&launch.buttonPulse==='blue-green-pulse','Ready launch screen failed: '+JSON.stringify(launch));
  await call('Emulation.setEmulatedMedia',{features:[{name:'prefers-reduced-motion',value:'reduce'}]});
  assert((await launchView()).buttonPulse==='none','Reduced motion did not stop the Launch pulse');
  await call('Emulation.setEmulatedMedia',{features:[]});
@@ -122,7 +122,7 @@ try{
  assert(targetHash===patch.target.sha256,'The patched game does not match the verified build');
  console.log('Local ROM patch verified',JSON.stringify({bytes:patchResponse.headers.get('content-length'),targetHash}));
  launch=await evaluate("document.querySelector('#connect').click();("+measureLaunch.toString()+")()");
- assert(launch.state==='loading'&&launch.splash&&launch.disabled&&launch.pickerPulse==='none'&&launch.buttonPulse==='none','Launch must keep the splash visible and stop pulsing while loading');
+ assert(launch.state==='loading'&&!launch.pickerVisible&&launch.splash&&launch.disabled&&launch.pickerPulse==='none'&&launch.buttonPulse==='none','Launch must keep the splash visible and stop pulsing while loading');
  let state;
  for(let i=0;i<180;i++){await sleep(500);state=await evaluate("({status:document.querySelector('#status').textContent,started:!!window.EJS_emulator?.started,canvas:!!document.querySelector('#game canvas'),threads:window.crossOriginIsolated})");if(state.started&&state.canvas)break}
  const selectedCore=await evaluate('EJS_emulator.getCore()');
@@ -130,7 +130,7 @@ try{
  console.log('Selected core',selectedCore,iosCore?'iOS selection under Chromium':'desktop');
  console.log('Local emulator',JSON.stringify(state));assert(state.started&&state.canvas&&state.threads,'Emulator failed to boot');
  launch=await launchView();
- assert(launch.state==='running'&&!launch.splash&&launch.disabled&&launch.buttonPulse==='none','Game start did not dismiss the splash');
+ assert(launch.state==='running'&&!launch.pickerVisible&&!launch.splash&&launch.disabled&&launch.buttonPulse==='none','Game start did not dismiss the splash');
  await sleep(6000);
  await evaluate("(()=>{const gm=EJS_emulator.gameManager,original=gm.simulateInput.bind(gm);window.inputProof=[];gm.simulateInput=(...args)=>{inputProof.push(args);return original(...args)}})()");
  await evaluate("document.querySelector('[data-action=fire]').click()");
@@ -141,11 +141,11 @@ try{
  await evaluate("document.querySelector('#disconnect').click()");
  assert(await evaluate("EJS_emulator.paused"),'Pause failed');
  launch=await launchView();
- assert(launch.state==='paused'&&!launch.splash&&launch.label==='Resume'&&launch.buttonPulse==='none','Pause restored the launch prompt');
+ assert(launch.state==='paused'&&!launch.pickerVisible&&!launch.splash&&launch.label==='Resume'&&launch.buttonPulse==='none','Pause restored the launch prompt');
  await evaluate("document.querySelector('#connect').click()");
  assert(await evaluate("!EJS_emulator.paused"),'Resume failed');
  launch=await launchView();
- assert(launch.state==='running'&&!launch.splash&&launch.buttonPulse==='none','Resume restored the launch prompt');
+ assert(launch.state==='running'&&!launch.pickerVisible&&!launch.splash&&launch.buttonPulse==='none','Resume restored the launch prompt');
  const audio=await evaluate("({state:EJS_emulator.Module.AL?.currentCtx?.audioCtx?.state,muted:EJS_emulator.muted,canvas:[EJS_emulator.canvas.width,EJS_emulator.canvas.height]})");
  console.log('Audio/render',JSON.stringify(audio));
  assert(audio.state==='running','Emulator audio context is not running');
