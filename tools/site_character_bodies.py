@@ -13,6 +13,7 @@ from package_site_characters import DEFAULT
 from site_character_gfx import GLB, Compiler
 from site_character_kami import add_details as add_kami_details
 from site_character_edits import apply_budget, edit_kami_body, body_head
+from site_character_panther import install as install_panther_head
 
 CREW = [('wolf', 'Fox', 'Fox'), ('panther', 'Falco', 'Falco'),
         ('krystal', 'Peppy', 'Fox'), ('kami', 'Slippy', 'Fox')]
@@ -186,6 +187,8 @@ class Bodies:
             expected_triangles = json.loads(archive.read('manifest.json'))['characters'][character]['variants'][variant]['triangles']
         glb.doc = copy.deepcopy(glb.doc)
         details = None
+        if character == 'panther':
+            details = install_panther_head(glb, variant)
         if character == 'kami':
             for material in glb.doc['materials']:
                 if material.get('name') == 'Kami_eight_view_head':

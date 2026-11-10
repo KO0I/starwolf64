@@ -20,6 +20,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', type=Path, default=ROOT / 'browser/runtime/characters-proof')
     parser.add_argument('--kami-closeup', action='store_true', help='Also capture Kami at three times title scale')
+    parser.add_argument('--panther-closeup', action='store_true', help='Also capture Panther from front, quarter and profile')
     args = parser.parse_args()
     run = args.output.resolve()
     run.mkdir(parents=True, exist_ok=True)
@@ -114,22 +115,24 @@ def main():
         time.sleep(.5)
         subprocess.run(['import', '-display', display, '-window', 'root', str(run / 'crew-next.png')],
                        env=env, check=True, timeout=5)
-        if args.kami_closeup:
+        if args.kami_closeup or args.panther_closeup:
+            closeup_slot = 1 if args.panther_closeup else 3
+            closeup_name = 'panther' if args.panther_closeup else 'kami'
             commands = ['break Title_Screen_Draw', 'continue', 'set {float}&D_menu_801B84D4 = 1.5',
                         'set {float}&sTitleStarfoxLogoXpos = 10000']
             for index in range(4):
                 base = f'(char*)&sTitleTeam + {index * team_size}'
-                for offset, value in [(team_pos, 0 if index == 3 else 10000), (team_pos + 4, -350), (team_pos + 8, 0),
+                for offset, value in [(team_pos, 0 if index == closeup_slot else 10000), (team_pos + 4, -350), (team_pos + 8, 0),
                                       (team_rotation, 0), (team_rotation + 4, 0), (team_rotation + 8, 0)]:
                     commands.append(f'set {{float}}({base} + {offset}) = {value}')
             debug(commands)
             time.sleep(1)
-            subprocess.run(['import', '-display', display, '-window', 'root', str(run / 'kami-closeup.png')],
+            subprocess.run(['import', '-display', display, '-window', 'root', str(run / f'{closeup_name}-closeup.png')],
                            env=env, check=True, timeout=5)
             for angle, label in [(35, 'quarter'), (70, 'profile')]:
-                debug([f'set {{float}}((char*)&sTitleTeam + {3 * team_size + team_rotation + 4}) = {angle}'])
+                debug([f'set {{float}}((char*)&sTitleTeam + {closeup_slot * team_size + team_rotation + 4}) = {angle}'])
                 time.sleep(.35)
-                subprocess.run(['import', '-display', display, '-window', 'root', str(run / f'kami-{label}.png')],
+                subprocess.run(['import', '-display', display, '-window', 'root', str(run / f'{closeup_name}-{label}.png')],
                                env=env, check=True, timeout=5)
         debug(['set {unsigned short}&gNextLevel = 0', 'set {unsigned short}&gNextGameState = 7'])
         time.sleep(4)
@@ -152,20 +155,23 @@ def main():
             paths = read_paths(dump)
             assert paths and all('characters/' in path and character in path and 'on_foot' in path for path in paths), (character, paths)
             on_foot[character] = paths
-        pilot_dump = run / 'kami-pilot.bin'
+        pilot_name = 'panther' if args.panther_closeup else 'kami'
+        pilot_face = 2 if args.panther_closeup else 3
+        pilot_path = 'ast_arwing/aAwFalcoHeadDL' if args.panther_closeup else 'ast_arwing/aAwSlippyHeadDL'
+        pilot_dump = run / f'{pilot_name}-pilot.bin'
         debug(['set $p = *(char**)&gPlayer',
                f'break Display_ArwingWings if $rdi == $p + {arwing_offset}', 'continue',
-               f'set {{unsigned char}}($rdi + {face_offset}) = 3',
+               f'set {{unsigned char}}($rdi + {face_offset}) = {pilot_face}',
                'set $start = *(char**)&gMasterDisp', 'finish', 'set $end = *(char**)&gMasterDisp',
                f'dump binary memory {pilot_dump} $start $end'])
         pilot_paths = read_paths(pilot_dump)
-        assert 'ast_arwing/aAwSlippyHeadDL' in pilot_paths, ('Kami pilot', pilot_paths)
+        assert pilot_path in pilot_paths, (pilot_name + ' pilot', pilot_paths)
         time.sleep(.25)
         if game.poll() is not None:
             raise RuntimeError((run / 'runtime.log').read_text()[-4000:])
         (run / 'proof.json').write_text(json.dumps({'title': results, 'on_foot': on_foot,
-                                                   'kami_pilot': pilot_paths}, indent=2) + '\n')
-        print('PASS: all four title/on-foot slots and Kami pilot draw reviewed resources; captures in', run)
+                                                   pilot_name + '_pilot': pilot_paths}, indent=2) + '\n')
+        print(f'PASS: all four title/on-foot slots and {pilot_name} pilot draw reviewed resources; captures in', run)
     finally:
         if game is not None and game.poll() is None:
             game.terminate()

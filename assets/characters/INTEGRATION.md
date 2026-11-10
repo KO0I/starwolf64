@@ -12,9 +12,11 @@
 
 Wolf, Panther, Krystal, and Kami have title and on-foot bodies and cockpit heads. Vitzy has her supplied 206-triangle head and Bill cockpit module. The native Expert fighter uses the module inside its existing Bill-derived exterior. The browser uses Vitzy's head in the Expert slot. Pigma and the original Star Fox lineup remain available as source assets.
 
-The converter removes the viewer's placement normalization, retains explicit body and head scales, and updates the game skeletons, pose tables, aiming callbacks, and ending callbacks. It retains every source triangle and records requested geometry additions separately. Positions, normals, and colors use N64 precision. Large textures shrink to fit texture memory, coincident pilot-head normals are averaged, and supplied ambient hints become vertex shading. The N64 renderer does not reproduce glTF metallic, roughness, or clearcoat shading.
+The converter removes the viewer's placement normalization, retains explicit body and head scales, and updates the game skeletons, pose tables, aiming callbacks, and ending callbacks. It records geometry additions, replacements, and reductions separately. Positions, normals, and colors use N64 precision. Large textures shrink to fit texture memory, coincident pilot-head normals are averaged, and supplied ambient hints become vertex shading. The N64 renderer does not reproduce glTF metallic, roughness, or clearcoat shading.
 
 The game uses the imported rigid body clips and its existing cockpit-head steering. Accessory-only tracks, alternate movement presets, and facial clips remain in the source pack. They do not have separate runtime animation controllers.
+
+`tools/site_character_panther.py` replaces Panther's title, on-foot, and cockpit head meshes with the same 172-triangle reconstruction. Registered front, rear, side, and quarter-view constraints form a closed skull hull. Removing redundant cross-sections reduces that hull from 1,132 to 76 triangles without changing those constraints. The ears have embedded bases, the pupils face forward, and the head is ten percent smaller than the initial reconstruction. [The reconstruction assets](panther-head/README.md) include the supplied reference, an editable GLB, and eight rendered views. Existing rig nodes and animation clips remain unchanged.
 
 Kami's body-head atlas uses only its first strip, with the eyes confined to a small band. The converter gives the front face a separate cropped texture and remaps its UVs before resizing. The remaining head facets use the larger strip. Every texture fits N64 texture memory, and the split preserves all triangles.
 
@@ -32,6 +34,7 @@ python3 tools/build_wolfen.py
 python3 tools/build_wolfen.py --check
 cmake --build build-cmake -j 4
 python3 tools/check_site_character_patches.py
+python3 tools/check_panther_head.py
 python3 tools/check_kami_eyes.py
 python3 tools/check_kami_details.py
 python3 tools/check_site_characters.py

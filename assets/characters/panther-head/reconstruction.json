@@ -1,0 +1,56 @@
+{
+  "dense_rings": 71,
+  "simplified_rings": 5,
+  "dense_hull_triangles": 1132,
+  "hull_triangles": 76,
+  "max_projection_error": 1.0658141036401503e-14,
+  "triangles": 172,
+  "source_triangles": 169,
+  "added_triangles": 3,
+  "method": "registered silhouette half-plane intersection; redundant ring removal",
+  "reference": "assets/characters/panther-head/reference.jpg",
+  "head_scale": 0.9,
+  "body_head_drop": 0,
+  "registered_profiles": [
+    [
+      24.0,
+      27.0,
+      -15.0,
+      28.0,
+      12.0,
+      10.0
+    ],
+    [
+      39.0,
+      43.0,
+      -27.0,
+      47.0,
+      26.0,
+      14.0
+    ],
+    [
+      51.0,
+      45.0,
+      -30.0,
+      47.0,
+      26.0,
+      14.0
+    ],
+    [
+      68.0,
+      43.0,
+      -29.0,
+      26.0,
+      13.0,
+      12.0
+    ],
+    [
+      94.0,
+      26.0,
+      -18.0,
+      18.0,
+      9.0,
+      9.0
+    ]
+  ]
+}

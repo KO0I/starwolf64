@@ -14,6 +14,7 @@ from site_character_gfx import GLB, Compiler
 from site_character_bodies import Bodies
 from site_character_edits import apply_budget, triangle_count
 from site_character_storage import Storage
+from site_character_panther import install as install_panther_head
 from extract_team_bodies import dependencies
 
 # Original US 1.1 instructions, checked before every replacement.
@@ -104,6 +105,8 @@ class SiteCharacters:
                 glb = wolf if name == 'wolf' else self.read(source)
                 details = None
                 reduction = apply_budget(glb, name, 'pilot')
+                if name == 'panther':
+                    details = install_panther_head(glb, 'pilot')
             glb.doc.setdefault('asset', {}).setdefault('extras', {})['runtime_smooth_head_normals'] = True
             trim = glb.doc.get('asset', {}).get('extras', {}).get('runtime_hair_trim')
             low, high = np.asarray(trim['fit_bounds']) if trim else self.bounds(glb)
@@ -277,6 +280,7 @@ class SiteCharacters:
             else:
                 removed = (head['triangle_reduction'] or {}).get('removed_triangles', 0)
                 expected = manifest_doc['pilot_heads'][name]['triangles'] - removed
+                expected += (head['generated_details'] or {}).get('added_triangles', 0)
             if head['triangles'] != expected:
                 raise ValueError(f'Reviewed head lost triangles: {name}')
         for offset, raw, path, native, header in self.head_compiler.blocks:
