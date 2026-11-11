@@ -8,6 +8,11 @@ const status = document.querySelector('#status');
 const play = document.querySelector('#connect');
 const fileInput = document.querySelector('#rom-file');
 const sound = document.querySelector('#sound');
+if (!document.querySelector('link[rel~="icon"]')) {
+  const icon = document.createElement('link');
+  icon.rel = 'icon'; icon.href = 'data:,';
+  document.head.append(icon);
+}
 let romUrl, selection = 0;
 delete window.EJS_gameUrl;
 fileInput.disabled = !window.crossOriginIsolated;
@@ -221,8 +226,30 @@ document.querySelectorAll('[data-action]').forEach(button => {
   });
 });
 const stick = document.querySelector('#stick');
-const deck = document.querySelector('#flight-deck');
-const placement = document.querySelector('#control-placement');
+const deck = document.querySelector('.deck');
+deck.id = 'flight-deck';
+const placement = document.createElement('button');
+placement.id = 'control-placement'; placement.type = 'button';
+document.querySelector('#disconnect').before(placement);
+const controlStyles = document.createElement('style');
+controlStyles.textContent = `
+.deck{touch-action:none;overscroll-behavior:contain}
+#screen.controls-in-view{touch-action:none;overscroll-behavior:none}
+#screen.controls-in-view>.deck{position:absolute;z-index:2;left:0;right:0;bottom:0;width:100%;max-width:none;margin:0;padding:8px max(10px,env(safe-area-inset-right)) 20px max(10px,env(safe-area-inset-left));grid-template-columns:minmax(150px,1fr) 48px minmax(220px,1fr);gap:12px;background:linear-gradient(0deg,#08090af2,#101113c4 72%,#10111300)}
+#screen.controls-in-view .steering{flex-direction:row;justify-content:center;gap:12px}
+#screen.controls-in-view #stick{width:88px;height:88px}
+#screen.controls-in-view .directions{grid-template-columns:repeat(3,28px);grid-template-rows:repeat(3,28px)}
+#screen.controls-in-view .flight-buttons{grid-template-rows:30px 48px 48px;gap:8px 6px;max-width:240px}
+#screen.controls-in-view .deck .n64-button{width:44px;height:44px;font-size:20px}
+#screen.controls-in-view .deck .n64-b{width:42px;height:42px}
+#screen.controls-in-view .deck .n64-c{width:40px;height:40px;font-size:18px}
+#screen.controls-in-view .deck .n64-start{width:40px;height:40px;font-size:10px}
+#screen.controls-in-view .deck .n64-shoulder{width:100%;height:30px;font-size:16px}
+#screen.controls-in-view .button-caption{top:calc(100% + 5px);font-size:9px}
+#screen.controls-in-view .n64-shoulder .button-caption{position:static;margin-left:5px;font-size:9px}
+@media(max-width:620px){#screen.controls-in-view>.deck{grid-template-columns:80px 38px minmax(0,1fr);gap:5px;padding:6px 7px 17px}#screen.controls-in-view .steering{gap:0}#screen.controls-in-view #stick{width:72px;height:72px}#screen.controls-in-view .directions{display:none}#screen.controls-in-view .flight-buttons{grid-template-rows:28px 44px 44px;gap:6px 3px;max-width:210px}#screen.controls-in-view .deck .n64-button{width:42px;height:42px}#screen.controls-in-view .deck .n64-b{width:40px;height:40px}#screen.controls-in-view .deck .n64-c{width:38px;height:38px}#screen.controls-in-view .deck .n64-start{width:34px;height:34px;font-size:9px}#screen.controls-in-view .deck .n64-shoulder{height:28px;font-size:14px}#screen.controls-in-view .button-caption{font-size:8px}#screen.controls-in-view .n64-shoulder .button-caption{font-size:8px}}
+`;
+document.head.append(controlStyles);
 let stickPointer;
 function steer(event) {
   if (event.pointerId !== stickPointer) return;
