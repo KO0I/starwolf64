@@ -8,6 +8,11 @@ const status = document.querySelector('#status');
 const play = document.querySelector('#connect');
 const fileInput = document.querySelector('#rom-file');
 const sound = document.querySelector('#sound');
+if (!document.querySelector('link[rel~="icon"]')) {
+  const icon = document.createElement('link');
+  icon.rel = 'icon'; icon.href = 'data:,';
+  document.head.append(icon);
+}
 let romUrl, selection = 0;
 delete window.EJS_gameUrl;
 fileInput.disabled = !window.crossOriginIsolated;
@@ -86,11 +91,28 @@ function send(force = false) {
     }
   }
 }
+const capturedPointers = new Map();
+function resetStick() {
+  const stick = document.querySelector('#stick');
+  stick.style.setProperty('--x', '0px');
+  stick.style.setProperty('--y', '0px');
+}
+function releaseCapture(pointerId) {
+  const element = capturedPointers.get(pointerId);
+  capturedPointers.delete(pointerId);
+  if (!element) return;
+  try {if (element.hasPointerCapture(pointerId)) element.releasePointerCapture(pointerId);} catch {}
+}
+function capture(element, pointerId) {
+  capturedPointers.set(pointerId, element);
+  try {element.setPointerCapture(pointerId);} catch {}
+  // Window-level move/release handlers remain the fallback when capture fails.
+}
 function clear() {
+  const pointers = [...capturedPointers.keys()];
   stickPointer = undefined;
-  sources.clear(); send(true);
-  document.querySelector('#stick').style.setProperty('--x', '0px');
-  document.querySelector('#stick').style.setProperty('--y', '0px');
+  sources.clear(); resetStick(); send(true);
+  for (const pointerId of pointers) releaseCapture(pointerId);
 }
 function syncSound() {
   const player = emulator();
@@ -136,7 +158,7 @@ window.EJS_onGameStart = () => {
   player.muted = false;
   if (!player.volume) player.volume = .7;
   player.setVolume(player.volume);
-  // All inputs come from our below-screen panel, keyboard and gamepad handler.
+  // All inputs come from our flight deck, keyboard and gamepad handler.
   emulator().controls = {0: {}, 1: {}, 2: {}, 3: {}};
   emulator().gamepadSelection = [];
   emulator().toggleVirtualGamepad(false);
@@ -190,13 +212,11 @@ document.querySelector('#fullscreen').onclick = async () => {
 };
 document.querySelectorAll('[data-action]').forEach(button => {
   button.addEventListener('pointerdown', event => {
-    if (!active) return;
-    resumeAudio();
-    event.preventDefault(); button.setPointerCapture(event.pointerId);
+    if (!active || (event.pointerType === 'mouse' && event.button !== 0)) return;
+    resumeAudio(); event.preventDefault();
+    capture(button, event.pointerId);
     sources.set('pointer:' + event.pointerId, [button.dataset.action]); send();
   });
-  const release = event => {sources.delete('pointer:' + event.pointerId); send();};
-  for (const type of ['pointerup', 'pointercancel', 'lostpointercapture']) button.addEventListener(type, release);
   button.addEventListener('click', event => {
     if (!event.detail && active) {
       resumeAudio();
@@ -206,9 +226,34 @@ document.querySelectorAll('[data-action]').forEach(button => {
   });
 });
 const stick = document.querySelector('#stick');
+const deck = document.querySelector('.deck');
+deck.id = 'flight-deck';
+const placement = document.createElement('button');
+placement.id = 'control-placement'; placement.type = 'button';
+document.querySelector('#disconnect').before(placement);
+const controlStyles = document.createElement('style');
+controlStyles.textContent = `
+.deck{touch-action:none;overscroll-behavior:contain}
+#screen.controls-in-view{touch-action:none;overscroll-behavior:none}
+#screen.controls-in-view>.deck{position:absolute;z-index:2;left:0;right:0;bottom:0;width:100%;max-width:none;margin:0;padding:8px max(10px,env(safe-area-inset-right)) 20px max(10px,env(safe-area-inset-left));grid-template-columns:minmax(150px,1fr) 48px minmax(220px,1fr);gap:12px;background:linear-gradient(0deg,#08090af2,#101113c4 72%,#10111300)}
+#screen.controls-in-view .steering{flex-direction:row;justify-content:center;gap:12px}
+#screen.controls-in-view #stick{width:88px;height:88px}
+#screen.controls-in-view .directions{grid-template-columns:repeat(3,28px);grid-template-rows:repeat(3,28px)}
+#screen.controls-in-view .flight-buttons{grid-template-rows:30px 48px 48px;gap:8px 6px;max-width:240px}
+#screen.controls-in-view .deck .n64-button{width:44px;height:44px;font-size:20px}
+#screen.controls-in-view .deck .n64-b{width:42px;height:42px}
+#screen.controls-in-view .deck .n64-c{width:40px;height:40px;font-size:18px}
+#screen.controls-in-view .deck .n64-start{width:40px;height:40px;font-size:10px}
+#screen.controls-in-view .deck .n64-shoulder{width:100%;height:30px;font-size:16px}
+#screen.controls-in-view .button-caption{top:calc(100% + 5px);font-size:9px}
+#screen.controls-in-view .n64-shoulder .button-caption{position:static;margin-left:5px;font-size:9px}
+@media(max-width:620px){#screen.controls-in-view>.deck{grid-template-columns:80px 38px minmax(0,1fr);gap:5px;padding:6px 7px 17px}#screen.controls-in-view .steering{gap:0}#screen.controls-in-view #stick{width:72px;height:72px}#screen.controls-in-view .directions{display:none}#screen.controls-in-view .flight-buttons{grid-template-rows:28px 44px 44px;gap:6px 3px;max-width:210px}#screen.controls-in-view .deck .n64-button{width:42px;height:42px}#screen.controls-in-view .deck .n64-b{width:40px;height:40px}#screen.controls-in-view .deck .n64-c{width:38px;height:38px}#screen.controls-in-view .deck .n64-start{width:34px;height:34px;font-size:9px}#screen.controls-in-view .deck .n64-shoulder{height:28px;font-size:14px}#screen.controls-in-view .button-caption{font-size:8px}#screen.controls-in-view .n64-shoulder .button-caption{font-size:8px}}
+`;
+document.head.append(controlStyles);
 let stickPointer;
 function steer(event) {
   if (event.pointerId !== stickPointer) return;
+  if (event.cancelable) event.preventDefault();
   const rect = stick.getBoundingClientRect();
   const x = Math.max(-1, Math.min(1, (event.clientX - rect.left - rect.width / 2) / (rect.width * .38)));
   const y = Math.max(-1, Math.min(1, (event.clientY - rect.top - rect.height / 2) / (rect.height * .38)));
@@ -219,16 +264,47 @@ function steer(event) {
   stick.style.setProperty('--x', x * 24 + 'px'); stick.style.setProperty('--y', y * 24 + 'px'); send();
 }
 stick.onpointerdown = event => {
-  if (!active || stickPointer !== undefined) return;
-  resumeAudio();
-  event.preventDefault(); stickPointer = event.pointerId; stick.setPointerCapture(event.pointerId); steer(event);
+  if (!active || (event.pointerType === 'mouse' && event.button !== 0)) return;
+  event.preventDefault();
+  if (stickPointer !== undefined) return;
+  resumeAudio(); stickPointer = event.pointerId;
+  capture(stick, event.pointerId); steer(event);
 };
-stick.onpointermove = steer;
-for (const type of ['pointerup', 'pointercancel', 'lostpointercapture']) stick.addEventListener(type, event => {
-  if (event.pointerId !== stickPointer) return;
-  stickPointer = undefined; sources.delete('stick');
-  stick.style.setProperty('--x', '0px'); stick.style.setProperty('--y', '0px'); send();
-});
+function releasePointer(event) {
+  const buttonReleased = sources.delete('pointer:' + event.pointerId);
+  const stickReleased = event.pointerId === stickPointer;
+  if (stickReleased) {
+    stickPointer = undefined; sources.delete('stick'); resetStick();
+  }
+  if (buttonReleased || stickReleased) send();
+  releaseCapture(event.pointerId);
+}
+for (const type of ['pointerup', 'pointercancel', 'lostpointercapture']) {
+  window.addEventListener(type, releasePointer, true);
+}
+window.addEventListener('pointermove', steer, {capture: true, passive: false});
+deck.addEventListener('touchmove', event => {
+  if (active && event.cancelable) event.preventDefault();
+}, {passive: false});
+deck.addEventListener('contextmenu', event => event.preventDefault());
+deck.addEventListener('dragstart', event => event.preventDefault());
+function setControlPlacement(inViewer, persist = true) {
+  clear();
+  if (inViewer) screen.append(deck);
+  else document.querySelector('#controls').insertBefore(deck, document.querySelector('#controls .hint'));
+  screen.classList.toggle('controls-in-view', inViewer);
+  placement.textContent = inViewer ? 'Controls: viewer' : 'Controls: below';
+  placement.setAttribute('aria-pressed', String(inViewer));
+  placement.title = inViewer ? 'Move flight controls below the viewer' : 'Move flight controls into the viewer';
+  if (persist) {
+    try {localStorage.setItem('starwolf64.controlPlacement', inViewer ? 'viewer' : 'below');} catch {}
+  }
+}
+let controlsInViewer = false;
+try {controlsInViewer = localStorage.getItem('starwolf64.controlPlacement') === 'viewer';} catch {}
+setControlPlacement(controlsInViewer, false);
+placement.onclick = () => setControlPlacement(!screen.classList.contains('controls-in-view'));
+document.addEventListener('fullscreenchange', clear);
 window.addEventListener('keydown', event => {
   const action = keyActions[event.code];
   if (!active || !action || event.target.matches('input,select,textarea') || (event.target.matches('button') && ['Space', 'Enter'].includes(event.code))) return;
