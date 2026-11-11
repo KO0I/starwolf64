@@ -86,11 +86,28 @@ function send(force = false) {
     }
   }
 }
+const capturedPointers = new Map();
+function resetStick() {
+  const stick = document.querySelector('#stick');
+  stick.style.setProperty('--x', '0px');
+  stick.style.setProperty('--y', '0px');
+}
+function releaseCapture(pointerId) {
+  const element = capturedPointers.get(pointerId);
+  capturedPointers.delete(pointerId);
+  if (!element) return;
+  try {if (element.hasPointerCapture(pointerId)) element.releasePointerCapture(pointerId);} catch {}
+}
+function capture(element, pointerId) {
+  capturedPointers.set(pointerId, element);
+  try {element.setPointerCapture(pointerId);} catch {}
+  // Window-level move/release handlers remain the fallback when capture fails.
+}
 function clear() {
+  const pointers = [...capturedPointers.keys()];
   stickPointer = undefined;
-  sources.clear(); send(true);
-  document.querySelector('#stick').style.setProperty('--x', '0px');
-  document.querySelector('#stick').style.setProperty('--y', '0px');
+  sources.clear(); resetStick(); send(true);
+  for (const pointerId of pointers) releaseCapture(pointerId);
 }
 function syncSound() {
   const player = emulator();
@@ -136,7 +153,7 @@ window.EJS_onGameStart = () => {
   player.muted = false;
   if (!player.volume) player.volume = .7;
   player.setVolume(player.volume);
-  // All inputs come from our below-screen panel, keyboard and gamepad handler.
+  // All inputs come from our flight deck, keyboard and gamepad handler.
   emulator().controls = {0: {}, 1: {}, 2: {}, 3: {}};
   emulator().gamepadSelection = [];
   emulator().toggleVirtualGamepad(false);
@@ -190,13 +207,11 @@ document.querySelector('#fullscreen').onclick = async () => {
 };
 document.querySelectorAll('[data-action]').forEach(button => {
   button.addEventListener('pointerdown', event => {
-    if (!active) return;
-    resumeAudio();
-    event.preventDefault(); button.setPointerCapture(event.pointerId);
+    if (!active || (event.pointerType === 'mouse' && event.button !== 0)) return;
+    resumeAudio(); event.preventDefault();
+    capture(button, event.pointerId);
     sources.set('pointer:' + event.pointerId, [button.dataset.action]); send();
   });
-  const release = event => {sources.delete('pointer:' + event.pointerId); send();};
-  for (const type of ['pointerup', 'pointercancel', 'lostpointercapture']) button.addEventListener(type, release);
   button.addEventListener('click', event => {
     if (!event.detail && active) {
       resumeAudio();
@@ -206,9 +221,12 @@ document.querySelectorAll('[data-action]').forEach(button => {
   });
 });
 const stick = document.querySelector('#stick');
+const deck = document.querySelector('#flight-deck');
+const placement = document.querySelector('#control-placement');
 let stickPointer;
 function steer(event) {
   if (event.pointerId !== stickPointer) return;
+  if (event.cancelable) event.preventDefault();
   const rect = stick.getBoundingClientRect();
   const x = Math.max(-1, Math.min(1, (event.clientX - rect.left - rect.width / 2) / (rect.width * .38)));
   const y = Math.max(-1, Math.min(1, (event.clientY - rect.top - rect.height / 2) / (rect.height * .38)));
@@ -219,16 +237,47 @@ function steer(event) {
   stick.style.setProperty('--x', x * 24 + 'px'); stick.style.setProperty('--y', y * 24 + 'px'); send();
 }
 stick.onpointerdown = event => {
-  if (!active || stickPointer !== undefined) return;
-  resumeAudio();
-  event.preventDefault(); stickPointer = event.pointerId; stick.setPointerCapture(event.pointerId); steer(event);
+  if (!active || (event.pointerType === 'mouse' && event.button !== 0)) return;
+  event.preventDefault();
+  if (stickPointer !== undefined) return;
+  resumeAudio(); stickPointer = event.pointerId;
+  capture(stick, event.pointerId); steer(event);
 };
-stick.onpointermove = steer;
-for (const type of ['pointerup', 'pointercancel', 'lostpointercapture']) stick.addEventListener(type, event => {
-  if (event.pointerId !== stickPointer) return;
-  stickPointer = undefined; sources.delete('stick');
-  stick.style.setProperty('--x', '0px'); stick.style.setProperty('--y', '0px'); send();
-});
+function releasePointer(event) {
+  const buttonReleased = sources.delete('pointer:' + event.pointerId);
+  const stickReleased = event.pointerId === stickPointer;
+  if (stickReleased) {
+    stickPointer = undefined; sources.delete('stick'); resetStick();
+  }
+  if (buttonReleased || stickReleased) send();
+  releaseCapture(event.pointerId);
+}
+for (const type of ['pointerup', 'pointercancel', 'lostpointercapture']) {
+  window.addEventListener(type, releasePointer, true);
+}
+window.addEventListener('pointermove', steer, {capture: true, passive: false});
+deck.addEventListener('touchmove', event => {
+  if (active && event.cancelable) event.preventDefault();
+}, {passive: false});
+deck.addEventListener('contextmenu', event => event.preventDefault());
+deck.addEventListener('dragstart', event => event.preventDefault());
+function setControlPlacement(inViewer, persist = true) {
+  clear();
+  if (inViewer) screen.append(deck);
+  else document.querySelector('#controls').insertBefore(deck, document.querySelector('#controls .hint'));
+  screen.classList.toggle('controls-in-view', inViewer);
+  placement.textContent = inViewer ? 'Controls: viewer' : 'Controls: below';
+  placement.setAttribute('aria-pressed', String(inViewer));
+  placement.title = inViewer ? 'Move flight controls below the viewer' : 'Move flight controls into the viewer';
+  if (persist) {
+    try {localStorage.setItem('starwolf64.controlPlacement', inViewer ? 'viewer' : 'below');} catch {}
+  }
+}
+let controlsInViewer = false;
+try {controlsInViewer = localStorage.getItem('starwolf64.controlPlacement') === 'viewer';} catch {}
+setControlPlacement(controlsInViewer, false);
+placement.onclick = () => setControlPlacement(!screen.classList.contains('controls-in-view'));
+document.addEventListener('fullscreenchange', clear);
 window.addEventListener('keydown', event => {
   const action = keyActions[event.code];
   if (!active || !action || event.target.matches('input,select,textarea') || (event.target.matches('button') && ['Space', 'Enter'].includes(event.code))) return;
