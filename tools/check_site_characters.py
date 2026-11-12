@@ -21,6 +21,7 @@ def main():
     parser.add_argument('--output', type=Path, default=ROOT / 'browser/runtime/characters-proof')
     parser.add_argument('--kami-closeup', action='store_true', help='Also capture Kami at three times title scale')
     parser.add_argument('--panther-closeup', action='store_true', help='Also capture Panther from front, quarter and profile')
+    parser.add_argument('--krystal-closeup', action='store_true', help='Capture Krystal from front, quarter and profile')
     args = parser.parse_args()
     run = args.output.resolve()
     run.mkdir(parents=True, exist_ok=True)
@@ -115,21 +116,21 @@ def main():
         time.sleep(.5)
         subprocess.run(['import', '-display', display, '-window', 'root', str(run / 'crew-next.png')],
                        env=env, check=True, timeout=5)
-        if args.kami_closeup or args.panther_closeup:
-            closeup_slot = 1 if args.panther_closeup else 3
-            closeup_name = 'panther' if args.panther_closeup else 'kami'
-            commands = ['break Title_Screen_Draw', 'continue', 'set {float}&D_menu_801B84D4 = 1.5',
+        if args.kami_closeup or args.panther_closeup or args.krystal_closeup:
+            closeup_slot = 1 if args.panther_closeup else 2 if args.krystal_closeup else 3
+            closeup_name = 'panther' if args.panther_closeup else 'krystal' if args.krystal_closeup else 'kami'
+            commands = ['break Title_Screen_Draw', 'continue', f'set {{float}}&D_menu_801B84D4 = {0.7 if args.krystal_closeup else 1.5}',
                         'set {float}&sTitleStarfoxLogoXpos = 10000']
             for index in range(4):
                 base = f'(char*)&sTitleTeam + {index * team_size}'
-                for offset, value in [(team_pos, 0 if index == closeup_slot else 10000), (team_pos + 4, -350), (team_pos + 8, 0),
+                for offset, value in [(team_pos, 0 if index == closeup_slot else 10000), (team_pos + 4, 15 if args.krystal_closeup else -350), (team_pos + 8, 0),
                                       (team_rotation, 0), (team_rotation + 4, 0), (team_rotation + 8, 0)]:
                     commands.append(f'set {{float}}({base} + {offset}) = {value}')
             debug(commands)
             time.sleep(1)
             subprocess.run(['import', '-display', display, '-window', 'root', str(run / f'{closeup_name}-closeup.png')],
                            env=env, check=True, timeout=5)
-            for angle, label in [(35, 'quarter'), (70, 'profile')]:
+            for angle, label in [(35, 'quarter'), (70, 'profile'), (180, 'back')]:
                 debug([f'set {{float}}((char*)&sTitleTeam + {closeup_slot * team_size + team_rotation + 4}) = {angle}'])
                 time.sleep(.35)
                 subprocess.run(['import', '-display', display, '-window', 'root', str(run / f'{closeup_name}-{label}.png')],
@@ -155,9 +156,10 @@ def main():
             paths = read_paths(dump)
             assert paths and all('characters/' in path and character in path and 'on_foot' in path for path in paths), (character, paths)
             on_foot[character] = paths
-        pilot_name = 'panther' if args.panther_closeup else 'kami'
-        pilot_face = 2 if args.panther_closeup else 3
-        pilot_path = 'ast_arwing/aAwFalcoHeadDL' if args.panther_closeup else 'ast_arwing/aAwSlippyHeadDL'
+        pilot_name = 'panther' if args.panther_closeup else 'krystal' if args.krystal_closeup else 'kami'
+        pilot_face = 2 if args.panther_closeup else 4 if args.krystal_closeup else 3
+        pilot_path = ('ast_arwing/aAwFalcoHeadDL' if args.panther_closeup else
+                      'ast_arwing/aAwPeppyHeadDL' if args.krystal_closeup else 'ast_arwing/aAwSlippyHeadDL')
         pilot_dump = run / f'{pilot_name}-pilot.bin'
         debug(['set $p = *(char**)&gPlayer',
                f'break Display_ArwingWings if $rdi == $p + {arwing_offset}', 'continue',

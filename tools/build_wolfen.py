@@ -714,7 +714,7 @@ def main():
         sides = builder.build()
         chatter = ROOT / "assets/audio/chatter/bank.bin"
         data = chatter.read_bytes()
-        if data[:4] != b"CHT1":
+        if data[:4] != b"CHT2":
             raise ValueError("Missing or invalid crew chatter bank")
         header = base.read("ast_audio/ast_audio_v1_sequence_DEA20")[:64]
         builder.resources["audio/crew_chatter"] = header + struct.pack("<I", len(data)) + data

@@ -10,6 +10,7 @@ FILES = {
     "/": ("index.html", "text/html; charset=utf-8"),
     "/index.html": ("index.html", "text/html; charset=utf-8"),
     "/crew-chatter.mjs": ("crew-chatter.mjs", "text/javascript; charset=utf-8"),
+    "/emulator-startup.mjs": ("emulator-startup.mjs", "text/javascript; charset=utf-8"),
     "/client.js": ("client.js", "text/javascript; charset=utf-8"),
     "/launch-background.jpg": ("launch-background.jpg", "image/jpeg"),
     "/rom-file.mjs": ("rom-file.mjs", "text/javascript; charset=utf-8"),

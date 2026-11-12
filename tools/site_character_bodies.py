@@ -14,6 +14,8 @@ from site_character_gfx import GLB, Compiler
 from site_character_kami import add_details as add_kami_details
 from site_character_edits import apply_budget, edit_kami_body, body_head
 from site_character_panther import install as install_panther_head
+from site_character_title_poses import standing_pose
+from site_character_krystal import focus_eyes as focus_krystal_eyes
 
 CREW = [('wolf', 'Fox', 'Fox'), ('panther', 'Falco', 'Falco'),
         ('krystal', 'Peppy', 'Fox'), ('kami', 'Slippy', 'Fox')]
@@ -122,7 +124,8 @@ class Bodies:
                 result[:, joint, axis] = values
         return result
 
-    def animation(self, glb, stem, target, source, bones, corrections, root_scale, root_delta, preserve_count):
+    def animation(self, glb, stem, target, source, bones, corrections, root_scale, root_delta,
+                  preserve_count, character, translations, parents):
         source_poses = self.source_frames(stem, source)
         target_path = stem + '/' + target
         target_header = self.builder.base.read(target_path)
@@ -152,6 +155,8 @@ class Bodies:
                 quaternions /= np.linalg.norm(quaternions, axis=1, keepdims=True)
                 index = bones.index(node)
                 frames[:, index + 1] = [euler(corrections[index] @ rotation(q)) for q in quaternions]
+        if stem == 'ast_title' and source == 'aFoxAnim':
+            standing_pose(character, frames, translations, parents)
         samples, keys = [], []
         quantized = np.rint(frames * np.array([1 if j == 0 else 65536 / math.tau
                                               for j in range(len(bones) + 1)])[None, :, None]).astype(np.int64) & 65535
@@ -196,6 +201,8 @@ class Bodies:
             focus_kami_face(glb)
             details = add_kami_details(glb)
         reduction = apply_budget(glb, character, variant)
+        if character == 'krystal':
+            focus_krystal_eyes(glb)
         styling = edit_kami_body(glb, variant) if character == 'kami' else None
         for node in glb.doc['nodes']:
             if node.get('name', '').endswith('_placement'):
@@ -331,7 +338,9 @@ class Bodies:
         for ordinal, name in enumerate(targets):
             source_name = sources[min(ordinal, len(sources) - 1)]
             self.animation(glb, stem, name, source_name, bones, corrections, root_scale, root_delta,
-                           ordinal >= 2 and variant == 'title')
+                           ordinal >= 2 and variant == 'title', character, translations,
+                           [bones.index(owner(index, False)) if owner(index, False) is not None else None
+                            for index in bones])
         self.rigs.append({'character': character, 'variant': variant, 'limbs': len(bones),
                           'triangles': triangle_count, 'skeleton': skeleton_path,
                           'run_source': source,

@@ -10,6 +10,7 @@ import numpy as np
 
 from build_wolfen import ROOT, END, HEAD_LIFT, COCKPIT_DROP, cartridge_crc, crc64, manifest, inverse
 from package_site_characters import DEFAULT, verify as verify_package
+from site_character_krystal import focus_eyes as focus_krystal_eyes
 from site_character_gfx import GLB, Compiler
 from site_character_bodies import Bodies
 from site_character_edits import apply_budget, triangle_count
@@ -105,6 +106,8 @@ class SiteCharacters:
                 glb = wolf if name == 'wolf' else self.read(source)
                 details = None
                 reduction = apply_budget(glb, name, 'pilot')
+                if name == 'krystal':
+                    focus_krystal_eyes(glb)
                 if name == 'panther':
                     details = install_panther_head(glb, 'pilot')
             glb.doc.setdefault('asset', {}).setdefault('extras', {})['runtime_smooth_head_normals'] = True

@@ -20,7 +20,7 @@ python3 tools/export_browser_site.py
 
 The build installs the reviewed Wolf, Panther, Krystal, and Kami bodies and pilot heads, plus Vitzy's Expert head. The native Expert fighter also uses her Bill cockpit module. See [character conversion](../assets/characters/INTEGRATION.md) for slot mappings, animation limits, rebuild checks, and credits.
 
-Crew dialogue uses short voiced syllables timed to the text reveal. Wolf uses his original voice lowered three semitones with a bass boost. Panther uses Peppy's voice lowered ten semitones with a bass boost. Kami uses Vitzy's recording lowered three semitones with slower delivery. Krystal uses newly generated English-accent female snippets. Vitzy keeps her own recording at its original base pitch, in the separate Expert pilot slot. Red portrait variants keep the same voice. The prologue narrator has a separate scrambled bank derived from the original narration, played as the text scrolls and stopped when the prologue is skipped or finishes.
+Crew dialogue uses short voiced syllables timed to the text reveal. Wolf uses his original voice lowered three semitones with a bass boost. Panther uses Peppy's voice lowered ten semitones with a bass boost. Kami uses Vitzy's recording lowered three semitones with slower delivery. Krystal uses newly generated English-accent female snippets. Vitzy keeps her own recording at its original base pitch, in the separate Expert pilot slot. Red portrait variants keep the same voice. The prologue plays the full original narration backwards as one continuous recording, stopped when the prologue is skipped or finishes.
 
 The native player mixes the shared 32 kHz PCM bank into Starship's audio output and follows its master and voice volumes. Settings > Audio > Crew chatter switches between chatter and silent crew dialogue. Rebuild the executable and regenerate the native mod together. The browser player reads the dialogue reveal from EmulatorJS and plays the same banks with Web Audio. It follows the browser sound control and the game's Voice Volume setting. Other speakers retain their original voices unless their dialogue text was edited.
 
@@ -99,3 +99,27 @@ References:
 - [Squarespace DNS settings](https://support.squarespace.com/hc/en-us/articles/360002101888-Edit-your-domain-s-DNS-records)
 - [EmulatorJS options](https://emulatorjs.org/docs/options/)
 - [coi-serviceworker](https://github.com/gzuidhof/coi-serviceworker)
+
+## N64 controller shared with the WASM preview
+
+The main player now uses the preview's controller layout: a proportional analog
+stick, A, B, Start, L, R, Z, a separate D-pad and all four C buttons. The controls
+can remain below the viewscreen or move into it with the existing placement button.
+Touches beginning on the controller cannot pan the page, even after dragging beyond
+its edges. Pointer cancellation, focus loss, rotation and fullscreen transitions
+release held input.
+
+The emulator adapter uses the N64 IDs from pinned EmulatorJS 4.2.3. Multiple sources
+sharing one input are combined before submission so releasing one source does not
+cancel another. Small stick movements send smaller magnitudes.
+
+```sh
+node browser/check-controls.mjs http://127.0.0.1:8641/
+node browser/check-audio.mjs http://127.0.0.1:8641/ --playback-session
+```
+
+The controller check verifies all 14 buttons, proportional input, pointer-capture
+failure, multitouch, scroll prevention and layouts from 320 to 1280 pixels wide.
+The main player's playback audio-session selection has also been transferred to
+the WASM preview before its AudioContext is created. Gesture-based resume remains
+in place in both players.
