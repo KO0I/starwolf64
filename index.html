@@ -28,46 +28,38 @@ button:disabled{opacity:.45;cursor:default}
 button:focus-visible,#stick:focus-visible{outline:2px solid #d34859;outline-offset:2px}
 #connect{color:#ffe4e6;border-top-color:#b84151;background:linear-gradient(#6b2831,#33161d 16%,#1d1015 55%,#3b171f)}
 #disconnect{margin-left:auto}
-.deck{display:grid;grid-template-columns:1fr 58px 1fr;align-items:center;gap:24px;max-width:760px;margin:8px auto 0;padding:12px 4px 18px}
-.steering{display:flex;flex-direction:row-reverse;align-items:center;justify-content:flex-end;gap:16px}
-#stick{position:relative;width:112px;height:112px;flex:none;touch-action:none;user-select:none;background:radial-gradient(circle,#53565a 0 39%,#303237 40% 49%,#9a9b9c 50% 55%,#62656a 56% 65%,#a4a5a6 66%);border:2px solid #a9aaac;box-shadow:inset 0 2px 5px #0008,0 4px 0 #373a3e,0 6px 8px #0008;clip-path:polygon(29% 0,71% 0,100% 29%,100% 71%,71% 100%,29% 100%,0 71%,0 29%)}
-#stick:before,#stick:after{content:"";position:absolute;background:#c5c6c780}
-#stick:before{width:2px;height:9px;left:calc(50% - 1px);top:5px}
-#stick:after{width:9px;height:2px;top:calc(50% - 1px);left:5px}
-.knob{position:absolute;left:calc(50% - 23px);top:calc(50% - 23px);width:46px;height:46px;transform:translate(var(--x,0px),var(--y,0px));border-radius:50%;background:radial-gradient(circle at 42% 35%,#d2d3d4,#989b9e 65%,#696c70 70%);border:2px solid #b8babc;box-shadow:0 5px 0 #5d6064,2px 8px 6px #0009}
-.knob:after{content:"";position:absolute;inset:7px;border:1px solid #777b80;border-radius:50%;box-shadow:inset 0 0 0 3px #b4b6b8,inset 0 0 0 4px #85898d,inset 0 0 0 7px #b4b6b8,inset 0 0 0 8px #85898d}
-.directions{position:relative;display:grid;grid-template-columns:repeat(3,34px);grid-template-rows:repeat(3,34px);gap:0;filter:drop-shadow(0 4px 1px #0008)}
-.directions:before{content:"";grid-area:2/2;background:radial-gradient(circle,#777b80 0 22%,#5c6065 25% 40%,#797d82 43%);border-block:1px solid #6c7075}
-.directions button{min-height:0;padding:0;font:18px sans-serif;color:#303337;background:linear-gradient(130deg,#a5a8ac,#797d82);border:1px solid;border-color:#c2c4c6 #53575d #53575d #a4a7aa;border-radius:2px;box-shadow:none;text-shadow:0 1px #ffffff50}
-.directions [data-action=up]{grid-area:1/2;border-bottom:0;border-radius:4px 4px 0 0}
-.directions [data-action=left]{grid-area:2/1;border-right:0;border-radius:4px 0 0 4px}
-.directions [data-action=down]{grid-area:3/2;border-top:0;border-radius:0 0 4px 4px}
-.directions [data-action=right]{grid-area:2/3;border-left:0;border-radius:0 4px 4px 0}
-.flight-buttons{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));grid-template-rows:44px 60px 60px;gap:12px 8px;max-width:260px;width:100%;justify-self:end}
-.deck .n64-button{--cap-light:#aeb1b5;--cap:#84888e;--cap-dark:#555a62;--cap-edge:#454a51;position:relative;display:flex;align-items:center;justify-content:center;justify-self:center;align-self:center;padding:0;width:56px;height:56px;min-height:0;border:1px solid var(--cap-edge);border-top-color:var(--cap-light);border-radius:50%;background:radial-gradient(circle at 35% 25%,var(--cap-light),var(--cap) 55%,var(--cap-dark));color:#fff;font:700 26px Arial,sans-serif;text-shadow:0 1px 2px #0008;box-shadow:inset 0 1px 2px #ffffff60,inset 0 -3px 3px #0003,0 4px 0 var(--cap-edge),0 6px 7px #0009}
-.deck .n64-button:hover{border-top-color:#fff;filter:brightness(1.1)}
-.deck .n64-button:active,.deck .n64-button.pressed{transform:translateY(3px);box-shadow:inset 0 2px 5px #0005,0 1px 0 var(--cap-edge),0 2px 3px #0008;filter:brightness(.88)}
-.deck .n64-button:focus-visible,.directions button:focus-visible{outline:2px solid #fff;outline-offset:5px}
-.directions button:active,.directions button.pressed{background:#595e65;color:#fff;box-shadow:inset 0 2px 4px #0006}
-.button-caption{position:absolute;top:calc(100% + 9px);left:50%;transform:translateX(-50%);white-space:nowrap;color:#b8b9bc;font:11px Arwing,sans-serif;text-shadow:0 1px #000;pointer-events:none}
-.deck .n64-start{--cap-light:#f57777;--cap:#cd343c;--cap-dark:#9e202e;--cap-edge:#6b1420;width:42px;height:42px;font-size:12px}
-.deck .n64-a{--cap-light:#659cff;--cap:#316cd2;--cap-dark:#204b9b;--cap-edge:#142d66;grid-area:3/2}
-.deck .n64-b{--cap-light:#6cdb91;--cap:#2ea65b;--cap-dark:#20733c;--cap-edge:#164c2c;grid-area:2/1;width:50px;height:50px}
-.deck .n64-c{--cap-light:#ffe77d;--cap:#edbd35;--cap-dark:#bb8a1e;--cap-edge:#7b5915;width:44px;height:44px;color:#6b4c09;font-size:22px;text-shadow:0 1px #fff6}
-.n64-c .c-mark{position:absolute;top:3px;left:8px;font:700 10px Arial,sans-serif}
-.deck .n64-boost{grid-area:2/3}
-.deck .n64-brake{grid-area:3/4}
-.deck .n64-shoulder{width:100%;height:34px;border-radius:15px 15px 8px 8px;font-size:18px;color:#30343a;text-shadow:0 1px #fff6}
-.deck .n64-z{grid-area:1/1/2/3}
-.deck .n64-r{grid-area:1/3/2/5}
-.n64-shoulder .button-caption{position:static;transform:none;margin-left:8px;font-size:10px;color:#252a31;text-shadow:0 1px #fff3}
+  .grip {display:flex;flex-direction:column;align-items:center;gap:14px;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;touch-action:none;}
+  .shoulders {display:flex;justify-content:center;gap:10px;width:100%;}
+  .pad-button {display:flex;align-items:center;justify-content:center;width:var(--key);height:var(--key);padding:0;border:1px solid #ffffff25;border-radius:50%;font-weight:800;font-size:19px;color:#101017;background:linear-gradient(145deg,#a1a0b1,#777584);box-shadow:0 4px 0 #393743,0 5px 8px #0007;text-shadow:0 1px 0 #fff3;touch-action:none;-webkit-tap-highlight-color:transparent;}
+  .pad-button.pressed {transform:translateY(3px);box-shadow:0 1px 0 #302e3b,0 1px 4px #0008;filter:brightness(1.2);}
+  .shoulder {width:60px;height:36px;min-height:36px;border-radius:12px 12px 6px 6px;font-size:14px;color:#e0deea;background:linear-gradient(#646370,#41404c);}
+  #stick {position:relative;width:120px;height:120px;flex-shrink:0;border:6px solid #4b4a58;border-radius:50%;background:repeating-radial-gradient(circle,#282831 0px,#282831 8px,#34343f 9px,#34343f 10px);box-shadow:inset 0 4px 10px #000a,0 2px 0 #888592;touch-action:none;}
+  .knob {position:absolute;left:50%;top:50%;width:52px;height:52px;margin:-26px;border-radius:50%;background:repeating-radial-gradient(circle,#a7a5b4 0px,#a7a5b4 3px,#92909f 4px,#92909f 5px);border:2px solid #c0bdcd;box-shadow:0 5px 8px #0009;pointer-events:none;}
+  .control-label {font-size:9px;color:#9d9bab;text-transform:uppercase;letter-spacing:.18em;text-align:center;}
+  .dpad {display:grid;grid-template:repeat(3,32px)/repeat(3,32px);position:relative;margin-top:2px;}
+  .dpad .pad-button {width:34px;height:34px;border-radius:4px;background:#44434e;color:#bcbacb;font-size:15px;box-shadow:0 3px 0 #22212a;}
+  .dpad .up {grid-area:1/2;}.dpad .left {grid-area:2/1;}.dpad .right {grid-area:2/3;}.dpad .down {grid-area:3/2;}
+  .dpad::before {content:"";position:absolute;left:32px;top:32px;width:34px;height:34px;background:#44434e;box-shadow:0 3px 0 #22212a;}
+  .c-buttons {display:grid;grid-template:repeat(3,40px)/repeat(3,40px);}
+  .c-buttons .pad-button {width:42px;height:42px;background:linear-gradient(145deg,#ffe68c,#d5ad36);box-shadow:0 4px 0 #7b5b16,0 5px 8px #0007;font-size:14px;}
+  .c-buttons .up {grid-area:1/2;}.c-buttons .left {grid-area:2/1;}.c-buttons .right {grid-area:2/3;}.c-buttons .down {grid-area:3/2;}
+  .ab-buttons {display:flex;align-items:flex-start;gap:16px;height:70px;}
+  .pad-button.b {background:linear-gradient(145deg,#76d99d,#299660);box-shadow:0 4px 0 #145435,0 5px 8px #0007;}
+  .pad-button.a {margin-top:20px;background:linear-gradient(145deg,#81afff,#3c6acd);box-shadow:0 4px 0 #203d7e,0 5px 8px #0007;}
+  .pad-button.pressed.a,.pad-button.pressed.b,.c-buttons .pad-button.pressed {box-shadow:0 1px 0 #302e3b,0 1px 4px #0008;}
+  .start-row {display:flex;justify-content:center;align-items:center;gap:12px;margin:16px 0;}
+  .pad-button.start {width:36px;height:36px;background:linear-gradient(145deg,#ee736e,#b0393c);box-shadow:0 3px 0 #69252a;font-size:10px;}
+  .start-row span {color:#b2afc1;font-size:10px;letter-spacing:.14em;}
+.deck{--key:46px;display:grid;grid-template-columns:144px 156px;justify-content:center;align-items:center;gap:16px 40px;margin:12px auto;padding:12px;touch-action:none;overscroll-behavior:contain;font-family:Arial,sans-serif}
+.deck button{min-height:0}.deck .pad-button{font-family:Arial,sans-serif}.deck .knob{transform:translate(var(--x,0px),var(--y,0px))}.deck .start-row{grid-column:1/-1;margin:0}
 .hint{font-size:11px;line-height:1.6;color:#838184;margin:10px 0 0;text-align:center}
 details{font-size:12px;color:#a6a2a2;margin-top:8px}
 summary{cursor:pointer}
 details p{line-height:1.7;margin:8px 0 0}
 main:fullscreen{width:100%;max-width:none;overflow:auto}
 main:fullscreen #screen{height:calc(100svh - 34px);max-height:none}
-@media(max-width:620px){main{width:100%;border:0}header{height:30px;padding:0 7px;gap:7px}#screen{height:calc(100vw*.5625)}#status{max-width:48%;font-size:10px}#controls{padding:8px 7px}.toolbar{gap:5px}button{padding:7px 9px;font-size:11px}.hint{font-size:10px}.deck{grid-template-columns:96px 38px minmax(0,1fr);gap:6px;max-width:390px;padding:8px 0 18px}.steering{flex-direction:column;gap:14px}#stick{width:96px;height:96px}.directions{grid-template-columns:repeat(3,30px);grid-template-rows:repeat(3,30px)}.flight-buttons{grid-template-rows:40px 60px 60px;gap:10px 4px;max-width:218px}.deck .n64-button{width:50px;height:50px;font-size:24px}.deck .n64-b{width:46px;height:46px}.deck .n64-c{width:40px;height:40px;font-size:20px}.deck .n64-start{width:36px;height:36px;font-size:10px}.deck .n64-shoulder{width:100%;height:32px;font-size:16px}.n64-shoulder .button-caption{font-size:9px;margin-left:5px}.button-caption{font-size:10px}}
+@media(max-width:620px){main{width:100%;border:0}header{height:30px;padding:0 7px;gap:7px}#screen{height:calc(100vw*.5625)}#status{max-width:48%;font-size:10px}#controls{padding:8px 7px}.toolbar{gap:5px}button{padding:7px 9px;font-size:11px}.hint{font-size:10px}.deck{grid-template-columns:1fr 1fr;gap:14px 8px;padding:8px 0;max-width:380px}}
+
 #game .ejs_menu_bar,#game .ejs_virtualGamepad_parent{display:none!important}
 #game .ejs_parent{width:100%!important;height:100%!important}
 #game *{font-family:Arwing,sans-serif!important}
@@ -96,25 +88,7 @@ main:fullscreen #screen{height:calc(100svh - 34px);max-height:none}
 <button id="fullscreen" type="button">Fullscreen</button>
 <button id="disconnect" type="button" disabled>Pause</button>
 </div>
-<div class="deck">
-<div class="steering">
-<div id="stick" role="group" aria-label="Drag to steer"><div class="knob"></div></div>
-<div class="directions" role="group" aria-label="Steering buttons">
-<button data-action="up" aria-label="Steer up" type="button">↑</button>
-<button data-action="left" aria-label="Steer left" type="button">←</button>
-<button data-action="down" aria-label="Steer down" type="button">↓</button>
-<button data-action="right" aria-label="Steer right" type="button">→</button>
-</div></div>
-<button class="n64-button n64-start" data-action="start" aria-label="Start / pause" type="button"><span aria-hidden="true">START</span><span class="button-caption" aria-hidden="true">Pause</span></button>
-<div class="flight-buttons" role="group" aria-label="N64 flight buttons">
-<button class="n64-button n64-shoulder n64-z" data-action="roll_left" aria-label="Z: Bank left" type="button"><span aria-hidden="true">Z</span><span class="button-caption" aria-hidden="true">Bank left</span></button>
-<button class="n64-button n64-shoulder n64-r" data-action="roll_right" aria-label="R: Bank right" type="button"><span aria-hidden="true">R</span><span class="button-caption" aria-hidden="true">Bank right</span></button>
-<button class="n64-button n64-b" data-action="bomb" aria-label="B: Bomb" type="button"><span aria-hidden="true">B</span><span class="button-caption" aria-hidden="true">Bomb</span></button>
-<button class="n64-button n64-a" data-action="fire" aria-label="A: Fire" type="button"><span aria-hidden="true">A</span><span class="button-caption" aria-hidden="true">Fire</span></button>
-<button class="n64-button n64-c n64-boost" data-action="boost" aria-label="C left: Boost" type="button"><span class="c-mark" aria-hidden="true">C</span><span aria-hidden="true">◀</span><span class="button-caption" aria-hidden="true">Boost</span></button>
-<button class="n64-button n64-c n64-brake" data-action="brake" aria-label="C down: Brake" type="button"><span class="c-mark" aria-hidden="true">C</span><span aria-hidden="true">▼</span><span class="button-caption" aria-hidden="true">Brake</span></button>
-</div>
-</div>
+<div class="deck"><section class="grip left-grip" aria-label="Steering and left triggers"><div class="shoulders"><button class="pad-button shoulder" data-action="shoulder_left" aria-label="L shoulder" type="button">L</button><button class="pad-button shoulder" data-action="roll_left" aria-label="Z, bank left" type="button">Z</button></div><div id="stick" role="group" aria-label="Analog stick. Drag to steer"><div class="knob"></div></div><div class="control-label">Analog control</div><div class="dpad" role="group" aria-label="D-pad"><button class="pad-button up" data-action="dpad_up" aria-label="dpad up" type="button">▲</button><button class="pad-button left" data-action="dpad_left" aria-label="dpad left" type="button">◀</button><button class="pad-button right" data-action="dpad_right" aria-label="dpad right" type="button">▶</button><button class="pad-button down" data-action="dpad_down" aria-label="dpad down" type="button">▼</button></div></section><section class="grip right-grip" aria-label="Action buttons and right trigger"><div class="shoulders"><button class="pad-button shoulder" data-action="roll_right" aria-label="R, bank right" type="button">R</button></div><div class="c-buttons" role="group" aria-label="C buttons"><button class="pad-button up" data-action="c_up" aria-label="c up" type="button">C ▲</button><button class="pad-button left" data-action="c_left" aria-label="c left" type="button">C ◀</button><button class="pad-button right" data-action="c_right" aria-label="c right" type="button">C ▶</button><button class="pad-button down" data-action="c_down" aria-label="c down" type="button">C ▼</button></div><div class="ab-buttons"><button class="pad-button b" data-action="bomb" aria-label="B, bomb or back" type="button">B</button><button class="pad-button a" data-action="fire" aria-label="A, fire or confirm" type="button">A</button></div><div class="control-label">B bomb · A fire</div></section><div class="start-row"><button class="pad-button start" data-action="start" aria-label="Start or pause" type="button">START</button><span>START / PAUSE</span></div></div>
 <p class="hint">WASD / arrows steer · X fire · C bomb · Shift boost · Ctrl brake · Q / E bank · Space pause</p>
 <details><summary>Gamepad controls</summary><p>Left stick or D pad steers. X or right trigger fires. Y or left trigger drops a bomb. A boosts. B brakes. Shoulder buttons bank. Menu starts or pauses.</p></details>
 </section>
@@ -136,6 +110,6 @@ window.EJS_defaultControls={0:{},1:{},2:{},3:{}};
 window.EJS_defaultOptions={'virtual-gamepad':'disabled','save-save-interval':'30'};
 </script>
 <script src="./coi-serviceworker.js"></script>
-<script type="module" src="./client.js?v=audio-4"></script>
+<script type="module" src="./client.js?v=n64-flight-deck-2"></script>
 </body>
 </html>
