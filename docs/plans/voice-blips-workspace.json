@@ -1,0 +1,111 @@
+{
+  "source_worktree": "/home/amber/proj/Starship",
+  "worktree": "/home/amber/proj/Starship-dialogue-blips",
+  "branch": "mods/dialogue-blips",
+  "base_commit": "12a36c5525c5f18d6667b8c94e1e5165e5b66eb0",
+  "purpose": "Isolated planning baseline. Only current audio work is seeded; character and browser UI edits stay in the source worktree.",
+  "seeded_files": [
+    {
+      "path": "assets/audio/chatter/bank.bin",
+      "sha256": "cec5bc913e9abc1d515f334ed71f1ab92b3c8e2451445ff55d8def2e98c1518e"
+    },
+    {
+      "path": "assets/audio/chatter/bank.json",
+      "sha256": "e1852b7ae8fe40780d42ad14c3c27204f625bb890cc274fd615fd7f125dc6ae4"
+    },
+    {
+      "path": "assets/audio/chatter/wolf.wav",
+      "sha256": "3da43ac1137cda220e7d300d0953a66676e10402846e3c80f17ec2134fa8ce6e"
+    },
+    {
+      "path": "assets/audio/chatter/panther.wav",
+      "sha256": "ded74808cf5c87861fac77c8ec0aa01cef9502792c71cb9a4781b9cbe87f8fd0"
+    },
+    {
+      "path": "assets/audio/chatter/kami.wav",
+      "sha256": "fade8d719d580b979f316f99d7a46596df549afe55a3cdbabd0c22333c9614c2"
+    },
+    {
+      "path": "assets/audio/chatter/krystal.wav",
+      "sha256": "bb9cd81e456f10860c626e01748a5d553624a759a9379c6099ff45a0e57390cc"
+    },
+    {
+      "path": "assets/audio/chatter/vitzy.wav",
+      "sha256": "0c44ec73b266fa1c5b3fc75316b0ae3165c81326f758a22045f1fa58251a3bd6"
+    },
+    {
+      "path": "assets/audio/chatter/narrator.wav",
+      "sha256": "6143a41b178f4fbf5a4cc3a2019fc25d3f90cf45687452d4f0dff181aac1745f"
+    },
+    {
+      "path": "browser/crew-chatter.mjs",
+      "sha256": "829cf31fc6f84b3e1e8bd08a713b8fe4621057b8197f4352ffefdbb1ce89e860"
+    },
+    {
+      "path": "browser/crew-chatter.test.mjs",
+      "sha256": "d081f5b6892390337c14f138e9d6512d5690faa8b0d094deddbea1bb38fa9424"
+    },
+    {
+      "path": "browser/check-browser.mjs",
+      "sha256": "7d1a34073237be537a0d21ad399f9af7f4e0e8ec0bbb7869f94a736915ab743b"
+    },
+    {
+      "path": "browser/README.md",
+      "sha256": "00bc854c40c02fca0c8a370a782174be1a5e872d1fb6bb6ea8ffadf47137eb0a"
+    },
+    {
+      "path": "src/port/audio/ChatterPlayer.h",
+      "sha256": "e2b3178da9576dbc73fa4f169891fc5916c27836d03d86432a816774b98ed11d"
+    },
+    {
+      "path": "tools/build_crew_chatter.py",
+      "sha256": "43c0bbf6257343d75fffe31b13cbf0f5a47001c5683fe0c5658c251a791afdc6"
+    },
+    {
+      "path": "tools/build_wolfen.py",
+      "sha256": "af4afae7add8ba949d0559f97c3a7d1e627fc9f4d01ec70cd146d7f348244176"
+    },
+    {
+      "path": "tools/check_crew_chatter.cpp",
+      "sha256": "a36f4037e98283519a3f4346047dbb515189591217b6c1f85b8c80e32d9b9830"
+    },
+    {
+      "path": "tools/check_narrator_audio.py",
+      "sha256": "2a11c6ed422e81d9a5a2dc046139195678f9ff9d025c714dfc07cebf6eca00d1"
+    }
+  ],
+  "local_inputs": [
+    {
+      "path": "Star Fox 64 (U) (V1.1) [!].z64",
+      "sha256": "385bcf1901ed12fb1152f3c227d1968cc54ae41e8566da66695df71af40a573f",
+      "access": "read-only copy"
+    },
+    {
+      "path": "sf64.o2r",
+      "sha256": "daa978b2f69cfb383aca9ede3318119f2e1e2e454c3bf9cba46a8eee131a5174",
+      "access": "read-only copy"
+    },
+    {
+      "path": "audio_data",
+      "files": 7046,
+      "access": "independent read-only copies"
+    },
+    {
+      "path": "build-cmake/audio-previews/crew-chatter-v6",
+      "files": 17,
+      "access": "independent read-only copies"
+    }
+  ],
+  "local_dependencies": [
+    {
+      "path": "libultraship",
+      "commit": "eaaf9d0fc91e2c400f49ef2a1f8547a691ce4d3c",
+      "source": "Independent local clone of /home/amber/proj/Starship/libultraship"
+    },
+    {
+      "path": "tools/Torch",
+      "commit": "cd92cc0f161c5e79e36f5dda0d0029edd3fc8d50",
+      "source": "Independent local clone of /home/amber/proj/Starship/tools/Torch"
+    }
+  ]
+}

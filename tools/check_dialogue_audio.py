@@ -130,6 +130,7 @@ static MsgLookup lookup[]={{2040,original_text,"ast_radio/gMsg_ID_2040"},{65536,
 static void* gMsgLookup=lookup;
 #define LOAD_ASSET(x) (x)
 static int GameEngine_OTRSigCheck(u16* msg){return memcmp(msg,"__OTR__",7)==0;}
+static int VoiceBlips_IsActive(void){return 0;}
 ''' + enum + native + r'''
 int main(void){
     const int speakers[]={SPEAKERS};

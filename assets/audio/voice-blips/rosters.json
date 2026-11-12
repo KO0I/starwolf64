@@ -1,0 +1,73 @@
+{
+  "version": 1,
+  "sample_rate": 32000,
+  "clips_per_voice": 16,
+  "speaker_aliases": {
+    "RCID_FOX": "fox",
+    "RCID_FOX_RED": "fox",
+    "RCID_FOX_EXPERT": "fox",
+    "RCID_FALCO": "falco",
+    "RCID_FALCO_RED": "falco",
+    "RCID_SLIPPY": "slippy",
+    "RCID_SLIPPY_RED": "slippy",
+    "RCID_PEPPY": "peppy",
+    "RCID_PEPPY_RED": "peppy",
+    "RCID_KATT": "katt",
+    "RCID_ANDROSS": "andross",
+    "RCID_ANDROSS_RED": "andross",
+    "RCID_JAMES": "james",
+    "RCID_GEN_PEPPER": "general_pepper",
+    "RCID_GEN_PEPPER_TITLE": "general_pepper",
+    "RCID_BOSS_CORNERIA": "granga",
+    "RCID_BOSS_CORNERIA2": "attack_carrier",
+    "RCID_ROB64": "rob64",
+    "RCID_ROB64_RED": "rob64",
+    "RCID_ROB64_2": "rob64",
+    "RCID_ROB64_TITLE": "rob64",
+    "RCID_BOSS_METEO": "meteocrusher",
+    "RCID_BOSS_AREA6": "gorgon",
+    "RCID_BOSS_ZONESS": "sarumarine",
+    "RCID_BOSS_SECTORX": "spyborg",
+    "RCID_BOSS_SECTORY": "shogun",
+    "RCID_BILL": "bill",
+    "RCID_CAIMAN_AREA6": "caiman",
+    "RCID_BOSS_MACBETH": "mechbeth",
+    "RCID_WOLF": "wolf",
+    "RCID_WOLF_2": "wolf",
+    "RCID_PIGMA": "pigma",
+    "RCID_PIGMA_2": "pigma",
+    "RCID_LEON": "leon",
+    "RCID_LEON_2": "leon",
+    "RCID_ANDREW": "andrew",
+    "RCID_ANDREW_2": "andrew"
+  },
+  "game_sets": {
+    "starfox64": {
+      "approved_overrides": {},
+      "expert_approved_bank": null,
+      "narration": "original"
+    },
+    "starwolf64": {
+      "approved_overrides": {
+        "fox": "wolf",
+        "falco": "panther",
+        "slippy": "kami",
+        "peppy": "krystal"
+      },
+      "expert_approved_bank": "vitzy",
+      "narration": "full_reversed"
+    }
+  },
+  "preserved_speakers": {
+    "RCID_STATIC": "radio effects",
+    "RCID_TR": "original training beeps",
+    "RCID_1000": "full narration"
+  },
+  "speaker_overrides": {
+    "8250": "andross",
+    "8255": "andross",
+    "8260": "andross",
+    "8265": "andross"
+  },
+  "unknown_speakers": "derive sixteen clips from each original recording and retain its source ID"
+}
