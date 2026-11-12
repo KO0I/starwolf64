@@ -920,6 +920,23 @@ void Title_Screen_Draw(void) {
     s32 i;
     static TitleTeam D_menu_801ADA84[4] = { TEAM_FOX, TEAM_FALCO, TEAM_SLIPPY, TEAM_PEPPY };
 
+#ifdef __EMSCRIPTEN__
+    // Optional developer view of the real title rig at repeatable apparent distances.
+    if (CVarGetInteger("gWasmPantherProbe", 0)) {
+        f32 scale = CVarGetFloat("gWasmPantherScale", 0.5f);
+        D_menu_801B84D4 = scale;
+        sTitleStarfoxLogoXpos = 10000.0f;
+        for (i = 0; i < 4; i++) {
+            sTitleTeam[i].pos.x = i == TEAM_FALCO ? 0.0f : 10000.0f;
+            sTitleTeam[i].pos.y = 175.0f - 350.0f * scale;
+            sTitleTeam[i].pos.z = 0.0f;
+            sTitleTeam[i].unk_48 = sTitleTeam[i].unk_50 = 0.0f;
+            sTitleTeam[i].unk_4C = CVarGetInteger("gWasmPantherYaw", 0);
+            sTitleTeam[i].frameCount = sTitleTeam[i].unk_5C = 0;
+        }
+    }
+#endif
+
     gLight1R = D_menu_801B82F8;
     gLight1G = D_menu_801B82FC;
     gLight1B = D_menu_801B8300;
@@ -3678,3 +3695,14 @@ void Title_Radio_PlayMessage(u16** msgList, RadioCharacterId character) {
 
     Audio_PlayVoice(Message_IdFromPtr(gRadioMsg));
 }
+
+#ifdef __EMSCRIPTEN__
+void Wasm_GetTitleStatus(double* state) {
+    state[0] = sCutsceneState;
+    state[1] = sSceneState;
+    state[2] = gCsFrameCount;
+    state[3] = D_menu_801B8340;
+    state[4] = sDrawTeamName;
+    state[5] = sTimer1;
+}
+#endif

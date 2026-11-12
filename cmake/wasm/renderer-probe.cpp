@@ -116,7 +116,11 @@ int main() {
         expectPixel(checks, "solid RGBA", 16, 32, {255, 0, 0, 255});
 
         renderer.UnloadShader(solidShader);
+        std::array<GLuint, 1100> texturePressure;
+        for (auto& id : texturePressure) id = renderer.NewTexture();
         auto texture = renderer.NewTexture();
+        require(texture > 1023, "Texture metadata regression did not exercise a high WebGL ID");
+        for (auto id : texturePressure) renderer.DeleteTexture(id);
         renderer.SelectTexture(0, texture);
         const uint8_t green[] = {0,255,0,255, 0,255,0,255, 0,255,0,255, 0,255,0,255};
         renderer.UploadTexture(green, 2, 2);
@@ -150,7 +154,7 @@ int main() {
 
         publish({{"status", "pass"}, {"glesVersion", version},
                  {"renderer", reinterpret_cast<const char*>(glGetString(GL_RENDERER))},
-                 {"checks", checks}, {"shaderPrograms", 2}, {"glError", 0},
+                 {"checks", checks}, {"textureId", texture}, {"shaderPrograms", 2}, {"glError", 0},
                  {"scope", "actual libultraship GLES renderer; not a game boot"}});
         return 0;
     } catch (const std::exception& error) {

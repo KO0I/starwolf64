@@ -210,3 +210,74 @@ creation. The previous preview recorded `auto`; the updated preview records
 ```sh
 node tools/wasm/check-webgl.mjs --game --preloaded --touch --audio-session --audio-resume --url https://nepthys.tail1396a4.ts.net:8664/
 ```
+
+## Panther title-eye regression
+
+Panther's title eye socket, iris and pupil used ordinary opaque depth writes, causing
+visible stripe patterns as the thin layers competed with the skull and one another.
+The generator marks only these six title surfaces as depth decals. The compiler
+emits the N64 AA_ZB_OPA_DECAL mode, which compares with the skull without replacing
+its depth, and preserves the intended socket, iris, pupil draw order.
+The geometry, textures and animation are unchanged.
+
+Use the real title rig with a fixed front view at two apparent distances:
+
+```sh
+node tools/wasm/check-webgl.mjs --game --preloaded --panther-eyes --output build/wasm/panther-near --url 'https://nepthys.tail1396a4.ts.net:8664/?character-probe=panther&distance=near'
+node tools/wasm/check-webgl.mjs --game --preloaded --panther-eyes --output build/wasm/panther-far --url 'https://nepthys.tail1396a4.ts.net:8664/?character-probe=panther&distance=far'
+python3 tools/wasm/check-panther-eye-visibility.py build/wasm/panther-near/panther-title-1.png --distance near
+python3 tools/wasm/check-panther-eye-visibility.py build/wasm/panther-far/panther-title-1.png --distance far
+```
+
+The opt-in diagnostic isolates Panther in the title scene and fixes the pose.
+It does not change normal game startup. The optional `angle=quarter` or
+`angle=profile` query parameter supports visual inspection from other angles.
+The pixel check is for the front-view fixture at the default 1000×1000 viewport.
+
+The original near image had 24 striped iris rows, with up to 17 yellow runs per
+row. The corrected image has no striped rows and at most two runs, separated by
+the pupil. The far image also passes after failing with the original asset.
+Captures and JSON reports are under build/wasm/panther-eyes-before-* and
+build/wasm/panther-eyes-after-* in the current worktree.
+
+For an existing private mod, this helper changes only the title-head display list
+and verifies all other archive members stay unchanged. It allows the eye correction
+to be preloaded without replacing unrelated character or audio work:
+
+```sh
+python3 tools/wasm/patch-panther-eyes.py /path/wolfen.o2r --output build/wasm/panther-eye-assets/wolfen.o2r
+python3 tools/wasm/patch-panther-eyes.py build/wasm/panther-eye-assets/wolfen.o2r --check
+```
+
+Pass the resulting archive to `run.py preload-preview --mod`. A fresh full mod
+build also gets the fix through the character material generator and compiler.
+
+## Intro crashes and texture IDs
+
+OpenGL texture IDs are opaque names. Emscripten can issue names above 1023,
+so the backend tracks texture dimensions and filtering in a map instead of a
+1024-entry array. Deleting a texture also removes its metadata. AddressSanitizer
+caught the old out-of-bounds write in `SetSamplerParameters`; this could corrupt
+the renderer and crash later during the intro.
+
+The renderer probe allocates enough textures to exceed that old limit, then
+checks textured pixels and framebuffer presentation. Its report includes the
+actual texture ID used by the draw.
+
+```sh
+python3 tools/wasm/run.py renderer-probe
+node tools/wasm/check-webgl.mjs --output build/wasm/renderer-high-texture-id
+node tools/wasm/check-webgl.mjs --game --preloaded --launch-sequence --crash-report --output build/wasm/intro-check --url https://nepthys.tail1396a4.ts.net:8664/
+```
+
+The intro check lets the complete cinematic run through 4000 game frames before
+opening the menu. It captures each crew name and the launch phases. It also
+captures Krystal's card repeatedly while visible. The game-state report includes
+the cutscene, card visibility and remaining display timer. In the corrected
+normal preview, Krystal's card was active from frame 1801 to 1841, the same
+40-frame interval used for the other names.
+
+Crash reports use diagnostics version 2 and retain worker stack lines printed
+after the first error. The crash-report check verifies those later lines survive
+the downloaded JSON. Browser checks here use Chromium; iPhone Safari still needs
+device confirmation.

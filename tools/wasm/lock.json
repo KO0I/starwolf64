@@ -130,7 +130,7 @@
   "patches": {
     "libultraship": {
       "path": "tools/wasm/patches/libultraship.patch",
-      "sha256": "4c78c42876021cf1bbd33c0343c2d207788589a554fcf65a49af2e25261acb4f"
+      "sha256": "7834ea9e4ef5dbc85c34bca5bd8311d466e42cfa65c2451bd5dd1a9001defee7"
     },
     "tools/Torch": {
       "path": "tools/wasm/patches/torch.patch",

@@ -152,12 +152,18 @@ function addLog(value) {
   logLines.push(String(value));
   if (logLines.length > 200) logLines.shift();
   statusEl.textContent = logLines.join('\n');
+  if(window.STARSHIP_CRASH_REPORT) {
+    const report=window.STARSHIP_CRASH_REPORT;
+    report.logs=logLines.slice(-80);
+    // Emscripten prints the worker exception's stack after its first error line.
+    if(!report.stack && /Starship\.wasm|wasm-function|^function\[/.test(String(value))) report.stack=String(value);
+  }
 }
 function stopGame(reason) {
   if (window.STARSHIP_GAME_ERROR) return;
   window.STARSHIP_GAME_ERROR=String(reason);
   enableControls(false);addLog('Game stopped: '+reason);
-  window.STARSHIP_CRASH_REPORT={recordedAt:new Date().toISOString(),url:location.href,
+  window.STARSHIP_CRASH_REPORT={diagnosticsVersion:2,recordedAt:new Date().toISOString(),url:location.href,
     userAgent:navigator.userAgent,isolated:crossOriginIsolated,memoryPolicy:'fixed-512MiB',
     error:window.STARSHIP_GAME_ERROR,state:window.STARSHIP_GAME_STATE,audioState:Module.SDL2?.audioContext?.state,logs:logLines.slice(-40)};
   document.getElementById('crash-panel').hidden=false;
@@ -317,9 +323,15 @@ launch.addEventListener('click',async()=>{
     for (const file of document.getElementById('mods').files) await write(file,'/mods/mod-'+(index++)+'.o2r');
     const save=document.getElementById('save').files[0];
     if (save) await write(save,'/default.sav');
+    const diagnostic=new URLSearchParams(location.search);
+    const characterView=diagnostic.get('character-probe')==='panther'?{
+      gWasmPantherProbe:1,
+      gWasmPantherScale:({near:1.5,far:0.5,distant:0.25})[diagnostic.get('distance')]||0.5,
+      gWasmPantherYaw:({front:0,quarter:35,profile:70})[diagnostic.get('angle')]||0
+    }:{};
     Module.FS.writeFile('/starship.cfg.json', JSON.stringify({
       Window:{Width:640,Height:480},
-      CVars:{gDeveloperTools:{LogLevel:2},gInterpolationFPS:30,gVsyncEnabled:0,gRenderParallelization:0}
+      CVars:{gDeveloperTools:{LogLevel:2},gInterpolationFPS:30,gVsyncEnabled:0,gRenderParallelization:0,...characterView}
     }));
     document.getElementById('game-state').textContent='Starting game…';
     Module.callMain([]);

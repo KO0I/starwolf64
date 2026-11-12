@@ -17,6 +17,7 @@ extern "C" {
 #ifdef __EMSCRIPTEN__
 #include <sf64thread.h>
 #include <sf64context.h>
+void Wasm_GetTitleStatus(double* state);
 #endif
     void Main_SetVIMode(void);
     void Main_Initialize(void);
@@ -63,23 +64,26 @@ extern "C" void Wasm_ReadController(OSContPad* pad) {
 static unsigned int browserFrames = 0;
 static void browserStatus(const char* phase) {
     // Pass one stack snapshot; Emscripten's main-thread proxy has a fixed argument limit.
+    double title[6];
+    Wasm_GetTitleStatus(title);
     const double state[] = {
         static_cast<double>(browserFrames), static_cast<double>(gGameState), static_cast<double>(gTitleState),
         static_cast<double>(gGameFrameCount), static_cast<double>(!emscripten_is_main_browser_thread()),
-        static_cast<double>(gPlayState), static_cast<double>(gCurrentLevel), static_cast<double>(gPlayer[0].state),
-        static_cast<double>(gPlayer[0].pos.x), static_cast<double>(gControllerHold[0].button),
+        static_cast<double>(gPlayState), static_cast<double>(gCurrentLevel), static_cast<double>(gPlayer ? gPlayer[0].state : 0),
+        static_cast<double>(gPlayer ? gPlayer[0].pos.x : 0), static_cast<double>(gControllerHold[0].button),
         static_cast<double>(gControllerHold[0].stick_x), static_cast<double>(gControllerHold[0].stick_y),
-        static_cast<double>(gPlayer[0].pos.y), static_cast<double>(gPlayer[0].shields),
-        static_cast<double>(gPlayer[0].radioDamageTimer), static_cast<double>(gPathProgress),
-        static_cast<double>(emscripten_get_heap_size())
+        static_cast<double>(gPlayer ? gPlayer[0].pos.y : 0), static_cast<double>(gPlayer ? gPlayer[0].shields : 0),
+        static_cast<double>(gPlayer ? gPlayer[0].radioDamageTimer : 0), static_cast<double>(gPathProgress),
+        static_cast<double>(emscripten_get_heap_size()), title[0], title[1], title[2], title[3], title[4], title[5]
     };
     MAIN_THREAD_EM_ASM({
-        const state = HEAPF64.subarray($1 / 8, $1 / 8 + 17);
+        const state = HEAPF64.subarray($1 / 8, $1 / 8 + 23);
         window.STARSHIP_GAME_STATE = ({phase:UTF8ToString($0), frames:state[0],
             gameState:state[1], titleState:state[2], gameFrame:state[3], onWorker:!!state[4],
             playState:state[5], level:state[6], playerState:state[7], playerX:state[8],
             buttons:state[9], stickX:state[10], stickY:state[11], playerY:state[12],
-            shields:state[13], radioDamageTimer:state[14], path:state[15], heapBytes:state[16]});
+            shields:state[13], radioDamageTimer:state[14], path:state[15], heapBytes:state[16], titleCutscene:state[17], titleScene:state[18],
+            cutsceneFrame:state[19], titleCard:state[20], titleNameVisible:!!state[21], titleCardTimer:state[22]});
         const label = document.getElementById('game-state');
         if (label && !window.STARSHIP_GAME_ERROR) label.textContent = UTF8ToString($0) === 'initializing' ? 'Initializing game…' : (state[1] === 2 ? 'Title screen running' : 'Game running');
     }, phase, state);
@@ -94,7 +98,12 @@ void push_frame() {
     // thread5_iteration();
     GameEngine::EndAudioFrame();
 #ifdef __EMSCRIPTEN__
-    if (++browserFrames % 20 == 0) browserStatus("running");
+    static int previousTitleName = -1;
+    double title[6];
+    Wasm_GetTitleStatus(title);
+    int titleName = gGameState == GSTATE_TITLE && title[4] ? static_cast<int>(title[3]) : -1;
+    if (++browserFrames % 20 == 0 || titleName != previousTitleName) browserStatus("running");
+    previousTitleName = titleName;
 #endif
 }
 

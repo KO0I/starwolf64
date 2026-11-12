@@ -4,7 +4,8 @@ import {resolve, sep, extname} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {spawn} from 'node:child_process';
 
-const root = fileURLToPath(new URL('../../build/wasm/game', import.meta.url));
+const buildDirectoryIndex = process.argv.indexOf('--build-dir');
+const root = buildDirectoryIndex < 0 ? fileURLToPath(new URL('../../build/wasm/game', import.meta.url)) : resolve(process.argv[buildDirectoryIndex+1]);
 const game = process.argv.includes('--game');
 const preloaded = process.argv.includes('--preloaded');
 const touch = process.argv.includes('--touch');
@@ -13,7 +14,7 @@ if(touch&&!game) throw Error('--touch requires --game');
 const previewUrl = process.argv.includes('--url') ? process.argv[process.argv.indexOf('--url')+1] : undefined;
 const option = name => { const index=process.argv.indexOf(name); return index<0?undefined:process.argv[index+1]; };
 if(game && !preloaded && (!option('--base') || !option('--port'))) throw Error('--game requires --base and --port archive paths');
-const output = fileURLToPath(new URL(game?'../../build/wasm/game-check':'../../build/wasm/webgl-check', import.meta.url));
+const output = option('--output')?resolve(option('--output')):fileURLToPath(new URL(game?'../../build/wasm/game-check':'../../build/wasm/webgl-check', import.meta.url));
 const sleep = ms => new Promise(done => setTimeout(done, ms));
 const types = {'.html':'text/html', '.js':'text/javascript', '.wasm':'application/wasm', '.data':'application/octet-stream'};
 await mkdir(output, {recursive:true});
@@ -198,6 +199,25 @@ try {
     if (result.glError !== 0 || result.checks?.length !== 3) throw Error('Incomplete renderer checks');
   }
   if (errors.length) throw Error('Browser errors: ' + JSON.stringify(errors));
+  if(game&&process.argv.includes('--launch-sequence')) {
+    const samples=[];result.intro={samples};
+    const introDeadline=Date.now()+Number(option('--intro-timeout-ms')||200000);
+    let lastCapture=0;
+    while(Date.now()<introDeadline) {
+      const state=await value('window.STARSHIP_GAME_STATE');
+      if(state?.frames!==samples.at(-1)?.frames) samples.push(state);
+      if(errors.length||await value('!!window.STARSHIP_GAME_ERROR')) throw Error('Intro/launch crash: '+JSON.stringify({state,errors:errors.slice(0,4)}));
+      if(state&&(state.frames>=lastCapture+400||state.titleNameVisible&&(state.titleCard!==result.intro.lastCard||state.titleCard===1))) {
+        if(state.titleNameVisible) result.intro.lastCard=state.titleCard;
+        console.log('Intro sample',JSON.stringify(state));lastCapture=state.frames;
+        const shot=await call('Page.captureScreenshot',{format:'png'});
+        await writeFile(resolve(output,'intro-'+state.frames+'.png'),Buffer.from(shot.data,'base64'));
+      }
+      if(state?.frames>=4000) break;
+      await sleep(500);
+    }
+    if(samples.at(-1)?.frames<4000) throw Error('Intro stopped advancing: '+JSON.stringify(samples.slice(-3)));
+  }
   if(game&&process.argv.includes('--audio-session')) {
     const sessions=await value('window.audioSessionAtCreation');
     if(!sessions.length||sessions.some(type=>type!=='playback')) throw Error('Audio context created before playback session selection: '+JSON.stringify(sessions));
@@ -229,6 +249,14 @@ try {
     };
     for(let attempt=0;attempt<6;attempt++) {
       await pressStart();
+      if(process.argv.includes('--panther-eyes')&&attempt===0) {
+        await sleep(1700);
+        for(let view=0;view<3;view++) {
+          const shot=await call('Page.captureScreenshot',{format:'png'});
+          await writeFile(resolve(output,'panther-title-'+view+'.png'),Buffer.from(shot.data,'base64'));
+          await sleep(1000);
+        }
+      }
       for(let poll=0;poll<20;poll++) {
         const value=await call('Runtime.evaluate',{expression:'window.STARSHIP_GAME_STATE',returnByValue:true});
         menu=value.result.value;
@@ -280,10 +308,10 @@ try {
         if(samples.at(-1)?.frames<=training.frames+350) throw Error('Game stopped during building collision check: '+JSON.stringify(samples.slice(-5)));
       }
       const beforeSteering=await value('window.STARSHIP_GAME_STATE');
-      if(collision) await key('KeyA','a',65,true);
+      if(collision&&!touch) await key('KeyA','a',65,true);
       if(touch) {
         const point=await center('#stick');
-        await finger('touchStart',1,point);await finger('touchMove',1,{x:point.x+30,y:point.y});
+        await finger('touchStart',1,point);await finger('touchMove',1,{x:point.x+(collision?-30:30),y:point.y});
         await finger('touchStart',2,await center('[data-button="0x8000"]'));
       } else {if(!collision) await key('KeyD','d',68,true);await key('KeyX','x',88,true);}
       await sleep(1500);
@@ -294,7 +322,7 @@ try {
         throw Error('Player did not respond to steering: '+JSON.stringify({training,moved}));
       result.training={before:training,beforeSteering,afterSteering:moved};
       if(touch) {
-        if(!(moved.buttons&0x8000)||moved.stickX<=0) throw Error('Touch stick and A did not reach the game together: '+JSON.stringify(moved));
+        if(!(moved.buttons&0x8000)||(collision?moved.stickX>=0:moved.stickX<=0)) throw Error('Touch stick and A did not reach the game together: '+JSON.stringify(moved));
         const waitPad=async predicate=>{
           let pad;
           for(let i=0;i<60;i++) {pad=await value('window.STARSHIP_GAME_STATE');if(predicate(pad)) return pad;await sleep(100);}
@@ -346,6 +374,7 @@ try {
   if(game&&process.argv.includes('--crash-report')) {
     const recovery=await value(`(()=>{
       stopGame('Synthetic recovery check');stopGame('Secondary error must not replace the first');
+      addLog('wasm-function[1604] synthetic delayed worker stack');
       return {error:window.STARSHIP_GAME_ERROR,report:window.STARSHIP_CRASH_REPORT,
         visible:!document.getElementById('crash-panel').hidden,
         disabled:[...document.querySelectorAll('[data-button]')].every(button=>button.disabled)};
@@ -360,13 +389,13 @@ try {
       try {saved=JSON.parse(await readFile(resolve(downloadPath,'starship-crash-report.json'),'utf8'));break;} catch {}
       await sleep(100);
     }
-    if(saved?.recordedAt!==recovery.report.recordedAt||saved?.error!==recovery.error||!saved?.userAgent||!saved?.state?.heapBytes)
+    if(saved?.recordedAt!==recovery.report.recordedAt||saved?.error!==recovery.error||!saved?.userAgent||!saved?.state?.heapBytes||saved?.stack!=='wasm-function[1604] synthetic delayed worker stack'||saved?.diagnosticsVersion!==2)
       throw Error('Crash report download missing or incomplete');
     const shot=await call('Page.captureScreenshot',{format:'png'});
     await writeFile(resolve(output,'recovery.png'),Buffer.from(shot.data,'base64'));
     result.recovery={firstError:recovery.error,disabled:recovery.disabled,download:resolve(downloadPath,'starship-crash-report.json')};
   }
-  console.log(game?(result.training?'PASS: title, menu, Training and steering':'PASS: title and Start-key menu'):'PASS: actual GLES renderer in WebGL 2', JSON.stringify(result));
+  console.log(game?(result.training?'PASS: title, menu, Training and steering':'PASS: title and Start-key menu'):'PASS: actual GLES renderer in WebGL 2', JSON.stringify(result?.intro?{...result,intro:{samples:result.intro.samples.length,last:result.intro.samples.at(-1)}}:result));
 } catch (error) {
   failure = String(error.stack || error);
   process.exitCode = 1;
