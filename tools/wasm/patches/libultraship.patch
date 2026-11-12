@@ -1,0 +1,163 @@
+diff --git a/cmake/dependencies/common.cmake b/cmake/dependencies/common.cmake
+index 8f5813ac..976acc46 100644
+--- a/cmake/dependencies/common.cmake
++++ b/cmake/dependencies/common.cmake
+@@ -52,7 +52,12 @@ endif()
+ 
+ #=================== STB ===================
+ set(STB_DIR ${CMAKE_BINARY_DIR}/_deps/stb)
+-file(DOWNLOAD "https://github.com/nothings/stb/raw/0bc88af4de5fb022db643c2d8e549a0927749354/stb_image.h" "${STB_DIR}/stb_image.h")
++if(EMSCRIPTEN)
++    file(MAKE_DIRECTORY "${STB_DIR}")
++    configure_file("${STARSHIP_WASM_DEPS}/inputs/stb_image.h" "${STB_DIR}/stb_image.h" COPYONLY)
++else()
++    file(DOWNLOAD "https://github.com/nothings/stb/raw/0bc88af4de5fb022db643c2d8e549a0927749354/stb_image.h" "${STB_DIR}/stb_image.h")
++endif()
+ file(WRITE "${STB_DIR}/stb_impl.c" "#define STB_IMAGE_IMPLEMENTATION\n#include \"stb_image.h\"")
+ 
+ add_library(stb STATIC)
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+index db92a29a..9a2685af 100644
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -217,7 +217,7 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Darwin" OR CMAKE_SYSTEM_NAME STREQUAL "iOS")
+     target_link_libraries(libultraship PRIVATE ${OSX_FOUNDATION} ${OSX_AVFOUNDATION} ${METAL} ${QUARTZCORE} ${CMAKE_DL_LIBS})
+ endif()
+ 
+-if (USE_OPENGLES)
++if (USE_OPENGLES AND NOT EMSCRIPTEN)
+     if (CMAKE_SYSTEM_NAME STREQUAL "Android")
+         find_library(OPENGLES_LIBRARY GLESv3)
+         target_link_libraries(libultraship PRIVATE GLESv3)
+diff --git a/src/graphic/Fast3D/backends/gfx_opengl.cpp b/src/graphic/Fast3D/backends/gfx_opengl.cpp
+index 097e2e86..36b408f6 100644
+--- a/src/graphic/Fast3D/backends/gfx_opengl.cpp
++++ b/src/graphic/Fast3D/backends/gfx_opengl.cpp
+@@ -652,7 +652,7 @@ void GfxRenderingAPIOGL::DrawTriangles(float buf_vbo[], size_t buf_vbo_len, size
+ }
+ 
+ void GfxRenderingAPIOGL::Init() {
+-#ifndef __linux__
++#if !defined(__linux__) && !defined(__EMSCRIPTEN__)
+     glewInit();
+ #endif
+ 
+diff --git a/src/graphic/Fast3D/backends/gfx_sdl2.cpp b/src/graphic/Fast3D/backends/gfx_sdl2.cpp
+index 1387e280..8a000b5a 100644
+--- a/src/graphic/Fast3D/backends/gfx_sdl2.cpp
++++ b/src/graphic/Fast3D/backends/gfx_sdl2.cpp
+@@ -1,4 +1,8 @@
+ #include <stdio.h>
++#ifdef __EMSCRIPTEN__
++#include <emscripten/html5.h>
++#include <stdexcept>
++#endif
+ 
+ #if defined(ENABLE_OPENGL) || defined(__APPLE__)
+ 
+@@ -342,6 +346,10 @@ void GfxWindowBackendSDL2::Init(const char* gameName, const char* gfxApiName, bo
+     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
+     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
++#elif defined(__EMSCRIPTEN__)
++    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
++    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
++    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+ #endif
+ 
+ #ifdef _WIN32
+@@ -394,10 +402,26 @@ void GfxWindowBackendSDL2::Init(const char* gameName, const char* gfxApiName, bo
+             SetFullscreenImpl(true, false);
+         }
+ 
++#ifdef __EMSCRIPTEN__
++        // SDL EGL bypasses the C WebGL TLS used by threaded upload wrappers.
++        EmscriptenWebGLContextAttributes attributes;
++        emscripten_webgl_init_context_attributes(&attributes);
++        attributes.majorVersion = 2;
++        attributes.alpha = false;
++        attributes.depth = true;
++        attributes.stencil = true;
++        attributes.explicitSwapControl = true;
++        attributes.proxyContextToMainThread = EMSCRIPTEN_WEBGL_CONTEXT_PROXY_ALWAYS;
++        const auto handle = emscripten_webgl_create_context("#canvas", &attributes);
++        if (handle <= 0 || emscripten_webgl_make_context_current(handle) != EMSCRIPTEN_RESULT_SUCCESS) {
++            throw std::runtime_error("Failed to initialize the browser WebGL 2 context");
++        }
++        mCtx = reinterpret_cast<SDL_GLContext>(static_cast<intptr_t>(handle));
++#else
+         mCtx = SDL_GL_CreateContext(mWnd);
+-
+         SDL_GL_MakeCurrent(mWnd, mCtx);
+         SDL_GL_SetSwapInterval(mVsyncEnabled ? 1 : 0);
++#endif
+ 
+         window_impl.Opengl = { mWnd, mCtx };
+     } else {
+@@ -678,12 +702,20 @@ void GfxWindowBackendSDL2::SwapBuffersBegin() {
+ 
+     if (mVsyncEnabled != nextVsyncEnabled) {
+         mVsyncEnabled = nextVsyncEnabled;
++#ifndef __EMSCRIPTEN__
+         SDL_GL_SetSwapInterval(mVsyncEnabled ? 1 : 0);
+         SDL_RenderSetVSync(mRenderer, mVsyncEnabled ? 1 : 0);
++#endif
+     }
+ 
+     SyncFramerateWithTime();
++#ifdef __EMSCRIPTEN__
++    if (emscripten_webgl_commit_frame() != EMSCRIPTEN_RESULT_SUCCESS) {
++        throw std::runtime_error("Browser WebGL frame presentation failed");
++    }
++#else
+     SDL_GL_SwapWindow(mWnd);
++#endif
+ }
+ 
+ void GfxWindowBackendSDL2::SwapBuffersEnd() {
+@@ -715,7 +747,11 @@ bool GfxWindowBackendSDL2::IsRunning() {
+ 
+ void GfxWindowBackendSDL2::Destroy() {
+     // TODO: destroy _any_ resources used by SDL
++#ifdef __EMSCRIPTEN__
++    emscripten_webgl_destroy_context(static_cast<EMSCRIPTEN_WEBGL_CONTEXT_HANDLE>(reinterpret_cast<intptr_t>(mCtx)));
++#else
+     SDL_GL_DeleteContext(mCtx);
++#endif
+     SDL_DestroyWindow(mWnd);
+     SDL_DestroyRenderer(mRenderer);
+     SDL_Quit();
+diff --git a/src/resource/type/DisplayList.cpp b/src/resource/type/DisplayList.cpp
+index 03d0acd8..3da64a48 100644
+--- a/src/resource/type/DisplayList.cpp
++++ b/src/resource/type/DisplayList.cpp
+@@ -1,5 +1,6 @@
+ #include "resource/type/DisplayList.h"
+ #include <memory>
++#include <cstdlib>
+ 
+ namespace Fast {
+ DisplayList::DisplayList() : Resource(std::shared_ptr<Ship::ResourceInitData>()) {
+diff --git a/src/utils/StringHelper.cpp b/src/utils/StringHelper.cpp
+index b88161a9..699f8b51 100644
+--- a/src/utils/StringHelper.cpp
++++ b/src/utils/StringHelper.cpp
+@@ -1,4 +1,5 @@
+ #include "StringHelper.h"
++#include <cstdlib>
+ 
+ #if (_MSC_VER)
+ #pragma optimize("2", on)
+diff --git a/src/window/gui/Gui.cpp b/src/window/gui/Gui.cpp
+index 953d4514..ce99a6de 100644
+--- a/src/window/gui/Gui.cpp
++++ b/src/window/gui/Gui.cpp
+@@ -277,7 +277,7 @@ bool Gui::SupportsViewports() {
+     }
+ #endif
+ 
+-#if defined(__ANDROID__) || defined(__IOS__)
++#if defined(__ANDROID__) || defined(__IOS__) || defined(__EMSCRIPTEN__)
+     return false;
+ #endif
+ 

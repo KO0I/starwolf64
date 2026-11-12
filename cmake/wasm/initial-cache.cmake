@@ -1,0 +1,16 @@
+# Browser target settings only. Load with emcmake, never a native compiler.
+set(CMAKE_BUILD_TYPE Release CACHE STRING "")
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE BOOL "")
+set(USE_OPENGLES ON CACHE BOOL "")
+set(USE_STANDALONE OFF CACHE BOOL "")
+set(BUILD_STORMLIB OFF CACHE BOOL "")
+set(INCLUDE_MPQ_SUPPORT OFF CACHE BOOL "")
+set(GFX_DEBUG_DISASSEMBLER OFF CACHE BOOL "")
+set(BUILD_SM64 OFF CACHE BOOL "")
+set(BUILD_MK64 OFF CACHE BOOL "")
+set(BUILD_FZERO OFF CACHE BOOL "")
+set(BUILD_MARIO_ARTIST OFF CACHE BOOL "")
+# Torch Companion uses AudioManager outside its format-specific branches.
+set(BUILD_NAUDIO ON CACHE BOOL "Required by Torch shared extraction code" FORCE)
+set(CMAKE_C_FLAGS "-pthread" CACHE STRING "")
+set(CMAKE_CXX_FLAGS "-pthread" CACHE STRING "")

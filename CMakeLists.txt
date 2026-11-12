@@ -3,6 +3,9 @@ cmake_minimum_required(VERSION 3.16.0 FATAL_ERROR)
 # Set the project version and language
 project(Starship VERSION 2.0.0 LANGUAGES C CXX ASM)
 include(FetchContent)
+if(EMSCRIPTEN)
+    include(cmake/wasm/dependencies.cmake)
+endif()
 
 set(NATO_PHONETIC_ALPHABET
   "Alfa" "Bravo" "Charlie" "Delta" "Echo" "Foxtrot" "Golf" "Hotel"
@@ -118,7 +121,11 @@ if (UNIX AND NOT APPLE)
 find_package(OpenGL REQUIRED)
 endif()
 
-configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/properties.h.in ${CMAKE_CURRENT_SOURCE_DIR}/properties.h @ONLY)
+if(EMSCRIPTEN)
+    configure_file(properties.h.in "${CMAKE_CURRENT_BINARY_DIR}/properties.h" @ONLY)
+else()
+    configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/properties.h.in ${CMAKE_CURRENT_SOURCE_DIR}/properties.h @ONLY)
+endif()
 
 # Include directories
 include_directories(
@@ -219,8 +226,12 @@ if (MSVC)
 endif()
 
 #=================== SSE2NEON ===================
-set(SSE2NEON_DIR ${CMAKE_BINARY_DIR}/_deps/sse2neon)
-file(DOWNLOAD "https://raw.githubusercontent.com/DLTcollab/sse2neon/refs/heads/master/sse2neon.h" "${SSE2NEON_DIR}/sse2neon.h")
+if(EMSCRIPTEN)
+    set(SSE2NEON_DIR "${STARSHIP_WASM_DEPS}/inputs")
+else()
+    set(SSE2NEON_DIR ${CMAKE_BINARY_DIR}/_deps/sse2neon)
+    file(DOWNLOAD "https://raw.githubusercontent.com/DLTcollab/sse2neon/refs/heads/master/sse2neon.h" "${SSE2NEON_DIR}/sse2neon.h")
+endif()
 
 include_directories(${SSE2NEON_DIR})
 
@@ -270,7 +281,11 @@ include_directories(
   ${dr_libs_SOURCE_DIR}
 )
 
-add_subdirectory(libultraship ${CMAKE_CURRENT_SOURCE_DIR}/libultraship)
+if(EMSCRIPTEN)
+    add_subdirectory(libultraship "${CMAKE_CURRENT_BINARY_DIR}/libultraship")
+else()
+    add_subdirectory(libultraship ${CMAKE_CURRENT_SOURCE_DIR}/libultraship)
+endif()
 add_dependencies(${PROJECT_NAME} libultraship)
 target_link_libraries(${PROJECT_NAME} PRIVATE libultraship)
 
@@ -606,7 +621,7 @@ add_custom_command(
 	COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_SOURCE_DIR}/assets/" "$<TARGET_FILE_DIR:Starship>/assets/"
 )
 
-if(NOT CMAKE_SYSTEM_NAME STREQUAL "NintendoSwitch")
+if(NOT CMAKE_SYSTEM_NAME STREQUAL "NintendoSwitch" AND NOT EMSCRIPTEN)
 include(ExternalProject)
 ExternalProject_Add(TorchExternal
 	PREFIX TorchExternal
@@ -687,5 +702,15 @@ elseif(CMAKE_SYSTEM_NAME MATCHES "Darwin")
     set(CPACK_GENERATOR "Bundle")
 endif()
 
+if(EMSCRIPTEN)
+    configure_file("${STARSHIP_WASM_DEPS}/inputs/gamecontrollerdb.txt"
+                   "${CMAKE_CURRENT_BINARY_DIR}/gamecontrollerdb.txt" COPYONLY)
+endif()
+
 set(CPACK_PROJECT_CONFIG_FILE ${CMAKE_SOURCE_DIR}/cmake/configure-packaging.cmake)
 include(cmake/packaging.cmake)
+
+if(EMSCRIPTEN)
+    include(cmake/wasm/renderer-probe.cmake)
+    include(cmake/wasm/game.cmake)
+endif()

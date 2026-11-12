@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#14151b">
+<title>Starship · N64 flight deck</title>
+<link rel="icon" href="data:,">
+<style>
+  :root {color-scheme:dark;font-family:Arial,Helvetica,sans-serif;background:#14151b;color:#eeeef4;--key:46px;}
+  * {box-sizing:border-box;}
+  [hidden] {display:none !important;}
+  body {margin:0;min-height:100dvh;background:radial-gradient(ellipse at 50% 25%,#30313d,#14151b 75%);}
+  button,input {font:inherit;}
+  button {cursor:pointer;color:inherit;}
+  button:focus-visible,summary:focus-visible,#stick:focus-visible {outline:3px solid #b8b1ff;outline-offset:4px;}
+  button:disabled {cursor:default;opacity:.45;}
+  #console {max-width:1280px;margin:auto;padding:max(12px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) max(12px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left));}
+  header {display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px;}
+  .brand {font-size:17px;font-weight:900;letter-spacing:.16em;}
+  .brand small {display:block;font-size:9px;font-weight:400;letter-spacing:.22em;color:#aaa9b8;margin-top:5px;}
+  .toolbar {display:flex;align-items:center;gap:12px;}
+  #game-state {margin:0;color:#b5b3c5;font-size:12px;max-width:240px;}
+  .utility {background:#292a35;border:1px solid #494956;border-radius:8px;padding:9px 12px;font-size:12px;}
+  .playfield {display:grid;grid-template-columns:144px minmax(0,1fr) 156px;gap:16px;align-items:center;}
+  #screen {position:relative;justify-self:center;width:min(100%,calc((100dvh - 146px) * 4 / 3));aspect-ratio:4/3;border:2px solid #454652;border-radius:12px;background:#000;box-shadow:0 16px 45px #0009;overflow:hidden;}
+  canvas {display:block;width:100%;height:100%;object-fit:contain;background:#000;touch-action:none;outline:none;}
+  #boot-panel {position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:16px;padding:20px;background:radial-gradient(ellipse at center,#292a3f,#0b0c12);text-align:center;overflow:auto;}
+  #boot-panel h1 {margin:0;font-size:clamp(20px,4vw,36px);letter-spacing:.06em;}
+  #preloaded-label {color:#bdb9d6;font-size:13px;}
+  #launch {background:#b6a9ee;color:#191522;border:0;border-radius:8px;padding:13px 30px;font-weight:800;letter-spacing:.1em;box-shadow:0 4px 0 #66598f;min-height:46px;}
+  #crash-panel {position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:18px;background:#11121beF;text-align:center;}
+  #crash-panel h2,#crash-panel p {margin:0;}#crash-panel p {font-size:12px;color:#c1bdd2;line-height:1.5;max-width:320px;}
+  #crash-panel .recovery {display:flex;gap:10px;flex-wrap:wrap;justify-content:center;}
+  #asset-inputs {text-align:left;font-size:12px;max-width:100%;}
+  #asset-inputs label {display:block;margin-bottom:10px;}
+  #asset-inputs input {display:block;width:100%;margin-top:4px;font-size:11px;}
+  .grip {display:flex;flex-direction:column;align-items:center;gap:14px;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;touch-action:none;}
+  .shoulders {display:flex;justify-content:center;gap:10px;width:100%;}
+  .pad-button {display:flex;align-items:center;justify-content:center;width:var(--key);height:var(--key);padding:0;border:1px solid #ffffff25;border-radius:50%;font-weight:800;font-size:19px;color:#101017;background:linear-gradient(145deg,#a1a0b1,#777584);box-shadow:0 4px 0 #393743,0 5px 8px #0007;text-shadow:0 1px 0 #fff3;touch-action:none;-webkit-tap-highlight-color:transparent;}
+  .pad-button.held {transform:translateY(3px);box-shadow:0 1px 0 #302e3b,0 1px 4px #0008;filter:brightness(1.2);}
+  .shoulder {width:60px;height:36px;min-height:36px;border-radius:12px 12px 6px 6px;font-size:14px;color:#e0deea;background:linear-gradient(#646370,#41404c);}
+  #stick {position:relative;width:120px;height:120px;flex-shrink:0;border:6px solid #4b4a58;border-radius:50%;background:repeating-radial-gradient(circle,#282831 0px,#282831 8px,#34343f 9px,#34343f 10px);box-shadow:inset 0 4px 10px #000a,0 2px 0 #888592;touch-action:none;}
+  #stick-knob {position:absolute;left:50%;top:50%;width:52px;height:52px;margin:-26px;border-radius:50%;background:repeating-radial-gradient(circle,#a7a5b4 0px,#a7a5b4 3px,#92909f 4px,#92909f 5px);border:2px solid #c0bdcd;box-shadow:0 5px 8px #0009;pointer-events:none;}
+  .control-label {font-size:9px;color:#9d9bab;text-transform:uppercase;letter-spacing:.18em;text-align:center;}
+  .dpad {display:grid;grid-template:repeat(3,32px)/repeat(3,32px);position:relative;margin-top:2px;}
+  .dpad .pad-button {width:34px;height:34px;border-radius:4px;background:#44434e;color:#bcbacb;font-size:15px;box-shadow:0 3px 0 #22212a;}
+  .dpad .up {grid-area:1/2;}.dpad .left {grid-area:2/1;}.dpad .right {grid-area:2/3;}.dpad .down {grid-area:3/2;}
+  .dpad::before {content:"";position:absolute;left:32px;top:32px;width:34px;height:34px;background:#44434e;box-shadow:0 3px 0 #22212a;}
+  .c-buttons {display:grid;grid-template:repeat(3,40px)/repeat(3,40px);}
+  .c-buttons .pad-button {width:42px;height:42px;background:linear-gradient(145deg,#ffe68c,#d5ad36);box-shadow:0 4px 0 #7b5b16,0 5px 8px #0007;font-size:14px;}
+  .c-buttons .up {grid-area:1/2;}.c-buttons .left {grid-area:2/1;}.c-buttons .right {grid-area:2/3;}.c-buttons .down {grid-area:3/2;}
+  .ab-buttons {display:flex;align-items:flex-start;gap:16px;height:70px;}
+  .pad-button.b {background:linear-gradient(145deg,#76d99d,#299660);box-shadow:0 4px 0 #145435,0 5px 8px #0007;}
+  .pad-button.a {margin-top:20px;background:linear-gradient(145deg,#81afff,#3c6acd);box-shadow:0 4px 0 #203d7e,0 5px 8px #0007;}
+  .pad-button.held.a,.pad-button.held.b,.c-buttons .pad-button.held {box-shadow:0 1px 0 #302e3b,0 1px 4px #0008;}
+  .start-row {display:flex;justify-content:center;align-items:center;gap:12px;margin:16px 0;}
+  #pad-start {width:36px;height:36px;background:linear-gradient(145deg,#ee736e,#b0393c);box-shadow:0 3px 0 #69252a;font-size:10px;}
+  .start-row span {color:#b2afc1;font-size:10px;letter-spacing:.14em;}
+  footer {display:flex;justify-content:center;gap:18px;flex-wrap:wrap;font-size:11px;color:#9491a4;margin-top:12px;}
+  details {font-size:12px;color:#b2afc1;}summary {cursor:pointer;}
+  .help {max-width:700px;margin:12px auto;line-height:1.8;}
+  #diagnostics {max-width:900px;margin:14px auto 0;}
+  #status {white-space:pre-wrap;overflow:auto;max-height:230px;background:#0b0c11;border:1px solid #383744;border-radius:8px;padding:12px;font:11px/1.5 monospace;color:#a2bbad;}
+  #console:fullscreen {max-width:none;background:#14151b;overflow:auto;}
+  @media (max-width:700px) and (orientation:portrait) {
+    header {align-items:flex-start;margin-bottom:14px;}.toolbar {flex-wrap:wrap;justify-content:flex-end;gap:8px;}#game-state {max-width:160px;font-size:11px;}
+    .playfield {grid-template-columns:1fr 1fr;gap:18px 10px;}
+    #screen {grid-column:1/-1;grid-row:1;width:100%;}
+    .grip {grid-row:2;gap:12px;}.left-grip {grid-column:1;}.right-grip {grid-column:2;}
+    .left-grip {display:grid;justify-items:center;gap:12px;}.left-grip .shoulders {grid-row:1;}.left-grip #stick {grid-row:2;}.left-grip .control-label {display:none;}
+    .start-row {margin:16px 0 10px;}
+  }
+  @media (max-height:520px) and (orientation:landscape) {
+    #console {padding-top:8px;padding-bottom:8px;}header {margin-bottom:8px;}.brand small {display:none;}
+    .playfield {grid-template-columns:120px minmax(0,1fr) 130px;gap:12px;}
+    #screen {width:min(100%,calc((100dvh - 102px) * 4 / 3));}
+    .grip {gap:8px;}#stick {width:96px;height:96px;border-width:4px;}#stick-knob {width:44px;height:44px;margin:-22px;}
+    .shoulder {height:30px;min-height:30px;width:52px;}.control-label {display:none;}
+    .dpad {grid-template:repeat(3,28px)/repeat(3,28px);}.dpad .pad-button {width:30px;height:30px;}.dpad::before {left:28px;top:28px;width:30px;height:30px;}
+    .c-buttons {grid-template:repeat(3,34px)/repeat(3,34px);}.c-buttons .pad-button {width:36px;height:36px;}
+    .ab-buttons {height:58px;gap:12px;}.ab-buttons .pad-button {width:42px;height:42px;}.ab-buttons .a {margin-top:14px;}
+    .start-row {margin:8px 0 0;}#pad-start {width:30px;height:30px;font-size:9px;}footer {margin-top:8px;}
+  }
+</style>
+</head>
+<body>
+<main id="console">
+  <header>
+    <div class="brand">STARSHIP<small>N64 FLIGHT DECK</small></div>
+    <div class="toolbar"><p id="game-state" role="status">Loading runtime…</p><button class="utility" id="sound" type="button" disabled>Enable sound</button><button class="utility" id="fullscreen" type="button">Fullscreen</button></div>
+  </header>
+  <div class="playfield">
+    <section class="grip left-grip" aria-label="Steering and left triggers">
+      <div class="shoulders"><button class="pad-button shoulder" data-button="0x0020" aria-label="L shoulder" disabled>L</button><button class="pad-button shoulder" data-button="0x2000" aria-label="Z trigger" disabled>Z</button></div>
+      <div id="stick" role="group" aria-label="Analog stick. Drag to steer, or use W A S D on a keyboard."><div id="stick-knob"></div></div>
+      <div class="control-label">Analog control</div>
+      <div class="dpad" role="group" aria-label="D-pad">
+        <button class="pad-button up" data-button="0x0800" aria-label="D-pad up" disabled>▲</button>
+        <button class="pad-button left" data-button="0x0200" aria-label="D-pad left" disabled>◀</button>
+        <button class="pad-button right" data-button="0x0100" aria-label="D-pad right" disabled>▶</button>
+        <button class="pad-button down" data-button="0x0400" aria-label="D-pad down" disabled>▼</button>
+      </div>
+    </section>
+    <div id="screen">
+      <canvas tabindex="0" aria-label="Starship game" id="canvas" width="640" height="480"></canvas>
+      <section id="boot-panel" aria-label="Launch game">
+        <h1>Ready for launch.</h1>
+        <span id="asset-inputs"><label>Base SF64 <input type="file" id="sf64" accept=".o2r" required></label>
+          <label>Port Starship <input type="file" id="starship" accept=".o2r" required></label>
+          <label>Mods (optional) <input type="file" id="mods" accept=".o2r" multiple></label>
+          <label>Native save (optional) <input type="file" id="save" accept=".sav"></label>
+        </span>
+        <span id="preloaded-label" hidden>Game + Wolfen mod loaded</span>
+        <button id="launch" type="button" disabled>POWER ON</button>
+      </section>
+      <section id="crash-panel" hidden aria-label="Game recovery" role="alert">
+        <h2>Flight interrupted.</h2>
+        <p>The game stopped unexpectedly. Save the crash report to help track it down, then reload to restart.</p>
+        <div class="recovery"><button id="save-report" class="utility" type="button">Save crash report</button><button id="reload" class="utility" type="button">Reload</button></div>
+      </section>
+    </div>
+    <section class="grip right-grip" aria-label="Action buttons and right trigger">
+      <div class="shoulders"><button class="pad-button shoulder" data-button="0x0010" aria-label="R shoulder" disabled>R</button></div>
+      <div class="c-buttons" role="group" aria-label="C buttons">
+        <button class="pad-button up" data-button="0x0008" aria-label="C up" disabled>C ▲</button>
+        <button class="pad-button left" data-button="0x0002" aria-label="C left" disabled>C ◀</button>
+        <button class="pad-button right" data-button="0x0001" aria-label="C right" disabled>C ▶</button>
+        <button class="pad-button down" data-button="0x0004" aria-label="C down" disabled>C ▼</button>
+      </div>
+      <div class="ab-buttons"><button class="pad-button b" data-button="0x4000" aria-label="B, bomb or back" disabled>B</button><button class="pad-button a" data-button="0x8000" aria-label="A, fire or confirm" disabled>A</button></div>
+      <div class="control-label">B bomb · A fire</div>
+    </section>
+  </div>
+  <div class="start-row"><button id="pad-start" class="pad-button" data-button="0x1000" aria-label="Start or pause" disabled>START</button><span>START / PAUSE</span></div>
+  <footer>
+    <details><summary>Keyboard controls</summary><p class="help">WASD steer · X = A / fire · C = B / bomb<br>Space = Start · Z = Z · E = L · R = R<br>Arrow keys = C buttons · TFGH = D-pad<br>On touchscreens, hold the stick and a button together.</p></details>
+  </footer>
+  <details id="diagnostics"><summary>Developer log</summary><pre id="status"></pre></details>
+</main>
+<script>
+const statusEl = document.getElementById('status');
+const launch = document.getElementById('launch');
+const padButtons = [...document.querySelectorAll('[data-button]')];
+const stick = document.getElementById('stick');
+const knob = document.getElementById('stick-knob');
+let runtimeReady = false, started = false, preloaded = false, controlsReady = false;
+let stickPointer = null, stickX = 0, stickY = 0;
+const heldButtons = new Map();
+const logLines = [];
+function addLog(value) {
+  logLines.push(String(value));
+  if (logLines.length > 200) logLines.shift();
+  statusEl.textContent = logLines.join('\n');
+}
+function stopGame(reason) {
+  if (window.STARSHIP_GAME_ERROR) return;
+  window.STARSHIP_GAME_ERROR=String(reason);
+  enableControls(false);addLog('Game stopped: '+reason);
+  window.STARSHIP_CRASH_REPORT={recordedAt:new Date().toISOString(),url:location.href,
+    userAgent:navigator.userAgent,isolated:crossOriginIsolated,memoryPolicy:'fixed-512MiB',
+    error:window.STARSHIP_GAME_ERROR,state:window.STARSHIP_GAME_STATE,audioState:Module.SDL2?.audioContext?.state,logs:logLines.slice(-40)};
+  document.getElementById('crash-panel').hidden=false;
+  document.getElementById('game-state').textContent='Game stopped';
+}
+document.getElementById('reload').addEventListener('click',()=>location.reload());
+document.getElementById('save-report').addEventListener('click',()=>{
+  const url=URL.createObjectURL(new Blob([JSON.stringify(window.STARSHIP_CRASH_REPORT,null,2)],{type:'application/json'}));
+  const link=document.createElement('a');link.href=url;link.download='starship-crash-report.json';link.click();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+});
+window.addEventListener('error',event=>{if(event.message) stopGame(event.error?.stack||event.message);});
+window.addEventListener('unhandledrejection',event=>stopGame(event.reason?.stack||event.reason));
+const soundButton=document.getElementById('sound');
+let observedAudioContext;
+function updateSoundButton() {
+  const context=Module.SDL2?.audioContext;
+  soundButton.textContent=context?.state==='running'?'Sound on':'Enable sound';
+  soundButton.disabled=!runtimeReady||!!window.STARSHIP_GAME_ERROR;
+}
+function unlockAudio() {
+  if (!runtimeReady || window.STARSHIP_GAME_ERROR) return;
+  try {
+    Module.SDL2 ||= {};
+    // Use playback audio session to avoid iPhone silent switch muting.
+    try {
+      if (navigator.audioSession) {
+        navigator.audioSession.type = "playback";
+      }
+    } catch {}
+    if (!Module.SDL2.audioContext) {
+      const Context=window.AudioContext||window.webkitAudioContext;
+      if (!Context) {addLog('Web Audio is unavailable');return;}
+      Module.SDL2.audioContext=new Context();
+    }
+    const context=Module.SDL2.audioContext;
+    if (context!==observedAudioContext) {
+      observedAudioContext=context;
+      context.addEventListener('statechange',updateSoundButton);
+    }
+    if (context.state!=='running' && context.state!=='closed') {
+      // Call resume synchronously within the user gesture, before asset I/O or worker startup.
+      context.resume().then(updateSoundButton).catch(error=>{addLog('Sound: '+error.message);updateSoundButton();});
+    }
+    updateSoundButton();
+  } catch(error) {addLog('Sound: '+error.message);updateSoundButton();}
+}
+soundButton.addEventListener('click',unlockAudio);
+for (const type of ['pointerdown','touchend','keydown']) document.addEventListener(type,event=>{
+  if (event.target instanceof Element && event.target.closest('.grip, #pad-start, #canvas, #sound, #launch')) unlockAudio();
+},{capture:true,passive:true});
+function checkReady() {
+  const selected = document.getElementById('sf64').files.length && document.getElementById('starship').files.length;
+  launch.disabled = started || !runtimeReady || !(preloaded || selected);
+}
+function publishPad() {
+  let buttons = 0;
+  for (const button of heldButtons.values()) buttons |= Number(button.dataset.button);
+  if (typeof Module._Wasm_SetControllerState === 'function') Module._Wasm_SetControllerState(buttons,stickX,stickY);
+  for (const button of padButtons) button.classList.toggle('held',[...heldButtons.values()].includes(button));
+}
+function releaseControls() {
+  heldButtons.clear();stickPointer=null;stickX=stickY=0;
+  knob.style.transform='';publishPad();
+}
+function enableControls(enabled) {
+  controlsReady=enabled;
+  for (const button of padButtons) button.disabled=!enabled;
+  if (!enabled) releaseControls();
+}
+for (const button of padButtons) {
+  button.addEventListener('pointerdown',event=>{
+    if (!controlsReady) return;
+    event.preventDefault();button.setPointerCapture(event.pointerId);
+    heldButtons.set(event.pointerId,button);publishPad();
+    Module.canvas.focus({preventScroll:true});
+  });
+  const release=event=>{heldButtons.delete(event.pointerId);publishPad();};
+  for (const type of ['pointerup','pointercancel','lostpointercapture']) button.addEventListener(type,release);
+  button.addEventListener('keydown',event=>{
+    if (!controlsReady || !['Enter',' '].includes(event.key)) return;
+    event.preventDefault();heldButtons.set('key-'+button.dataset.button,button);publishPad();
+  });
+  button.addEventListener('keyup',event=>{
+    if (!['Enter',' '].includes(event.key)) return;
+    event.preventDefault();heldButtons.delete('key-'+button.dataset.button);publishPad();
+  });
+  button.addEventListener('blur',()=>{heldButtons.delete('key-'+button.dataset.button);publishPad();});
+}
+function moveStick(event) {
+  const box=stick.getBoundingClientRect(),radius=box.width*.29;
+  let x=(event.clientX-box.left-box.width/2)/radius,y=(event.clientY-box.top-box.height/2)/radius;
+  const distance=Math.hypot(x,y);
+  if (distance>1) {x/=distance;y/=distance;}
+  stickX=Math.round(x*85);stickY=Math.round(-y*85);
+  knob.style.transform=`translate(${x*radius}px,${y*radius}px)`;publishPad();
+}
+stick.addEventListener('pointerdown',event=>{
+  if (!controlsReady || stickPointer!==null) return;
+  event.preventDefault();stickPointer=event.pointerId;stick.setPointerCapture(event.pointerId);
+  moveStick(event);Module.canvas.focus({preventScroll:true});
+});
+stick.addEventListener('pointermove',event=>{if(event.pointerId===stickPointer) {event.preventDefault();moveStick(event);}});
+for (const type of ['pointerup','pointercancel','lostpointercapture']) stick.addEventListener(type,event=>{
+  if (event.pointerId!==stickPointer) return;
+  stickPointer=null;stickX=stickY=0;knob.style.transform='';publishPad();
+});
+for (const grip of document.querySelectorAll('.grip')) grip.addEventListener('contextmenu',event=>event.preventDefault());
+// Safari may start page panning despite the pointer handler's preventDefault.
+// Touch targets remain the element where contact began, even outside the pad.
+document.addEventListener('touchmove',event=>{
+  const onController=touch=>touch.target instanceof Element && touch.target.closest('.grip, #pad-start');
+  if ([...event.touches].some(onController) && event.cancelable) event.preventDefault();
+},{passive:false,capture:true});
+window.addEventListener('blur',releaseControls);
+window.addEventListener('pagehide',releaseControls);
+window.addEventListener('orientationchange',releaseControls);
+document.addEventListener('visibilitychange',()=>{if(document.hidden) releaseControls();});
+const fullscreen=document.getElementById('fullscreen');
+if (!document.documentElement.requestFullscreen) fullscreen.hidden=true;
+fullscreen.addEventListener('click',async()=>{
+  try {
+    if(document.fullscreenElement) await document.exitFullscreen();
+    else await document.getElementById('console').requestFullscreen();
+  } catch(error) {addLog('Fullscreen: '+error.message);}
+});
+document.addEventListener('fullscreenchange',()=>{fullscreen.textContent=document.fullscreenElement?'Exit fullscreen':'Fullscreen';releaseControls();});
+var Module = {
+  noInitialRun:true, canvas:document.getElementById('canvas'),
+  print:function(text){console.log(text);addLog(text);},
+  printErr:function(text){console.error(text);addLog(text);if(/RuntimeError:|Out of bounds memory access|Aborted\(/i.test(text)) stopGame(text);},
+  onAbort:stopGame,
+  onRuntimeInitialized:function(){
+    runtimeReady=true;
+    const exists=path=>{try{return Module.FS.stat(path).size>0;}catch{return false;}};
+    preloaded=exists('/sf64.o2r')&&exists('/starship.o2r');
+    document.getElementById('asset-inputs').hidden=preloaded;
+    document.getElementById('preloaded-label').hidden=!preloaded;
+    document.getElementById('game-state').textContent=preloaded?'Game and mod ready':'Select the game archives';
+    addLog('Runtime ready');checkReady();updateSoundButton();
+  }
+};
+for (const id of ['sf64','starship','mods','save']) document.getElementById(id).addEventListener('change',checkReady);
+launch.addEventListener('click',async()=>{
+  if (started || !runtimeReady) return;
+  unlockAudio();
+  started = true; checkReady();
+  document.getElementById('game-state').textContent = 'Loading assets…';
+  try {
+    const write = async(file,path)=>Module.FS.writeFile(path,new Uint8Array(await file.arrayBuffer()));
+    const base=document.getElementById('sf64').files[0];
+    const port=document.getElementById('starship').files[0];
+    if(base) await write(base,'/sf64.o2r');
+    if(port) await write(port,'/starship.o2r');
+    Module.FS.mkdirTree('/mods');
+    let index=0;
+    for (const file of document.getElementById('mods').files) await write(file,'/mods/mod-'+(index++)+'.o2r');
+    const save=document.getElementById('save').files[0];
+    if (save) await write(save,'/default.sav');
+    Module.FS.writeFile('/starship.cfg.json', JSON.stringify({
+      Window:{Width:640,Height:480},
+      CVars:{gDeveloperTools:{LogLevel:2},gInterpolationFPS:30,gVsyncEnabled:0,gRenderParallelization:0}
+    }));
+    document.getElementById('game-state').textContent='Starting game…';
+    Module.callMain([]);
+    document.getElementById('boot-panel').hidden=true;
+    enableControls(true);Module.canvas.focus({preventScroll:true});
+  } catch(error) {
+    stopGame('Launch failed: '+error);
+    document.getElementById('game-state').textContent='Launch failed. Reload to try again.';
+    document.getElementById('diagnostics').open=true;
+  }
+});
+</script>
+{{{ SCRIPT }}}
+</body></html>
