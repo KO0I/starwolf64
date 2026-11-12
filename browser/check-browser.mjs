@@ -225,6 +225,11 @@ try{
      ram.setInt32(0x1CD9C0,0,true);ram.setInt32(0x178340,0,true);ram.setFloat32(0x1CD9E0,210,true);
      await new Promise(r=>setTimeout(r,280));
      if((STARWOLF_chatter.stats.voices.narrator||0)<=(before.narrator||0))throw Error('Prologue narrator did not play');
+     const narrationStarts=STARWOLF_chatter.stats.voices.narrator;
+     ram.setFloat32(0x1CD9E0,180,true);
+     await new Promise(r=>setTimeout(r,500));
+     if(!STARWOLF_chatter.stats.playing||STARWOLF_chatter.stats.voices.narrator!==narrationStarts)
+       throw Error('Narration must continue without retriggering as prologue scrolls');
      ram.setInt32(0x1CD944,3,true);ram.setInt32(0x17829C,0,true);
      await new Promise(r=>setTimeout(r,50));
      if(STARWOLF_chatter.stats.playing)throw Error('Skipping prologue did not stop narrator');

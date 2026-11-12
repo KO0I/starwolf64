@@ -1,3 +1,4 @@
+#include "port/audio/VoiceBlips.h"
 #include "ImguiUI.h"
 #include "UIWidgets.h"
 #include "ResolutionEditor.h"
@@ -233,10 +234,14 @@ void DrawSpeakerPositionEditor() {
 void DrawSettingsMenu(){
     if(UIWidgets::BeginMenu("Settings")){
         if (UIWidgets::BeginMenu("Audio")) {
-            UIWidgets::CVarCheckbox("Crew chatter", "gCrewChatter", {
-                .tooltip = "Play character syllables as crew dialogue appears. Disable for silent crew dialogue.",
-                .defaultValue = true,
-            });
+            if (VoiceBlips_IsActive()) {
+                ImGui::TextUnformatted("Blip voice mod loaded");
+            } else {
+                UIWidgets::CVarCheckbox("Crew chatter", "gCrewChatter", {
+                    .tooltip = "Play character syllables as crew dialogue appears. Disable for silent crew dialogue.",
+                    .defaultValue = true,
+                });
+            }
             UIWidgets::CVarSliderFloat("Master Volume", "gGameMasterVolume", 0.0f, 1.0f, 1.0f, {
                 .format = "%.0f%%",
                 .isPercentage = true,

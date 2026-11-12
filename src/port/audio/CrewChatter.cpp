@@ -1,5 +1,6 @@
 #include "CrewChatter.h"
 #include "ChatterPlayer.h"
+#include "VoiceBlips.h"
 #include <libultraship.h>
 #include <mutex>
 
@@ -8,10 +9,25 @@ CrewAudio::Player player;
 std::mutex mutex;
 bool loaded = false;
 bool attempted = false;
+bool narrationActive = false;
+bool narrationSeen = false;
 }
+
+extern "C" void Audio_PlayVoiceWithoutBGM(uint32_t message);
 
 extern "C" int CrewChatter_Observe(int speaker, const void* message, int index, int glyph, float volume) {
     std::lock_guard<std::mutex> lock(mutex);
+    if (VoiceBlips_IsActive()) {
+        player.Stop();
+        if (speaker == 1000) {
+            narrationSeen = true;
+            if (!narrationActive) {
+                Audio_PlayVoiceWithoutBGM(1000);
+                narrationActive = true;
+            }
+        }
+        return 0;
+    }
     if (!CVarGetInteger("gCrewChatter", 1)) {
         player.Stop();
         return 0;
@@ -30,6 +46,11 @@ extern "C" int CrewChatter_Observe(int speaker, const void* message, int index, 
 
 extern "C" void CrewChatter_Commit() {
     std::lock_guard<std::mutex> lock(mutex);
+    if (narrationActive && !narrationSeen) {
+        VoiceBlips_ClearNarration();
+        narrationActive = false;
+    }
+    narrationSeen = false;
     player.Commit();
 }
 
