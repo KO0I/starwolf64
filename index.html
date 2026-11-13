@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#0b0c0e">
+<meta name="theme-color" content="#10102f">
 <title>A wolf in space</title>
 <style>@font-face{font-family:Arwing;src:url(data:font/ttf;base64,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AG4ATv/oAG8ATv/oAHAAT//nAHEAUP/nAHIAUf/nAHMAUf/nAHQAUv/mAHUAU//mAHYAU//mAHcAVP/mAHgAVf/mAHkAVf/lAHoAVv/lAHsAV//lAHwAWP/lAH0AWP/lAH4AWf/kAH8AWv/kAIAAWv/kAIEAW//kAIIAXP/jAIMAXP/jAIQAXf/jAIUAXv/jAIYAX//jAIcAX//iAIgAYP/iAIkAYf/iAIoAYf/iAIsAYv/hAIwAY//hAI0AY//hAI4AZP/hAI8AZf/hAJAAZv/gAJEAZv/gAJIAZ//gAJMAaP/gAJQAaP/gAJUAaf/fAJYAav/fAJcAa//fAJgAa//fAJkAbP/eAJoAbf/eAJsAbf/eAJwAbv/eAJ0Ab//eAJ4Ab//dAJ8AcP/dAKAAcf/dAKEAcv/dAKIAcv/dAKMAc//cAKQAdP/cAKUAdP/cAKYAdf/cAKcAdv/bAKgAdv/bAKkAd//bAKoAeP/bAKsAef/bAKwAef/aAK0Aev/aAK4Ae//aAK8Ae//aALAAfP/ZALEAff/ZALIAff/ZALMAfv/ZALQAf//ZALUAgP/YALYAgP/YALcAgf/YALgAgv/YALkAgv/YALoAg//XALsAhP/XALwAhP/XAL0Ahf/XAL4Ahv/WAL8Ah//WAMAAh//WAMEAiP/WAMIAif/WAMMAif/VAMQAiv/VAMUAi//VAMYAi//VAMcAjP/VAMgAjf/UAMkAjv/UAMoAjv/UAMsAj//UAMwAkP/TAM0AkP/TAM4Akf/TAM8Akv/TANAAk//TANEAk//SANIAlP/SANMAlf/SANQAlf/SANUAlv/RANYAl//RANcAl//RANgAmP/RANkAmf/RANoAmv/QANsAmv/QANwAm//QAN0AnP/QAN4AnP/QAN8Anf/PAOAAnv/PAOEAnv/PAOIAn//PAOMAoP/OAOQAof/OAOUAof/OAOYAov/OAOcAo//OAOgAo//NAOkApP/NAOoApf/NAOsApf/NAOwApv/NAO0Ap//MAO4AqP/MAO8AqP/MAPAAqf/MAPEAqv/LAPIAqv/LAPMAq//LAPQArP/LAPUArP/LAPYArf/KAPcArv/KAPgAr//KAPkAr//KAPoAsP/KAPsAsf/JAPwAsf/JAP0Asv/JAP4As//JAP8AtP/I) format("truetype");font-weight:400;font-style:normal;font-display:swap}
 *{box-sizing:border-box}
@@ -73,10 +73,159 @@ main:fullscreen #screen{height:calc(100svh - 34px);max-height:none}
 @keyframes blue-green-pulse{0%,100%{border-color:#4bbfff;box-shadow:inset 0 0 12px #359cff24,0 0 9px #359cff55}50%{border-color:#43e5aa;box-shadow:inset 0 0 18px #35dfa533,0 0 16px #35dfa577}}
 @media(prefers-reduced-motion:reduce){#screen[data-state]~#controls .rom-picker,#screen[data-state]~#controls #connect:not(:disabled){animation:none}#screen:is([data-state="awaiting-rom"],[data-state="checking-rom"])~#controls .rom-picker,#screen[data-state="ready"]~#controls #connect:not(:disabled){border-color:#43d8be;box-shadow:0 0 9px #35c8b555}}
 </style>
+<style id="flight-club-theme">
+/* Lylat Flight Club theme, matching tools/multiplayer/web/styles.css in the multiplayer worktree. */
+body.flight-club {
+  --club-bg: #030310; --club-panel: #10102f; --club-text: #f1edff;
+  --club-cyan: #75ffff; --club-yellow: #fff075; --club-edge: #b6b4d0;
+  --club-title: linear-gradient(90deg, #3d0967, #181557);
+  --club-stars: radial-gradient(circle at 18px 29px,#fff 0 1px,transparent 1.5px),radial-gradient(circle at 119px 68px,#91c9ff 0 1px,transparent 1.5px),radial-gradient(circle at 62px 141px,#e8b9ff 0 1px,transparent 1.5px),radial-gradient(circle at 183px 107px,#fff 0 .7px,transparent 1.2px),radial-gradient(circle at 34px 184px,#4c527d 0 1px,transparent 1.5px);
+  color-scheme: dark; color: var(--club-text); background-color: var(--club-bg);
+  background-image: var(--club-stars); background-size: 211px 223px,283px 197px,173px 239px,307px 271px,157px 181px;
+  font-family: "Times New Roman", Georgia, serif;
+}
+.flight-club a { color: #75ffff; text-decoration: underline; }
+.flight-club a:visited { color: #f7a3ff; }
+.flight-club a:hover { color: #fff275; }
+.flight-club button:not(.pad-button), .flight-club input, .flight-club select, .flight-club input::file-selector-button { border-radius: 0; }
+.flight-club button:not(.pad-button), .flight-club input::file-selector-button {
+  background: #c4c4d2; color: #171127; border-color: #efedf8 #737083 #737083 #efedf8; border-style: outset;
+  box-shadow: inset 1px 1px #dedce9, inset -1px -1px #9b98ac; text-shadow: none;
+  font-family: Arial, sans-serif; font-weight: bold;
+}
+.flight-club button:not(.pad-button):hover:enabled { background: #e4e4f1; color: #171127; }
+.flight-club button:not(.pad-button):active:enabled { border-style: inset; }
+.flight-club button:disabled { color: #636174; background: #9291a7; opacity: .7; }
+.flight-club input:not([type=range]), .flight-club select {
+  background: #020417; color: #a5ffff; border-color: #6f6c85 #c6c3d6 #c6c3d6 #6f6c85; border-style: inset;
+  font-family: "Courier New", monospace;
+}
+.flight-club input::placeholder { color: #a3a3b8; opacity: 1; }
+.flight-club button:focus-visible, .flight-club input:focus-visible, .flight-club select:focus-visible, .flight-club summary:focus-visible {
+  outline: 2px solid #7effff; outline-offset: -3px;
+}
+.flight-club .club-logo {
+  color: #f3dfff; font-family: Georgia, serif; font-style: italic; font-weight: 900;
+  text-shadow: 2px 2px 0 #a3007a,3px 3px 0 #42005d,-1px -1px 0 #76ffff;
+}
+@supports (background-clip:text) {
+  .flight-club .club-logo {
+    background: linear-gradient(#fff 12%,#c8c0e9 35%,#8970b6 48%,#fff 51%,#f09dff 65%,#c928c7 85%);
+    background-clip: text; -webkit-background-clip: text; color: transparent; -webkit-text-stroke: .3px #f3dfff;
+  }
+}
+.flight-club .club-badge { background: #ffe82d; color: #210030; border: 1px outset #fff295; font-family: "Courier New",monospace; font-weight: bold; text-shadow: none; }
+/* The editor keeps its fixed-height workspace and mobile scrub dock. */
+body.club-editor { --bg:#030310; --panel:#10102f; --line:#6c658b; --text:#f1edff; --muted:#c0b8da; --green:#9cffff; }
+.club-editor .app-header { background-color: #030318; background-image: var(--club-stars); background-size: inherit; border-bottom: 2px ridge #b7adc8; box-shadow: none; }
+.club-editor .brand strong { font-size: 22px; letter-spacing: -1px; line-height: 1.12; }
+.club-editor .brand div > span { color: #fff071; font-family: "Courier New",monospace; }
+.club-editor .mark { color: #ffe82d; text-shadow: 1px 1px #a3007a; }
+.club-editor .document-state { color: #f1c2ff; font-family: "Courier New",monospace; }
+.club-editor .project-menu, .club-editor .workspace-toolbar, .club-editor .mobile-nav { background: #10102f; border-color: #9891ba; box-shadow: inset 0 1px #6b598a; }
+.club-editor .project-menu.open { border-color: #b7adc8; box-shadow: 4px 4px #000a; }
+.club-editor #message { color: #fff071; background: #210745; border-color: #b7adc8; font-family: "Courier New",monospace; box-shadow: none; }
+.club-editor #message.error { background:#4d123c; color:#fff2a2; }
+.club-editor aside { background: #10102ff5; }
+.club-editor .panel-heading { padding:3px 6px; color:#fff5a3; background:var(--club-title); box-shadow:inset 0 -1px #a1a0c3; }
+.club-editor h2, .club-editor label, .club-editor h3 { font-family:"Courier New",monospace; }
+.club-editor .panel-heading > span { color:#f1c2ff; }
+.club-editor #object-list { background:#05051a; border-color:#545079; }
+.club-editor #object-list button { background:transparent; color:#f1edff; box-shadow:none; font-weight:normal; }
+.club-editor #object-list button:hover { background:#272046; }
+.club-editor #object-list button[aria-selected=true] { background:#3d0967; color:#fff; box-shadow:inset 3px 0 #fff075; }
+.club-editor #object-list button small { color:#bff7ff; }
+.club-editor button.primary, .club-editor button.play { background:#fff075; color:#210030; border-color:#fff3aa #9d8436 #9d8436 #fff3aa; }
+.club-editor .view-switch button[aria-pressed=true], .club-editor .library-tabs button[aria-pressed=true], .club-editor .mobile-nav button[aria-pressed=true] {
+  color:#fff5a3; background:var(--club-title); border-color:#b6b4d0; box-shadow:inset 0 -2px #75ffff;
+}
+.club-editor .mobile-nav button:not([aria-pressed=true]) { background:#c4c4d2; color:#171127; }
+.club-editor .canvas-wrap { border-color:#77708c #b6b4d0 #b6b4d0 #77708c; }
+.club-editor .viewport-tag { padding:3px 5px; color:#fff5a3; background:#210745d9; font-family:"Courier New",monospace; }
+.club-editor .live-dot { background:#75ffff; box-shadow:0 0 3px #75ffff66; }
+.club-editor .legend, .club-editor #empty, .club-editor #empty h2 { color:#eae2ff; }
+.club-editor .view-footer { background:#09071be8; color:#bff7ff; }
+.club-editor .timeline { background:#10102f; border-color:#b6b4d0; box-shadow:inset 0 1px #b83bce; }
+.club-editor .scrub-heading > label { color:#fff075; }
+.club-editor .scrub-heading > output { color:#9cffff; font-family:"Courier New",monospace; }
+.club-editor #flight-distance { color:#a5ffff; background:#020417; border-color:#6f6c85 #c6c3d6 #c6c3d6 #6f6c85; }
+.club-editor #distance::-webkit-slider-runnable-track { background:#210745; border-color:#77708c #b6b4d0 #b6b4d0 #77708c; }
+.club-editor #distance::-webkit-slider-thumb { background:#fff075; border-color:#fff3aa #9d8436 #9d8436 #fff3aa; }
+.club-editor #distance::-moz-range-track { background:#210745; }
+.club-editor #distance::-moz-range-thumb { background:#fff075; border-color:#fff3aa #9d8436 #9d8436 #fff3aa; }
+.club-editor .scrub-hint { color:#c7bed9; }
+.club-editor #camera-settings summary { background:#210745; color:#fff5a3; box-shadow:inset 1px 1px #74618e,inset -1px -1px #030310; }
+.club-editor #flight-camera-fields { background:#10102f; border-color:#b6b4d0; box-shadow:4px 4px #000a; }
+.club-editor .notes h3 { color:#f1cdf9; }
+/* ROM preparation page. */
+body.club-player { display:flow-root; }
+.club-player #setup {
+  width:min(860px,calc(100% - 24px)); max-width:860px; margin:14px auto; padding:22px 28px 16px;
+  background:#030318f0; border:4px ridge #9891ba; box-shadow:5px 5px #000;
+}
+.club-player #setup > header { display:flex; flex-direction:column; text-align:center; gap:8px; letter-spacing:0; }
+.club-player #setup .club-logo { display:block; margin:5px 0 8px; font-size:clamp(32px,7.8vw,76px); line-height:1.12; letter-spacing:-3px; }
+.club-player #setup header span { display:inline-block; border-radius:0; padding:4px 12px; font-size:11px; letter-spacing:2px; }
+.club-player #headline { color:#fff; font:bold 22px/1.25 Georgia,serif; text-align:center; margin:20px 0 12px; letter-spacing:0; }
+.club-player #intro { color:#f1edff; text-align:center; font-size:16px; }
+.club-player #setup section { border:3px ridge #b6b4d0; border-radius:0; background:#10102f; padding:18px; box-shadow:3px 3px #000; }
+.club-player #setup label { color:#fff5a3; font:bold 14px "Courier New",monospace; }
+.club-player #setup input { padding:10px; max-width:100%; }
+.club-player #setup input::file-selector-button { border:2px outset #d8d8e4; padding:9px 10px; margin-right:8px; }
+.club-player #setup small, .club-player #setup footer, .club-player #setup p { color:#c7bed9; }
+.club-player #setup #status { color:#bff7ff; font:13px/1.5 "Courier New",monospace; }
+.club-player #setup #error { color:#ffe1ef; background:#4d123c; border:2px ridge #ffb3d9; padding:10px; }
+.club-player #setup #play:enabled { background:#fff075; color:#210030; border-color:#fff3aa; }
+.club-player #setup #actions { justify-content:center; }
+.club-player #setup footer { margin-top:18px; padding-top:10px; border-top:2px ridge #9a94b3; text-align:center; }
+.club-player #toolbar { background:var(--club-title); color:#fff5a3; }
+.club-player #toolbar button { font-size:12px; }
+.club-player #play-status { color:#bff7ff; font-family:"Courier New",monospace; }
+/* Runtime flight deck and the legacy emulator keep controller geometry unchanged. */
+.club-runtime #console { background:#030318eb; border-inline:2px ridge #9891ba; }
+.club-runtime header { border-bottom:2px ridge #b7adc8; padding-bottom:8px; }
+.club-runtime .brand { color:#f3dfff; font-style:italic; font-family:Georgia,serif; }
+.club-runtime .brand small { color:#fff071; font:9px "Courier New",monospace; }
+.club-runtime #game-state, .club-runtime .control-label, .club-runtime .start-row span, .club-runtime footer { color:#c7bed9; }
+.club-runtime #screen { border-radius:0; border-color:#b6b4d0; box-shadow:3px 3px #000; }
+.club-runtime #boot-panel { background:#10102f; }
+.club-runtime #boot-panel h1 { color:#f3dfff; font-family:Georgia,serif; font-style:italic; }
+.club-runtime #preloaded-label, .club-runtime #diagnostics { color:#c7bed9; }
+.club-runtime #launch { border:2px outset #fff3aa; border-radius:0; box-shadow:2px 2px #000; }
+.club-runtime #launch:enabled { background:#fff075; color:#210030; }
+.club-runtime #status { background:#020417; border-color:#a2a2b0; border-radius:0; color:#bff7ff; }
+.club-runtime #console:fullscreen { background-color:#030310; }
+.club-emulator { font-family:"Times New Roman",Georgia,serif; }
+.club-emulator > main { background:#030318f0; border-color:#9891ba; }
+.club-emulator > main > header { background:var(--club-title); border-color:#b6b4d0; }
+.club-emulator > main > header h1 { font-style:italic; font-family:Georgia,serif; }
+.club-emulator #status { color:#bff7ff; font-family:"Courier New",monospace; }
+.club-emulator #screen { border-color:#b6b4d0; box-shadow:0 2px #b83bce; }
+.club-emulator #controls { background:#10102f; border-color:#9891ba; }
+.club-emulator .rom-picker { background:#210745; border:2px ridge #b7adc8; color:#fff5a3; }
+.club-emulator .rom-picker p, .club-emulator .hint, .club-emulator details { color:#c7bed9; }
+.club-emulator .rom-picker a { color:#75ffff; }
+.club-emulator #connect:not(:disabled) { background:#fff075; color:#210030; }
+.club-emulator #connect:disabled { color:#636174; background:#9291a7; box-shadow:none; }
+@media (max-width:1000px) {
+  .club-editor .brand strong { font-size:18px; }
+  .club-editor .mobile-nav { background:#10102f; }
+}
+@media (max-width:550px) {
+  .club-player #setup { width:calc(100% - 16px); padding:18px 14px 14px; margin:8px auto; }
+  .club-player #setup .club-logo { letter-spacing:-1px; }
+  .club-player #setup header span { font-size:10px; letter-spacing:1px; }
+  .club-player #setup section { padding:14px; }
+  .club-player #actions { display:grid; grid-template-columns:minmax(0,1fr); }
+  .club-player #setup input { font-size:16px; }
+}
+@media (max-width:360px) { .club-editor .brand strong { font-size:14px; } }
+
+</style>
 </head>
-<body>
+<body class="flight-club club-emulator">
 <main>
-<header><h1>A wolf in space</h1><span id="status" role="status">Choose your base ROM</span></header>
+<header><h1 class="club-logo">A wolf in space</h1><span id="status" role="status">Choose your base ROM</span></header>
 <section id="screen" data-state="awaiting-rom" aria-label="Game viewscreen"><div id="game" tabindex="0" aria-label="Emulated game"></div><img id="splash" src="./launch-background.jpg" alt="" aria-hidden="true" draggable="false"></section>
 <section id="controls" aria-label="Flight controls">
 <div class="rom-picker"><label for="rom-file">Choose base ROM</label><input id="rom-file" type="file" accept=".z64,.v64,.n64,.zip" aria-describedby="rom-help"><p id="rom-help">Star Fox 64, US v1.1. ROM or ZIP containing one ROM. Files stay on this device.</p><a href="./wolfen.patch.json?v=73b5cd8404d052c0" download>Download mod patch</a></div>

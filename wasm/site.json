@@ -9,8 +9,8 @@
   "modAssetSetSha256": "8f6cfeca601ec080f9bfbaaa34f5feadb7ce30b1c7c80f591e3c9e01f7a4d542",
   "files": {
     "index.html": {
-      "size": 3402,
-      "sha256": "c7ee47edbd38be200e17f37588aef9d9c2203d259b16048819b9b04773ffebaf"
+      "size": 15122,
+      "sha256": "3b8fe5ebeea888fa6177bf89af5962833447665df0754d860edfc4cdfc201b9c"
     },
     "app.mjs": {
       "size": 6108,
@@ -41,8 +41,8 @@
       "sha256": "e97bbac6017322d48aa54a5bc7ce473c725a4b7376ff245002e0ba71c3dcdd7e"
     },
     "runtime/Starship.html": {
-      "size": 21262,
-      "sha256": "5d5d511b8e0ae8345551935d4cd174db278dbbd711a4fdcb3f1ade945ef962fc"
+      "size": 32926,
+      "sha256": "b333483fa4b007bb83f69177c50e46a5ba72b58542a29dc373b4c8ef123f8dd9"
     },
     "runtime/Starship.js": {
       "size": 1113483,
