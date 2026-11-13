@@ -7,6 +7,10 @@ import {fileURLToPath} from 'node:url';
 const i = process.argv.indexOf('--output');
 if (i !== -1 && !process.argv[i + 1]) throw Error('--output requires a path');
 const output = i < 0 ? fileURLToPath(new URL('../../build/multiplayer-check', import.meta.url)) : resolve(process.argv[i + 1]);
+const urlIndex = process.argv.indexOf('--url');
+if (urlIndex !== -1 && !process.argv[urlIndex + 1]) throw Error('--url requires a URL');
+const hostedURL = urlIndex < 0 ? null : new URL(process.argv[urlIndex + 1]);
+if (hostedURL && !['http:', 'https:'].includes(hostedURL.protocol)) throw Error('--url must use HTTP or HTTPS');
 const sleep = ms => new Promise(done => setTimeout(done, ms));
 const report = {ok:false, assertions:{}, signalKinds:[], diagnostics:{}, errors:[]};
 const requests = [], pending = new Map(), pages = [];
@@ -84,10 +88,13 @@ async function screenshot(name) {
 }
 await mkdir(output, {recursive:true});
 try {
-  const {createSignalingServer} = await import('./server.mjs');
-  server = createSignalingServer({host:'127.0.0.1', port:0});
-  await bound(new Promise((done, reject) => { server.server.once('error', reject); server.server.listen(0, '127.0.0.1', done); }), 'server startup');
-  const url = `http://127.0.0.1:${server.server.address().port}/`;
+  if (!hostedURL) {
+    const {createSignalingServer} = await import('./server.mjs');
+    server = createSignalingServer({host:'127.0.0.1', port:0});
+    await bound(new Promise((done, reject) => { server.server.once('error', reject); server.server.listen(0, '127.0.0.1', done); }), 'server startup');
+  }
+  const url = hostedURL?.href ?? `http://127.0.0.1:${server.server.address().port}/`;
+  report.url = url;
   profile = await mkdtemp(resolve(tmpdir(), 'starship-mp-'));
   chrome = spawn('/usr/bin/chromium', ['--headless', '--no-sandbox', '--disable-dev-shm-usage', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--remote-debugging-port=0', `--user-data-dir=${profile}`, 'about:blank'], {stdio:['ignore','ignore','pipe']});
   const debuggerUrl = await bound(new Promise((done, reject) => {
@@ -152,6 +159,10 @@ try {
   assert(channels.some(c => c.messagesSent > 0) && channels.some(c => c.messagesReceived > 0), 'RTC data channels transmitted and received messages', channels);
   assert(Object.values(report.diagnostics).every(d => d.connections.some(c => c.selectedCandidatePair)), 'RTC candidate paths selected', report.diagnostics);
   await screenshot('connected.png');
+  await call('Emulation.setDeviceMetricsOverride', {width:390,height:844,deviceScaleFactor:1,mobile:true}, host.sessionId);
+  assert(await value(host, 'document.documentElement.scrollWidth <= window.innerWidth'), 'mobile page fits viewport', null);
+  await screenshot('mobile.png');
+  await call('Emulation.setDeviceMetricsOverride', {width:1000,height:1100,deviceScaleFactor:1,mobile:false}, host.sessionId);
   await invoke(guest1, 'close');
   await wait('guest departure', async () => {
     const [h, g] = await Promise.all([state(host), state(guest2)]);

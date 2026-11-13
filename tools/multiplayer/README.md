@@ -54,6 +54,16 @@ Signaling traffic is inspected to ensure it carries connection setup rather than
 The browser check writes its report and screenshots to the output directory.
 A local direct connection does not establish TURN fallback, remote-network, Safari, or WASM gameplay support.
 
+
+To check a running service, including a Tailscale HTTPS address:
+
+```sh
+node tools/multiplayer/check-browser.mjs --url https://your-node.your-tailnet.ts.net:8670/ --output /tmp/starwolf-hosted-check
+```
+
+With `--url`, the check uses the supplied service instead of starting another server.
+It runs the same real WebRTC assertions and captures desktop and 390-pixel phone screenshots.
+
 ## LAN, Tailscale, and relay setup
 
 For an intentional LAN listener:
@@ -68,6 +78,19 @@ Use HTTPS for a deployed browser game and its signaling service, including the t
 Tailscale can supply connectivity to the service, but browser ICE routing still needs validation on the intended devices.
 Behind an HTTPS reverse proxy, allow its exact public origin with `--origin https://your-game.example`.
 The option can be repeated for additional trusted origins; it does not enable cross-origin CORS.
+
+
+For a private Tailscale HTTPS proxy, start the backend with the exact public origin:
+
+```sh
+node tools/multiplayer/server.mjs --port 8670 --origin https://your-node.your-tailnet.ts.net:8670
+tailscale serve --bg --https=8670 http://127.0.0.1:8670
+```
+
+Use the address printed by Tailscale Serve while connected to the tailnet.
+The Node process must remain running; a user service can manage it.
+Remove only this proxy with `tailscale serve --https=8670 off`.
+See the [Tailscale Serve documentation](https://tailscale.com/docs/reference/tailscale-cli/serve).
 
 Optional STUN or TURN settings are supplied as a JSON array:
 
