@@ -1,6 +1,8 @@
-"""Serve the exported patch-only emulator for local preview."""
+"""Preview the default WASM site, or select the legacy emulator explicitly."""
 import argparse
 import json
+import subprocess
+import sys
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import urlsplit
@@ -65,8 +67,17 @@ class Handler(BaseHTTPRequestHandler):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--port", type=int, default=8641)
+    parser.add_argument("--runtime", choices=("wasm", "emulator"), default="wasm")
+    parser.add_argument("--directory", type=Path)
     args = parser.parse_args()
+    if args.runtime == "wasm":
+        project = Path(__file__).resolve().parents[1]
+        raise SystemExit(subprocess.call([sys.executable, str(project / "tools/wasm/serve_site.py"),
+            "--directory", str(args.directory or project / "build/wasm/site"),
+            "--port", str(args.port), "--no-browser"]))
+    if args.directory:
+        ROOT = args.directory.resolve()
     if not (ROOT / "wolfen.patch.json").is_file():
-        parser.error("Run python3 tools/export_browser_site.py before starting the preview")
+        parser.error("Run python3 tools/export_browser_site.py --runtime emulator before starting the preview")
     print("Patch-only emulator on http://127.0.0.1:" + str(args.port), flush=True)
     ThreadingHTTPServer(("127.0.0.1", args.port), Handler).serve_forever()

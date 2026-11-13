@@ -177,6 +177,8 @@ def main():
                 raise RuntimeError("Dependency probe did not report its successful round-trip")
             print(output.strip())
         elif command == "public":
+            from refresh_mod import verify_sources as verify_mod_sources
+            verify_mod_sources(ROOT)
             dependencies.prepare(ROOT, LOCK, run)
             dependencies.verify(ROOT)
             configure(ROOT, BUILD / "public-build", "public-configure",
@@ -239,6 +241,6 @@ def main():
 if __name__ == "__main__":
     try:
         sys.exit(main())
-    except (RuntimeError, OSError, subprocess.CalledProcessError) as error:
+    except (RuntimeError, ValueError, OSError, subprocess.CalledProcessError) as error:
         print(f"WASM experiment failed: {error}", file=sys.stderr)
         sys.exit(1)

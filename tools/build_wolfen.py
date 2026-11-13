@@ -535,6 +535,8 @@ class Builder:
         replace_icons(self)
         from medusa import install_medusa
         install_medusa(self, crc64)
+        from crew_hud import install as install_crew_hud
+        install_crew_hud(self)
         from wolf_portraits import replace_portraits
         replace_portraits(self)
         from wolf_identity import replace_name_cards
@@ -546,6 +548,7 @@ class Builder:
         self.recolor_menu()
         replace_identity(self)
         mute_changed_dialogue(self)
+        self.medusa.relocate_launch()
         from vitzy_fighter import build_fighter
         build_fighter(self)
         return wing_parts
@@ -565,6 +568,8 @@ class Builder:
             entry = TABLE + 16 * self.table_indices[stem]
             virtual = struct.unpack_from('>I', out, entry)[0]
             struct.pack_into('>IIII', out, entry, virtual, start, len(out), 0)
+        from crew_hud import patch_rom as patch_crew_hud
+        patch_crew_hud(self, out)
         self.character.patch_rom(out)
         self.medusa.patch_rom(out)
         from wolf_dialogue import patch_dialogue_voice
@@ -678,6 +683,8 @@ class Builder:
         for offset, (_, replacement) in ROM_PATCHES.items():
             if struct.unpack_from('>I', patched, offset)[0] != replacement:
                 raise ValueError('Browser flight color/position patch missing')
+        from crew_hud import verify as verify_crew_hud, restore_common
+        verify_crew_hud(self, patched)
         from wolf_portraits import verify_portraits
         common = bytearray(verify_portraits(self))
         from wolfen_icons import verify_icons
@@ -685,6 +692,7 @@ class Builder:
         for stem, _, offset, old, _ in self.small_icon_changes:
             if stem == 'ast_common':
                 common[offset:offset + len(old)] = old
+        restore_common(self, common)
         if common[:0x1AF98] != self.original_common[:0x1AF98] or common[0x1B198:] != self.original_common[0x1B198:]:
             raise ValueError('An unrelated common asset, including hyper lasers, changed')
         pixels = struct.unpack_from('>256H', common, 0x1AF98)

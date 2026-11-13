@@ -2,18 +2,17 @@ name: WASM browser builder
 on:
   workflow_dispatch:
   push:
-    branches: [starwolf/wasm-port-exploration]
+    branches: [starwolf/dev, starwolf/wasm-port-exploration]
     paths:
       - '.github/workflows/wasm.yml'
       - 'CMakeLists.txt'
       - 'cmake/wasm/**'
       - 'src/**'
-      - 'tools/wasm/**'
-      - 'assets/wasm/**'
+      - 'tools/**'
+      - 'assets/**'
+      - 'include/**'
       - 'port/**'
-      - 'assets/yaml/**'
-      - 'browser/rom-file*'
-      - 'browser/rom-patch*'
+      - 'browser/**'
 permissions:
   contents: read
 concurrency:
@@ -35,6 +34,8 @@ jobs:
           node-version: '22'
       - name: Install host build tools
         run: sudo apt-get update && sudo apt-get install -y cmake ninja-build patch
+      - name: Verify current asset snapshot
+        run: python3 tools/wasm/refresh_mod.py --verify-sources
       - name: Test archive and mod preparation
         run: |
           python3 -m unittest discover -s tools/wasm -p 'test_*.py' -v

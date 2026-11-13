@@ -123,11 +123,14 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--base", type=Path, required=True)
     parser.add_argument("--mod", type=Path, required=True)
+    parser.add_argument("--overlay", type=Path, action="append", default=[], help="Native add-on applied after the main mod")
     parser.add_argument("--chatter", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--check", action="store_true")
     args = parser.parse_args()
     base, target, chatter = archive_files(args.base), archive_files(args.mod), args.chatter.read_bytes()
+    for overlay in args.overlay:
+        target.update(archive_files(overlay))
     if args.check:
         recipe = json.loads((args.output / "recipe.json").read_text())
         literals = (args.output / "literals.dat").read_bytes()

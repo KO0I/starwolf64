@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#14151b">
-<title>Starship · N64 flight deck</title>
+<title>Starwolf64 · N64 flight deck</title>
 <link rel="icon" href="data:,">
 <style>
   :root {color-scheme:dark;font-family:Arial,Helvetica,sans-serif;background:#14151b;color:#eeeef4;--key:46px;}
@@ -87,7 +87,7 @@
 <body>
 <main id="console">
   <header>
-    <div class="brand">STARSHIP<small>N64 FLIGHT DECK</small></div>
+    <div class="brand">STARWOLF64<small>N64 FLIGHT DECK</small></div>
     <div class="toolbar"><p id="game-state" role="status">Loading runtime…</p><button class="utility" id="sound" type="button" disabled>Enable sound</button><button class="utility" id="fullscreen" type="button">Fullscreen</button></div>
   </header>
   <div class="playfield">
@@ -138,6 +138,7 @@
   </footer>
   <details id="diagnostics"><summary>Developer log</summary><pre id="status"></pre></details>
 </main>
+<p id="save-status" role="status" hidden></p>
 <script>
 const statusEl = document.getElementById('status');
 const launch = document.getElementById('launch');
@@ -291,12 +292,40 @@ fullscreen.addEventListener('click',async()=>{
   } catch(error) {addLog('Fullscreen: '+error.message);}
 });
 document.addEventListener('fullscreenchange',()=>{fullscreen.textContent=document.fullscreenElement?'Exit fullscreen':'Fullscreen';releaseControls();});
+const saveKey='starwolf64.wasm.save.v1';
+window.STARSHIP_SAVE_STATUS={restored:false,writes:0,error:null};
+function saveError(error) {
+  window.STARSHIP_SAVE_STATUS.error=String(error);
+  document.getElementById('save-status').hidden=false;
+  document.getElementById('save-status').textContent='Saves unavailable in this browser session.';
+  addLog('Save storage: '+error);
+}
+window.STARSHIP_PERSIST_SAVE=()=>{
+  try {
+    const bytes=Module.FS.readFile('/default.sav');
+    if(bytes.length!==512) throw Error('Invalid save size');
+    localStorage.setItem(saveKey,btoa(String.fromCharCode(...bytes)));
+    window.STARSHIP_SAVE_STATUS.writes++;
+  } catch(error) {saveError(error);}
+};
+function restoreSave() {
+  try {
+    const stored=localStorage.getItem(saveKey);
+    if(stored!==null) {
+      const bytes=Uint8Array.from(atob(stored),char=>char.charCodeAt(0));
+      if(bytes.length!==512) throw Error('Invalid stored save size');
+      Module.FS.writeFile('/default.sav',bytes);
+      window.STARSHIP_SAVE_STATUS.restored=true;
+    }
+  } catch(error) {saveError(error);}
+}
 var Module = {
   noInitialRun:true, canvas:document.getElementById('canvas'),
   print:function(text){console.log(text);addLog(text);},
   printErr:function(text){console.error(text);addLog(text);if(/RuntimeError:|Out of bounds memory access|Aborted\(/i.test(text)) stopGame(text);},
   onAbort:stopGame,
   onRuntimeInitialized:function(){
+    restoreSave();
     runtimeReady=true;
     const exists=path=>{try{return Module.FS.stat(path).size>0;}catch{return false;}};
     preloaded=exists('/sf64.o2r')&&exists('/starship.o2r');
@@ -336,7 +365,11 @@ launch.addEventListener('click',async()=>{
     let index=0;
     for (const file of document.getElementById('mods').files) await write(file,'/mods/mod-'+(index++)+'.o2r');
     const save=document.getElementById('save').files[0];
-    if (save) await write(save,'/default.sav');
+    if (save) {
+      if(save.size!==512) throw Error('Choose a 512-byte Starship save');
+      await write(save,'/default.sav');
+      window.STARSHIP_PERSIST_SAVE();
+    }
     const diagnostic=new URLSearchParams(location.search);
     const characterView=diagnostic.get('character-probe')==='panther'?{
       gWasmPantherProbe:1,

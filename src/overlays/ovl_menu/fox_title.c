@@ -8,6 +8,7 @@
 #include "prevent_bss_reordering2.h"
 #include "global.h"
 #include "fox_title.h"
+#include "medusa.h"
 #include "assets/ast_title.h"
 #include "assets/ast_text.h"
 #include "port/interpolation/FrameInterpolation.h"
@@ -2026,8 +2027,8 @@ void Title_CsTakeOffSpace_Setup(void) {
     gAmbientB = 10;
 
     for (i = 0; i < ARRAY_COUNT(sTitleArwing); i++) {
-        sTitleArwing[i].pos.x = 0.0f;
-        sTitleArwing[i].pos.y = -40.0f;
+        sTitleArwing[i].pos.x = MEDUSA_LAUNCH_OFFSET_X;
+        sTitleArwing[i].pos.y = -40.0f + MEDUSA_LAUNCH_OFFSET_Y;
         sTitleArwing[i].pos.z = -30.0f;
         sTitleArwing[i].scale = 0.1f;
         sTitleArwing[i].xRot = 0.0f;
@@ -2046,8 +2047,8 @@ void Title_CsTakeOffSpace_Setup(void) {
         sTitleArwing[i].draw = false;
     }
 
-    D_menu_801B86BC = -8.0f;
-    D_menu_801B86C0 = -37.0f;
+    D_menu_801B86BC = -8.0f + MEDUSA_LAUNCH_OFFSET_X;
+    D_menu_801B86C0 = -37.0f + MEDUSA_LAUNCH_OFFSET_Y;
     D_menu_801B86C4 = 64.0f;
 
     D_menu_801B86A8 = 5.899999f;
@@ -2065,15 +2066,24 @@ void Title_CsTakeOffSpace_Setup(void) {
 }
 
 CameraPoint D_menu_801ADF84[50] = {
-    { -223.5775f, -61.156242f, -26.375984f, -53.867554f, -42.139626f, 44.77107f },
-    { -160.05501f, -67.74775f, 85.750084f, -61.486446f, -44.164986f, 29.322315f },
-    { -22.228004f, -79.54139f, 121.01903f, -15.555059f, -64.843475f, 85.51631f },
-    { 94.76258f, -100.20792f, 96.57968f, 56.850273f, -76.324486f, 62.990417f },
-    { 187.5704f, -114.560425f, 12.510195f, 111.428185f, -84.394104f, 8.465982f },
-    { 244.8392f, -135.20625f, -212.59172f, 124.296425f, -87.25594f, -43.656223f },
-    { 279.38947f, -216.01698f, -401.49118f, 122.86145f, -89.64914f, -105.359215f },
-    { 440.83572f, -305.19196f, -598.5676f, 89.57457f, -23.879997f, -4.847023f },
-    { 481.63818f, -313.2934f, -628.9213f, 96.2103f, -5.343582f, -4.23885f },
+    { -223.5775f + MEDUSA_LAUNCH_OFFSET_X, -61.156242f + MEDUSA_LAUNCH_OFFSET_Y, -26.375984f,
+      -53.867554f + MEDUSA_LAUNCH_OFFSET_X, -42.139626f + MEDUSA_LAUNCH_OFFSET_Y, 44.77107f },
+    { -160.05501f + MEDUSA_LAUNCH_OFFSET_X, -67.74775f + MEDUSA_LAUNCH_OFFSET_Y, 85.750084f,
+      -61.486446f + MEDUSA_LAUNCH_OFFSET_X, -44.164986f + MEDUSA_LAUNCH_OFFSET_Y, 29.322315f },
+    { -22.228004f + MEDUSA_LAUNCH_OFFSET_X, -79.54139f + MEDUSA_LAUNCH_OFFSET_Y, 121.01903f,
+      -15.555059f + MEDUSA_LAUNCH_OFFSET_X, -64.843475f + MEDUSA_LAUNCH_OFFSET_Y, 85.51631f },
+    { 94.76258f + MEDUSA_LAUNCH_OFFSET_X, -100.20792f + MEDUSA_LAUNCH_OFFSET_Y, 96.57968f,
+      56.850273f + MEDUSA_LAUNCH_OFFSET_X, -76.324486f + MEDUSA_LAUNCH_OFFSET_Y, 62.990417f },
+    { 187.5704f + MEDUSA_LAUNCH_OFFSET_X, -114.560425f + MEDUSA_LAUNCH_OFFSET_Y, 12.510195f,
+      111.428185f + MEDUSA_LAUNCH_OFFSET_X, -84.394104f + MEDUSA_LAUNCH_OFFSET_Y, 8.465982f },
+    { 244.8392f + MEDUSA_LAUNCH_OFFSET_X, -135.20625f + MEDUSA_LAUNCH_OFFSET_Y, -212.59172f,
+      124.296425f + MEDUSA_LAUNCH_OFFSET_X, -87.25594f + MEDUSA_LAUNCH_OFFSET_Y, -43.656223f },
+    { 279.38947f + MEDUSA_LAUNCH_OFFSET_X, -216.01698f + MEDUSA_LAUNCH_OFFSET_Y, -401.49118f,
+      122.86145f + MEDUSA_LAUNCH_OFFSET_X, -89.64914f + MEDUSA_LAUNCH_OFFSET_Y, -105.359215f },
+    { 440.83572f + MEDUSA_LAUNCH_OFFSET_X, -305.19196f + MEDUSA_LAUNCH_OFFSET_Y, -598.5676f,
+      89.57457f + MEDUSA_LAUNCH_OFFSET_X, -23.879997f + MEDUSA_LAUNCH_OFFSET_Y, -4.847023f },
+    { 481.63818f + MEDUSA_LAUNCH_OFFSET_X, -313.2934f + MEDUSA_LAUNCH_OFFSET_Y, -628.9213f,
+      96.2103f + MEDUSA_LAUNCH_OFFSET_X, -5.343582f + MEDUSA_LAUNCH_OFFSET_Y, -4.23885f },
 };
 
 void Title_CsTakeOffSpace_Update(void) {
@@ -2081,8 +2091,14 @@ void Title_CsTakeOffSpace_Update(void) {
     f32 x;
     f32 y;
     f32 z;
-    static f32 D_menu_801AE434[4] = { -15.0f, -5.0f, 5.0f, 10.0f };
-    static f32 D_menu_801AE444[4] = { -50.0f, -45.0f, -55.0f, -60.0f };
+    static f32 D_menu_801AE434[4] = {
+        -15.0f + MEDUSA_LAUNCH_OFFSET_X, -5.0f + MEDUSA_LAUNCH_OFFSET_X,
+        5.0f + MEDUSA_LAUNCH_OFFSET_X, 10.0f + MEDUSA_LAUNCH_OFFSET_X,
+    };
+    static f32 D_menu_801AE444[4] = {
+        -50.0f + MEDUSA_LAUNCH_OFFSET_Y, -45.0f + MEDUSA_LAUNCH_OFFSET_Y,
+        -55.0f + MEDUSA_LAUNCH_OFFSET_Y, -60.0f + MEDUSA_LAUNCH_OFFSET_Y,
+    };
     static f32 D_menu_801AE454[4] = { 265.0f, 260.0f, 255.0f, 230.0f };
 
     switch (sSceneState) {

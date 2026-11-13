@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Export the public emulator and a delta patch, with no complete ROM files."""
+"""Export the default WASM browser player, or the legacy emulator explicitly."""
 import argparse
 import base64
 import hashlib
@@ -19,11 +19,28 @@ ASSETS = ("client.js", "rom-patch.mjs", "rom-file.mjs", "coi-serviceworker.js",
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--rom", type=Path, default=ROOT / BASE_NAME)
-    parser.add_argument("--patched", type=Path, default=ROOT / "browser/wolfen.z64")
-    parser.add_argument("--output", type=Path, default=ROOT / "browser/runtime/site")
-    parser.add_argument("--domain", help="Custom domain to put in the exported CNAME file")
+    parser.add_argument("--runtime", choices=("wasm", "emulator"), default="wasm")
+    parser.add_argument("--build-dir", type=Path, default=ROOT / "build/wasm/public-build")
+    parser.add_argument("--rom", type=Path)
+    parser.add_argument("--patched", type=Path)
+    parser.add_argument("--output", type=Path)
+    parser.add_argument("--domain", help="Custom domain for the exported CNAME")
     args = parser.parse_args()
+    if args.domain and not re.fullmatch(r"[a-zA-Z0-9.-]+", args.domain):
+        parser.error("Use a domain name without a scheme, path, or port")
+    if args.runtime == "wasm":
+        if args.rom or args.patched:
+            parser.error("ROM patch options require --runtime emulator")
+        from wasm.export_site import export
+        export(args.build_dir, args.output or ROOT / "build/wasm/site", domain=args.domain)
+        return
+    args.rom = args.rom or ROOT / BASE_NAME
+    args.patched = args.patched or ROOT / "browser/wolfen.z64"
+    args.output = args.output or ROOT / "browser/runtime/site"
+    export_emulator(args, parser)
+
+
+def export_emulator(args, parser):
     source, target = args.rom.read_bytes(), args.patched.read_bytes()
     if hashlib.sha1(source).hexdigest() != BASE_SHA1:
         parser.error("Expected an unmodified US v1.1 big-endian base ROM")

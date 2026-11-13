@@ -1,64 +1,75 @@
 # Play Starwolf64 in a browser
 
-Choose your own unmodified Star Fox 64 US v1.1 ROM, then press Launch. The browser verifies the ROM, reconstructs the unchanged assets, applies the mod, and runs EmulatorJS 4.2.3 with mupen64plus_next.
+Choose your unmodified Star Fox 64 US v1.1 ROM, wait for preparation, then press Play. The default browser edition runs the native Starship engine compiled to WebAssembly with WebGL 2. ROM verification, extraction, and mod assembly happen on your device.
 
-The ROM stays on your device. The public site contains the emulator interface and a delta patch. It contains neither the base ROM nor a complete modified ROM. The hosted patch stores only bytes that differ after the browser reconstructs the original expanded segments. The finished game must match the build's SHA-256 digest.
+The public site contains the engine, extractor, and a mod recipe. It contains no ROM or extracted base archive. Raw .z64, .v64, and .n64 files are supported, along with a ZIP containing exactly one ROM. The normalized ROM must match the known US v1.1 SHA-256 before extraction.
 
-The file picker accepts .z64, .v64, .n64, or a ZIP containing exactly one ROM at its root. ZIPs may use stored or DEFLATE compression and must be no larger than 16 MiB. Encrypted files, extra files, directories, links, unsafe paths, ZIP64, split archives, malformed headers, and CRC mismatches are rejected. File names must be valid UTF-8; ASCII names work with older ZIP tools.
+The browser edition includes the current Wolf, Panther, Krystal, Kami, and Vitzy assets, crew HUD, Medusa updates, and Panther title-eye correction. It applies the Starwolf [dialogue-blip add-on](../docs/dialogue-blips.md) after the character mod. Blips use the native audio sequence timing and voice-volume setting. Expert mode uses Vitzy's voice, and the prologue plays the full reversed narration. The older PCM chatter mixer is suppressed while the blip add-on is active.
 
-Decompression is streamed with bounded input chunks and a strict 12 MiB output limit. The normalized ROM must match the known base ROM's SHA-1 and SHA-256 checksums before emulation. Archive contents are never executed or written to the filesystem. These checks validate an exact ROM rather than perform a general antivirus scan.
+## Build the browser edition
 
-## Build and export
+Prepare the pinned toolchain once:
 
-Put your base ROM at the project root under its existing filename and generate sf64.o2r using the upstream build instructions. Install NumPy and Pillow for the asset builder if needed.
+```sh
+python3 tools/wasm/run.py bootstrap
+python3 tools/wasm/run.py dependencies
+```
 
-~~~sh
-python3 tools/build_wolfen.py
-python3 tools/build_wolfen.py --check
-python3 tools/export_browser_site.py
-~~~
+Build and export the ROM-free public site:
 
-The build installs the reviewed Wolf, Panther, Krystal, and Kami bodies and pilot heads, plus Vitzy's Expert head. The native Expert fighter also uses her Bill cockpit module. See [character conversion](../assets/characters/INTEGRATION.md) for slot mappings, animation limits, rebuild checks, and credits.
+```sh
+python3 tools/wasm/run.py public
+python3 tools/export_browser_site.py --domain play.starwolf64.com
+python3 browser/serve.py --port 8641
+```
 
-Crew dialogue uses short voiced syllables timed to the text reveal. Wolf uses his original voice lowered three semitones with a bass boost. Panther uses Peppy's voice lowered ten semitones with a bass boost. Kami uses Vitzy's recording lowered three semitones with slower delivery. Krystal uses newly generated English-accent female snippets. Vitzy keeps her own recording at its original base pitch, in the separate Expert pilot slot. Red portrait variants keep the same voice. The prologue plays the full original narration backwards as one continuous recording, stopped when the prologue is skipped or finishes.
+Open http://127.0.0.1:8641/. Both export and preview commands default to WASM. The site is written to `build/wasm/site/`. The exporter can package an existing non-preloaded build without compiling it again. Use `--output /path/to/site` for a separate output directory. It refuses to overwrite unrelated files.
 
-The native player mixes the shared 32 kHz PCM bank into Starship's audio output and follows its master and voice volumes. Settings > Audio > Crew chatter switches between chatter and silent crew dialogue. Rebuild the executable and regenerate the native mod together. The browser player reads the dialogue reveal from EmulatorJS and plays the same banks with Web Audio. It follows the browser sound control and the game's Voice Volume setting. Other speakers retain their original voices unless their dialogue text was edited.
+Publish only the exported directory. Keep its licenses and `.nojekyll` file. The `--domain` option writes a CNAME. Omit it for project-path hosting. The WASM workflow builds the same package on `starwolf/dev` and uploads it as an artifact. It does not publish it automatically.
 
-The packaged banks and source/processing record live in assets/audio/chatter. To regenerate them from the approved preview working files, run python3 tools/build_crew_chatter.py. The native PCM player is independent of ROM addresses; the browser adapter contains the US v1.1 RAM addresses. Browser chatter requires this web player; it is not embedded in the standalone ROM.
+## Refresh assets and audio
 
-The static site is written to browser/runtime/site. The exporter uses an explicit file list and refuses to overwrite unrelated files. It never copies either ROM, native save files, Python environments, or extracted game archives.
+After changing mod sources, supply the verified base ROM, `sf64.o2r`, and its matching `audio_data` export, then run:
 
-To export with a custom domain:
+```sh
+python3 tools/wasm/refresh_mod.py
+python3 tools/wasm/refresh_mod.py --check
+```
 
-~~~sh
-python3 tools/export_browser_site.py --output /tmp/starwolf64-site --domain play.starwolf64.com
-~~~
+The refresh command rebuilds the character mod and native dialogue-blip add-on, applies the add-on last, then compares every reconstructed resource before saving the recipe. Commit the source changes and all files under `assets/wasm/mod/` together. Public export and CI reject changed source inputs until the snapshot is refreshed. CI needs no private ROM or extracted assets.
 
-Fork the repository and copy the export to your own GitHub Pages source branch. Use your own domain in --domain, or omit that option to host under your GitHub Pages project address. The page uses relative asset URLs for both arrangements. Preserve LICENSE.md, the service worker license, and Arwing-source.txt when copying it.
+See [character integration](../assets/characters/INTEGRATION.md), [the WASM build guide](../tools/wasm/README.md), and [snapshot details](../assets/wasm/README.md).
 
-## Preview and verify
+## Play and save
 
-Preview exactly the public files:
+The N64 controller supports a proportional stick, A, B, Start, L, R, Z, a D-pad, and four C buttons. Keyboard controls and standard gamepads also work. Touch gestures and Enable sound resume suspended browser audio. Fullscreen expands the flight deck.
 
-~~~sh
-python3 -m http.server 8643 --bind 127.0.0.1 --directory browser/runtime/site
-~~~
+Game saves persist in this browser for the site's address. The WASM player keeps a separate save from the legacy emulator. Choosing another ROM after reloading does not clear the WASM save. The runtime accepts a 512-byte native Starship save through its developer file picker. Browser storage restrictions can prevent persistence; the player reports that failure.
 
-The included service worker supplies the isolation headers needed by the threaded core. It reloads the page once on the first visit to HTTPS or localhost.
+Download game creates a ZIP with your prepared assets and a Python 3 localhost launcher. Unpack it and run `python3 start.py`. Keep the prepared download for your own use. Opening its HTML through file:// is unsupported.
 
-~~~sh
-node --test browser/rom-patch.test.mjs browser/rom-file.test.mjs browser/crew-chatter.test.mjs
-node browser/check-browser.mjs http://127.0.0.1:8643/
-node browser/check-audio.mjs http://127.0.0.1:8643/
-~~~
+WebGL 2, SharedArrayBuffer, and cross-origin isolation are required. Local preview supplies isolation headers. Static HTTPS hosting uses the included service worker and can reload once on first visit. Chromium gameplay and mobile viewport checks are automated. Actual iPhone Safari behavior and complete campaign play still require device testing.
 
-The browser check selects the local base ROM with the real file picker, boots the emulator, checks input and audio, locates live dialogue RAM, exercises all six chatter banks and pause/resume, and captures desktop and mobile layouts. It also checks that no ROM is served or uploaded. Supply another base ROM path as the second argument after the URL when needed.
+## Verify the browser build
 
-The audio check measures the emulator's actual output signal. It verifies that mute resets on refresh, mute lasts through pause/resume within a page session, saved volume survives refresh, and keyboard and sound-button input restore suspended audio. It uses real input events without granting artificial user activation to status reads.
+```sh
+python3 -m unittest discover -s tools/wasm -p 'test_*.py' -v
+node --test tools/wasm/web/zip.test.mjs browser/rom-file.test.mjs browser/rom-patch.test.mjs
+node tools/wasm/check-webgl.mjs --site --rom '/path/to/base.z64' --site-invalid --site-download --audio-session --audio-resume --touch --voice-blips --save-persistence --output build/wasm/default-browser-check
+```
 
-If audio is silent, press Enable sound. Each fresh page load starts unmuted. Mute lasts for the current page session, including pause/resume, and is not remembered after refresh. Other preferences and game saves are preserved. The sound button reflects browser audio suspension. Keyboard and touch controls also resume suspended audio; they preserve the current session's mute setting.
+The browser check prepares a local ROM, validates the download, enters Training, exercises touch input, measures audio, verifies voice routing and mute, and reloads to compare persisted save bytes. It rejects upload requests.
 
-Keyboard, touch, and standard gamepads use the controls below the viewscreen. Save states and game saves are stored in the browser for that site's address.
+## Use the legacy emulator
+
+The previous EmulatorJS player remains available explicitly:
+
+```sh
+python3 tools/export_browser_site.py --runtime emulator
+python3 browser/serve.py --runtime emulator --port 8642
+```
+
+Its export remains `browser/runtime/site/`. Its checks are `browser/check-browser.mjs`, `browser/check-controls.mjs`, and `browser/check-audio.mjs`.
 
 ## Connect the game domain
 
@@ -99,27 +110,3 @@ References:
 - [Squarespace DNS settings](https://support.squarespace.com/hc/en-us/articles/360002101888-Edit-your-domain-s-DNS-records)
 - [EmulatorJS options](https://emulatorjs.org/docs/options/)
 - [coi-serviceworker](https://github.com/gzuidhof/coi-serviceworker)
-
-## N64 controller shared with the WASM preview
-
-The main player now uses the preview's controller layout: a proportional analog
-stick, A, B, Start, L, R, Z, a separate D-pad and all four C buttons. The controls
-can remain below the viewscreen or move into it with the existing placement button.
-Touches beginning on the controller cannot pan the page, even after dragging beyond
-its edges. Pointer cancellation, focus loss, rotation and fullscreen transitions
-release held input.
-
-The emulator adapter uses the N64 IDs from pinned EmulatorJS 4.2.3. Multiple sources
-sharing one input are combined before submission so releasing one source does not
-cancel another. Small stick movements send smaller magnitudes.
-
-```sh
-node browser/check-controls.mjs http://127.0.0.1:8641/
-node browser/check-audio.mjs http://127.0.0.1:8641/ --playback-session
-```
-
-The controller check verifies all 14 buttons, proportional input, pointer-capture
-failure, multitouch, scroll prevention and layouts from 320 to 1280 pixels wide.
-The main player's playback audio-session selection has also been transferred to
-the WASM preview before its AudioContext is created. Gesture-based resume remains
-in place in both players.

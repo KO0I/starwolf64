@@ -37,7 +37,7 @@ def plans():
 
 def apply_budget(glb, character, variant):
     key = f'{character}/{variant}'
-    limits = {'krystal/title': 768, 'kami/title': 768}
+    limits = {'krystal/title': 768, 'kami/title': 768, 'krystal/pilot': 360}
     if key not in limits:
         return None
     plan = plans().get(key)

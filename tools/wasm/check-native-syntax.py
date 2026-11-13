@@ -9,6 +9,8 @@ import subprocess
 
 ROOT = Path(__file__).resolve().parents[2]
 FILES = ['src/port/Game.cpp', 'src/port/Engine.cpp', 'src/port/extractor/GameExtractor.cpp',
+         'src/sys/sys_joybus.c', 'src/audio/audio_synthesis.c', 'src/engine/fox_bg.c',
+         'src/engine/fox_display.c', 'src/engine/fox_hud.c', 'src/overlays/ovl_menu/fox_title.c',
          'libultraship/src/graphic/Fast3D/backends/gfx_sdl2.cpp', 'libultraship/src/window/gui/Gui.cpp']
 
 

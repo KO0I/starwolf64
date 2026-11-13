@@ -1,29 +1,24 @@
-# Tested WASM mod snapshot
+# Current WASM mod snapshot
 
-`mod/recipe.json` and `mod/literals.dat` reconstruct the exact native mod used by
-the working private preview. Base resources are referenced by path and content
-hash, with only changed byte ranges stored in the patch. Identical resources under
-new mod names reuse the extracted base data. New mod resources are patch data.
-`mod/chatter.dat` is the reviewed CHT2 crew-chatter bank used by that preview; it
-is separate from the older native-authoring bank on this branch.
+`mod/recipe.json` and `mod/literals.dat` reconstruct the current character mod with the Starwolf dialogue-blip add-on applied last. Base resources are referenced by path and content hash. Changed byte ranges and new mod resources are stored as patch data.
 
-The snapshot contains 1,668 resources. Its canonical resource-set SHA-256 is
-`8f6cfeca601ec080f9bfbaaa34f5feadb7ce30b1c7c80f591e3c9e01f7a4d542`.
-This preserves the existing characters, ships, title cards, chatter and Panther
-eye correction. ZIP timestamps and compression can differ; every resource's
-actual bytes must match.
+`mod/chatter.dat` matches `assets/audio/chatter/bank.bin`. The archive retains that PCM bank, but the dialogue-blip marker selects native sequence playback and suppresses the legacy mixer. The current snapshot includes the crew HUD, Medusa launch updates, reviewed character refinements, and Panther title-eye correction.
 
-The browser's pinned Torch extractor supplies the original game assets from the
-user's ROM. No base archive or ROM is stored here. The recipe is the versioned mod
-input for the browser build, so a fresh CI build does not need either private file.
+The browser's pinned Torch extractor supplies the original game assets from the visitor's ROM. No base archive or ROM is stored here. The recipe contains each resource hash and a canonical resource-set SHA-256. ZIP timestamps and compression may differ; reconstructed resource bytes must match.
 
-To update the snapshot from a reviewed native mod:
+To rebuild and verify the snapshot from current sources:
 
 ```sh
-python3 tools/wasm/mod_recipe.py --base /path/sf64.o2r --mod /path/wolfen.o2r --chatter /path/reviewed-bank.bin --output assets/wasm/mod
+python3 tools/wasm/refresh_mod.py
+python3 tools/wasm/refresh_mod.py --check
 ```
 
-The generator reconstructs and compares every resource before writing the new
-recipe. Repeat with `--check` to verify an existing snapshot. Include the changed
-recipe, literals and chatter together in the source commit. The browser's asset
-fingerprint identifies which snapshot a prepared game uses.
+These commands require the verified base ROM, `sf64.o2r`, and its matching `audio_data` export. The refresh command runs the existing character and audio builders, combines their resource maps in native load order, and compares every reconstructed resource before writing the recipe.
+
+`mod/sources.json` records SHA-256 hashes of versioned asset inputs and the builders' transitive local Python imports. Public export and CI verify these inputs without a ROM:
+
+```sh
+python3 tools/wasm/refresh_mod.py --verify-sources
+```
+
+Commit source changes with the recipe, literals, chatter, and source hashes. The browser's asset fingerprint identifies the snapshot in prepared downloads.

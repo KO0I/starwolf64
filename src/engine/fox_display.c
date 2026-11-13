@@ -1600,8 +1600,9 @@ void Display_Player_Update(Player* player, s32 reflectY) {
 f32 D_display_800CA334[] = {
     0.02f, 0.06f, 0.08f, 0.05f, 0.04f, 0.03f, 0.06f, 0.04f,
 };
+static const ALIGN_ASSET(2) char aWolfMarkDL[] = "__OTR__crew_hud/aWolfMarkDL";
 Gfx* sTeammateMarkDLs[] = {
-    aFalcoMarkDL, aFalcoMarkDL, aSlippyMarkDL, aPeppyMarkDL, aPeppyMarkDL, aPeppyMarkDL,
+    aWolfMarkDL, aFalcoMarkDL, aSlippyMarkDL, aPeppyMarkDL, aPeppyMarkDL, aPeppyMarkDL,
     aPeppyMarkDL, aPeppyMarkDL, aKattMarkDL,   aBillMarkDL,  aJamesMarkDL,
 };
 f32 D_display_800CA380 = 0.0f;

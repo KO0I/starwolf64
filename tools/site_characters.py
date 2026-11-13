@@ -48,6 +48,9 @@ POSE_REFERENCES = (
 )
 HEAD_SLOTS = {'wolf': 0x90, 'krystal': 0x3CE0, 'kami': 0x5AB0,
               'panther': 0x16CC0, 'vitzy': 0x1C90}
+CREW_HEAD_DROP_RATIO = .15
+KAMI_HEAD_SCALE = 1.155
+KAMI_HEAD_EXTRA_DROP_RATIO = .2
 
 
 def replace_word(data, offset, old, new):
@@ -79,7 +82,7 @@ class SiteCharacters:
             return GLB(archive.read(path))
 
     @staticmethod
-    def bounds(glb):
+    def bounds(glb, referenced_only=False):
         world = glb.world_matrices()
         points = []
         for index, node in enumerate(glb.doc['nodes']):
@@ -87,6 +90,8 @@ class SiteCharacters:
                 continue
             for part in glb.doc['meshes'][node['mesh']]['primitives']:
                 xyz = glb.accessor(part['attributes']['POSITION'])
+                if referenced_only and 'indices' in part:
+                    xyz = xyz[glb.accessor(part['indices']).reshape(-1)]
                 points.extend((np.c_[xyz, np.ones(len(xyz))] @ world[index].T)[:, :3])
         points = np.array(points)
         return points.min(axis=0), points.max(axis=0)
@@ -112,15 +117,25 @@ class SiteCharacters:
                     details = install_panther_head(glb, 'pilot')
             glb.doc.setdefault('asset', {}).setdefault('extras', {})['runtime_smooth_head_normals'] = True
             trim = glb.doc.get('asset', {}).get('extras', {}).get('runtime_hair_trim')
+            bounds = self.bounds(glb, referenced_only=True)
             low, high = np.asarray(trim['fit_bounds']) if trim else self.bounds(glb)
             scale = min(5.0, * (np.array([554., 623., 636.]) / (high - low)))
             if name == 'panther':
                 scale *= 1.1
-            if name in ('wolf', 'panther', 'krystal', 'kami'):
-                scale *= .9
+            crew_head = name in ('wolf', 'panther', 'krystal', 'kami')
+            head_height = (bounds[1][1] - bounds[0][1]) * scale
+            seat_drop = head_height * CREW_HEAD_DROP_RATIO if crew_head else 0.
             fit = np.eye(4)
             fit[:3, :3] *= scale
             fit[:3, 3] = center - (low + high) * .5 * scale
+            fit[1, 3] -= seat_drop
+            if name == 'kami':
+                head_center = (bounds[0] + bounds[1]) * .5
+                fit[:3, 3] += head_center * scale * (1 - KAMI_HEAD_SCALE)
+                fit[:3, :3] *= KAMI_HEAD_SCALE
+                extra_drop = head_height * KAMI_HEAD_EXTRA_DROP_RATIO
+                fit[1, 3] -= extra_drop
+                seat_drop += extra_drop
             world = glb.world_matrices()
             meshes = [(index, fit @ world[index]) for index, node in enumerate(glb.doc['nodes']) if 'mesh' in node]
             path = 'ast_arwing/' + self.builder.assets['ast_arwing', offset][0]
@@ -128,10 +143,11 @@ class SiteCharacters:
             before = bytes(self.builder.segments['ast_arwing'][offset:offset + 8])
             struct.pack_into('>II', self.builder.segments['ast_arwing'], offset, 0x06010000, address)
             self.head_patches.append((offset, before, address))
-            if name == 'kami' and triangles > 512:
-                raise ValueError(f'{name} cockpit head exceeds 512 triangles')
+            head_budget = {'kami': 512, 'krystal': 360}.get(name)
+            if head_budget is not None and triangles > head_budget:
+                raise ValueError(f'{name} cockpit head exceeds {head_budget} triangles')
             self.heads[name] = {'source': source, 'triangles': triangles,
-                                'fit': fit.tolist(), 'path': path, 'address': address,
+                                'fit': fit.tolist(), 'path': path, 'address': address, 'seat_drop': seat_drop,
                                 'generated_details': details, 'triangle_reduction': reduction, 'hair_trim': trim}
             if name == 'vitzy':
                 if triangles > 216:
@@ -313,7 +329,7 @@ class SiteCharacters:
                           'Pilot meshes use the game head steering; facial animation clips remain in the source pack.',
                           'Large atlases are reduced to the N64 texture memory budget.',
                           'Verified runtime selections limit Krystal/Kami title bodies to 768 and the Kami cockpit head to 512 triangles.',
-                          'Krystal cockpit geometry retains the original 520-triangle source head.',
+                          'Krystal cockpit uses the eye-preserving 360-triangle reduction of its 520-triangle source head.',
                           'Kami cockpit geometry is taken directly from her prepared title body head.']}
 
     def summary(self):

@@ -315,6 +315,27 @@ with zipfile.ZipFile(sys.argv[1]) as z:
     if(buttonResume.state!=='running'||buttonResume.buffers<=buttonBefore.buffers||buttonResume.energy<=buttonBefore.energy) throw Error('Enable sound did not restore audio: '+JSON.stringify(buttonResume));
     result.audioResume={controller:resumed,button:buttonResume};
   }
+  if(game&&process.argv.includes('--voice-blips')) {
+    if(!await value('window.STARSHIP_GAME_STATE.voiceBlips')) throw Error('Native dialogue-blip marker was not loaded');
+    const phases={};result.voiceBlips=phases;
+    for(const [name,expert,volume] of [['normal',0,99],['expert',1,99],['muted',1,0]]) {
+      await value(`Module._Wasm_ProbeVoice(2050,${expert},${volume})`);
+      await sleep(1100);
+      await value('Object.assign(window.STARSHIP_AUDIO_STATS,{peak:0,energy:0,samples:0})');
+      await sleep(1000);
+      const measured=await value('({state:window.STARSHIP_GAME_STATE,audio:{...window.STARSHIP_AUDIO_STATS}})');
+      const state=measured.state;
+      if(state.routedVoiceId!==(expert?24040:2050)) throw Error('Incorrect '+name+' voice routing: '+JSON.stringify(state));
+      const rms=Math.sqrt(measured.audio.energy/measured.audio.samples);
+      phases[name]={routedVoiceId:state.routedVoiceId,voiceId:state.voiceId,rms};
+      if(name==='muted'?rms>0.00025||rms>phases.normal.rms/100:rms<0.003)
+        throw Error('Dialogue-blip output or volume failed: '+JSON.stringify(phases));
+      const deadline=Date.now()+10000;
+      while(await value('window.STARSHIP_GAME_STATE.voiceId')!==0&&Date.now()<deadline) await sleep(100);
+      if(await value('window.STARSHIP_GAME_STATE.voiceId')!==0) throw Error('Dialogue voice did not complete');
+    }
+    result.voiceBlips=phases;
+  }
   if(game) {
     await call('Page.bringToFront');
     await sleep(1600); // Let the game's initial controller lock expire.
@@ -445,6 +466,28 @@ with zipfile.ZipFile(sys.argv[1]) as z:
         result.touch={released,portrait,landscape};
       }
     }
+  }
+  if(game&&process.argv.includes('--save-persistence')) {
+    const saved=await value(`({status:window.STARSHIP_SAVE_STATUS,stored:localStorage.getItem('starwolf64.wasm.save.v1'),
+      actual:btoa(String.fromCharCode(...Module.FS.readFile('/default.sav')))})`);
+    if(saved.status.error||!saved.status.writes||saved.stored!==saved.actual||Buffer.from(saved.stored,'base64').length!==512)
+      throw Error('Game save was not persisted: '+JSON.stringify(saved.status));
+    const savedShot=await call('Page.captureScreenshot',{format:'png'});
+    await writeFile(resolve(output,'saved-gameplay.png'),Buffer.from(savedShot.data,'base64'));
+    evaluationContext=undefined;
+    // Reload the player on the same origin, then read the restored file before game startup.
+    await call('Page.navigate',{url:site?new URL('runtime/Starship.html',previewUrl||`http://127.0.0.1:${server.address().port}/`).href:
+      previewUrl||`http://127.0.0.1:${server.address().port}/Starship.html`});
+    const deadline=Date.now()+45000;
+    let restored;
+    while(Date.now()<deadline) {
+      restored=await value(`window.STARSHIP_RUNTIME_READY?({status:window.STARSHIP_SAVE_STATUS,
+        actual:btoa(String.fromCharCode(...Module.FS.readFile('/default.sav')))}):null`);
+      if(restored) break;
+      await sleep(100);
+    }
+    if(!restored?.status.restored||restored.actual!==saved.actual) throw Error('Reload did not restore the game save');
+    result.savePersistence={bytes:512,writes:saved.status.writes,restored:true};
   }
   if(errors.length) throw Error('Browser errors after gameplay: '+JSON.stringify(errors));
   const shot = await call('Page.captureScreenshot', {format:'png'});

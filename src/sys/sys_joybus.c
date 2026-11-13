@@ -1,6 +1,7 @@
 #include "sys.h"
 
 #ifdef __EMSCRIPTEN__
+#include <emscripten.h>
 extern void Wasm_ReadController(OSContPad* pad);
 #endif
 
@@ -108,7 +109,13 @@ bool Save_ReadData(void) {
 }
 
 bool Save_WriteData(void) {
-    return Save_WriteEeprom(&gSaveIOBuffer) == 0;
+    bool saved = Save_WriteEeprom(&gSaveIOBuffer) == 0;
+#ifdef __EMSCRIPTEN__
+    if (saved) {
+        MAIN_THREAD_EM_ASM({ window.STARSHIP_PERSIST_SAVE(); });
+    }
+#endif
+    return saved;
 }
 
 void Controller_Rumble(void) {

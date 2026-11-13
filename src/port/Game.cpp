@@ -10,6 +10,7 @@
 #include <emscripten.h>
 #include <emscripten/heap.h>
 #include <emscripten/threading.h>
+#include "audio/VoiceBlips.h"
 #endif
 
 extern "C" {
@@ -18,6 +19,11 @@ extern "C" {
 #include <sf64thread.h>
 #include <sf64context.h>
 void Wasm_GetTitleStatus(double* state);
+void Audio_PlayVoice(s32 message);
+void Audio_SetVolume(u8 type, u8 volume);
+s32 Audio_GetCurrentVoice(void);
+extern u32 sNextVoiceId;
+extern s32 sTitleMsgFrameCount;
 #endif
     void Main_SetVIMode(void);
     void Main_Initialize(void);
@@ -42,6 +48,13 @@ extern "C" void Timer_Update();
 
 #ifdef __EMSCRIPTEN__
 static std::atomic<uint32_t> browserControllerState{0};
+static std::atomic<uint32_t> browserVoiceProbe{0};
+
+extern "C" EMSCRIPTEN_KEEPALIVE void Wasm_ProbeVoice(int message, int expert, int volume) {
+    if (message < 4 || message >= 24000 || volume < 0 || volume > 99) return;
+    browserVoiceProbe.store(static_cast<uint32_t>(message) | (expert ? 0x10000u : 0u) |
+                            (static_cast<uint32_t>(volume) << 17), std::memory_order_relaxed);
+}
 
 extern "C" EMSCRIPTEN_KEEPALIVE void Wasm_SetControllerState(int buttons, int stickX, int stickY) {
     stickX = std::clamp(stickX, -85, 85);
@@ -74,16 +87,19 @@ static void browserStatus(const char* phase) {
         static_cast<double>(gControllerHold[0].stick_x), static_cast<double>(gControllerHold[0].stick_y),
         static_cast<double>(gPlayer ? gPlayer[0].pos.y : 0), static_cast<double>(gPlayer ? gPlayer[0].shields : 0),
         static_cast<double>(gPlayer ? gPlayer[0].radioDamageTimer : 0), static_cast<double>(gPathProgress),
-        static_cast<double>(emscripten_get_heap_size()), title[0], title[1], title[2], title[3], title[4], title[5]
+        static_cast<double>(emscripten_get_heap_size()), title[0], title[1], title[2], title[3], title[4], title[5],
+        static_cast<double>(browserFrames ? VoiceBlips_IsActive() : 0),
+        static_cast<double>(browserFrames ? Audio_GetCurrentVoice() : 0),
+        static_cast<double>(sNextVoiceId)
     };
     MAIN_THREAD_EM_ASM({
-        const state = HEAPF64.subarray($1 / 8, $1 / 8 + 23);
+        const state = HEAPF64.subarray($1 / 8, $1 / 8 + 26);
         window.STARSHIP_GAME_STATE = ({phase:UTF8ToString($0), frames:state[0],
             gameState:state[1], titleState:state[2], gameFrame:state[3], onWorker:!!state[4],
             playState:state[5], level:state[6], playerState:state[7], playerX:state[8],
             buttons:state[9], stickX:state[10], stickY:state[11], playerY:state[12],
             shields:state[13], radioDamageTimer:state[14], path:state[15], heapBytes:state[16], titleCutscene:state[17], titleScene:state[18],
-            cutsceneFrame:state[19], titleCard:state[20], titleNameVisible:!!state[21], titleCardTimer:state[22]});
+            cutsceneFrame:state[19], titleCard:state[20], titleNameVisible:!!state[21], titleCardTimer:state[22], voiceBlips:!!state[23], voiceId:state[24], routedVoiceId:state[25]});
         const label = document.getElementById('game-state');
         if (label && !window.STARSHIP_GAME_ERROR) label.textContent = UTF8ToString($0) === 'initializing' ? 'Initializing game…' : (state[1] === 2 ? 'Title screen running' : 'Game running');
     }, phase, state);
@@ -91,6 +107,18 @@ static void browserStatus(const char* phase) {
 #endif
 
 void push_frame() {
+#ifdef __EMSCRIPTEN__
+    if (const auto probe = browserVoiceProbe.exchange(0, std::memory_order_relaxed)) {
+        const auto previousExpertMode = gExpertMode;
+        gExpertMode = (probe & 0x10000u) != 0;
+        sTitleMsgFrameCount = 0;
+        Audio_SetVolume(0, 0);
+        Audio_SetVolume(2, 0);
+        Audio_SetVolume(1, (probe >> 17) & 0x7Fu);
+        Audio_PlayVoice(probe & 0xFFFFu);
+        gExpertMode = previousExpertMode;
+    }
+#endif
     Graphics_ThreadUpdate();
     GameEngine::StartAudioFrame();
     GameEngine::Instance->StartFrame();

@@ -1,6 +1,16 @@
-"""Project the installed Wolfen mesh into the original small ship textures."""
+"""Install the supplied life/menu icon and project the Wolfen radar marker."""
 import math
 import struct
+from pathlib import Path
+
+from PIL import Image, ImageOps
+
+LIFE_ICON = Path(__file__).resolve().parents[1] / "assets/wolfen/life-indicator.png"
+LIFE_PALETTE = (
+    (0, 0, 0, 0), (255, 255, 255, 255), (183, 255, 242, 255),
+    (88, 244, 217, 255), (29, 219, 193, 255),
+    (255, 193, 209, 255), (255, 115, 149, 255), (247, 49, 100, 255),
+)
 
 
 PALETTE = (
@@ -68,11 +78,27 @@ def render_icon(triangles, tilt):
     return bytes(indices[i] << 4 | indices[i + 1] for i in range(0, len(indices), 2)), bytes(silhouette)
 
 
-def replace_icons(builder):
-    icon, _ = render_icon(builder.geometry['full'], math.radians(60))
-    _, radar = render_icon(builder.geometry['full'], 0)
+def load_life_icon():
+    """Pack the reference into the existing 16x16 CI4/eight-color slots."""
+    with Image.open(LIFE_ICON) as source:
+        image = ImageOps.contain(source.convert('RGBA'), (16, 16), Image.Resampling.LANCZOS)
+    canvas = Image.new('RGBA', (16, 16))
+    canvas.paste(image, ((16 - image.width) // 2, (16 - image.height) // 2))
+    indices = [0 if a < 96 else min(range(1, len(LIFE_PALETTE)),
+               key=lambda c: sum((LIFE_PALETTE[c][i] - rgb) ** 2
+                                 for i, rgb in enumerate((r, g, b))))
+               for r, g, b, a in canvas.getdata()]
+    if not all(any(index == c for index in indices) for c in (0, 3, 7)):
+        raise ValueError('Life icon must retain transparency, mint wings and pink engines')
+    icon = bytes(indices[i] << 4 | indices[i + 1] for i in range(0, len(indices), 2))
     palette = struct.pack('>8H', *((r >> 3) << 11 | (g >> 3) << 6 | (b >> 3) << 1 | bool(a)
-                                   for r, g, b, a in PALETTE))
+                                   for r, g, b, a in LIFE_PALETTE))
+    return icon, palette
+
+
+def replace_icons(builder):
+    icon, palette = load_life_icon()
+    _, radar = render_icon(builder.geometry['full'], 0)
     builder.small_icon_changes = []
     for stem, offset, fmt in ICON_SLOTS:
         name, fields = builder.assets[stem, offset]

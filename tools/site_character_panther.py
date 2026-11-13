@@ -98,7 +98,7 @@ def parts():
         add(name, faces, rgb)
 
     prism('neck', 25, 9, 29, 6, [40, 8, 64])
-    prism('gold_collar', 34, 5, 13, 8, [136, 112, 24])
+    prism('gold_collar', 34, 5, 13, 8, [255, 216, 45])
     for side in (-1, 1):
         ear = np.array([[side*22, 82, 12], [side*37, 74, 4],
                         [side*36, 99, -2], [side*32, 80, -14], [side*22, 82, -9]])
