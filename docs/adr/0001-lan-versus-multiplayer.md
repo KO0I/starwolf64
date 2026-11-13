@@ -1,15 +1,17 @@
 # ADR 0001: Player-hosted LAN versus multiplayer
 
-Status: Accepted design. Implementation has not started under this decision.
+Status: Accepted gameplay design. A browser WebRTC connection proof is locally verified; networked gameplay is not implemented.
 Date: 2026-11-08
-Updated: 2026-11-09 for the requested pilot roster, original-asset identities, and eight-player Venom target.
+Updated: 2026-11-12 for the browser-hosted WebRTC direction, following the pilot roster and eight-player Venom decisions.
 Approval: The user confirmed the design and approved this document and the project glossary at Q14.
 Related terms: [Project glossary](../../GLOSSARY.md).
-Proposed technical plan: [RFL-derived C TCP multiplayer](../plans/lan-tcp-multiplayer.md).
+Current transport plan: [Browser-hosted WebRTC multiplayer](../plans/browser-webrtc-multiplayer.md).
+Historical proposal: [RFL-derived C TCP multiplayer](../plans/lan-tcp-multiplayer.md).
 
 ## Context
 
-Starship needs multiplayer in the native PC port, with one player per computer and a full-screen local view.
+Starship needs multiplayer with one player per computer and a full-screen local view.
+The original native-port design now targets browser-hosted WebRTC first, using the C/WASM engine.
 The first milestone networks an existing versus stage. Campaign hosting remains later work.
 
 The initial connection flow must work over a wired LAN, ordinary home Wi-Fi, or a user-managed Tailscale network.
@@ -47,7 +49,7 @@ Gameplay decisions must not depend on which local camera is drawn.
 | Capacity | First deliver the two-to-four-player Corneria proof, then eight players in two teams of four, including the host. Design new player state for eight from the start. One player per PC. |
 | View | One full-screen local camera and HUD. No split screen. |
 | Platforms | Linux and Windows peers can share a session. |
-| Joining | Enter the host's reachable LAN or Tailscale address. |
+| Joining | Open the reachable signaling service and enter the host's room code. Browser WebRTC carries game traffic to the playing host. |
 | Lobby | Everyone joins before the match starts. Players ready up and the host starts the match. |
 | First milestone | Corneria with a Points match. |
 | Required pilots | Fox, Falco, Slippy, Peppy, Pigma, Katt, and Vitzy, alongside the existing replacement crew. Vitzy is a Katt-derived axolotl. |
@@ -70,7 +72,9 @@ A disconnected guest can join again when the host returns to the lobby.
 
 ### Connection scope
 
-The game exposes the same direct-address flow for LAN and Tailscale connections.
+The browser connection proof uses a reachable signaling service and a room code.
+The original native proposal used the host's direct address.
+LAN and Tailscale browser paths still require real ICE connection tests.
 Tailscale supplies network connectivity between the PCs. It does not replace the game's host or shared simulation.
 Users manage their own Tailscale installation, access rules, and connectivity.
 
@@ -79,8 +83,9 @@ Connectivity alone does not establish that a connection feels acceptable for com
 See [Connect to devices](https://tailscale.com/docs/how-to/connect-to-devices) and
 [Tailscale connection types](https://tailscale.com/docs/reference/connection-types).
 
-Automatic LAN discovery, a public server list, account services, and built-in internet traversal services are outside the first milestone.
-A separate dedicated server is also outside this decision.
+Automatic LAN discovery, a public server list, and account services are outside the first milestone.
+The browser direction adds signaling and optional externally configured STUN/TURN services.
+A dedicated game-simulation server remains outside this decision.
 
 ### Ship selection and vehicle forms
 
@@ -334,18 +339,27 @@ That conflicts with the approved requirement for responsive Wi-Fi and Tailscale 
 
 ### Stream one running game to remote screens
 
-Streaming does not provide independent native clients with their own full-screen game cameras.
+Streaming does not give each browser its own local simulation and full-screen game camera.
 It also ties control response to video transport.
-The target is native networked simulation on each participating PC.
+The target is a local C/WASM simulation and presentation on each participating PC.
 
 ### Start with a dedicated server or transfer hosting after departure
 
 Both add lifecycle and deployment work beyond a match hosted by one player.
 The approved session ends when the host leaves.
 
+## Browser-hosted WebRTC direction
+
+On 2026-11-12, the user selected a browser-hosted WebRTC approach.
+The [browser plan](../plans/browser-webrtc-multiplayer.md) supersedes raw TCP as the first browser transport.
+A small signaling service exchanges connection setup. Game messages travel through WebRTC data channels.
+The first connection proof is separate from WASM gameplay integration and leaves the single-player preview intact.
+The host-authoritative simulation, roster, respawn, and scoring rules above remain the contract.
+
 ## RFL reuse and TCP planning
 
-The requested implementation direction is to reuse the C RFL networking as a starting point and adapt it to TCP.
+The earlier native proposal was to reuse the C RFL networking as a starting point and adapt it to TCP.
+The browser WebRTC plan supersedes that first transport choice.
 The located source is `/home/amber/proj/rfl/rfl_net.c` with its `rfl_net.h` interface.
 It opens a UDP `SOCK_DGRAM` socket. No separate C TCP implementation was verified in the checked RFL working copies.
 Its current pose relay is not the authoritative control-and-combat protocol required here.
@@ -368,7 +382,7 @@ Timeout handling must preserve the remaining players' simulation and respawns.
 
 The following details need implementation investigation and validation:
 
-- The RFL-derived C TCP adaptation, packet format, protocol compatibility rules, and snapshot contents, as proposed in the technical plan.
+- The WASM worker bridge, final packet format, protocol compatibility rules, and complete snapshot contents described in the browser plan.
 - Input and snapshot rates relative to the existing simulation cadence.
 - Prediction, reconciliation, and interpolation behavior under delay and packet loss.
 - Timeout duration and the treatment of stale controls before removal.

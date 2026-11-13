@@ -1,6 +1,7 @@
 # LAN TCP multiplayer implementation plan
 
-Status: Proposed technical plan. The user requested planning only.
+Status: Historical native TCP proposal. Browser-first transport was superseded by the [WebRTC plan](browser-webrtc-multiplayer.md) on 2026-11-12.
+The browser connection proof is now authorized; C/WASM gameplay integration remains a later unit.
 Date: 2026-11-09
 Behavioral contract: [Player-hosted LAN versus multiplayer](../adr/0001-lan-versus-multiplayer.md).
 Terminology: [Project glossary](../../GLOSSARY.md).

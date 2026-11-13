@@ -1,0 +1,51 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {decodeMessage, encodeMessage, MAX_FRAME, validateMessage, VERSION} from './web/protocol.mjs';
+
+const hello = () => ({type: 'hello', version: VERSION});
+const input = () => ({type: 'input', version: VERSION, slot: 1, seq: 17, stickX: -1, stickY: 1, buttons: 65535, spawn: 0xffffffff});
+const snapshot = () => ({type: 'snapshot', version: VERSION, tick: 42, players: [{slot: 1, x: 1.5, y: -20, z: 0, spawn: 1}], acks: [{slot: 1, seq: 17}]});
+
+test('hello, input and snapshot round trip through binary frames', () => {
+  for (const message of [hello(), input(), snapshot()]) {
+    const frame = encodeMessage(message);
+    assert.ok(frame instanceof ArrayBuffer);
+    assert.deepEqual(decodeMessage(frame), message);
+  }
+});
+
+test('rejects wrong versions, unknown types and fields', () => {
+  for (const message of [{...hello(), version: 2}, {...hello(), extra: 1}, {...hello(), type: 'other'}, null, {}, []]) {
+    assert.equal(validateMessage(message), false);
+    assert.throws(() => encodeMessage(message));
+  }
+});
+
+test('rejects invalid input fields', () => {
+  for (const fields of [
+    {slot: -1}, {slot: 8}, {slot: 1.1}, {seq: -1}, {seq: 0x100000000}, {seq: 1.5},
+    {stickX: -1.01}, {stickY: 1.01}, {stickX: NaN}, {stickY: Infinity},
+    {buttons: -1}, {buttons: 65536}, {buttons: 1.5}, {spawn: -1}, {spawn: 0x100000000}
+  ]) assert.equal(validateMessage({...input(), ...fields}), false, JSON.stringify(fields));
+});
+
+test('snapshot slots are unique and values bounded', () => {
+  const base = snapshot();
+  const player = base.players[0];
+  for (const message of [
+    {...base, tick: -1}, {...base, tick: 0x100000000},
+    {...base, players: [player, player]}, {...base, acks: [{slot: 1, seq: 0}, {slot: 1, seq: 1}]},
+    {...base, players: Array(9).fill(player)}, {...base, acks: Array(9).fill({slot: 0, seq: 0})},
+    {...base, players: [null]}, {...base, acks: [null]},
+    {...base, players: [{...player, slot: 8}]}, {...base, players: [{...player, x: Infinity}]},
+    {...base, players: [{...player, spawn: 0x100000000}]}, {...base, acks: [{slot: 1, seq: -1}]}
+  ]) assert.equal(validateMessage(message), false);
+  assert.equal(validateMessage({...base, players: [], acks: []}), true);
+});
+
+test('decoder rejects invalid UTF-8, JSON, messages, and oversized frames', () => {
+  const bytes = new TextEncoder();
+  for (const frame of [new Uint8Array([255]).buffer, bytes.encode('{').buffer, bytes.encode('{}').buffer, new ArrayBuffer(MAX_FRAME + 1), 'text']) {
+    assert.throws(() => decodeMessage(frame));
+  }
+});
