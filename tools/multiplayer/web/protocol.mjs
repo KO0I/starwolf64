@@ -1,5 +1,7 @@
+import {validSelection, validSetup} from './catalog.mjs';
+
 // This proof codec is independent of the future C engine-state field inventory.
-export const VERSION = 1;
+export const VERSION = 2;
 export const MAX_FRAME = 65536;
 const encoder = new TextEncoder();
 const decoder = new TextDecoder('utf-8', { fatal: true });
@@ -10,9 +12,14 @@ const finite = n => typeof n === 'number' && Number.isFinite(n);
 const keys = (value, names) => value !== null && typeof value === 'object' && !Array.isArray(value) && Object.keys(value).length === names.length && names.every(k => Object.hasOwn(value, k));
 const unique = values => values.every(v => v !== null && typeof v === 'object') && new Set(values.map(v => v.slot)).size === values.length;
 
+const validRequest = value => typeof value === 'string' && /^[a-f0-9]{32}$/.test(value);
+
 export function validateMessage(value) {
   if (!value || value.version !== VERSION) return false;
   if (value.type === 'hello') return keys(value, ['type', 'version']);
+  if (value.type === 'select-loadout') return keys(value, ['type','version','request','selection']) && validRequest(value.request) && validSelection(value.selection);
+  if (value.type === 'selection-result') return keys(value, ['type','version','request','error']) && validRequest(value.request) && (value.error === null || (typeof value.error === 'string' && value.error.length > 0 && value.error.length <= 160));
+  if (value.type === 'room-state') return keys(value, ['type','version','setup']) && validSetup(value.setup);
   if (value.type === 'input') {
     return keys(value, ['type', 'version', 'slot', 'seq', 'stickX', 'stickY', 'buttons', 'spawn']) && slot(value.slot) && u32(value.seq) && finite(value.stickX) && Math.abs(value.stickX) <= 1 && finite(value.stickY) && Math.abs(value.stickY) <= 1 && uint(value.buttons, 65535) && u32(value.spawn);
   }

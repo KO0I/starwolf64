@@ -1,4 +1,4 @@
-# Browser-hosted WebRTC connection proof
+# Browser-hosted multiplayer setup and connection test
 
 Run in the isolated multiplayer worktree:
 
@@ -8,10 +8,15 @@ node tools/multiplayer/server.mjs --port 8670
 
 Open `http://127.0.0.1:8670/` in two browser windows.
 Create a room in one window and enter its code in the other.
-The guest can send a control sample, and the host can send a world snapshot.
+After hosting or joining, choose a pilot with its radio picture, starting aircraft, and preferred hue.
+Confirm the selection so the host can assign a distinct hue to repeated pilots.
+The host can save an existing VS map/rule combination or main-game crew target.
+New guests receive the current accepted setup. Vitzy is visible but unavailable as "portrait pending".
+The guest can also send a control sample, and the host can send a sample world snapshot.
 The page reports messages received over real WebRTC data channels.
 
-This is the first connection milestone. It does not yet run a shared Starwolf match or connect to the WASM engine.
+This implements synchronized setup. It does not yet start a shared Starwolf match or connect to the WASM engine.
+Map/main-game choices are saved configuration targets. Real game launch and joining a running world require the worker and replication work in the [session plan](../../docs/plans/hosted-multiplayer-session.md).
 The single-player WASM preview is unchanged.
 
 ## How the pieces communicate
@@ -29,14 +34,15 @@ Input sequences and snapshot ticks reject stale samples.
 Snapshots in this proof are self-contained.
 The transport bounds buffered data rather than accumulating unlimited stale state.
 
-The first proof codec sends validated versioned JSON as binary UTF-8 data.
+The version 2 codec sends validated setup and proof messages as binary UTF-8 JSON.
+Refresh all browser clients when changing protocol versions.
 This establishes real message exchange and ownership rules. It does not freeze the future C engine-state encoding.
 The engine bridge still needs complete movement-state, collision, entity-lifetime, and prediction inventories.
 
 ## Tests
 
 ```sh
-node --test tools/multiplayer/server.test.mjs tools/multiplayer/protocol.test.mjs
+node --test tools/multiplayer/catalog.test.mjs tools/multiplayer/server.test.mjs tools/multiplayer/protocol.test.mjs
 node tools/multiplayer/check-browser.mjs --output /tmp/starwolf-webrtc-check
 ```
 
@@ -46,6 +52,7 @@ The development environment uses Node 26. No npm dependencies are required.
 The check starts its own local service and browser contexts.
 It verifies one host with two guests, guest-to-host inputs, host-to-guest snapshots,
 stale-message rejection, and continued exchange after one guest leaves.
+It uses the visible pilot/map controls, verifies real radio images, duplicate hues, co-op rules, late setup synchronization, and a replacement peer joining a reused slot.
 It also checks that leaving the host ends the remaining guest session.
 The remaining guest deliberately processes its room-close notice 300 ms late to exercise shutdown ordering.
 The report includes actual data-channel counters and the selected ICE path.

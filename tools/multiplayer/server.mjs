@@ -2,6 +2,8 @@ import { createServer } from "node:http";
 import { randomBytes } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import { pathToFileURL } from "node:url";
+import { PILOTS } from "./web/catalog.mjs";
+import { VERSION } from "./web/protocol.mjs";
 
 const webDir = new URL("./web/", import.meta.url);
 const files = new Map([
@@ -10,8 +12,12 @@ const files = new Map([
   ["/app.mjs", ["app.mjs", "text/javascript; charset=utf-8"]],
   ["/session.mjs", ["session.mjs", "text/javascript; charset=utf-8"]],
   ["/protocol.mjs", ["protocol.mjs", "text/javascript; charset=utf-8"]],
+  ["/catalog.mjs", ["catalog.mjs", "text/javascript; charset=utf-8"]],
   ["/styles.css", ["styles.css", "text/css; charset=utf-8"]],
 ]);
+for (const pilot of PILOTS) {
+  if (pilot.portrait) files.set("/portraits/" + pilot.id + ".png", [new URL("../../assets/" + pilot.portrait, import.meta.url), "image/png"]);
+}
 const MAX_BODY = 64 * 1024;
 const MAX_PENDING = 64;
 const MAX_PENDING_BYTES = 256 * 1024;
@@ -123,7 +129,7 @@ export function createSignalingServer({ host = "127.0.0.1", port = 8670, iceServ
     try {
       const url = new URL(req.url, "http://localhost");
       if (req.method === "POST" && !allowedOrigin(req)) return json(res, 403, { error: "origin denied" });
-      if (req.method === "GET" && url.pathname === "/api/config") return json(res, 200, { protocol: 1, iceServers });
+      if (req.method === "GET" && url.pathname === "/api/config") return json(res, 200, { protocol: VERSION, iceServers });
       if (req.method === "GET" && files.has(url.pathname)) {
         const [name, type] = files.get(url.pathname);
         try {

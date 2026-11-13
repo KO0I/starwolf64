@@ -81,6 +81,30 @@ async function page(label, url) {
 const state = p => value(p, 'window.STARWOLF_MP.state');
 const events = p => value(p, 'window.STARWOLF_MP_PROOF');
 const invoke = (p, method, ...args) => value(p, `window.STARWOLF_MP.${method}(...${JSON.stringify(args)})`);
+const choosePilot = (page,selection) => value(page, `(() => {
+  const choice = ${JSON.stringify(selection)};
+  document.getElementById('pilot-' + choice.pilot).click();
+  const vehicle = document.getElementById('vehicle');
+  vehicle.value = choice.vehicle;
+  vehicle.dispatchEvent(new Event('change',{bubbles:true}));
+  document.getElementById('hue-' + choice.hue).click();
+  document.getElementById('save-pilot').click();
+})()`);
+const chooseVersus = (page,stage,rules) => value(page, `(() => {
+  const mode = document.getElementById('mode');
+  mode.value = 'versus'; mode.dispatchEvent(new Event('change',{bubbles:true}));
+  const map = document.getElementById('map');
+  map.value = ${JSON.stringify(stage)}; map.dispatchEvent(new Event('change',{bubbles:true}));
+  const rules = document.getElementById('rules');
+  rules.value = ${JSON.stringify(rules)}; rules.dispatchEvent(new Event('change',{bubbles:true}));
+  document.getElementById('save-match').click();
+})()`);
+async function joinViaUI(guest,code,name) {
+  await value(guest, 'document.getElementById("name").value = ' + JSON.stringify(name) +
+    '; document.getElementById("code").value = ' + JSON.stringify(code) +
+    '; document.getElementById("join").click()');
+}
+
 async function screenshot(name) {
   if (!pages.length || ws?.readyState !== WebSocket.OPEN) return;
   const shot = await call('Page.captureScreenshot', {format:'png'}, pages[0].sessionId);
@@ -117,6 +141,7 @@ try {
   };
   ws.onclose = () => { for (const entry of pending.values()) entry.reject(Error('CDP disconnected')); pending.clear(); };
   const host = await page('host', url), guest1 = await page('guest1', url), guest2 = await page('guest2', url);
+  report.environment = await value(host, '({secureContext:window.isSecureContext,randomUUID:typeof crypto.randomUUID})');
   await value(host, 'document.getElementById("name").value = "Host"; document.getElementById("host").click()');
   const hostState = await wait('host creates room', async () => {
     const current = await state(host);
@@ -124,11 +149,58 @@ try {
     return current.room ? current : false;
   });
   assert(hostState.room, 'host created room', hostState);
-  for (const [guest, name] of [[guest1, 'Guest 1'], [guest2, 'Guest 2']]) {
-    await value(guest, 'document.getElementById("name").value = ' + JSON.stringify(name) +
-      '; document.getElementById("code").value = ' + JSON.stringify(hostState.room) +
-      '; document.getElementById("join").click()');
+  await choosePilot(host,{pilot:'wolf',vehicle:'wolfen',hue:0});
+  await wait('host confirms pilot alone',async () => (await state(host)).setup?.members[0].selection?.pilot === 'wolf');
+  report.assertions['host configures a pilot without guests'] = true;
+  await chooseVersus(host,'sector_z','time');
+  await wait('host configures existing versus map',async () => (await state(host)).setup.match.stage === 'sector_z');
+  await joinViaUI(guest1,hostState.room,'Guest 1');
+  await wait('first guest receives setup',async () => {
+    const s = await state(guest1);
+    return s.phase === 'connected' && s.setup?.match.stage === 'sector_z';
+  });
+  await choosePilot(guest1,{pilot:'wolf',vehicle:'arwing',hue:0});
+  await wait('host resolves duplicate hue',async () => {
+    const s = await state(guest1), selected = s.setup?.members.find(member => member.peer === s.peer)?.selection;
+    return selected?.pilot === 'wolf' && selected.hue !== 0;
+  });
+  const firstSetup = (await state(host)).setup;
+  const wolfChoices = firstSetup.members.map(member => member.selection).filter(Boolean);
+  assert(wolfChoices.length === 2 && new Set(wolfChoices.map(choice => choice.hue)).size === 2 &&
+    wolfChoices.some(choice => choice.vehicle === 'arwing') && wolfChoices.some(choice => choice.vehicle === 'wolfen'),
+    'host confirms mixed aircraft and distinct duplicate-pilot hues',wolfChoices);
+  await joinViaUI(guest2,hostState.room,'Guest 2');
+  await wait('late guest receives current setup',async () => {
+    const s = await state(guest2);
+    return s.phase === 'connected' && s.setup?.match.stage === 'sector_z' &&
+      s.setup.match.rules === 'time' && s.setup.members.filter(member => member.selection?.pilot === 'wolf').length === 2;
+  });
+  report.assertions['late guest receives current selections and map'] = true;
+  await wait('radio images loaded',async () => value(host, `[...document.querySelectorAll('#pilot-cards img')].every(img => img.complete && img.naturalWidth === 44 && img.naturalHeight === 44)`));
+  assert(await value(host, `document.querySelectorAll('#pilot-cards img').length === 11 && document.getElementById('pilot-vitzy').disabled && document.getElementById('pilot-vitzy').parentElement.textContent.includes('portrait pending')`),
+    'real radio portraits and unavailable Vitzy card displayed',null);
+  assert(await value(guest1, `document.getElementById('match-form').hidden`),'only host sees match configuration controls',null);
+  await value(host, `(() => {
+    const mode = document.getElementById('mode');
+    mode.value = 'campaign'; mode.dispatchEvent(new Event('change',{bubbles:true}));
+    const crew = document.getElementById('crew');
+    crew.value = 'star_fox'; crew.dispatchEvent(new Event('change',{bubbles:true}));
+    document.getElementById('save-match').click();
+  })()`);
+  await wait('campaign crew setting synchronizes',async () => (await Promise.all([host,guest1,guest2].map(state))).every(s =>
+    s.setup?.match.kind === 'campaign' && s.setup.match.crew === 'star_fox' && s.setup.members.every(member => member.selection === null)));
+  assert(await value(guest1, `document.getElementById('pilot-wolf').disabled && !document.getElementById('pilot-fox_original').disabled && [...document.getElementById('vehicle').options].find(option => option.value === 'wolfen').disabled`),
+    'main-game setup enforces crew and matching aircraft',null);
+  for (const page of [host,guest1,guest2]) {
+    await choosePilot(page,{pilot:'fox_original',vehicle:'arwing',hue:0});
+    await wait(page.label + ' confirms original Fox',async () => {
+      const s = await state(page);
+      return s.setup?.members.find(member => member.peer === s.peer)?.selection?.pilot === 'fox_original';
+    });
   }
+  const foxSetup = (await state(host)).setup;
+  assert(new Set(foxSetup.members.map(member => member.selection.hue)).size === 3,
+    'three original Fox pilots keep distinct accepted hues',foxSetup);
   await wait('RTC connections', async () => {
     const [h, a, b] = await Promise.all([host, guest1, guest2].map(state));
     return h.connections.filter(c => c.state === 'connected').length === 2 && [a,b].every(s => s.connections.some(c => c.state === 'connected'));
@@ -159,27 +231,53 @@ try {
   assert(channels.some(c => c.messagesSent > 0) && channels.some(c => c.messagesReceived > 0), 'RTC data channels transmitted and received messages', channels);
   assert(Object.values(report.diagnostics).every(d => d.connections.some(c => c.selectedCandidatePair)), 'RTC candidate paths selected', report.diagnostics);
   await screenshot('connected.png');
+  await value(host, "document.getElementById('pilot-panel').scrollIntoView({block:'start'})");
+  await screenshot('pilot-selection.png');
+
   await call('Emulation.setDeviceMetricsOverride', {width:390,height:844,deviceScaleFactor:1,mobile:true}, host.sessionId);
   assert(await value(host, 'document.documentElement.scrollWidth <= window.innerWidth'), 'mobile page fits viewport', null);
   await screenshot('mobile.png');
   await call('Emulation.setDeviceMetricsOverride', {width:1000,height:1100,deviceScaleFactor:1,mobile:false}, host.sessionId);
+  const stableHue = (await state(guest2)).setup.members.find(member => member.peer === b.peer).selection.hue;
   await invoke(guest1, 'close');
   await wait('guest departure', async () => {
     const [h, g] = await Promise.all([state(host), state(guest2)]);
     return h.connections.filter(c => c.state === 'connected').length === 1 && g.connections.some(c => c.state === 'connected');
   });
+  assert((await state(guest2)).setup.members.find(member => member.peer === b.peer).selection.hue === stableHue,'departure preserves remaining pilot hue',null);
   await invoke(guest2, 'sendInput', {...input,seq:2});
   await wait('remaining guest input', async () => (await events(host)).inputs.some(e => e.slot === b.slot && e.message.seq === 2));
   await invoke(host, 'publishSnapshot', {...snapshot,tick:2,acks:[{slot:b.slot,seq:2}]});
   await wait('remaining guest snapshot', async () => (await events(guest2)).snapshots.some(s => s.tick === 2));
   report.assertions['remaining guest exchanges after departure'] = true;
+  const replacement = await page('replacement',url);
+  await joinViaUI(replacement,hostState.room,'Replacement');
+  await wait('replacement receives room setup',async () => {
+    const s = await state(replacement);
+    return s.phase === 'connected' && s.setup?.members.some(member => member.peer === s.peer);
+  });
+  const replacementState = await state(replacement);
+  assert(replacementState.slot === a.slot && replacementState.peer !== a.peer,'reused slot has a new peer identity',replacementState);
+  await choosePilot(replacement,{pilot:'fox_original',vehicle:'arwing',hue:0});
+  await wait('replacement pilot confirmed',async () => {
+    const s = await state(replacement);
+    return Boolean(s.setup.members.find(member => member.peer === s.peer)?.selection);
+  });
+  await value(host,"document.getElementById('send-state').click()");
+  await wait('replacement receives UI snapshot',async () => (await events(replacement)).snapshots.length > 0);
+  const replacementSnapshot = (await events(replacement)).snapshots[0];
+  assert(replacementSnapshot.acks.find(ack => ack.slot === replacementState.slot)?.seq === 0,
+    'reused slot does not inherit old peer input acknowledgments',replacementSnapshot);
+  assert((await state(guest2)).setup.members.find(member => member.peer === b.peer).selection.hue === stableHue,
+    'replacement does not recolor remaining duplicate pilots',null);
   await screenshot('screenshot.png');
   await invoke(host, 'close');
   await wait('host departure closes guest', async () => (await state(guest2)).phase === 'closed');
+  await wait('host departure closes replacement',async () => (await state(replacement)).phase === 'closed');
   report.assertions['host departure ends remaining guest'] = true;
   assert(await value(guest2, 'window.STARWOLF_DELAYED_CLOSE_TEST'), 'delayed room-close notice handled', null);
-  report.finalStates = Object.fromEntries(await Promise.all([host, guest1, guest2].map(async p => [p.label, await state(p)])));
-  const recorded = await Promise.all([host, guest1, guest2].map(events));
+  report.finalStates = Object.fromEntries(await Promise.all([host, guest1, guest2, replacement].map(async p => [p.label, await state(p)])));
+  const recorded = await Promise.all([host, guest1, guest2, replacement].map(events));
   assert(recorded.every(events => events.errors.length === 0), 'no session errors during normal departure', recorded.map(events => events.errors));
   await sleep(250);
   const bodies = requests.map(request => {

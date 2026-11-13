@@ -185,3 +185,17 @@ test("peers that never open an event stream expire", { timeout: 10000 }, async t
   assert.equal((await he.next()).data.peers.length, 1);
   assert.equal((await f.leave(guest)).status, 403);
 });
+
+test('only registered radio portraits are served', {timeout:10000},async t => {
+  const f = await fixture(t);
+  for (const pilot of ['fox_original','falco_original','slippy_original','peppy_original','wolf','leon','pigma','katt','panther','krystal','kami']) {
+    const response = await fetch(f.base + '/portraits/' + pilot + '.png');
+    assert.equal(response.status,200,pilot);
+    assert.equal(response.headers.get('content-type'),'image/png');
+    const bytes = new Uint8Array(await response.arrayBuffer());
+    assert.deepEqual([...bytes.slice(0,8)],[137,80,78,71,13,10,26,10]);
+  }
+  for (const path of ['/portraits/vitzy.png','/portraits/unknown.png','/assets/portraits/manifest.json']) {
+    assert.equal((await fetch(f.base+path)).status,404,path);
+  }
+});

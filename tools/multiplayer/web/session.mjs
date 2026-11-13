@@ -1,4 +1,5 @@
 import {encodeMessage, decodeMessage, VERSION} from './protocol.mjs';
+import {DEFAULT_MATCH, validMatch, selectionProblem, assignSelection} from './catalog.mjs';
 
 const MAX_BUFFER = 256 * 1024;
 
@@ -20,6 +21,8 @@ export class BrowserSession extends EventTarget {
     this.eventTimer = null;
     this.peerErrorTimer = null;
     this.lastTick = -1;
+    this.setup = null;
+    this.selectionRequests = new Map();
   }
 
   get state() {
@@ -27,7 +30,7 @@ export class BrowserSession extends EventTarget {
       phase: this.phase, role: this.role, room: this.room, slot: this.slot,
       peer: this.peer, peers: this.peers.map(p => ({...p})),
       connections: [...this.links.values()].map(link => ({peer: link.peer, slot: link.slot, state: link.state})),
-      error: this.error
+      error: this.error, setup: this.setup ? structuredClone(this.setup) : null
     };
   }
 
@@ -70,6 +73,7 @@ export class BrowserSession extends EventTarget {
       this.slot = result.slot;
       this.token = result.token;
       this.peers = result.peers;
+      if (role === 'host') this.setup = {revision:0, match:{...DEFAULT_MATCH}, members:result.peers.map(p => ({peer:p.peer, slot:p.slot, selection:null}))};
       this.openEvents(epoch);
       this.changed();
     } catch (error) {
@@ -122,6 +126,7 @@ export class BrowserSession extends EventTarget {
     for (const peer of wanted) {
       if (this.peerErrorTimer === null && !this.links.has(peer.peer)) this.createLink(peer);
     }
+    if (this.role === 'host') this.syncSetupRoster();
     this.refresh();
   }
 
@@ -207,6 +212,31 @@ export class BrowserSession extends EventTarget {
         if (channel === link.control && message.type === 'hello') {
           link.hello = true;
           this.refresh();
+          if (this.role === 'host') this.sendControl(link, {type:'room-state', version:VERSION, setup:this.setup});
+        } else if (channel === link.control && this.role === 'host' && link.hello && message.type === 'select-loadout') {
+          let error = null;
+          try { this.acceptSelection(link.peer, message.selection); }
+          catch (problem) { error = problem.message.slice(0,160); }
+          this.sendControl(link, {type:'selection-result', version:VERSION, request:message.request, error});
+        } else if (channel === link.control && this.role === 'guest' && link.hello && message.type === 'room-state') {
+          if (!message.setup.members.some(member => member.peer === this.peer && member.slot === this.slot) ||
+              !message.setup.members.some(member => member.peer === link.peer && member.slot === 0)) throw new Error('Room setup does not match this session');
+          if (!this.setup || message.setup.revision > this.setup.revision) {
+            this.setup = message.setup;
+            this.changed();
+          }
+        } else if (channel === link.control && this.role === 'guest' && link.hello && message.type === 'selection-result') {
+          const pending = this.selectionRequests.get(message.request);
+          if (pending) {
+            clearTimeout(pending.timer);
+            this.selectionRequests.delete(message.request);
+            if (message.error) pending.reject(new Error(message.error));
+            else {
+              const selection = this.setup?.members.find(member => member.peer === this.peer)?.selection;
+              if (selection) pending.resolve(structuredClone(selection));
+              else pending.reject(new Error('Host did not confirm a pilot selection'));
+            }
+          }
         } else if (channel === link.control && this.role === 'host' && link.hello && message.type === 'input') {
           if (message.slot !== link.slot) throw new Error('Input slot does not match peer');
           if (message.seq > link.lastSeq) {
@@ -221,6 +251,85 @@ export class BrowserSession extends EventTarget {
         } else throw new Error('Unexpected data channel message');
       } catch (error) { this.linkError(link, error.message); }
     };
+  }
+
+  syncSetupRoster() {
+    if (!this.setup) return;
+    const members = this.peers.map(peer => ({
+      peer:peer.peer, slot:peer.slot,
+      selection:this.setup.members.find(member => member.peer === peer.peer && member.slot === peer.slot)?.selection ?? null
+    })).sort((a,b) => a.slot-b.slot);
+    if (JSON.stringify(members) !== JSON.stringify(this.setup.members)) {
+      this.setup = {...this.setup, revision:this.setup.revision+1, members};
+      this.broadcastSetup();
+    }
+  }
+
+  broadcastSetup() {
+    for (const link of this.links.values()) {
+      if (link.hello) this.sendControl(link, {type:'room-state', version:VERSION, setup:this.setup});
+    }
+    this.changed();
+  }
+
+  acceptSelection(peer, request) {
+    const member = this.setup?.members.find(member => member.peer === peer);
+    if (!member) throw new Error('This player is no longer in the room');
+    const others = this.setup.members.filter(member => member.peer !== peer).map(member => member.selection);
+    const selection = assignSelection(request, member.selection, others, this.setup.match);
+    this.setup = {
+      ...this.setup, revision:this.setup.revision+1,
+      members:this.setup.members.map(member => member.peer === peer ? {...member, selection} : member)
+    };
+    this.broadcastSetup();
+    return structuredClone(selection);
+  }
+
+  async selectLoadout(selection) {
+    if (!this.setup || !['hosting','connected'].includes(this.phase)) throw new Error('Connect to the host before choosing a pilot');
+    const problem = selectionProblem(selection, this.setup.match);
+    if (problem) throw new Error(problem);
+    if (this.role === 'host') return this.acceptSelection(this.peer, selection);
+    const link = [...this.links.values()].find(link => link.state === 'connected');
+    if (!link) throw new Error('Host connection is not ready');
+    if (this.selectionRequests.size >= 8) throw new Error('Wait for the host to confirm your selection');
+    const request = Array.from(crypto.getRandomValues(new Uint8Array(16)), byte => byte.toString(16).padStart(2,'0')).join('');
+    return new Promise((resolve,reject) => {
+      const timer = setTimeout(() => {
+        this.selectionRequests.delete(request);
+        reject(new Error('Pilot confirmation timed out'));
+      },this.timeoutMs);
+      this.selectionRequests.set(request,{resolve,reject,timer});
+      try {
+        if (!this.sendControl(link,{type:'select-loadout',version:VERSION,request,selection})) throw new Error('Host connection is not ready');
+      } catch(error) {
+        clearTimeout(timer);
+        this.selectionRequests.delete(request);
+        reject(error);
+      }
+    });
+  }
+
+  async configureMatch(match) {
+    if (this.role !== 'host' || !this.setup || !['hosting','connected'].includes(this.phase)) throw new Error('Only the active host can choose the match');
+    if (!validMatch(match)) throw new Error('Choose an existing map and its supported match type');
+    this.setup = {
+      revision:this.setup.revision+1, match:structuredClone(match),
+      members:this.setup.members.map(member => {
+        const selected = member.selection;
+        const invalid = selected && selectionProblem({pilot:selected.pilot,vehicle:selected.vehicle,hue:selected.hue},match);
+        return {...member,selection:invalid ? null : selected};
+      })
+    };
+    this.broadcastSetup();
+  }
+
+  rejectSelections(reason) {
+    for (const pending of this.selectionRequests.values()) {
+      clearTimeout(pending.timer);
+      pending.reject(new Error(reason));
+    }
+    this.selectionRequests.clear();
   }
 
   sendControl(link, message) {
@@ -277,6 +386,7 @@ export class BrowserSession extends EventTarget {
     link.closed = true;
     clearTimeout(link.timer);
     link.abort.abort();
+    if (this.role === 'guest') this.rejectSelections('Host connection ended before confirming the pilot');
     this.links.delete(link.peer);
     if (closeTransport) this.closeTransport(link);
   }
@@ -311,6 +421,7 @@ export class BrowserSession extends EventTarget {
     const room = this.room, peer = this.peer, token = this.token;
     ++this.epoch;
     this.abort.abort();
+    this.rejectSelections('Room connection ended');
     this.events?.close();
     this.events = null;
     clearTimeout(this.eventTimer);

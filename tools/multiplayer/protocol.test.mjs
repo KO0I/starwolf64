@@ -15,7 +15,7 @@ test('hello, input and snapshot round trip through binary frames', () => {
 });
 
 test('rejects wrong versions, unknown types and fields', () => {
-  for (const message of [{...hello(), version: 2}, {...hello(), extra: 1}, {...hello(), type: 'other'}, null, {}, []]) {
+  for (const message of [{...hello(), version: VERSION + 1}, {...hello(), extra: 1}, {...hello(), type: 'other'}, null, {}, []]) {
     assert.equal(validateMessage(message), false);
     assert.throws(() => encodeMessage(message));
   }
@@ -48,4 +48,22 @@ test('decoder rejects invalid UTF-8, JSON, messages, and oversized frames', () =
   for (const frame of [new Uint8Array([255]).buffer, bytes.encode('{').buffer, bytes.encode('{}').buffer, new ArrayBuffer(MAX_FRAME + 1), 'text']) {
     assert.throws(() => decodeMessage(frame));
   }
+});
+
+test('selection requests, confirmations and authoritative setup round trip', () => {
+  const request = '11111111111141118111111111111111';
+  const setup = {revision:2,match:{kind:'versus',stage:'sector_z',rules:'time'},
+    members:[{peer:'00000000000000000000000000000001',slot:0,
+      selection:{pilot:'fox_original',vehicle:'arwing',preferredHue:0,hue:0}}]};
+  for (const message of [
+    {type:'select-loadout',version:VERSION,request,selection:{pilot:'fox_original',vehicle:'arwing',hue:0}},
+    {type:'selection-result',version:VERSION,request,error:null},
+    {type:'selection-result',version:VERSION,request,error:'Portrait pending'},
+    {type:'room-state',version:VERSION,setup}
+  ]) assert.deepEqual(decodeMessage(encodeMessage(message)),message);
+  for (const message of [
+    {type:'select-loadout',version:VERSION,request:'bad',selection:{pilot:'fox_original',vehicle:'arwing',hue:0}},
+    {type:'selection-result',version:VERSION,request,error:'x'.repeat(161)},
+    {type:'room-state',version:VERSION,setup:{...setup,members:[]}}
+  ]) assert.equal(validateMessage(message),false);
 });

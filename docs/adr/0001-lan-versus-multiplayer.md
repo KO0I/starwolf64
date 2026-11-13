@@ -1,8 +1,9 @@
 # ADR 0001: Player-hosted LAN versus multiplayer
 
-Status: Accepted gameplay design. A browser WebRTC connection proof is locally verified; networked gameplay is not implemented.
+Status: Accepted gameplay design. Browser connection and synchronized setup are locally verified; networked gameplay is not implemented.
 Date: 2026-11-08
-Updated: 2026-11-12 for the browser-hosted WebRTC direction, following the pilot roster and eight-player Venom decisions.
+Updated: 2026-11-13 for post-host pilot/vehicle/hue selection and joining during play.
+Current session design: [Hosted setup and live joining](../plans/hosted-multiplayer-session.md).
 Approval: The user confirmed the design and approved this document and the project glossary at Q14.
 Related terms: [Project glossary](../../GLOSSARY.md).
 Current transport plan: [Browser-hosted WebRTC multiplayer](../plans/browser-webrtc-multiplayer.md).
@@ -12,7 +13,7 @@ Historical proposal: [RFL-derived C TCP multiplayer](../plans/lan-tcp-multiplaye
 
 Starship needs multiplayer with one player per computer and a full-screen local view.
 The original native-port design now targets browser-hosted WebRTC first, using the C/WASM engine.
-The first milestone networks an existing versus stage. Campaign hosting remains later work.
+The first milestone networks an existing versus stage. Campaign co-op is also a selectable target; its engine integration follows the first working versus match.
 
 The initial connection flow must work over a wired LAN, ordinary home Wi-Fi, or a user-managed Tailscale network.
 One player hosts while playing. Linux and Windows peers must be able to play together.
@@ -50,13 +51,13 @@ Gameplay decisions must not depend on which local camera is drawn.
 | View | One full-screen local camera and HUD. No split screen. |
 | Platforms | Linux and Windows peers can share a session. |
 | Joining | Open the reachable signaling service and enter the host's room code. Browser WebRTC carries game traffic to the playing host. |
-| Lobby | Everyone joins before the match starts. Players ready up and the host starts the match. |
+| Lobby and live joining | The host can start alone. Other players may join during play after choosing a pilot and synchronizing with the current world. |
 | First milestone | Corneria with a Points match. |
 | Required pilots | Fox, Falco, Slippy, Peppy, Pigma, Katt, and Vitzy, alongside the existing replacement crew. Vitzy is a Katt-derived axolotl. |
 | Expanded arena | Venom showdown as a separate versus entry. |
 | Aircraft roster | Arwing and Wolfen, plus Vitzy's requested magenta-and-pink Bill-derived fighter. PvP keeps free pilot and ship selection. Co-op uses crew-appropriate pilot assignments. |
 | Ship behavior | Identical handling, weapons, health, and collision size. Only models and engine and laser colors differ. |
-| Pilot changes | Select a pilot before the match. Keep that pilot for the whole match. |
+| Pilot changes | Select a pilot before that participant first spawns. Keep the pilot for the remainder of the match. |
 | Duplicate pilots | Allowed. Every additional instance of the same pilot gets a distinct portrait, ship-marker, and laser hue. |
 | Respawns | Offer vehicle selection after every death, keeping the same pilot. Initially Arwing or Wolfen, with tank and on-foot choices added later. |
 | Team rules | Respawning team-points combat. Competitive teams may use any pilot and available aircraft. Co-op uses one crew with matching aircraft and Vitzy's signature-fighter exception. |
@@ -67,8 +68,11 @@ Gameplay decisions must not depend on which local camera is drawn.
 | Host departure | End the session. There is no transfer of hosting in this milestone. |
 | Menus | Opening a menu does not pause the network match. |
 
-The initial join window is the lobby. Joining an active match is outside this milestone.
-A disconnected guest can join again when the host returns to the lobby.
+The user amended the earlier lobby-only rule on 2026-11-13.
+Room-code joining stays available while the host plays.
+A new or returning guest chooses a pilot, starting vehicle, and preferred hue, then loads and acknowledges the current world before the host activates its ship.
+The host keeps simulating during this process. Match identity, stage epoch, peer incarnation, and spawn generation reject obsolete admission or input.
+The setup preview implements choices and late setup synchronization; running-game admission still needs the C/WASM world bridge.
 
 ### Connection scope
 
@@ -424,7 +428,7 @@ Also extend support to the existing versus stage and match-type combinations.
 Add tanks and on-foot play after aircraft networking works.
 Validate macOS separately later.
 
-Campaign co-op remains a future gameplay expansion. Its selection rule is one crew with matching ships.
+Campaign co-op is now an explicit main-game selection target. Its playable engine integration remains pending. Its selection rule is one crew with matching ships.
 Katt is Star Fox, and Vitzy and Pigma are Star Wolf. Later vehicle-form restrictions and affiliations for future pilots still need definition.
 Mission progression, checkpoints, death rules, cutscenes, and the role of AI teammates still need their own decisions.
 Competitive reuse of the Venom layout does not implement campaign co-op.

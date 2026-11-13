@@ -1,7 +1,8 @@
 # Browser-hosted WebRTC multiplayer
 
 Date: 2026-11-12
-Status: The local connection milestone is verified. The C/WASM game is not connected yet.
+Status: Connection and synchronized pilot/match setup are verified locally. The C/WASM game is not connected yet.
+Latest flow: [Hosted setup and joining during play](hosted-multiplayer-session.md).
 Direction: One browser hosts the authoritative match. Other browsers join it.
 This replaces raw TCP as the first browser transport target.
 The [earlier TCP plan](lan-tcp-multiplayer.md) remains a record of the native transport proposal.
@@ -12,7 +13,9 @@ The gameplay contract remains [ADR 0001](../adr/0001-lan-versus-multiplayer.md).
 The first milestone is a standalone connection proof under `tools/multiplayer/`.
 It provides room creation, room-code joining, one WebRTC peer connection per guest,
 and real data channels for numbered inputs and host snapshots.
-It does not yet drive the C/WASM simulation.
+It now includes actual radio-portrait selection, starting aircraft, preferred/assigned hues, and host-selected VS or main-game setup.
+Late guests receive the current accepted choices.
+It does not yet drive the C/WASM simulation or admit guests into a running game.
 
 ```mermaid
 flowchart LR

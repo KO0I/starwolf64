@@ -12,6 +12,7 @@
   <div class="banner"><span>UNDER CONSTRUCTION // MULTIPLAYER CONNECTION TEST</span></div>
   <nav class="topnav" aria-label="Site navigation">
     <a href="#setup">Pilot sign-in</a>
+    <a href="#pilot-panel">Pilot select</a>
     <a href="#room">Squadron</a>
     <a href="#proof">Link test</a>
   </nav>
@@ -22,7 +23,7 @@
       <span class="badge">MULTIPLAYER HEADQUARTERS</span>
     </header>
     <h2 class="subtitle">One browser hosts. Friends join the room.</h2>
-    <p class="intro">Welcome to the Lylat underground. Pick a callsign, open a room, and give your wingmates the code. This prototype sends control samples and world snapshots. Shared WASM gameplay comes next.</p>
+    <p class="intro">Welcome to the Lylat underground. Pick a callsign, open a room, and give your wingmates the code. Choose your pilot and match, and check the connection with your wingmates. Shared gameplay is the next integration step.</p>
     <hr class="star-rule">
     <section id="setup" class="setup" aria-labelledby="setup-title">
       <h2 id="setup-title" class="panel-title">01 // PILOT SIGN-IN <small>&lt; JOIN THE PACK &gt;</small></h2>
@@ -39,8 +40,29 @@
       </div>
     </section>
     <p id="notice" role="alert" hidden></p>
+    <section id="pilot-panel" aria-labelledby="pilot-title" hidden>
+      <h2 id="pilot-title" class="panel-title">02 // PILOT, VEHICLE &amp; HUE</h2>
+      <p id="crew-rule"></p>
+      <form id="loadout-form">
+        <fieldset><legend>Choose a pilot / radio portrait</legend><div id="pilot-cards" class="pilot-grid"></div></fieldset>
+        <div class="loadout-editor">
+          <div class="pilot-preview-frame">
+            <img id="pilot-preview" width="132" height="132" alt="">
+            <strong id="pilot-preview-name"></strong>
+            <small id="pilot-preview-detail"></small>
+          </div>
+          <div class="loadout-controls">
+            <label for="vehicle">Starting vehicle</label><select id="vehicle"></select>
+            <p class="selection-note">Aircraft first. Tank and on-foot play come later.</p>
+            <fieldset><legend>Preferred hue</legend><div id="hue-options" class="hue-options"></div></fieldset>
+            <button id="save-pilot" type="submit" class="primary">Confirm pilot</button>
+          </div>
+        </div>
+      </form>
+      <p id="selection-status" role="status" aria-live="polite"></p>
+    </section>
     <section id="room" class="room" aria-labelledby="room-title">
-      <h2 id="room-title" class="panel-title">02 // SQUADRON ROSTER</h2>
+      <h2 id="room-title" class="panel-title">03 // SQUADRON ROSTER</h2>
       <div class="room-heading">
         <div><span class="eyebrow">YOUR ROOM CODE</span><strong id="room-code">No room yet</strong></div>
         <button id="leave" disabled>Leave room</button>
@@ -48,8 +70,25 @@
       <p id="status" role="status" aria-live="polite">Create a room, or enter a friend's code.</p>
       <ul id="peers" aria-label="Players"></ul>
     </section>
+    <section id="match-panel" aria-labelledby="match-title" hidden>
+      <h2 id="match-title" class="panel-title">04 // MAP OR MAIN GAME</h2>
+      <p id="match-summary" role="status" aria-live="polite"></p>
+      <form id="match-form">
+        <label for="mode">Game</label>
+        <select id="mode"><option value="versus">Versus maps</option><option value="campaign">Main game / co-op</option></select>
+        <div id="vs-fields" class="match-fields">
+          <div><label for="map">Map</label><select id="map"></select></div>
+          <div><label for="rules">Match type</label><select id="rules"></select></div>
+        </div>
+        <div id="campaign-fields" class="match-fields" hidden>
+          <div><label for="crew">One crew for co-op</label><select id="crew"><option value="star_fox">Star Fox / Arwing</option><option value="star_wolf">Star Wolf / Wolfen</option></select></div>
+        </div>
+        <button id="save-match" type="submit">Save match settings</button>
+      </form>
+      <p class="game-readiness">Setup preview: pilot and match choices synchronize now. Starting a shared game is the next integration step.</p>
+    </section>
     <section id="proof" class="proof" aria-labelledby="proof-title">
-      <h2 id="proof-title" class="panel-title">03 // SUBSPACE LINK TEST</h2>
+      <h2 id="proof-title" class="panel-title">05 // SUBSPACE LINK TEST</h2>
       <p>A guest sends a control sample to the host. The host sends a world snapshot back to every connected guest.</p>
       <div class="actions">
         <button id="send-input" disabled>Send control sample</button>
