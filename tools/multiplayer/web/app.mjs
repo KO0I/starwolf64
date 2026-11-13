@@ -1,5 +1,5 @@
 import {BrowserSession} from './session.mjs';
-import {PILOTS, VEHICLES, HUES, STAGES, DEFAULT_MATCH, pilotById, vehicleById, hueById, crewName, portraitURL} from './catalog.mjs';
+import {PILOTS, VEHICLES, HUES, STAGES, DEFAULT_MATCH, pilotById, vehicleById, hueById, crewName, portraitURL, campaignVehicle} from './catalog.mjs';
 
 const $ = id => document.getElementById(id);
 const proof = window.STARWOLF_MP_PROOF = {inputs:[], snapshots:[], errors:[]};
@@ -59,7 +59,7 @@ for (const pilot of PILOTS) {
   radio.addEventListener('change',() => {
     draftSelection.pilot = pilot.id;
     const match = session.state.setup.match;
-    if (match.kind === 'campaign') draftSelection.vehicle = match.crew === 'star_fox' ? 'arwing' : pilot.id === 'vitzy' ? 'vitzy_fighter' : 'wolfen';
+    if (match.kind === 'campaign' || pilot.signatureVehicle) draftSelection.vehicle = campaignVehicle(pilot);
     render();
   });
 }
@@ -84,7 +84,7 @@ function renderSelection(state,active) {
   const campaign = setup.match.kind === 'campaign';
   const pilot = pilotById(draftSelection.pilot);
   if (campaign && pilot.crew !== setup.match.crew) draftSelection = defaultSelection(setup.match);
-  if (campaign) draftSelection.vehicle = setup.match.crew === 'star_fox' ? 'arwing' : draftSelection.pilot === 'vitzy' ? 'vitzy_fighter' : 'wolfen';
+  if (campaign) draftSelection.vehicle = campaignVehicle(pilotById(draftSelection.pilot));
   const selectedPilot = pilotById(draftSelection.pilot);
   for (const pilot of PILOTS) {
     const radio = $('pilot-' + pilot.id), label = radio.parentElement;
@@ -112,7 +112,7 @@ function renderSelection(state,active) {
       (accepted.hue !== accepted.preferredHue ? '. The host assigned a distinct hue for this duplicate pilot.' : '.') :
     'Choose your pilot, starting aircraft, and hue, then confirm.';
   $('save-pilot').disabled = selectionBusy || (state.role === 'guest' && state.phase !== 'connected');
-  $('crew-rule').textContent = campaign ? 'Main game uses one crew: ' + crewName(setup.match.crew) + ', with matching aircraft.' :
+  $('crew-rule').textContent = campaign ? 'Main game uses one crew: ' + crewName(setup.match.crew) + ', with crew aircraft and signature ships.' :
     'Versus allows either crew and any available aircraft. Repeated pilots receive distinct hues.';
   if (!draftMatch) draftMatch = structuredClone(setup.match);
   const host = state.role === 'host';

@@ -191,6 +191,13 @@ try {
     s.setup?.match.kind === 'campaign' && s.setup.match.crew === 'star_fox' && s.setup.members.every(member => member.selection === null)));
   assert(await value(guest1, `document.getElementById('pilot-wolf').disabled && !document.getElementById('pilot-fox_original').disabled && [...document.getElementById('vehicle').options].find(option => option.value === 'wolfen').disabled`),
     'main-game setup enforces crew and matching aircraft',null);
+  await value(host, "document.getElementById('pilot-katt').click(); document.getElementById('save-pilot').click()");
+  await wait('Katt signature ship confirmed',async () => {
+    const s = await state(host);
+    return s.setup.members.find(member => member.peer === s.peer)?.selection?.vehicle === 'katt_fighter';
+  });
+  assert(await value(host, "document.getElementById('vehicle').value === 'katt_fighter'"),
+    'Katt receives her unique starting fighter',null);
   for (const page of [host,guest1,guest2]) {
     await choosePilot(page,{pilot:'fox_original',vehicle:'arwing',hue:0});
     await wait(page.label + ' confirms original Fox',async () => {

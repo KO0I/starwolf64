@@ -55,12 +55,12 @@ Gameplay decisions must not depend on which local camera is drawn.
 | First milestone | Corneria with a Points match. |
 | Required pilots | Fox, Falco, Slippy, Peppy, Pigma, Katt, and Vitzy, alongside the existing replacement crew. Vitzy is a Katt-derived axolotl. |
 | Expanded arena | Venom showdown as a separate versus entry. |
-| Aircraft roster | Arwing and Wolfen, plus Vitzy's requested magenta-and-pink Bill-derived fighter. PvP keeps free pilot and ship selection. Co-op uses crew-appropriate pilot assignments. |
+| Aircraft roster | Arwing, Wolfen, Katt's original fighter, and Vitzy's separate magenta-and-pink Bill-derived fighter. PvP keeps free pilot and ship selection. Co-op uses crew-appropriate pilot assignments. |
 | Ship behavior | Identical handling, weapons, health, and collision size. Only models and engine and laser colors differ. |
 | Pilot changes | Select a pilot before that participant first spawns. Keep the pilot for the remainder of the match. |
 | Duplicate pilots | Allowed. Every additional instance of the same pilot gets a distinct portrait, ship-marker, and laser hue. |
 | Respawns | Offer vehicle selection after every death, keeping the same pilot. Initially Arwing or Wolfen, with tank and on-foot choices added later. |
-| Team rules | Respawning team-points combat. Competitive teams may use any pilot and available aircraft. Co-op uses one crew with matching aircraft and Vitzy's signature-fighter exception. |
+| Team rules | Respawning team-points combat. Competitive teams may use any pilot and available aircraft. Co-op uses one crew with matching aircraft and Katt's and Vitzy's signature-fighter exceptions. |
 | Additional AI | A third hostile faction attacks both human teams. AI enemies are separate from the eight human slots. AI kills do not advance the victory score. Population budgets need validation. |
 | Friendly fire | Selectable and off by default. Lock-on always ignores teammates. A friendly-fire kill subtracts one team point. |
 | Guest timeout | Remove the timed-out guest's ship. Do not pause or end gameplay for the remaining players. |
@@ -126,7 +126,7 @@ In competitive play, character and ship selection are independent. Fox can fly a
 Duplicate pilots are allowed, with distinct portrait, ship-marker, and laser hues for every additional selection of the same pilot.
 The selected pilot stays fixed for the match. Vehicles can change after death.
 Multiplayer team membership imposes no competitive pilot or ship restriction. Co-op selects one crew and its matching aircraft, including pilot-specific assignments.
-Star Fox uses Arwing. Star Wolf normally uses Wolfen, with Vitzy assigned her signature fighter.
+Star Fox normally uses Arwing, with Katt using her own fighter. Star Wolf normally uses Wolfen, with Vitzy assigned her separate signature fighter.
 Katt belongs to Star Fox. Vitzy the axolotl and Pigma belong to Star Wolf.
 
 Verification must show original Star Fox and replacement Star Wolf characters together in one match.
@@ -196,7 +196,7 @@ The complete dependency graph, cockpit pilot presentation, engine effects, and s
 
 This is an additional aircraft appearance under the shared aircraft gameplay rules.
 It does not introduce different handling, damage, health, or collision size.
-The requested aircraft roster therefore includes Arwing, Wolfen, and Vitzy's fighter.
+The requested aircraft roster therefore includes Arwing, Wolfen, Katt's own fighter, and Vitzy's separate fighter.
 The small Corneria proof can establish aircraft networking with Arwing and Wolfen before the additional appearance is integrated.
 
 Keep competitive pilot and ship selection independent, including the new fighter.
@@ -240,8 +240,8 @@ Design new networking and player-state interfaces for eight participants from th
 
 In competitive play, either team may select any available pilot and aircraft variant.
 Co-op is an explicit exception. The host selects one crew, players choose pilots from that crew, and aircraft must match the crew.
-Star Fox co-op uses Arwing. Star Wolf co-op normally uses Wolfen, with Vitzy using her signature fighter.
-Katt is Star Fox. Vitzy and Pigma are Star Wolf. Later added pilots will need explicit affiliations.
+Star Fox co-op normally uses Arwing, with Katt using her own fighter. Star Wolf co-op normally uses Wolfen, with Vitzy using her separate signature fighter.
+Katt is Star Fox and has her own fighter, identified by ast_allies/aKattShipDL. Vitzy and Pigma are Star Wolf. Vitzy keeps her separate Bill-derived fighter. Later added pilots will need explicit affiliations.
 Crew-specific restrictions for later tank and on-foot forms are not settled by this aircraft rule.
 Pilot identity is fixed for the duration of a match.
 After death, players can change vehicles without changing pilots.

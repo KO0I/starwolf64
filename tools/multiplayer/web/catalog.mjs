@@ -14,19 +14,20 @@ export const PILOTS = Object.freeze([
   {id:'falco_original', name:'Falco', crew:'star_fox', portrait:'portraits/png/aFalcoPortraitTex.png'},
   {id:'slippy_original', name:'Slippy', crew:'star_fox', portrait:'portraits/png/aSlippyPortraitTex.png'},
   {id:'peppy_original', name:'Peppy', crew:'star_fox', portrait:'portraits/png/aPeppyPortraitTex.png'},
-  {id:'katt', name:'Katt', crew:'star_fox', portrait:'portraits/png/D_D003DF0.png'},
+  {id:'katt', name:'Katt', crew:'star_fox', signatureVehicle:'katt_fighter', portrait:'portraits/png/D_D003DF0.png'},
   {id:'wolf', name:'Wolf', crew:'star_wolf', portrait:'portraits/png/D_STAR_WOLF_F00B580.png'},
   {id:'leon', name:'Leon', crew:'star_wolf', portrait:'portraits/png/D_STAR_WOLF_F007900.png'},
   {id:'pigma', name:'Pigma', crew:'star_wolf', portrait:'portraits/png/D_STAR_WOLF_F003C80.png'},
   {id:'panther', name:'Panther', crew:'star_wolf', portrait:'crew_portraits/native/panther_closed.rgba16.png'},
   {id:'krystal', name:'Krystal', crew:'star_wolf', portrait:'crew_portraits/native/krystal_closed.rgba16.png'},
   {id:'kami', name:'Kami', crew:'star_wolf', portrait:'crew_portraits/native/kami_closed.rgba16.png'},
-  {id:'vitzy', name:'Vitzy', crew:'star_wolf', portrait:null, unavailable:'portrait pending'},
+  {id:'vitzy', name:'Vitzy', crew:'star_wolf', signatureVehicle:'vitzy_fighter', portrait:null, unavailable:'portrait pending'},
 ]);
 
 export const VEHICLES = Object.freeze([
   {id:'arwing', name:'Arwing'},
   {id:'wolfen', name:'Wolfen'},
+  {id:'katt_fighter', name:"Katt's fighter"},
   {id:'vitzy_fighter', name:"Vitzy's fighter"},
 ]);
 
@@ -39,6 +40,7 @@ export const STAGES = Object.freeze([
 export const DEFAULT_MATCH = Object.freeze({kind:'versus', stage:'corneria', rules:'points'});
 export const crewName = id => id === 'star_fox' ? 'Star Fox' : 'Star Wolf';
 export const pilotById = id => PILOTS.find(pilot => pilot.id === id);
+export const campaignVehicle = pilot => pilot.signatureVehicle || (pilot.crew === 'star_fox' ? 'arwing' : 'wolfen');
 export const vehicleById = id => VEHICLES.find(vehicle => vehicle.id === id);
 export const hueById = id => HUES.find(hue => hue.id === id);
 export const portraitURL = pilot => pilot.portrait ? '/portraits/' + pilot.id + '.png' : null;
@@ -63,8 +65,8 @@ export function selectionProblem(selection, match) {
   if (pilot.unavailable) return pilot.name + ': ' + pilot.unavailable + '.';
   if (match.kind === 'campaign') {
     if (pilot.crew !== match.crew) return 'Main game uses the ' + crewName(match.crew) + ' crew.';
-    const required = pilot.id === 'vitzy' ? 'vitzy_fighter' : match.crew === 'star_fox' ? 'arwing' : 'wolfen';
-    if (selection.vehicle !== required) return crewName(match.crew) + ' pilots use ' + vehicleById(required).name + ' in the main game.';
+    const required = campaignVehicle(pilot);
+    if (selection.vehicle !== required) return pilot.name + ' uses ' + vehicleById(required).name + ' in the main game.';
   }
   return null;
 }

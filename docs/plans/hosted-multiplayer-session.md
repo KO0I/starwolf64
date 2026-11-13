@@ -41,7 +41,7 @@ A newly connected guest receives the current complete setup after the channel ha
 This proves late setup synchronization, not restoration of a running C game.
 
 VS choices preserve native combinations: Corneria with Points or Battle; Katina with Time; Sector Z with Points, Battle, or Time.
-Main-game setup selects one crew. Star Fox uses Arwings. Star Wolf uses Wolfens, with Vitzy's signature fighter exception when her pilot becomes available.
+Main-game setup selects one crew. Star Fox normally uses Arwings, with Katt using her own fighter. Star Wolf normally uses Wolfens, with Vitzy's separate signature fighter exception when her pilot becomes available.
 Changing the crew during setup clears incompatible unspawned choices and allows players to choose again.
 
 There is no fake Start action or JavaScript-only playing state.
@@ -108,3 +108,5 @@ The first playable gate is Corneria Points.
 The host must start alone, move, fire, and score; a guest must join that running world, see existing objects, and control a different ship.
 Verify one full-screen view per participant, mixed aircraft, deaths/vehicle changes, stale admissions, and uninterrupted host play during guest loading.
 Then extend the verified engine bridge to all existing VS combinations, campaign co-op, and eventually eight-player Venom with extra hostile AI.
+
+Katt uses the distinct katt_fighter identity and original ast_allies/aKattShipDL resource. Vitzy keeps vitzy_fighter, the private magenta-and-pink Bill-derived fighter. Signature pilot selection suggests her ship; PvP retains free aircraft choice, while co-op preserves signature assignments.

@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {
   DEFAULT_MATCH, HUES, PILOTS, STAGES, assignSelection, pilotById,
-  selectionProblem, validMatch, validSetup,
+  selectionProblem, validMatch, validSetup, campaignVehicle,
 } from './web/catalog.mjs';
 
 const read = path => readFileSync(new URL('../../' + path, import.meta.url));
@@ -82,7 +82,7 @@ test('campaign selections use the selected crew and its starting vehicle', () =>
   for (const pilot of PILOTS.filter(pilot => !pilot.unavailable)) {
     const own = pilot.crew === 'star_fox' ? fox : wolf;
     const other = own === fox ? wolf : fox;
-    const vehicle = own === fox ? 'arwing' : 'wolfen';
+    const vehicle = pilot.id === 'katt' ? 'katt_fighter' : own === fox ? 'arwing' : 'wolfen';
     const wrongVehicle = own === fox ? 'wolfen' : 'arwing';
     assert.equal(selectionProblem(selection(pilot.id, vehicle), own), null, pilot.id);
     assert.ok(selectionProblem(selection(pilot.id, vehicle), other), pilot.id);
@@ -112,4 +112,12 @@ test('setup rejects malformed matches, members, and duplicate pilot hues', () =>
     {...valid, match: {kind: 'campaign', crew: 'star_fox'}, members: [a, member(1, accepted('wolf', 'wolfen'))]},
   ];
   for (const value of invalid) assert.equal(validSetup(value), false, JSON.stringify(value));
+});
+
+test('Katt and Vitzy keep separate signature ships', () => {
+  assert.equal(campaignVehicle(pilotById('katt')), 'katt_fighter');
+  assert.equal(campaignVehicle(pilotById('vitzy')), 'vitzy_fighter');
+  assert.equal(selectionProblem(selection('katt', 'katt_fighter'), {kind:'campaign',crew:'star_fox'}), null);
+  assert.match(selectionProblem(selection('katt', 'arwing'), {kind:'campaign',crew:'star_fox'}), /Katt.*fighter/);
+  assert.equal(pilotById('vitzy').unavailable,'portrait pending');
 });
