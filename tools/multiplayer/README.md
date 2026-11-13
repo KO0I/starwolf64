@@ -133,3 +133,15 @@ Then add weapons, damage, deaths, vehicle changes, scoring, and the four-player 
 Pilots, crew rules, duplicate appearance hues, and the eight-player Venom mode remain governed by
 [ADR 0001](../../docs/adr/0001-lan-versus-multiplayer.md).
 See the [browser WebRTC plan](../../docs/plans/browser-webrtc-multiplayer.md).
+
+## Ship wireframes
+
+The aircraft selector displays a floating and rotating wireframe using actual source geometry for Arwing, Wolfen, Katt's fighter, and Vitzy's fighter. The preview uses the selected hue, pauses offscreen or in a hidden tab, and stays stationary with reduced motion enabled.
+
+Regenerate geometry from the existing original US v1.1 ROM and sf64.o2r archive:
+
+```sh
+python3 tools/multiplayer/export-wireframes.py --source-root /path/to/local/game-assets
+```
+
+The exporter does not modify the source archives. The browser check verifies each model and reduced-motion behavior.

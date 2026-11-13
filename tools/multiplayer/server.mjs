@@ -12,6 +12,8 @@ const files = new Map([
   ["/app.mjs", ["app.mjs", "text/javascript; charset=utf-8"]],
   ["/session.mjs", ["session.mjs", "text/javascript; charset=utf-8"]],
   ["/protocol.mjs", ["protocol.mjs", "text/javascript; charset=utf-8"]],
+  ["/ship-preview.mjs", ["ship-preview.mjs", "text/javascript; charset=utf-8"]],
+  ["/ship-wireframes.json", ["ship-wireframes.json", "application/json"]],
   ["/catalog.mjs", ["catalog.mjs", "text/javascript; charset=utf-8"]],
   ["/styles.css", ["styles.css", "text/css; charset=utf-8"]],
 ]);

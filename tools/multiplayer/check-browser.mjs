@@ -152,6 +152,24 @@ try {
   await choosePilot(host,{pilot:'wolf',vehicle:'wolfen',hue:0});
   await wait('host confirms pilot alone',async () => (await state(host)).setup?.members[0].selection?.pilot === 'wolf');
   report.assertions['host configures a pilot without guests'] = true;
+  await value(host,"document.getElementById('ship-preview').scrollIntoView({block:'center'})");
+  await wait('ship geometry ready',async () => value(host,'window.STARWOLF_SHIP_PREVIEW.state.ready'));
+  const startFrame = await value(host,'window.STARWOLF_SHIP_PREVIEW.state.frames');
+  await wait('ship floats and rotates',async () => (await value(host,'window.STARWOLF_SHIP_PREVIEW.state.frames')) > startFrame+3);
+  report.assertions['ship preview animates when visible'] = true;
+  for (const ship of ['arwing','wolfen','katt_fighter','vitzy_fighter']) {
+    await value(host,"document.getElementById('vehicle').value="+JSON.stringify(ship)+";document.getElementById('vehicle').dispatchEvent(new Event('change',{bubbles:true}))");
+    const preview = await value(host,'window.STARWOLF_SHIP_PREVIEW.state');
+    assert(preview.ship===ship && preview.ready && preview.edges>50,'wireframe matches '+ship,preview);
+  }
+  await screenshot('ship-preview.png');
+  await call('Emulation.setEmulatedMedia',{features:[{name:'prefers-reduced-motion',value:'reduce'}]},host.sessionId);
+  await wait('reduced motion stops ship',async () => !(await value(host,'window.STARWOLF_SHIP_PREVIEW.state.animated')));
+  const still = await value(host,"document.getElementById('ship-preview').toDataURL()");
+  await sleep(300);
+  assert(await value(host,"document.getElementById('ship-preview').toDataURL()")===still,'reduced-motion preview stays stationary',null);
+  await call('Emulation.setEmulatedMedia',{features:[{name:'prefers-reduced-motion',value:'no-preference'}]},host.sessionId);
+  await value(host,"document.getElementById('vehicle').value='wolfen';document.getElementById('vehicle').dispatchEvent(new Event('change',{bubbles:true}))");
   await chooseVersus(host,'sector_z','time');
   await wait('host configures existing versus map',async () => (await state(host)).setup.match.stage === 'sector_z');
   await joinViaUI(guest1,hostState.room,'Guest 1');

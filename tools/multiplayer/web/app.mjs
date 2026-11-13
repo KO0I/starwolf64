@@ -1,9 +1,11 @@
+import {ShipPreview} from './ship-preview.mjs';
 import {BrowserSession} from './session.mjs';
 import {PILOTS, VEHICLES, HUES, STAGES, DEFAULT_MATCH, pilotById, vehicleById, hueById, crewName, portraitURL, campaignVehicle} from './catalog.mjs';
 
 const $ = id => document.getElementById(id);
 const proof = window.STARWOLF_MP_PROOF = {inputs:[], snapshots:[], errors:[]};
 const lastInputs = new Map();
+const shipPreview = window.STARWOLF_SHIP_PREVIEW = new ShipPreview($('ship-preview'),$('ship-preview-caption'));
 let session, inputSequence = 0, snapshotTick = 0, draftSelection, draftMatch;
 let selectionBusy = false, matchBusy = false;
 
@@ -102,6 +104,7 @@ function renderSelection(state,active) {
     item.disabled = campaign && item.value !== draftSelection.vehicle;
   }
   $('vehicle').value = draftSelection.vehicle;
+  shipPreview.select(draftSelection.vehicle,vehicleById(draftSelection.vehicle).name,hueById(draftSelection.hue).color);
   $('vehicle').disabled = selectionBusy;
   setPortrait($('pilot-preview'),selectedPilot,draftSelection.hue);
   $('pilot-preview-name').textContent = selectedPilot.name;
