@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Starwolf · WASM</title><link rel="icon" href="data:,">
+<style>
+:root{color-scheme:dark;font:16px system-ui,sans-serif;background:#12131b;color:#e9e9f0}*{box-sizing:border-box}body{margin:0;min-height:100dvh;background:radial-gradient(ellipse at top,#2e3046 0,transparent 65%)}[hidden]{display:none!important}main{max-width:620px;margin:0 auto;padding:clamp(28px,8vh,90px) 24px}header{display:flex;align-items:center;gap:14px;letter-spacing:3px;font-weight:700;font-size:14px}header span{letter-spacing:1px;font-size:11px;border:1px solid #62657e;border-radius:6px;padding:4px 7px;color:#bec3e6}h1{font-size:clamp(28px,7vw,42px);line-height:1.15;margin:36px 0 16px;letter-spacing:-1px}p{color:#b9bbcc;line-height:1.6}section{border:1px solid #4a4c64;border-radius:16px;background:#1c1e2bd9;padding:24px;margin:28px 0}label{font-weight:600;display:block;margin-bottom:14px}input{width:100%;color:#c4c6d7;font:inherit}input::file-selector-button,button{font:inherit;font-weight:600;color:#e9e9f0;background:#30344b;border:1px solid #5b607d;border-radius:9px;padding:12px 16px;cursor:pointer}input::file-selector-button{margin-right:12px}button:disabled,input:disabled{opacity:.5;cursor:default}#play{background:#545fc8;border-color:#8390ff}#actions{display:flex;gap:12px;flex-wrap:wrap}#status{min-height:24px;color:#d0d4f7;margin:22px 0 0}#error{color:#ffb7b7;white-space:pre-wrap}small{display:block;color:#9599af;line-height:1.5;margin-top:18px}footer{color:#9599af;font-size:13px;line-height:1.6}footer a{color:#bfc7ff}#game{border:0;width:100%;height:calc(100dvh - 42px);display:block}#toolbar{height:42px;display:flex;align-items:center;gap:12px;padding:4px 12px;background:#1b1d29;font-size:12px}#toolbar button{padding:6px 10px;font-size:12px}#play-status{margin-left:auto;color:#b9bbcc}.playing{overflow:hidden;background:#12131b}
+</style>
+<script>window.coi={coepCredentialless:()=>false};</script>
+<script src="./coi-serviceworker.js"></script>
+</head><body>
+<main id="setup"><header>STARWOLF <span>WASM PREVIEW</span></header>
+<h1 id="headline">Build Starwolf in your browser.</h1>
+<p id="intro">Choose your Star Fox 64 US v1.1 ROM. The game and mod are prepared on this device.</p>
+<section><div id="picker"><label for="rom">Choose ROM</label><input id="rom" type="file" accept=".z64,.v64,.n64,.zip" disabled>
+<small>Supports .z64, .v64, .n64, or a ZIP containing one ROM. Your ROM is never uploaded.</small></div>
+<p id="status" role="status" aria-live="polite">Loading the builder…</p><p id="error" role="alert" hidden></p>
+</section>
+<div id="actions"><button id="play" disabled>Play</button><button id="download" disabled>Download game</button></div>
+<small id="download-note">Includes your prepared game and a Python 3 launcher for desktop use. Keep it for your own use.</small>
+<footer><p>Single player · Keyboard, gamepad and touch</p><a href="https://github.com/KO0I/starwolf64/tree/starwolf/wasm-port-exploration">Source and build process</a></footer>
+</main>
+<div id="toolbar" hidden><button id="change-rom">Change ROM</button><button id="game-download">Download game</button><span id="play-status" role="status"></span></div>
+<div id="game-host" hidden></div>
+<script type="module" src="./app.mjs"></script>
+</body></html>

@@ -1,0 +1,132 @@
+{
+  "format": "starwolf64-wasm-site-v1",
+  "sourceRevision": "6378390439062c03f109eaa9583853a9cc21abb5",
+  "rom": {
+    "size": 12582912,
+    "sha1": "09f0d105f476b00efa5303a3ebc42e60a7753b7a",
+    "sha256": "385bcf1901ed12fb1152f3c227d1968cc54ae41e8566da66695df71af40a573f"
+  },
+  "modAssetSetSha256": "8f6cfeca601ec080f9bfbaaa34f5feadb7ce30b1c7c80f591e3c9e01f7a4d542",
+  "files": {
+    "index.html": {
+      "size": 3402,
+      "sha256": "c7ee47edbd38be200e17f37588aef9d9c2203d259b16048819b9b04773ffebaf"
+    },
+    "app.mjs": {
+      "size": 6108,
+      "sha256": "dea03c1ee70cbe675dcf70521eee9b8a023572e06a29b0ba0b65c4ca72bbc4a7"
+    },
+    "prepare-worker.mjs": {
+      "size": 2087,
+      "sha256": "5955cf48ebc2122f1d616139af941a9870b9af6fbd82c582ab435a5005253ed0"
+    },
+    "files.mjs": {
+      "size": 1476,
+      "sha256": "37ea706f4875617ecef58fe5bea38df137c93895ec2f53c8bfbe5b09c3c73afd"
+    },
+    "zip.mjs": {
+      "size": 4594,
+      "sha256": "a9f97b58827ee42779d320634ef3d12d57c74d59b615480ea6decced44e33d5b"
+    },
+    "rom-file.mjs": {
+      "size": 7648,
+      "sha256": "fe91044db04e691320b2736d10c888e224f8124d795478c4ff6ba17c2af012a3"
+    },
+    "rom-patch.mjs": {
+      "size": 4480,
+      "sha256": "799194e186c4a1987ec0eb05f9f8ec0412358a8f5823d301a1d3ba120e7fba8c"
+    },
+    "coi-serviceworker.js": {
+      "size": 6028,
+      "sha256": "e97bbac6017322d48aa54a5bc7ce473c725a4b7376ff245002e0ba71c3dcdd7e"
+    },
+    "runtime/Starship.html": {
+      "size": 21262,
+      "sha256": "5d5d511b8e0ae8345551935d4cd174db278dbbd711a4fdcb3f1ade945ef962fc"
+    },
+    "runtime/Starship.js": {
+      "size": 1113483,
+      "sha256": "e63b8c3123ea2685355f8ec1c9dba6a4fc12b039320a92edb238b25382faf5bf"
+    },
+    "runtime/Starship.wasm": {
+      "size": 8503803,
+      "sha256": "f2a5c284e1c0669af3d9e33a35dae5ea863d3324b13c8907a398bdc57fc88be6"
+    },
+    "runtime/Starship.data": {
+      "size": 610848,
+      "sha256": "a2299ef257b68c62b9fcce39fc59b5fb3a5a7068214f766a96c21595b55a11c3"
+    },
+    "extractor/extractor.mjs": {
+      "size": 144302,
+      "sha256": "ec151f5f50a311984a3a5414b97153af25a46fc4bef312b47051f0e780b33866"
+    },
+    "extractor/extractor.wasm": {
+      "size": 2939220,
+      "sha256": "c0059785684eb708455b0331c27bf3c029738b92911d577d78bac4345281933b"
+    },
+    "extractor/extractor.data": {
+      "size": 466320,
+      "sha256": "2e0e18efe6d936b7dd0195612415287dc77f8d8fc5e24c8154e19a8fd0c284e0"
+    },
+    "mod/recipe.json": {
+      "size": 295121,
+      "sha256": "88996658ded16d94125ce79daec910de654a690643d398aec9f7d3853a0e6891"
+    },
+    "mod/literals.dat": {
+      "size": 688956,
+      "sha256": "1c16f5e8614957f9a624fcf51b6cb46ed7183bdb52d1d3c932c5cb7f86711ff5"
+    },
+    "mod/chatter.dat": {
+      "size": 4518238,
+      "sha256": "cec5bc913e9abc1d515f334ed71f1ab92b3c8e2451445ff55d8def2e98c1518e"
+    },
+    "start.py": {
+      "size": 1993,
+      "sha256": "d17821ad22ba3675bf99d3ab597cf1f46de40f05c52d22e681761f94bccbe792"
+    },
+    "licenses/Starship.md": {
+      "size": 7047,
+      "sha256": "6d489af6292662d9e36d34ce49423784984a5f6e41d7b58f49b01264df59fa03"
+    },
+    "licenses/Torch": {
+      "size": 1081,
+      "sha256": "111037b48f3d60ad59a896ecc30913989451723ff468f85e847693dd6a7264af"
+    },
+    "licenses/libultraship": {
+      "size": 1090,
+      "sha256": "fdd4f25c62f0a30865c4395d53e731be208c7b8912d5c068dbd93ca7fadc8a97"
+    },
+    "licenses/Fast3D.txt": {
+      "size": 1074,
+      "sha256": "f26e9084000ec95baf5fbec41998b95c26a686c4f9179e95fa05fb550bc6a0d2"
+    },
+    "licenses/coi-serviceworker": {
+      "size": 1070,
+      "sha256": "3ee2c88cec9f3036fd4b0cba94e94485bb8b4673be7b8e0f3b1496c5baff75cb"
+    },
+    "README.txt": {
+      "size": 558,
+      "sha256": "6b6227f6995d365234abf0dd3a51389aec648c03f17f46a96b2fb1340c0bbebd"
+    }
+  },
+  "download": [
+    "index.html",
+    "app.mjs",
+    "files.mjs",
+    "zip.mjs",
+    "rom-file.mjs",
+    "rom-patch.mjs",
+    "coi-serviceworker.js",
+    "runtime/Starship.html",
+    "runtime/Starship.js",
+    "runtime/Starship.wasm",
+    "runtime/Starship.data",
+    "start.py",
+    "licenses/Starship.md",
+    "licenses/Torch",
+    "licenses/libultraship",
+    "licenses/Fast3D.txt",
+    "licenses/coi-serviceworker",
+    "README.txt"
+  ]
+}
