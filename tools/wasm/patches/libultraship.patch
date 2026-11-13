@@ -1,5 +1,5 @@
 diff --git a/cmake/dependencies/common.cmake b/cmake/dependencies/common.cmake
-index 8f5813ac..976acc46 100644
+index 8f5813ac57919e7d6352a2577ed962d6fd94a16c..976acc46dc440a3865ed84ba0b70a53717a6d934 100644
 --- a/cmake/dependencies/common.cmake
 +++ b/cmake/dependencies/common.cmake
 @@ -52,7 +52,12 @@ endif()
@@ -17,7 +17,7 @@ index 8f5813ac..976acc46 100644
  
  add_library(stb STATIC)
 diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
-index db92a29a..9a2685af 100644
+index db92a29aea08ac60db4eddc9d59a96b457530a0c..9a2685afd54b7e97cffdfc4bfb16facda6774de4 100644
 --- a/src/CMakeLists.txt
 +++ b/src/CMakeLists.txt
 @@ -217,7 +217,7 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Darwin" OR CMAKE_SYSTEM_NAME STREQUAL "iOS")
@@ -30,7 +30,7 @@ index db92a29a..9a2685af 100644
          find_library(OPENGLES_LIBRARY GLESv3)
          target_link_libraries(libultraship PRIVATE GLESv3)
 diff --git a/src/graphic/Fast3D/backends/gfx_opengl.cpp b/src/graphic/Fast3D/backends/gfx_opengl.cpp
-index 097e2e86..2d1a15a2 100644
+index 097e2e86c61c6db3d07b002bc6d28a82804f29f1..2d1a15a24f0d967d7fefbcc23d35814890228f94 100644
 --- a/src/graphic/Fast3D/backends/gfx_opengl.cpp
 +++ b/src/graphic/Fast3D/backends/gfx_opengl.cpp
 @@ -521,11 +521,13 @@ void GfxRenderingAPIOGL::ShaderGetInfo(struct ShaderProgram* prg, uint8_t* numIn
@@ -57,7 +57,7 @@ index 097e2e86..2d1a15a2 100644
  #endif
  
 diff --git a/src/graphic/Fast3D/backends/gfx_opengl.h b/src/graphic/Fast3D/backends/gfx_opengl.h
-index d5fd9002..bd0cd7d6 100644
+index d5fd9002a4cddbd7ab00bddb9a8c26ae8464e75e..bd0cd7d69bd8518a350887bb61764ab428ad7f36 100644
 --- a/src/graphic/Fast3D/backends/gfx_opengl.h
 +++ b/src/graphic/Fast3D/backends/gfx_opengl.h
 @@ -1,6 +1,8 @@
@@ -89,7 +89,7 @@ index d5fd9002..bd0cd7d6 100644
  
      std::map<std::pair<uint64_t, uint32_t>, ShaderProgram> mShaderProgramPool;
 diff --git a/src/graphic/Fast3D/backends/gfx_sdl2.cpp b/src/graphic/Fast3D/backends/gfx_sdl2.cpp
-index 1387e280..8a000b5a 100644
+index 1387e280429cb2d02815bab236ed214b65364612..8a000b5a801011beb21466dc5e21a73e9cb37476 100644
 --- a/src/graphic/Fast3D/backends/gfx_sdl2.cpp
 +++ b/src/graphic/Fast3D/backends/gfx_sdl2.cpp
 @@ -1,4 +1,8 @@
@@ -174,7 +174,7 @@ index 1387e280..8a000b5a 100644
      SDL_DestroyRenderer(mRenderer);
      SDL_Quit();
 diff --git a/src/graphic/Fast3D/interpreter.cpp b/src/graphic/Fast3D/interpreter.cpp
-index 607909ec..a503bafb 100644
+index 607909ec50e63caaa9febbac89e7d14739415ec0..a503bafbf6d0066e37582217518c809c39e9c878 100644
 --- a/src/graphic/Fast3D/interpreter.cpp
 +++ b/src/graphic/Fast3D/interpreter.cpp
 @@ -3167,7 +3167,7 @@ bool gfx_branch_z_otr_handler_f3dex2(F3DGfx** cmd0) {
@@ -187,7 +187,7 @@ index 607909ec..a503bafb 100644
  }
  
 diff --git a/src/resource/type/DisplayList.cpp b/src/resource/type/DisplayList.cpp
-index 03d0acd8..3da64a48 100644
+index 03d0acd8019fd8a0c91f167d4ba2ddd7d8f5f20f..3da64a4836a6903f91ac8a4cbaee7675569bbd11 100644
 --- a/src/resource/type/DisplayList.cpp
 +++ b/src/resource/type/DisplayList.cpp
 @@ -1,5 +1,6 @@
@@ -198,7 +198,7 @@ index 03d0acd8..3da64a48 100644
  namespace Fast {
  DisplayList::DisplayList() : Resource(std::shared_ptr<Ship::ResourceInitData>()) {
 diff --git a/src/utils/StringHelper.cpp b/src/utils/StringHelper.cpp
-index b88161a9..699f8b51 100644
+index b88161a97722db06eabaa853b286d31598b81fb9..699f8b513495969bc215a42b8ecf75db63747dbd 100644
 --- a/src/utils/StringHelper.cpp
 +++ b/src/utils/StringHelper.cpp
 @@ -1,4 +1,5 @@
@@ -208,7 +208,7 @@ index b88161a9..699f8b51 100644
  #if (_MSC_VER)
  #pragma optimize("2", on)
 diff --git a/src/window/gui/Gui.cpp b/src/window/gui/Gui.cpp
-index 953d4514..ce99a6de 100644
+index 953d4514ee637139f98b2d45e0220ef6f32c85cc..ce99a6de0e2aa6808b7651c817236baab151f84c 100644
 --- a/src/window/gui/Gui.cpp
 +++ b/src/window/gui/Gui.cpp
 @@ -277,7 +277,7 @@ bool Gui::SupportsViewports() {

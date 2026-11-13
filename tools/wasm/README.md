@@ -15,7 +15,8 @@ python3 tools/wasm/run.py build
 
 Bootstrap installs Emscripten 7.0.0 and its bundled Node. It populates the pinned
 submodules and applies exactly the patches listed in `lock.json`. It rejects
-other tracked dependency edits. The patches are stored in this repository so a
+other tracked dependency edits. Patch comparisons use full object IDs and explicit
+diff options, independent of host Git abbreviation and color settings. The patches are stored in this repository so a
 fresh worktree can reproduce them without a separate submodule commit.
 
 `dependencies` downloads the SHA-256-checked source archives and data files,

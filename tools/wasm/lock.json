@@ -130,11 +130,11 @@
   "patches": {
     "libultraship": {
       "path": "tools/wasm/patches/libultraship.patch",
-      "sha256": "7834ea9e4ef5dbc85c34bca5bd8311d466e42cfa65c2451bd5dd1a9001defee7"
+      "sha256": "a0e11e17bb94bd9521fe0713c4baf42a02fc0fd8eed009883ac2302b0909a2f5"
     },
     "tools/Torch": {
       "path": "tools/wasm/patches/torch.patch",
-      "sha256": "55a1f2a4e49042fc50914db7ea1ee5d866d790d0da152fffde3a8ab32cb60172"
+      "sha256": "a37a9eca41340c6456b870efdac0ace67023e54f1c6d05ace36bfd4f8463e7ea"
     }
   },
   "source_patches": {

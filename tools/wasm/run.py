@@ -61,6 +61,15 @@ def git(*args, cwd=ROOT):
     return subprocess.check_output(["git", *args], cwd=cwd, text=True).strip()
 
 
+def canonical_diff(directory):
+    # Host Git settings must not change the dependency-pin comparison.
+    return subprocess.check_output([
+        "git", "-c", "diff.algorithm=myers", "diff", "--binary", "--full-index",
+        "--no-ext-diff", "--no-textconv", "--no-color", "--no-renames",
+        "--no-indent-heuristic", "--src-prefix=a/", "--dst-prefix=b/", "--unified=3", "HEAD", "--",
+    ], cwd=directory)
+
+
 def verify_sources():
     for path, expected in LOCK["submodules"].items():
         if not (ROOT / path / "CMakeLists.txt").is_file():
@@ -74,11 +83,11 @@ def verify_sources():
             expected_diff = (ROOT / patch["path"]).read_bytes()
             if hashlib.sha256(expected_diff).hexdigest() != patch["sha256"]:
                 raise RuntimeError(f"{path}: patch hash mismatch")
-            diff = subprocess.check_output(["git", "diff", "HEAD", "--binary"], cwd=ROOT / path)
+            diff = canonical_diff(ROOT / path)
             if not diff:
                 run("patch-" + path.replace("/", "-"), ["git", "-C", ROOT / path,
                                                         "apply", ROOT / patch["path"]])
-        diff = subprocess.check_output(["git", "diff", "HEAD", "--binary"], cwd=ROOT / path)
+        diff = canonical_diff(ROOT / path)
         if diff != expected_diff:
             raise RuntimeError(f"{path}: dependency changes differ from the locked patch")
 

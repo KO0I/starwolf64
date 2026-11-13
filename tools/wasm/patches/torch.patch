@@ -1,5 +1,5 @@
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 7e048ff..28f2cbf 100644
+index 7e048ff559093ca6bf79106ea77928d930dd19c1..28f2cbfbea7c35cec88e900e476982f0f8a5dbac 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
 @@ -238,6 +238,10 @@ else()
@@ -23,7 +23,7 @@ index 7e048ff..28f2cbf 100644
      target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
      target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/lib)
 diff --git a/src/utils/StringHelper.cpp b/src/utils/StringHelper.cpp
-index b88161a..699f8b5 100644
+index b88161a97722db06eabaa853b286d31598b81fb9..699f8b513495969bc215a42b8ecf75db63747dbd 100644
 --- a/src/utils/StringHelper.cpp
 +++ b/src/utils/StringHelper.cpp
 @@ -1,4 +1,5 @@
