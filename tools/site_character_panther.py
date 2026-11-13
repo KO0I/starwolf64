@@ -207,7 +207,9 @@ def install(glb, variant):
         glb.doc['materials'].append({'name': 'Panther_'+name,
             'pbrMetallicRoughness': {'baseColorFactor': [*(np.array(rgb)/255).tolist(), 1],
                                     'metallicFactor': 0, 'roughnessFactor': 1},
-            'extras': {'ambient': ambient, 'runtime_flat_normals': True, 'runtime_vertex_precision': 8}})
+            'extras': {'ambient': ambient, 'runtime_flat_normals': True, 'runtime_vertex_precision': 8,
+                       'runtime_depth_decal': variant == 'title' and name in
+                           ('eye_socket', 'yellow_eye', 'slit_pupil')}})
         mesh['primitives'].append({'attributes': {
             'POSITION': append_accessor(glb, faces.reshape(-1, 3), 'VEC3'),
             'NORMAL': append_accessor(glb, np.repeat(normal, 3, axis=0), 'VEC3'),

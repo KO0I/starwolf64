@@ -971,11 +971,10 @@ void Background_DrawBackdrop(void) {
 
                         case LEVEL_TRAINING:
                             Matrix_Translate(gGfxMatrix, bgXpos - 120.0f, -(bgYpos - 120.0f), -290.0f, MTXF_APPLY);
-                            Matrix_Scale(gGfxMatrix, 0.2f, 0.2f, 1.0f, MTXF_APPLY);
+                            // Bolse's Venom backdrop has 80-unit halves; Training's had 200-unit halves.
+                            Matrix_Scale(gGfxMatrix, 0.5f, 0.5f, 1.0f, MTXF_APPLY);
                             Matrix_SetGfxMtx(&gMasterDisp);
-                            RCP_SetupDL_62();
-                            gDPSetPrimColor(gMasterDisp++, 0x00, 0x00, 255, 255, 255, 255);
-                            gSPDisplayList(gMasterDisp++, D_TR_6003760);
+                            gSPDisplayList(gMasterDisp++, D_BO_600D190);
                             break;
 
                         case LEVEL_AREA_6:

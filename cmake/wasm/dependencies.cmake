@@ -1,0 +1,16 @@
+# Included only for the Emscripten game target, before nested projects.
+if(NOT DEFINED STARSHIP_WASM_DEPS OR NOT EXISTS "${STARSHIP_WASM_DEPS}/sources.cmake")
+    message(FATAL_ERROR "Run python3 tools/wasm/run.py dependencies, then configure")
+endif()
+include("${STARSHIP_WASM_DEPS}/sources.cmake")
+set(FETCHCONTENT_FULLY_DISCONNECTED ON CACHE BOOL "Use verified local sources only" FORCE)
+set(FETCHCONTENT_UPDATES_DISCONNECTED ON CACHE BOOL "Do not update locked sources" FORCE)
+set(CMAKE_FIND_PACKAGE_TARGETS_GLOBAL TRUE)
+# Nested projects overwrite CMAKE_CXX_FLAGS; inherited target options preserve ABI.
+add_compile_options(-pthread "$<$<COMPILE_LANGUAGE:CXX>:-fexceptions>")
+add_link_options(-pthread -fexceptions -sMAX_WEBGL_VERSION=2)
+find_package(SDL2 CONFIG REQUIRED)
+set(SDL2_INCLUDE_DIRS "${STARSHIP_WASM_DEPS}/prefix/include;${STARSHIP_WASM_DEPS}/prefix/include/SDL2")
+include_directories(${SDL2_INCLUDE_DIRS})
+add_compile_definitions(IMGUI_IMPL_OPENGL_ES3)
+link_libraries(SDL2::SDL2)

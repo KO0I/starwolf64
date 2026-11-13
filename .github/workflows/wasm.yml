@@ -1,0 +1,56 @@
+name: WASM browser builder
+on:
+  workflow_dispatch:
+  push:
+    branches: [starwolf/wasm-port-exploration]
+    paths:
+      - '.github/workflows/wasm.yml'
+      - 'CMakeLists.txt'
+      - 'cmake/wasm/**'
+      - 'src/**'
+      - 'tools/wasm/**'
+      - 'assets/wasm/**'
+      - 'port/**'
+      - 'assets/yaml/**'
+      - 'browser/rom-file*'
+      - 'browser/rom-patch*'
+permissions:
+  contents: read
+concurrency:
+  group: wasm-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  browser-builder:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install host build tools
+        run: sudo apt-get update && sudo apt-get install -y cmake ninja-build patch
+      - name: Test archive and mod preparation
+        run: |
+          python3 -m unittest discover -s tools/wasm -p 'test_*.py' -v
+          node --test tools/wasm/web/zip.test.mjs browser/rom-file.test.mjs browser/rom-patch.test.mjs
+      - name: Install pinned toolchain
+        run: python3 tools/wasm/run.py bootstrap
+      - name: Cross-build and verify dependencies
+        run: |
+          python3 tools/wasm/run.py dependencies
+          python3 tools/wasm/run.py dependency-probe
+      - name: Build ROM-free browser package
+        run: python3 tools/wasm/run.py public
+      - name: Upload browser builder
+        uses: actions/upload-artifact@v4
+        with:
+          name: starwolf-wasm-browser-builder
+          path: build/wasm/site/
+          if-no-files-found: error
+          retention-days: 14

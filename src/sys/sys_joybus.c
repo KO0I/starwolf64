@@ -1,5 +1,9 @@
 #include "sys.h"
 
+#ifdef __EMSCRIPTEN__
+extern void Wasm_ReadController(OSContPad* pad);
+#endif
+
 OSContPad gControllerHold[4];
 OSContPad gControllerPress[4];
 u8 gControllerPlugged[4];
@@ -93,6 +97,9 @@ void Controller_ReadData(void) {
     } else {
         osContStartReadData(&gSerialEventQueue);
         osContGetReadData(sNextController);
+#ifdef __EMSCRIPTEN__
+        Wasm_ReadController(&sNextController[0]);
+#endif
     }
 }
 
