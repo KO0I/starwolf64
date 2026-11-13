@@ -1,26 +1,31 @@
 import {createServer} from 'node:http';
-import {readFile, writeFile, mkdir, mkdtemp, realpath} from 'node:fs/promises';
+import {readFile, writeFile, mkdir, mkdtemp, realpath, readdir} from 'node:fs/promises';
 import {resolve, sep, extname} from 'node:path';
 import {fileURLToPath} from 'node:url';
-import {spawn} from 'node:child_process';
+import {spawn,execFileSync} from 'node:child_process';
 
+const site = process.argv.includes('--site');
 const buildDirectoryIndex = process.argv.indexOf('--build-dir');
-const root = buildDirectoryIndex < 0 ? fileURLToPath(new URL('../../build/wasm/game', import.meta.url)) : resolve(process.argv[buildDirectoryIndex+1]);
-const game = process.argv.includes('--game');
+const root = buildDirectoryIndex < 0 ? fileURLToPath(new URL(site?'../../build/wasm/site':'../../build/wasm/game', import.meta.url)) : resolve(process.argv[buildDirectoryIndex+1]);
+const game = site || process.argv.includes('--game');
 const preloaded = process.argv.includes('--preloaded');
 const touch = process.argv.includes('--touch');
 const collision = process.argv.includes('--collision');
 if(touch&&!game) throw Error('--touch requires --game');
 const previewUrl = process.argv.includes('--url') ? process.argv[process.argv.indexOf('--url')+1] : undefined;
 const option = name => { const index=process.argv.indexOf(name); return index<0?undefined:process.argv[index+1]; };
-if(game && !preloaded && (!option('--base') || !option('--port'))) throw Error('--game requires --base and --port archive paths');
+if(game && !site && !preloaded && (!option('--base') || !option('--port'))) throw Error('--game requires --base and --port archive paths');
 const output = option('--output')?resolve(option('--output')):fileURLToPath(new URL(game?'../../build/wasm/game-check':'../../build/wasm/webgl-check', import.meta.url));
 const sleep = ms => new Promise(done => setTimeout(done, ms));
-const types = {'.html':'text/html', '.js':'text/javascript', '.wasm':'application/wasm', '.data':'application/octet-stream'};
+const types = {'.html':'text/html', '.js':'text/javascript', '.mjs':'text/javascript', '.json':'application/json', '.wasm':'application/wasm', '.data':'application/octet-stream'};
 await mkdir(output, {recursive:true});
+const requests=[];
 const server = createServer(async (request, response) => {
-  response.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
-  response.setHeader('Cross-Origin-Embedder-Policy', 'require-corp');
+  requests.push({method:request.method,url:request.url});
+  if(!process.argv.includes('--service-worker-isolation')) {
+    response.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
+    response.setHeader('Cross-Origin-Embedder-Policy', 'require-corp');
+  }
   try {
     const pathname = decodeURIComponent(new URL(request.url, 'http://localhost').pathname);
     const path = await realpath(resolve(root, '.' + pathname));
@@ -34,7 +39,8 @@ const server = createServer(async (request, response) => {
 });
 let chrome, ws, call;
 const pending = new Map(), errors = [], consoleLogs = [];
-let result, isolated = false, failure;
+let result, isolated = false, failure, evaluationContext, siteResult;
+const contexts=new Map();
 try {
   await new Promise((done, reject) => { server.once('error', reject); server.listen(0, '127.0.0.1', done); });
   const profile = await mkdtemp(resolve(output, 'chrome-'));
@@ -70,6 +76,8 @@ try {
   let nextId = 0;
   ws.onmessage = event => {
     const message = JSON.parse(event.data);
+    if(message.method==='Runtime.executionContextCreated') contexts.set(message.params.context.id,message.params.context);
+    if(message.method==='Runtime.executionContextDestroyed') contexts.delete(message.params.executionContextId);
     if(message.method === 'Runtime.consoleAPICalled') {
       const text=message.params.args.map(value=>value.value||value.description).join(' ');
       consoleLogs.push(text);
@@ -97,6 +105,7 @@ try {
     const id = ++nextId;
     const timeout = setTimeout(() => { pending.delete(id); reject(Error('CDP timed out: ' + method)); }, 10000);
     pending.set(id, {done, reject, timeout});
+    if(method==='Runtime.evaluate'&&evaluationContext) params={contextId:evaluationContext,...params};
     ws.send(JSON.stringify({id, method, params}));
   });
   await call('Runtime.enable'); await call('Page.enable'); await call('Log.enable');
@@ -107,7 +116,7 @@ try {
     if(evaluated.exceptionDetails) throw Error(JSON.stringify(evaluated.exceptionDetails));
     return evaluated.result.value;
   };
-  const center=async selector=>value(`(()=>{const node=document.querySelector(${JSON.stringify(selector)});node.scrollIntoView({block:'nearest'});const box=node.getBoundingClientRect();return {x:box.x+box.width/2,y:box.y+box.height/2};})()`);
+  const center=async selector=>value(`(()=>{const node=document.querySelector(${JSON.stringify(selector)});node.scrollIntoView({block:'nearest'});const box=node.getBoundingClientRect();const frame=window.frameElement?.getBoundingClientRect()||{x:0,y:0};return {x:box.x+box.width/2+frame.x,y:box.y+box.height/2+frame.y};})()`);
   const touches=new Map();
   const finger=async(type,id,point)=>{
     if(type==='touchEnd') touches.delete(id);
@@ -122,11 +131,76 @@ try {
     if(!navigator.audioSession) Object.defineProperty(navigator,'audioSession',{value:{type:'auto'}});
     window.audioSessionAtCreation=[];
     window.AudioContext=new Proxy(window.AudioContext,{construct(Target,args){
-      audioSessionAtCreation.push(navigator.audioSession.type);return Reflect.construct(Target,args);
+      audioSessionAtCreation.push(navigator.audioSession.type);window.audioCreatedWithGesture=navigator.userActivation.isActive;return Reflect.construct(Target,args);
     }});
   `});
-  await call('Page.navigate', {url:previewUrl || `http://127.0.0.1:${server.address().port}/${game?'Starship':'renderer-probe'}.html`});
-  if(game) {
+  await call('Page.navigate', {url:previewUrl || `http://127.0.0.1:${server.address().port}/${site?'index':game?'Starship':'renderer-probe'}.html`});
+  if(site) {
+    const waitSite=async phase=>{
+      const deadline=Date.now()+180000;
+      let state;
+      while(Date.now()<deadline) {
+        state=await value('window.STARWOLF_PREPARATION');
+        if(state?.phase===phase) return state;
+        if(state?.phase==='error'&&phase!=='error') throw Error('ROM preparation failed: '+await value('document.getElementById("error").textContent'));
+        if(errors.length) throw Error('Browser preparation errors: '+JSON.stringify(errors.slice(0,3)));
+        await sleep(100);
+      }
+      throw Error('ROM preparation timed out: '+JSON.stringify(state));
+    };
+    if(option('--rom')) {
+      await waitSite('selecting');
+      const document=await call('DOM.getDocument');
+      const input=await call('DOM.querySelector',{nodeId:document.root.nodeId,selector:'#rom'});
+      if(process.argv.includes('--site-invalid')) {
+        const invalid=resolve(output,'invalid.z64');await writeFile(invalid,new Uint8Array(4));
+        await call('DOM.setFileInputFiles',{nodeId:input.nodeId,files:[invalid]});
+        await waitSite('error');
+        if(!await value('document.getElementById("play").disabled&&document.getElementById("download").disabled'))
+          throw Error('Invalid ROM left Play or Download enabled');
+      }
+      await call('DOM.setFileInputFiles',{nodeId:input.nodeId,files:[resolve(option('--rom'))]});
+    }
+    siteResult=await waitSite('ready');
+    siteResult.serviceWorkerIsolation=process.argv.includes('--service-worker-isolation');
+    const shot=await call('Page.captureScreenshot',{format:'png'});
+    await writeFile(resolve(output,'builder-ready.png'),Buffer.from(shot.data,'base64'));
+    if(process.argv.includes('--site-download')) {
+      const downloadPath=await mkdtemp(resolve(output,'game-download-'));
+      await call('Browser.setDownloadBehavior',{behavior:'allow',downloadPath});
+      await call('Runtime.evaluate',{expression:'document.getElementById("download").click()',userGesture:true});
+      let downloaded;
+      for(let attempt=0;attempt<600;attempt++) {
+        downloaded=(await readdir(downloadPath)).find(name=>name.endsWith('.zip'));
+        if(downloaded) break;
+        await sleep(100);
+      }
+      if(!downloaded) throw Error('Prepared game download did not complete');
+      siteResult.download=resolve(downloadPath,downloaded);
+      execFileSync('python3',['-c',`
+import sys,zipfile,json,hashlib
+with zipfile.ZipFile(sys.argv[1]) as z:
+    assert z.testzip() is None
+    p=json.loads(z.read('prepared-assets.json'))
+    assert p['prepared'] and len(p['archives'])==3
+    assert 'runtime/Starship.wasm' in z.namelist() and 'start.py' in z.namelist()
+    assert not any(n.endswith(('.z64','.v64','.n64')) for n in z.namelist())
+    for a in p['archives']:
+        data=z.read(a['path'])
+        assert len(data)==a['size'] and hashlib.sha256(data).hexdigest()==a['sha256']
+`,siteResult.download]);
+    }
+    await call('Runtime.evaluate',{expression:'document.getElementById("play").click()',userGesture:true});
+    const tree=await call('Page.getFrameTree');
+    const child=tree.frameTree.childFrames?.find(f=>f.frame.url.includes('/runtime/Starship.html'));
+    evaluationContext=[...contexts.values()].find(c=>c.auxData?.frameId===child?.frame.id&&c.auxData?.isDefault)?.id;
+    if(!evaluationContext) throw Error('Game iframe execution context is unavailable');
+    const installed=await value('({base:Module.FS.stat("/sf64.o2r").size,port:Module.FS.stat("/starship.o2r").size,mod:Module.FS.stat("/mods/mod-0000.o2r").size,selected:document.getElementById("sf64").files.length})');
+    if(!installed.base||!installed.port||!installed.mod||installed.selected) throw Error('Prepared assets were not mounted');
+    siteResult.installed=installed;
+    if(process.argv.includes('--audio-session')&&!await value('window.audioCreatedWithGesture')) throw Error('Browser Play did not unlock audio in the user gesture');
+  }
+  if(game&&!site) {
     const readyDeadline=Date.now()+45000;
     let ready=false;
     while(Date.now()<readyDeadline) {
@@ -194,6 +268,10 @@ try {
       throw Error('Worker/audio check failed: '+JSON.stringify(result));
   } else if (result.status !== 'pass') throw Error('Renderer probe failed: ' + JSON.stringify(result));
   if (!isolated) throw Error('Shared-memory isolation is unavailable');
+  if(site) {
+    if(requests.some(r=>r.method!=='GET'&&r.method!=='HEAD')) throw Error('Unexpected upload request');
+    siteResult.observedRequests=requests.length;result.site=siteResult;
+  }
   if(!game) {
     if (!result.webglVersion?.includes('WebGL 2.0')) throw Error('WebGL 2 was not used');
     if (result.glError !== 0 || result.checks?.length !== 3) throw Error('Incomplete renderer checks');
@@ -405,7 +483,7 @@ try {
     await writeFile(resolve(output,'failure.png'),Buffer.from(shot.data,'base64'));
   } catch {}
 } finally {
-  const report=JSON.stringify({result, preloaded, previewUrl, isolated, errors, consoleLogs, failure}, null, 2) + '\n';
+  const report=JSON.stringify({result, preloaded, previewUrl, isolated, errors, consoleLogs, siteResult, failure}, null, 2) + '\n';
   await writeFile(resolve(output, 'result.json'),report);
   if(touch) await writeFile(resolve(output,'touch-result.json'),report);
   if(collision) await writeFile(resolve(output,'collision-result.json'),report);

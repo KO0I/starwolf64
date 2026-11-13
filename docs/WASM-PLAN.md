@@ -93,3 +93,12 @@ must be explicitly integrated before claiming current-mod release parity.
 - Local evidence: CMakeLists.txt, src/port/Game.cpp, src/port/Engine.cpp,
   src/port/extractor/GameExtractor.cpp, libultraship/src/resource/ResourceManager.cpp,
   and libultraship/src/graphic/Fast3D/backends/gfx_opengl.cpp.
+
+## Browser preparation authorization, 2026-11-12
+
+The user requested the complete process be published and selected processing
+entirely in the browser, with Play and Download options. This authorizes local
+ROM extraction, preservation of the exact tested preview mod, a separately
+published experimental WASM player, and a downloadable prepared game bundle.
+The existing emulator player remains available. Campaign completion and actual
+mobile browser preparation checks remain validation work, not implied passes.

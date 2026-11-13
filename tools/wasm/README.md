@@ -108,8 +108,8 @@ python3 tools/wasm/serve.py --port 8664
 ```
 
 Open http://127.0.0.1:8664/Starship.html. Select sf64.o2r and starship.o2r from a
-native installation; optionally select mod archives. The public ROM-picker and
-persistence work is still pending. Existing keyboard mappings work in this preview.
+native installation; optionally select mod archives. The browser builder below handles ROM input locally. Remembered assets and
+save persistence remain pending. Existing keyboard mappings work in this preview.
 
 ```sh
 node tools/wasm/check-webgl.mjs --game --training --base /path/sf64.o2r --port /path/starship.o2r --mod /path/wolfen.o2r
@@ -281,3 +281,61 @@ Crash reports use diagnostics version 2 and retain worker stack lines printed
 after the first error. The crash-report check verifies those later lines survive
 the downloaded JSON. Browser checks here use Chromium; iPhone Safari still needs
 device confirmation.
+
+## Public browser builder
+
+A separate experimental player accepts the original Star Fox 64 US v1.1 ROM
+entirely on the user's device. The runtime is compiled once. A disposable worker
+uses the same pinned Torch extractor to build the base archive, packs the shipped
+port resources, then applies the frozen native-mod recipe. Every mod resource is
+verified before Play becomes available. The extractor uses fixed 384 MiB memory
+and is terminated before the 512 MiB game runtime is loaded.
+
+```sh
+python3 tools/wasm/run.py bootstrap
+python3 tools/wasm/run.py dependencies
+python3 tools/wasm/run.py public
+python3 tools/wasm/serve_site.py --directory build/wasm/site
+```
+
+Publish only `build/wasm/site/`. The export refuses a preloaded runtime and checks
+that its runtime data package contains only the controller database. It copies
+an explicit list of tools and mod inputs. The public directory contains no ROM,
+extracted base archive, or private preloaded game package. The CI workflow
+`.github/workflows/wasm.yml` builds this same directory without a ROM and uploads
+it as `starwolf-wasm-browser-builder`.
+
+The page supports raw .z64/.v64/.n64 files and a ZIP with exactly one ROM. It checks
+the normalized ROM's size and SHA-256 before starting Torch. File reading,
+extraction, mod assembly and download preparation happen locally. Browser checks
+against the local server recorded only GET/HEAD requests.
+
+Play uses the existing N64 controller and audio gesture handling through a same-origin
+player frame. Download creates a ZIP with the engine, prepared assets and a small
+Python 3 localhost launcher. Running `python3 start.py` in the unpacked directory
+opens the prepared game with the required isolation headers. No extraction tools
+or ROM selection are needed for that downloaded copy. A direct file:// launch is
+not supported. Downloaded prepared assets remain personal local output.
+
+The exact preview mod is frozen in `assets/wasm/mod/`; see
+[its notes](../../assets/wasm/README.md). The authoring scripts can continue evolving
+independently of this tested snapshot. Regenerate the recipe intentionally when
+shipping a new mod snapshot.
+
+### Verification
+
+```sh
+python3 -m unittest discover -s tools/wasm -p 'test_*.py' -v
+node --test tools/wasm/web/zip.test.mjs browser/rom-file.test.mjs browser/rom-patch.test.mjs
+node tools/wasm/check-extraction.mjs --build-dir build/wasm/public-build --rom /path/base.z64 --reference-base /path/sf64.o2r --reference-mod /path/wolfen.o2r
+node tools/wasm/check-webgl.mjs --site --rom /path/base.z64 --site-invalid --site-download --audio-session --touch --output build/wasm/site-check
+```
+
+The extraction comparison verified all 15,898 base resources and all 1,668 mod
+resources against the native preview. The browser check rejected an invalid ROM,
+prepared a valid ROM locally, generated a ZIP whose contents passed independent
+Python ZIP/hash checks, entered Training, exercised touch input and scrolling, and
+measured real audio output unlocked by the Play gesture. The downloaded copy also
+entered Training through its own `start.py` server without selecting a ROM.
+These runs used Chromium and mobile viewport/touch emulation. Actual iPhone
+preparation and a complete campaign remain separate validation work.

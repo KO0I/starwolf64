@@ -303,8 +303,22 @@ var Module = {
     document.getElementById('asset-inputs').hidden=preloaded;
     document.getElementById('preloaded-label').hidden=!preloaded;
     document.getElementById('game-state').textContent=preloaded?'Game and mod ready':'Select the game archives';
+    window.STARSHIP_RUNTIME_READY=true;
+    if(new URLSearchParams(location.search).get('prepared')==='1') document.getElementById('asset-inputs').hidden=true;
     addLog('Runtime ready');checkReady();updateSoundButton();
   }
+};
+window.STARSHIP_INSTALL_ASSETS=archives=>{
+  if(!runtimeReady||started||new URLSearchParams(location.search).get('prepared')!=='1') throw Error('Player is not ready for prepared assets');
+  const paths={'sf64.o2r':'/sf64.o2r','starship.o2r':'/starship.o2r','wolfen.o2r':'/mods/mod-0000.o2r'};
+  if(!Array.isArray(archives)||archives.length!==3||new Set(archives.map(a=>a.name)).size!==3||
+      archives.some(a=>!Object.hasOwn(paths,a.name)||!ArrayBuffer.isView(a.bytes)||a.bytes.BYTES_PER_ELEMENT!==1||!a.bytes.byteLength||a.bytes.byteLength>64*1024*1024))
+    throw Error('Prepared game files are incomplete');
+  Module.FS.mkdirTree('/mods');
+  for(const archive of archives) Module.FS.writeFile(paths[archive.name],new Uint8Array(archive.bytes));
+  preloaded=true;document.getElementById('asset-inputs').hidden=true;
+  document.getElementById('preloaded-label').hidden=false;
+  document.getElementById('game-state').textContent='Game and mod ready';checkReady();
 };
 for (const id of ['sf64','starship','mods','save']) document.getElementById(id).addEventListener('change',checkReady);
 launch.addEventListener('click',async()=>{

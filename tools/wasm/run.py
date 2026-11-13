@@ -136,7 +136,7 @@ def probe():
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("command", choices=("bootstrap", "probe", "dependencies", "dependency-probe", "renderer-probe", "preload-preview", "configure", "build"))
+    parser.add_argument("command", choices=("bootstrap", "probe", "dependencies", "dependency-probe", "renderer-probe", "preload-preview", "configure", "build", "public"))
     parser.add_argument("--base", type=Path)
     parser.add_argument("--port", type=Path)
     parser.add_argument("--mod", type=Path, action="append", default=[])
@@ -167,6 +167,15 @@ def main():
             if "PASS: WASM target dependency round-trip" not in output:
                 raise RuntimeError("Dependency probe did not report its successful round-trip")
             print(output.strip())
+        elif command == "public":
+            dependencies.prepare(ROOT, LOCK, run)
+            dependencies.verify(ROOT)
+            configure(ROOT, BUILD / "public-build", "public-configure",
+                      ["-DSTARSHIP_WASM_PRELOAD_DIRECTORY="])
+            run("public-build", ["cmake", "--build", BUILD / "public-build", "--target",
+                                  "Starship", "wasm-extractor", "--parallel", "2"], sdk=True)
+            from export_site import export
+            export(BUILD / "public-build", BUILD / "site")
         elif command == "preload-preview":
             dependencies.prepare(ROOT, LOCK, run)
             dependencies.verify(ROOT)
