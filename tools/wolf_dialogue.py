@@ -11,6 +11,16 @@ PROLOGUE_TEXT = (
     "Now Pepper has launched an attack on Venom, home of the revolution. Andross and the people stand their ground as Cornerian warships close in to crush their uprising.\n\n"
     "With Venom under fire, Andross turns to Wolf O'Donnell and the Star Wolf team. Outnumbered and hunted, they launch into battle to break Pepper's assault and free Lylat from Cornerian rule."
 )
+LOCATION_PHRASING = {
+    1300: ('straight for', 'right to'),
+    4103: ("we'll head to", 'we head to'),
+    7012: ('Entering Corneria air\ndefense zone.', "Entering Corneria's\ndefense zone."),
+    7064: ('close to', 'near'),
+    7070: ('right there', 'just ahead'),
+    7093: ('air space', 'airspace'),
+    11200: ('here we come', 'here we go'),
+    16230: ('could', 'may'),
+}
 PROLOGUE_VOICE_OFFSET = 0x19534
 LINES = ("I see em' up ahead.", "Let's light up these", "fucking fascists!")
 ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!?-,.0123456789'():|"
@@ -23,7 +33,8 @@ LOOKUP_OFFSET = 0xCDF0
 CALL_OFFSET = 0x94E8
 LOOKUP_RESOURCE = 'ast_radio/message_table'
 VOICE_RETURN_ROM = 0xC34B8
-UNUSED_GLYPH_BYTES = 400
+# Only END through PRI3 are never rendered. SPC starts the next texture.
+UNUSED_GLYPH_BYTES = 0x138
 SILENT_LOOKUP_ID = 0x10000
 RADIO_SPEAKER_ADDRESS = 0x80177D68
 CREW_SPEAKERS = (0, 5, 10, 15, 20, 25, 30, 35, 400)
@@ -78,6 +89,17 @@ def replace_dialogue(builder):
     if struct.unpack_from('>II', menu, PROLOGUE_VOICE_OFFSET) != (0x0C006B40, 0x240403E8):
         raise ValueError('Unexpected original prologue narration call')
     struct.pack_into('>I', menu, PROLOGUE_VOICE_OFFSET, 0)
+    title_cards = tuple(struct.pack('>IIIf', *card) for card in (
+        (0x06008990, 232, 19, 46.0),  # Enter Star Fox
+        (0x0600AD30, 168, 19, 77.0),  # Enter Star Wolf
+    ))
+    offsets = [menu.find(card) for card in title_cards]
+    if any(menu.count(card) != 1 for card in title_cards) or offsets[1] - offsets[0] != 3 * 16:
+        raise ValueError('Unexpected Corneria/Fortuna mission title table')
+    builder.level_title_changes = []
+    for offset, original, replacement in zip(offsets, title_cards, reversed(title_cards)):
+        menu[offset:offset + len(original)] = replacement
+        builder.level_title_changes.append((offset, original, replacement))
 
 
 def verify_dialogue(builder, patched):
@@ -93,10 +115,9 @@ def verify_dialogue(builder, patched):
     restored = bytearray(radio)
     for _, offset, original, _ in builder.identity_changes:
         restored[offset:offset + len(original)] = original
-    restored[400:413] = builder.dialogue_originals['ast_radio'][400:413]
     restored[:len(payload)] = builder.dialogue_originals['ast_radio'][:len(payload)]
-    start, data = builder.dialogue_voice_filter
-    restored[start:start + len(data)] = builder.dialogue_originals['ast_radio'][start:start + len(data)]
+    for start, data in (builder.dialogue_voice_filter, builder.dialogue_voice_table, builder.dialogue_hud_labels):
+        restored[start:start + len(data)] = builder.dialogue_originals['ast_radio'][start:start + len(data)]
     crew_start, crew_data = builder.dialogue_crew_filter
     restored[crew_start:crew_start + len(crew_data)] = builder.dialogue_originals['ast_radio'][crew_start:crew_start + len(crew_data)]
     struct.pack_into('>I', restored, LOOKUP_OFFSET, RADIO_BASE + MESSAGE_OFFSET)
@@ -113,6 +134,10 @@ def verify_dialogue(builder, patched):
     if struct.unpack_from('>II', menu, PROLOGUE_VOICE_OFFSET) != (0, 0x240403E8):
         raise ValueError('Browser prologue still plays the original narration')
     restored = bytearray(menu)
+    for offset, original, expected in builder.menu_color_changes + builder.level_title_changes:
+        if menu[offset:offset + len(expected)] != expected:
+            raise ValueError(f'Browser menu mismatch at {offset:#x}')
+        restored[offset:offset + len(original)] = original
     struct.pack_into('>I', restored, PROLOGUE_VOICE_OFFSET, 0x0C006B40)
     if restored != builder.dialogue_originals['ovl_menu']:
         raise ValueError('Unrelated menu overlay data changed')
@@ -123,43 +148,74 @@ def verify_dialogue(builder, patched):
             raise ValueError(f'Browser dialogue segment mismatch in {stem}')
 
 
-def voice_filter(offset, message_ids):
-    """Map edited voice IDs to zero using byte deltas and escaped absolute IDs."""
-    table = bytearray()
+def voice_filter(table_offset, message_ids):
+    """Map edited voice IDs to zero using deltas, consecutive runs and absolute IDs."""
+    from itertools import groupby
+    entries = []
     previous = 0
     for message_id in message_ids:
         if not previous < message_id < 0xFFFF:
             raise ValueError('Voice filter IDs must be sorted, unique and positive')
         delta = message_id - previous
-        table.extend(bytes((delta,)) if delta < 255 else b'\xff' + struct.pack('>H', message_id))
+        if delta < 0xF0:
+            entries.append(bytes((delta,)))
+        elif delta < 0xE00:
+            entries.append(bytes((0xF0 + (delta >> 8), delta & 0xFF)))
+        else:
+            entries.append(b'\xff' + struct.pack('>H', message_id))
         previous = message_id
+    table = bytearray()
+    for entry, group in groupby(entries):
+        count = sum(1 for _ in group)
+        if entry == b'\x01':
+            while count >= 3:
+                table.append(0xFE)
+                count -= 3
+        table.extend(entry * count)
     table.append(0)
-    table_address = RADIO_BASE + offset + 88
+    table_address = RADIO_BASE + table_offset
     words = (
         0x3C080000 | ((table_address + 0x8000) >> 16),  # lui t0, table high
         0x25080000 | (table_address & 0xFFFF),          # addiu t0, table low
         0x00005025,  # or t2, zero, zero
         0x91090000,  # loop: lbu t1, 0(t0)
-        0x1120000F,  # beq t1, zero, return
+        0x11200018,  # beq t1, zero, return
         0x25080001,  # delay: addiu t0, t0, 1
-        0x240B00FF,  # addiu t3, zero, 255
-        0x152B0008,  # bne t1, t3, delta
+        0x240B00F0,  # addiu t3, zero, 0xf0
+        0x012B582B,  # sltu t3, t1, t3
+        0x15600010,  # bne t3, zero, delta
+        0x240B00FF,  # delay: addiu t3, zero, 0xff
+        0x152B0007,  # bne t1, t3, wide_delta_or_run
         0x00000000,  # delay: nop
         0x910A0000,  # lbu t2, 0(t0)
         0x000A5200,  # sll t2, t2, 8
         0x91090001,  # lbu t1, 1(t0)
         0x01495025,  # or t2, t2, t1
-        0x25080002,  # addiu t0, t0, 2
-        0x10000002,  # beq zero, zero, compare
-        0x00000000,  # delay: nop
+        0x10000009,  # beq zero, zero, compare
+        0x25080002,  # delay: addiu t0, t0, 2
+        0x240B00FE,  # wide_delta_or_run: addiu t3, zero, 0xfe
+        0x112B000B,  # beq t1, t3, run
+        0x2529FF10,  # delay: addiu t1, t1, -0xf0
+        0x00094A00,  # sll t1, t1, 8
+        0x910B0000,  # lbu t3, 0(t0)
+        0x012B4825,  # or t1, t1, t3
+        0x25080001,  # addiu t0, t0, 1
         0x01495021,  # delta: addu t2, t2, t1
-        0x144AFFF1,  # compare: bne v0, t2, loop
+        0x144AFFE8,  # compare: bne v0, t2, loop
         0x00000000,  # delay: nop
-        0x00001025,  # or v0, zero, zero
+        0x00001025,  # mute: or v0, zero, zero
         0x03E00008,  # return: jr ra
         0x00000000,  # delay: nop
+        0x24090003,  # run: addiu t1, zero, 3
+        0x004A5823,  # subu t3, v0, t2
+        0x256BFFFF,  # addiu t3, t3, -1
+        0x0169582B,  # sltu t3, t3, t1
+        0x1560FFF8,  # bne t3, zero, mute
+        0x00000000,  # delay: nop
+        0x1000FFDD,  # beq zero, zero, loop
+        0x01495021,  # delay: addu t2, t2, t1
     )
-    return struct.pack('>22I', *words) + table
+    return struct.pack('>39I', *words), bytes(table)
 
 
 def crew_voice_filter(changed_filter_address):
@@ -167,7 +223,7 @@ def crew_voice_filter(changed_filter_address):
     # the only other declared speaker below 36 and must pass unchanged.
     words = (
         0x3408FFFF,  # ori t0, zero, 0xffff
-        0x1048000F,  # beq v0, t0, return
+        0x10480010,  # beq v0, t0, return
         0x00000000,
         0x3C080000 | ((RADIO_SPEAKER_ADDRESS + 0x8000) >> 16),
         0x8D080000 | (RADIO_SPEAKER_ADDRESS & 0xFFFF),
@@ -183,10 +239,15 @@ def crew_voice_filter(changed_filter_address):
         0x08000000 | ((changed_filter_address & 0x0FFFFFFF) >> 2),
         0x00000000,
         0x00001025,  # mute: or v0, zero, zero
+        0x00000000,  # Keep the branch displacement from encoding MSGCHAR_NXT.
         0x03E00008,  # return: jr ra
         0x00000000,
     )
-    return struct.pack('>19I', *words)
+    code = struct.pack('>20I', *words)
+    # Original N64 radio code scans 60 characters even after a text terminator.
+    if 15 in struct.unpack('>40H', code):
+        raise ValueError('Crew gate encodes a radio next-page marker in text lookahead')
+    return code
 
 
 def lookup_entries(data):
@@ -229,21 +290,33 @@ def mute_changed_dialogue(builder):
         b''.join(struct.pack('<iQ', *entry) for entry in entries))
     radio = builder.segments['ast_radio']
     payload_size = (len(encode('\n'.join(LINES))) * 2 + 3) & ~3
-    data = voice_filter(payload_size, ids)
-    if payload_size + len(data) > UNUSED_GLYPH_BYTES or any(radio[payload_size:payload_size + len(data)]):
-        raise ValueError('Voice filter exceeds the unused control-glyph space')
-    radio[payload_size:payload_size + len(data)] = data
-    builder.dialogue_voice_filter = (payload_size, data)
+    code, table = voice_filter(payload_size, ids)
+    if payload_size + len(table) > UNUSED_GLYPH_BYTES or any(radio[payload_size:payload_size + len(table)]):
+        raise ValueError('Voice filter table exceeds the unused control-glyph space')
+    radio[payload_size:payload_size + len(table)] = table
+    builder.dialogue_voice_table = (payload_size, table)
+    # The rewritten prologue ends earlier than its allocation. Put executable
+    # code and HUD labels after its terminator, before the next message.
+    prologue = builder.identity_offsets[1]
+    count = struct.unpack_from('<I', builder.resources['ast_radio/gMsg_ID_1'], 64)[0]
+    code_offset = (prologue + count * 2 + 3) & ~3
+    label_offset = code_offset + len(code)
+    labels = b'WOLF\0PANTHER\0'
+    limit = min(offset for offset in builder.identity_offsets.values() if offset > prologue)
+    if label_offset + len(labels) > limit:
+        raise ValueError('Dialogue code and labels exceed the retired prologue tail')
+    radio[code_offset:label_offset] = code
+    radio[label_offset:label_offset + len(labels)] = labels
+    builder.dialogue_voice_filter = (code_offset, code)
+    builder.dialogue_hud_labels = (label_offset, labels)
     # Both the message table and Corneria call now use the replacement text at
     # RADIO_BASE. Reuse the old 2050 text allocation without growing radio RAM.
-    crew_filter = crew_voice_filter(RADIO_BASE + payload_size)
+    crew_filter = crew_voice_filter(RADIO_BASE + code_offset)
     original_payload = struct.pack(f'>{len(encode(ORIGINAL_TEXT))}H', *encode(ORIGINAL_TEXT))
     if len(crew_filter) > len(original_payload) or radio[MESSAGE_OFFSET:MESSAGE_OFFSET + len(original_payload)] != original_payload:
         raise ValueError('Original 2050 text allocation is unavailable for the crew voice filter')
     radio[MESSAGE_OFFSET:MESSAGE_OFFSET + len(crew_filter)] = crew_filter
     builder.dialogue_crew_filter = (MESSAGE_OFFSET, crew_filter)
-    if any(radio[400:413]): raise ValueError('HUD label storage is not blank')
-    radio[400:413] = b'WOLF\0PANTHER\0'
 
 
 def patch_dialogue_voice(builder, rom):
@@ -253,12 +326,12 @@ def patch_dialogue_voice(builder, rom):
     address = RADIO_BASE + offset
     if address & 3 or address >> 28 != (VOICE_RETURN_ROM + 0x7FFFF404) >> 28:
         raise ValueError('Voice filter jump is misaligned or out of range')
-    label = RADIO_BASE + 400
+    label = RADIO_BASE + builder.dialogue_hud_labels[0]
     if struct.unpack_from('>II', builder.rom, 0x8BA68) != (0x3C0B800D, 0x256B7730) or struct.unpack_from('>I', builder.rom, 0xD5880)[0] != 0x800D9260:
         raise ValueError('Unexpected original FOX label references')
     struct.pack_into('>II', rom, 0x8BA68, 0x3C0B0000 | ((label + 0x8000) >> 16), 0x256B0000 | (label & 0xFFFF))
     struct.pack_into('>I', rom, 0xD5880, label)
-    panther = RADIO_BASE + 405
+    panther = label + 5
     if struct.unpack_from('>II', builder.rom, 0x8BA98) != (0x3C0C800D, 0x258C7734) or struct.unpack_from('>I', builder.rom, 0xD588C)[0] != 0x800D9274:
         raise ValueError('Unexpected original FALCO label references')
     struct.pack_into('>II', rom, 0x8BA98, 0x3C0C0000 | ((panther + 0x8000) >> 16), 0x258C0000 | (panther & 0xFFFF))
@@ -290,9 +363,11 @@ def verify_dialogue_voice(builder, patched):
         expected = 0 if message_id in builder.dialogue_muted_ids else message_id
         if reverse[crc] != expected:
             raise ValueError('Unexpected native voice suppression')
-    offset, data = builder.dialogue_voice_filter
-    if builder.segments['ast_radio'][offset:offset + len(data)] != data:
-        raise ValueError('Browser voice filter is missing')
+    for offset, data in (builder.dialogue_voice_filter, builder.dialogue_voice_table, builder.dialogue_hud_labels):
+        if builder.segments['ast_radio'][offset:offset + len(data)] != data:
+            raise ValueError('Browser dialogue storage is missing')
+    if builder.segments['ast_radio'][UNUSED_GLYPH_BYTES:0x9C0] != builder.dialogue_originals['ast_radio'][UNUSED_GLYPH_BYTES:0x9C0]:
+        raise ValueError('A printable radio glyph was overwritten')
     offset, crew_data = builder.dialogue_crew_filter
     if builder.segments['ast_radio'][offset:offset + len(crew_data)] != crew_data:
         raise ValueError('Browser crew voice filter is missing')
@@ -311,13 +386,16 @@ def replace_identity(builder):
     for index in range(len(entries) - 1):
         message_id, pointer = struct.unpack_from('>iI', radio, 0xCCAC + index * 8)
         offsets[message_id] = pointer - RADIO_BASE
+    builder.identity_offsets = offsets
     builder.identity_changes = []
     for message_id, offset in offsets.items():
         path = f'ast_radio/gMsg_ID_{message_id}'
         original = builder.base.read(path)
         codes = struct.unpack_from(f'<{(len(original) - 68) // 2}H', original, 68)
         text = ''.join(chars.get(code, chr(0xE000 + code)) for code in codes[:-1])
-        changed = re.sub(r'\bFox\s+McCloud\b', "Wolf O'Donnell", text)
+        changed = re.sub(r'\b(Arwing|Wolfen)(s?)\b',
+                         lambda match: {'Arwing': 'Wolfen', 'Wolfen': 'Arwing'}[match[1]] + match[2], text)
+        changed = re.sub(r'\bFox\s+McCloud\b', "Wolf O'Donnell", changed)
         changed = re.sub(r'\bFox\b', 'Wolf', changed)
         changed = re.sub(r'\bFalco\s+Lombardi\b', 'Panther Caroso', changed)
         changed = re.sub(r'\bFalco\b', 'Panther', changed)
@@ -325,8 +403,17 @@ def replace_identity(builder):
         changed = re.sub(r'\bSlippy\b', 'Kami', changed)
         changed = re.sub(r'\bPeppy\s+Hare\b', 'Krystal', changed)
         changed = re.sub(r'\bPeppy\b', 'Krystal', changed)
+        changed = re.sub(r"\b(?:Andross'|Andross\b|(?:General\s+)?Pepper\b)",
+                         lambda match: {"Andross": "Pepper", "Andross'": "Pepper's"}.get(match[0], "Andross"), changed)
         if message_id == 1:
             changed = PROLOGUE_TEXT
+        else:
+            changed = re.sub(r'\b(?:Corneria|Venom|Cornerian|Venomian)\b',
+                             lambda match: {'Corneria': 'Venom', 'Venom': 'Corneria',
+                                            'Cornerian': 'Venomian', 'Venomian': 'Cornerian'}[match[0]], changed)
+            if message_id in LOCATION_PHRASING:
+                before, after = LOCATION_PHRASING[message_id]
+                changed = changed.replace(before, after)
         if message_id == 4024:
             changed = changed.replace("Don't go too fast,", 'Not too fast,')
         if message_id in (20337, 20338):

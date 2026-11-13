@@ -24,10 +24,10 @@ with zipfile.ZipFile('sf64.o2r') as original, zipfile.ZipFile('build-cmake/mods/
         source_name = next(n for n, f in manifest('ast_allies')[1].items() if int(f.get('offset', '-1'), 16) & 0xFFFFFF == source)
         assert mod.read(stem + '/' + name)[80:] == original.read('ast_allies/' + source_name)[80:]
 rom = Path('browser/wolfen.z64').read_bytes()
-label = RADIO_BASE + 400
+label = struct.unpack_from('>I', rom, 0xD5880)[0]
 assert struct.unpack_from('>II', rom, 0x8BA68) == (0x3C0B0000 | ((label + 0x8000) >> 16), 0x256B0000 | (label & 65535))
 assert struct.unpack_from('>I', rom, 0xD5880)[0] == label
-panther = RADIO_BASE + 405
+panther = label + 5
 assert struct.unpack_from('>II', rom, 0x8BA98) == (0x3C0C0000 | ((panther + 0x8000) >> 16), 0x258C0000 | (panther & 65535))
 assert struct.unpack_from('>I', rom, 0xD588C)[0] == panther
 for offset, expected in ((0xD833C, b'KAMI\0'), (0xD8344, b'KRYSTAL\0'),
@@ -36,7 +36,19 @@ for offset, expected in ((0xD833C, b'KAMI\0'), (0xD8344, b'KRYSTAL\0'),
 for i in range(64):
     virtual, start, end, compressed = struct.unpack_from('>IIII', rom, TABLE + i * 16)
     if virtual == 0xDE5D50:
-        assert rom[start + 400:start + 405] == b'WOLF\0'
-        assert rom[start + 405:start + 413] == b'PANTHER\0'
+        from build_wolfen import manifest
+        with zipfile.ZipFile('sf64.o2r') as source:
+            for name, fields in manifest('ast_radio')[1].items():
+                if fields.get('type') != 'TEXTURE':
+                    continue
+                offset = int(fields['offset'], 16) & 0xFFFFFF
+                if offset < 0x138:
+                    continue
+                expected = source.read('ast_radio/' + name)[80:]
+                assert rom[start + offset:start + offset + len(expected)] == expected, 'Printable radio font corrupted: ' + name
+        offset = label - RADIO_BASE
+        assert 0x9C0 <= offset < end - start
+        assert rom[start + offset:start + offset + 5] == b'WOLF\0'
+        assert rom[start + offset + 5:start + offset + 13] == b'PANTHER\0'
         break
 print('PASS: player dialogue uses Wolf; full surname, all four Andross radio frames and Wolf, Panther, Kami and Krystal HUD/versus labels verified.')

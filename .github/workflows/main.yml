@@ -23,19 +23,11 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-o2r-ccache-${{ github.ref }}
           ${{ runner.os }}-o2r-ccache-
-    - name: Cache build folders
-      uses: actions/cache@v4
-      with:
-        key: ${{ runner.os }}-o2r-build-${{ github.ref }}-${{ github.sha }}
-        restore-keys: |
-          ${{ runner.os }}-o2r-build-${{ github.ref }}
-          ${{ runner.os }}-o2r-build-
-        path: |
-          tools/Torch/cmake-build-release
     - name: Generate starship.o2r
       run: |
         export PATH="/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH"
-        make -C tools/Torch type=release -j3
+        cmake -S tools/Torch -B tools/Torch/cmake-build-release -DCMAKE_BUILD_TYPE=Release -G Ninja
+        cmake --build tools/Torch/cmake-build-release --parallel 3
         tools/Torch/cmake-build-release/torch pack port starship.o2r o2r
     - uses: actions/upload-artifact@v4
       with:
@@ -75,7 +67,7 @@ jobs:
 
   build-macos:
     needs: generate-port-o2r
-    runs-on: macos-14
+    runs-on: macos-15
     steps:
       - uses: actions/checkout@v6
         with:
@@ -126,17 +118,6 @@ jobs:
           restore-keys: |
             linux-ccache-${{ github.ref }}
             linux-ccache-
-      - name: Cache build folders
-        uses: actions/cache@v4
-        with:
-          key: linux-build-${{ github.ref }}-${{ github.sha }}
-          restore-keys: |
-            linux-build-${{ github.ref }}
-            linux-build-
-          path: |
-            SDL2-2.30.3
-            tinyxml2-10.0.0
-            libzip-1.10.1
       - name: Install latest SDL
         run: |
           export PATH="/usr/lib/ccache:/usr/local/opt/ccache/libexec:$PATH"
@@ -213,7 +194,8 @@ jobs:
           sudo apt-get remove -y cmake
           git -C libultraship remote add nx https://github.com/Net64DD/libultraship.git
           git -C libultraship fetch nx
-          git -C libultraship checkout 09dfab5fb2a9a047a6e268dc9db2daad9b2ce5f0
+          git -C libultraship checkout 5e41ab67138110206c0d7dcf113e0ad11d79265e
+          git -C libultraship submodule update --init --recursive
           wget https://github.com/Kitware/CMake/releases/download/v3.28.3/cmake-3.28.3-linux-x86_64.sh -O /tmp/cmake.sh
           sudo sh /tmp/cmake.sh --prefix=/usr/local/ --exclude-subdir
           cmake -H. -Bbuild-switch -GNinja -DCMAKE_TOOLCHAIN_FILE=/opt/devkitpro/cmake/Switch.cmake

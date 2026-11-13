@@ -28,36 +28,52 @@ button:disabled{opacity:.45;cursor:default}
 button:focus-visible,#stick:focus-visible{outline:2px solid #d34859;outline-offset:2px}
 #connect{color:#ffe4e6;border-top-color:#b84151;background:linear-gradient(#6b2831,#33161d 16%,#1d1015 55%,#3b171f)}
 #disconnect{margin-left:auto}
-.deck{display:flex;align-items:center;justify-content:space-between;gap:16px;max-width:760px;margin:auto}
-.steering{display:flex;align-items:center;gap:10px}
-#stick{position:relative;width:120px;height:120px;flex:none;touch-action:none;user-select:none;background:radial-gradient(ellipse,#070809 35%,#27292c 62%,#070809 65%,#35373b 67%,#141518 70%);border:1px solid #393b3f;box-shadow:inset 0 0 12px #000,0 1px #69202a;clip-path:polygon(12px 0,calc(100% - 12px) 0,100% 12px,100% calc(100% - 12px),calc(100% - 12px) 100%,12px 100%,0 calc(100% - 12px),0 12px)}
-#stick:before,#stick:after{content:"";position:absolute;background:#a02e3b}
-#stick:before{width:1px;height:12px;left:50%;top:5px}
-#stick:after{width:12px;height:1px;top:50%;left:5px}
-.knob{position:absolute;left:calc(50% - 21px);top:calc(50% - 21px);width:42px;height:42px;transform:translate(var(--x,0px),var(--y,0px));background:linear-gradient(130deg,#66696c 0,#292c30 20%,#101114 70%);border:2px outset #3c3e42;box-shadow:3px 5px 7px #000;clip-path:polygon(8px 0,34px 0,42px 8px,42px 34px,34px 42px,8px 42px,0 34px,0 8px)}
-.knob:after{content:"";position:absolute;inset:7px;border:1px solid #9a3340;box-shadow:inset 0 1px 2px #000}
-.directions{display:grid;grid-template-columns:repeat(3,33px);grid-template-rows:repeat(3,33px);gap:2px}
-.directions button{min-height:0;padding:0;font:16px sans-serif}
-.directions [data-action=up]{grid-area:1/2}
-.directions [data-action=left]{grid-area:2/1}
-.directions [data-action=down]{grid-area:3/2}
-.directions [data-action=right]{grid-area:2/3}
-.flight-buttons{display:grid;grid-template-columns:repeat(3,minmax(70px,1fr));gap:6px;flex:1;max-width:390px}
-.flight-buttons button{min-height:46px;padding:7px}
-.flight-buttons [data-action=fire]{color:#ffb1b8;border-top-color:#a43a48}
+.deck{display:grid;grid-template-columns:1fr 58px 1fr;align-items:center;gap:24px;max-width:760px;margin:8px auto 0;padding:12px 4px 18px}
+.steering{display:flex;flex-direction:row-reverse;align-items:center;justify-content:flex-end;gap:16px}
+#stick{position:relative;width:112px;height:112px;flex:none;touch-action:none;user-select:none;background:radial-gradient(circle,#53565a 0 39%,#303237 40% 49%,#9a9b9c 50% 55%,#62656a 56% 65%,#a4a5a6 66%);border:2px solid #a9aaac;box-shadow:inset 0 2px 5px #0008,0 4px 0 #373a3e,0 6px 8px #0008;clip-path:polygon(29% 0,71% 0,100% 29%,100% 71%,71% 100%,29% 100%,0 71%,0 29%)}
+#stick:before,#stick:after{content:"";position:absolute;background:#c5c6c780}
+#stick:before{width:2px;height:9px;left:calc(50% - 1px);top:5px}
+#stick:after{width:9px;height:2px;top:calc(50% - 1px);left:5px}
+.knob{position:absolute;left:calc(50% - 23px);top:calc(50% - 23px);width:46px;height:46px;transform:translate(var(--x,0px),var(--y,0px));border-radius:50%;background:radial-gradient(circle at 42% 35%,#d2d3d4,#989b9e 65%,#696c70 70%);border:2px solid #b8babc;box-shadow:0 5px 0 #5d6064,2px 8px 6px #0009}
+.knob:after{content:"";position:absolute;inset:7px;border:1px solid #777b80;border-radius:50%;box-shadow:inset 0 0 0 3px #b4b6b8,inset 0 0 0 4px #85898d,inset 0 0 0 7px #b4b6b8,inset 0 0 0 8px #85898d}
+.directions{position:relative;display:grid;grid-template-columns:repeat(3,34px);grid-template-rows:repeat(3,34px);gap:0;filter:drop-shadow(0 4px 1px #0008)}
+.directions:before{content:"";grid-area:2/2;background:radial-gradient(circle,#777b80 0 22%,#5c6065 25% 40%,#797d82 43%);border-block:1px solid #6c7075}
+.directions button{min-height:0;padding:0;font:18px sans-serif;color:#303337;background:linear-gradient(130deg,#a5a8ac,#797d82);border:1px solid;border-color:#c2c4c6 #53575d #53575d #a4a7aa;border-radius:2px;box-shadow:none;text-shadow:0 1px #ffffff50}
+.directions [data-action=up]{grid-area:1/2;border-bottom:0;border-radius:4px 4px 0 0}
+.directions [data-action=left]{grid-area:2/1;border-right:0;border-radius:4px 0 0 4px}
+.directions [data-action=down]{grid-area:3/2;border-top:0;border-radius:0 0 4px 4px}
+.directions [data-action=right]{grid-area:2/3;border-left:0;border-radius:0 4px 4px 0}
+.flight-buttons{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));grid-template-rows:44px 60px 60px;gap:12px 8px;max-width:260px;width:100%;justify-self:end}
+.deck .n64-button{--cap-light:#aeb1b5;--cap:#84888e;--cap-dark:#555a62;--cap-edge:#454a51;position:relative;display:flex;align-items:center;justify-content:center;justify-self:center;align-self:center;padding:0;width:56px;height:56px;min-height:0;border:1px solid var(--cap-edge);border-top-color:var(--cap-light);border-radius:50%;background:radial-gradient(circle at 35% 25%,var(--cap-light),var(--cap) 55%,var(--cap-dark));color:#fff;font:700 26px Arial,sans-serif;text-shadow:0 1px 2px #0008;box-shadow:inset 0 1px 2px #ffffff60,inset 0 -3px 3px #0003,0 4px 0 var(--cap-edge),0 6px 7px #0009}
+.deck .n64-button:hover{border-top-color:#fff;filter:brightness(1.1)}
+.deck .n64-button:active,.deck .n64-button.pressed{transform:translateY(3px);box-shadow:inset 0 2px 5px #0005,0 1px 0 var(--cap-edge),0 2px 3px #0008;filter:brightness(.88)}
+.deck .n64-button:focus-visible,.directions button:focus-visible{outline:2px solid #fff;outline-offset:5px}
+.directions button:active,.directions button.pressed{background:#595e65;color:#fff;box-shadow:inset 0 2px 4px #0006}
+.button-caption{position:absolute;top:calc(100% + 9px);left:50%;transform:translateX(-50%);white-space:nowrap;color:#b8b9bc;font:11px Arwing,sans-serif;text-shadow:0 1px #000;pointer-events:none}
+.deck .n64-start{--cap-light:#f57777;--cap:#cd343c;--cap-dark:#9e202e;--cap-edge:#6b1420;width:42px;height:42px;font-size:12px}
+.deck .n64-a{--cap-light:#659cff;--cap:#316cd2;--cap-dark:#204b9b;--cap-edge:#142d66;grid-area:3/2}
+.deck .n64-b{--cap-light:#6cdb91;--cap:#2ea65b;--cap-dark:#20733c;--cap-edge:#164c2c;grid-area:2/1;width:50px;height:50px}
+.deck .n64-c{--cap-light:#ffe77d;--cap:#edbd35;--cap-dark:#bb8a1e;--cap-edge:#7b5915;width:44px;height:44px;color:#6b4c09;font-size:22px;text-shadow:0 1px #fff6}
+.n64-c .c-mark{position:absolute;top:3px;left:8px;font:700 10px Arial,sans-serif}
+.deck .n64-boost{grid-area:2/3}
+.deck .n64-brake{grid-area:3/4}
+.deck .n64-shoulder{width:100%;height:34px;border-radius:15px 15px 8px 8px;font-size:18px;color:#30343a;text-shadow:0 1px #fff6}
+.deck .n64-z{grid-area:1/1/2/3}
+.deck .n64-r{grid-area:1/3/2/5}
+.n64-shoulder .button-caption{position:static;transform:none;margin-left:8px;font-size:10px;color:#252a31;text-shadow:0 1px #fff3}
 .hint{font-size:11px;line-height:1.6;color:#838184;margin:10px 0 0;text-align:center}
 details{font-size:12px;color:#a6a2a2;margin-top:8px}
 summary{cursor:pointer}
 details p{line-height:1.7;margin:8px 0 0}
 main:fullscreen{width:100%;max-width:none;overflow:auto}
 main:fullscreen #screen{height:calc(100svh - 34px);max-height:none}
-@media(max-width:580px){main{width:100%;border:0}header{height:30px;padding:0 7px;gap:7px}#screen{height:calc(100vw*.5625)}#status{max-width:48%;font-size:10px}.deck{gap:9px}.steering{gap:5px}#stick{width:96px;height:96px}.directions{grid-template-columns:repeat(3,26px);grid-template-rows:repeat(3,26px)}.flight-buttons{grid-template-columns:repeat(2,minmax(60px,1fr));gap:5px}.flight-buttons button{font-size:11px;min-height:40px}#controls{padding:8px 7px}.toolbar{gap:5px}button{padding:7px 9px;font-size:11px}.hint{font-size:10px}}
-@media(max-width:360px){.directions{display:none}.steering{gap:0}}
+@media(max-width:620px){main{width:100%;border:0}header{height:30px;padding:0 7px;gap:7px}#screen{height:calc(100vw*.5625)}#status{max-width:48%;font-size:10px}#controls{padding:8px 7px}.toolbar{gap:5px}button{padding:7px 9px;font-size:11px}.hint{font-size:10px}.deck{grid-template-columns:96px 38px minmax(0,1fr);gap:6px;max-width:390px;padding:8px 0 18px}.steering{flex-direction:column;gap:14px}#stick{width:96px;height:96px}.directions{grid-template-columns:repeat(3,30px);grid-template-rows:repeat(3,30px)}.flight-buttons{grid-template-rows:40px 60px 60px;gap:10px 4px;max-width:218px}.deck .n64-button{width:50px;height:50px;font-size:24px}.deck .n64-b{width:46px;height:46px}.deck .n64-c{width:40px;height:40px;font-size:20px}.deck .n64-start{width:36px;height:36px;font-size:10px}.deck .n64-shoulder{width:100%;height:32px;font-size:16px}.n64-shoulder .button-caption{font-size:9px;margin-left:5px}.button-caption{font-size:10px}}
 #game .ejs_menu_bar,#game .ejs_virtualGamepad_parent{display:none!important}
 #game .ejs_parent{width:100%!important;height:100%!important}
 #game *{font-family:Arwing,sans-serif!important}
 .rom-picker{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;font-size:12px}.rom-picker input{max-width:100%;min-width:0;font-size:12px;color:#c7c8c9}.rom-picker p{width:100%;margin:0;line-height:1.6;color:#aaa}.rom-picker a{color:#db8d95}
 .rom-picker{padding:10px;border:1px solid #34383d;background:#14171a}
+#screen:is([data-state="ready"],[data-state="loading"],[data-state="running"],[data-state="paused"])~#controls .rom-picker{display:none}
 #connect:disabled{color:#aaa;border-color:#555 #161616 #161616 #3b3b3b;background:linear-gradient(#3b3b3b,#242424 16%,#171717 55%,#202020);box-shadow:inset 0 -1px #383838,1px 1px 1px #000;opacity:.65}
 #screen:is([data-state="awaiting-rom"],[data-state="checking-rom"])~#controls .rom-picker,
 #screen[data-state="ready"]~#controls #connect:not(:disabled){animation:blue-green-pulse 2.4s ease-in-out infinite}
@@ -74,7 +90,6 @@ main:fullscreen #screen{height:calc(100svh - 34px);max-height:none}
 <div class="rom-picker"><label for="rom-file">Choose base ROM</label><input id="rom-file" type="file" accept=".z64,.v64,.n64,.zip" aria-describedby="rom-help"><p id="rom-help">Star Fox 64, US v1.1. ROM or ZIP containing one ROM. Files stay on this device.</p><a href="./wolfen.patch.json?v=zip-1" download>Download mod patch</a></div>
 <div class="toolbar">
 <button id="connect" type="button" disabled>Launch</button>
-<button data-action="start" type="button">Start / pause</button>
 <button id="sound" type="button">Mute</button>
 <button id="save" type="button" disabled>Save state</button>
 <button id="load" type="button" disabled>Load state</button>
@@ -90,13 +105,14 @@ main:fullscreen #screen{height:calc(100svh - 34px);max-height:none}
 <button data-action="down" aria-label="Steer down" type="button">↓</button>
 <button data-action="right" aria-label="Steer right" type="button">→</button>
 </div></div>
-<div class="flight-buttons">
-<button data-action="roll_left" type="button">Bank left</button>
-<button data-action="fire" type="button">Fire</button>
-<button data-action="roll_right" type="button">Bank right</button>
-<button data-action="brake" type="button">Brake</button>
-<button data-action="bomb" type="button">Bomb</button>
-<button data-action="boost" type="button">Boost</button>
+<button class="n64-button n64-start" data-action="start" aria-label="Start / pause" type="button"><span aria-hidden="true">START</span><span class="button-caption" aria-hidden="true">Pause</span></button>
+<div class="flight-buttons" role="group" aria-label="N64 flight buttons">
+<button class="n64-button n64-shoulder n64-z" data-action="roll_left" aria-label="Z: Bank left" type="button"><span aria-hidden="true">Z</span><span class="button-caption" aria-hidden="true">Bank left</span></button>
+<button class="n64-button n64-shoulder n64-r" data-action="roll_right" aria-label="R: Bank right" type="button"><span aria-hidden="true">R</span><span class="button-caption" aria-hidden="true">Bank right</span></button>
+<button class="n64-button n64-b" data-action="bomb" aria-label="B: Bomb" type="button"><span aria-hidden="true">B</span><span class="button-caption" aria-hidden="true">Bomb</span></button>
+<button class="n64-button n64-a" data-action="fire" aria-label="A: Fire" type="button"><span aria-hidden="true">A</span><span class="button-caption" aria-hidden="true">Fire</span></button>
+<button class="n64-button n64-c n64-boost" data-action="boost" aria-label="C left: Boost" type="button"><span class="c-mark" aria-hidden="true">C</span><span aria-hidden="true">◀</span><span class="button-caption" aria-hidden="true">Boost</span></button>
+<button class="n64-button n64-c n64-brake" data-action="brake" aria-label="C down: Brake" type="button"><span class="c-mark" aria-hidden="true">C</span><span aria-hidden="true">▼</span><span class="button-caption" aria-hidden="true">Brake</span></button>
 </div>
 </div>
 <p class="hint">WASD / arrows steer · X fire · C bomb · Shift boost · Ctrl brake · Q / E bank · Space pause</p>
@@ -105,8 +121,8 @@ main:fullscreen #screen{height:calc(100svh - 34px);max-height:none}
 </main>
 <script>
 window.EJS_player='#game';
-window.EJS_core='mupen64plus_next';
-window.EJS_gameUrl='/game.z64?v=75f2776244fd6ae5';
+window.EJS_core='n64';
+window.EJS_gameUrl='/game.z64?v=93267da753fd586b';
 window.EJS_gameName='A wolf in space';
 window.EJS_pathtodata='https://cdn.emulatorjs.org/4.2.3/data/';
 window.EJS_color='#b62c34';
@@ -120,6 +136,6 @@ window.EJS_defaultControls={0:{},1:{},2:{},3:{}};
 window.EJS_defaultOptions={'virtual-gamepad':'disabled','save-save-interval':'30'};
 </script>
 <script src="./coi-serviceworker.js"></script>
-<script type="module" src="./client.js?v=launch-1"></script>
+<script type="module" src="./client.js?v=audio-4"></script>
 </body>
 </html>

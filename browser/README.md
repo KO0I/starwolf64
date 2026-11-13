@@ -10,13 +10,15 @@ Decompression is streamed with bounded input chunks and a strict 12 MiB output l
 
 ## Build and export
 
-Put your base ROM at the project root under its existing filename and generate sf64.o2r using the upstream build instructions. Install Pillow for the asset builder if needed.
+Put your base ROM at the project root under its existing filename and generate sf64.o2r using the upstream build instructions. Install NumPy and Pillow for the asset builder if needed.
 
 ~~~sh
 python3 tools/build_wolfen.py
 python3 tools/build_wolfen.py --check
 python3 tools/export_browser_site.py
 ~~~
+
+The build installs the reviewed Wolf, Panther, Krystal, and Kami bodies and pilot heads, plus Vitzy's Expert head. The native Expert fighter also uses her Bill cockpit module. See [character conversion](../assets/characters/INTEGRATION.md) for slot mappings, animation limits, rebuild checks, and credits.
 
 Crew dialogue uses short voiced syllables timed to the text reveal. Wolf uses his original voice lowered three semitones with a bass boost. Panther uses Peppy's voice lowered ten semitones with a bass boost. Kami uses Vitzy's recording lowered three semitones with slower delivery. Krystal uses newly generated English-accent female snippets. Vitzy keeps her own recording at its original base pitch, in the separate Expert pilot slot. Red portrait variants keep the same voice. The prologue narrator has a separate scrambled bank derived from the original narration, played as the text scrolls and stopped when the prologue is skipped or finishes.
 
@@ -47,9 +49,14 @@ The included service worker supplies the isolation headers needed by the threade
 ~~~sh
 node --test browser/rom-patch.test.mjs browser/rom-file.test.mjs browser/crew-chatter.test.mjs
 node browser/check-browser.mjs http://127.0.0.1:8643/
+node browser/check-audio.mjs http://127.0.0.1:8643/
 ~~~
 
 The browser check selects the local base ROM with the real file picker, boots the emulator, checks input and audio, locates live dialogue RAM, exercises all six chatter banks and pause/resume, and captures desktop and mobile layouts. It also checks that no ROM is served or uploaded. Supply another base ROM path as the second argument after the URL when needed.
+
+The audio check measures the emulator's actual output signal. It verifies that mute resets on refresh, mute lasts through pause/resume within a page session, saved volume survives refresh, and keyboard and sound-button input restore suspended audio. It uses real input events without granting artificial user activation to status reads.
+
+If audio is silent, press Enable sound. Each fresh page load starts unmuted. Mute lasts for the current page session, including pause/resume, and is not remembered after refresh. Other preferences and game saves are preserved. The sound button reflects browser audio suspension. Keyboard and touch controls also resume suspended audio; they preserve the current session's mute setting.
 
 Keyboard, touch, and standard gamepads use the controls below the viewscreen. Save states and game saves are stored in the browser for that site's address.
 

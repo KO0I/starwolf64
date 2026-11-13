@@ -1,0 +1,13 @@
+<!doctype html>
+<html lang="en"><meta charset="utf-8"><title>Starship WebGL 2 renderer probe</title>
+<link rel="icon" href="data:,"><style>
+body{background:#18202a;color:#eee;font:16px monospace;margin:24px}
+canvas{width:256px;height:256px;image-rendering:pixelated;border:1px solid #aaa}pre{white-space:pre-wrap}
+</style><h1>Starship WebGL 2 renderer probe</h1>
+<canvas id="canvas" width="64" height="64"></canvas><pre id="result">Loading renderer…</pre>
+<script>
+var Module={canvas:document.getElementById('canvas'),
+print:console.log.bind(console),printErr:console.error.bind(console),
+onAbort:function(reason){window.STARSHIP_WEBGL_RESULT={status:'fail',error:String(reason)};
+document.getElementById('result').textContent=JSON.stringify(window.STARSHIP_WEBGL_RESULT,null,2);}};
+</script>{{{ SCRIPT }}}</html>

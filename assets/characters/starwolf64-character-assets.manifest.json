@@ -1,0 +1,4876 @@
+{
+  "schema": "starwolf64-character-source-pack-1",
+  "source": {
+    "site_url": "https://star-wolf-64-characters.sesheta.chatgpt.site",
+    "site_commit": "485694b048d8bd585b835443b4321acd72e36ec3",
+    "site_version": 27,
+    "viewer_sha256": "50e61725d382aabc19d40380d20a3c147eb9fafff82e11b418325a927a160490",
+    "model_updates": {
+      "kami": {
+        "archive_file": "Kami_models.zip",
+        "archive_sha256": "d5dd5c07802cc9b04eff534bd557e854466e60b4e644bf6df4ebd0d5f0918cce",
+        "credits": "Kami_CREDITS.md",
+        "variants": {
+          "title": "Kami_title.glb",
+          "on_foot": "Kami_on_foot.glb"
+        }
+      }
+    }
+  },
+  "runtime": {
+    "format": "glTF 2.0 authoring sources",
+    "native_conversion_complete": false,
+    "required_native_formats": [
+      "o2r",
+      "otr"
+    ],
+    "note": "Import and convert through the mod asset pipeline before runtime use."
+  },
+  "characters": {
+    "wolf": {
+      "label": "Wolf",
+      "variants": {
+        "title": {
+          "file": "characters/wolf/title/body.glb",
+          "sha256": "342ddb4eab60d2ff18588881daf0e84454c4b2a269fce4659039db6a5baf86ea",
+          "bytes": 280892,
+          "triangles": 487,
+          "nodes": 25,
+          "meshes": 17,
+          "skins": [],
+          "animations": [
+            {
+              "name": "aFoxRunningAnim",
+              "duration_seconds": 1.9666666984558105,
+              "maximum_samples": 60,
+              "channels": 22
+            },
+            {
+              "name": "aFoxAnim",
+              "duration_seconds": 6.633333206176758,
+              "maximum_samples": 200,
+              "channels": 22
+            },
+            {
+              "name": "Run as Krystal",
+              "duration_seconds": 1.9666666984558105,
+              "maximum_samples": 60,
+              "channels": 16
+            },
+            {
+              "name": "Run as Kami",
+              "duration_seconds": 1.9666666984558105,
+              "maximum_samples": 60,
+              "channels": 16
+            },
+            {
+              "name": "Run as Panther",
+              "duration_seconds": 1.9666666984558105,
+              "maximum_samples": 60,
+              "channels": 16
+            },
+            {
+              "name": "Run as Pigma",
+              "duration_seconds": 1.9666666984558105,
+              "maximum_samples": 60,
+              "channels": 14
+            }
+          ],
+          "textures": [
+            {
+              "image_index": 0,
+              "name": "ast_title_2DF30_mouth",
+              "file": "textures/68bb1658be041e5b89204f06759a6950cfde509c32fb0a34e3a248934d4751c4.png",
+              "sha256": "68bb1658be041e5b89204f06759a6950cfde509c32fb0a34e3a248934d4751c4",
+              "width": 16,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 1,
+              "name": "ast_title_2DB30_fur",
+              "file": "textures/927ce3456b44031b9afb8f3445b8076c65a454e21a57e2efab7f943ffba9ee9b.png",
+              "sha256": "927ce3456b44031b9afb8f3445b8076c65a454e21a57e2efab7f943ffba9ee9b",
+              "width": 16,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 2,
+              "name": "ast_title_1F200_glove",
+              "file": "textures/efac22aadbe7b14937d98546dd5f61bf8a16585eeffa954c08cbf09ce6677922.png",
+              "sha256": "efac22aadbe7b14937d98546dd5f61bf8a16585eeffa954c08cbf09ce6677922",
+              "width": 16,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 3,
+              "name": "ast_title_1F400_glove",
+              "file": "textures/0477a90798b132162fbb65de59bf562c37058b7db04c087196fac64d3b863e51.png",
+              "sha256": "0477a90798b132162fbb65de59bf562c37058b7db04c087196fac64d3b863e51",
+              "width": 16,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 4,
+              "name": "ast_title_1EA00_glove",
+              "file": "textures/8c49a46649dd34f20fce71e57a949a9716aea7a9e2af241674fc55d56bee1e0a.png",
+              "sha256": "8c49a46649dd34f20fce71e57a949a9716aea7a9e2af241674fc55d56bee1e0a",
+              "width": 32,
+              "height": 32,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 5,
+              "name": "ast_title_214F8_fur",
+              "file": "textures/34424610318cfaf6c4ba86ca22cd178137df701005461e29158a4ee9235d3398.png",
+              "sha256": "34424610318cfaf6c4ba86ca22cd178137df701005461e29158a4ee9235d3398",
+              "width": 16,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 7,
+              "name": "ast_title_21F10_metal",
+              "file": "textures/3e530a90e86f1366762e478d341f565c39408990f5f9accd54d4445d314e11b9.png",
+              "sha256": "3e530a90e86f1366762e478d341f565c39408990f5f9accd54d4445d314e11b9",
+              "width": 16,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 8,
+              "name": "ast_title_426E0_metal",
+              "file": "textures/ff899b00f949b6dec7896cd5ccaebc3dc0ee4eae1b8bfb1347baaa32d35059f8.png",
+              "sha256": "ff899b00f949b6dec7896cd5ccaebc3dc0ee4eae1b8bfb1347baaa32d35059f8",
+              "width": 16,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 10,
+              "name": "ast_title_28988_mouth",
+              "file": "textures/2a9cdd1bfb0456501f9257d5f7f48f743c66b98b638aad98d64a3e5cccbd1b98.png",
+              "sha256": "2a9cdd1bfb0456501f9257d5f7f48f743c66b98b638aad98d64a3e5cccbd1b98",
+              "width": 16,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 11,
+              "name": "ast_title_24340_fur",
+              "file": "textures/3739284e997525abdd20925fcd46d4322e97e371c6e29a4e31235769b7d4f08f.png",
+              "sha256": "3739284e997525abdd20925fcd46d4322e97e371c6e29a4e31235769b7d4f08f",
+              "width": 16,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 12,
+              "name": "ast_title_25FA8_eye",
+              "file": "textures/ff6d8a889ed8ea4e6dfe723ee10ae42bcf376e876e2f8463215438a274c21924.png",
+              "sha256": "ff6d8a889ed8ea4e6dfe723ee10ae42bcf376e876e2f8463215438a274c21924",
+              "width": 32,
+              "height": 32,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 13,
+              "name": "ast_title_23340_scarf",
+              "file": "textures/ed12e4935ca7d19767ae34e07ee6e60e554b78f2771302bf28d7ee73e7d33a05.png",
+              "sha256": "ed12e4935ca7d19767ae34e07ee6e60e554b78f2771302bf28d7ee73e7d33a05",
+              "width": 32,
+              "height": 32,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 14,
+              "name": "ast_title_22B40_chest",
+              "file": "textures/32cc457cd3f374419234ac07addb3bc26cf268ce5646c670c72cbf40367c394e.png",
+              "sha256": "32cc457cd3f374419234ac07addb3bc26cf268ce5646c670c72cbf40367c394e",
+              "width": 32,
+              "height": 32,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 15,
+              "name": "ast_title_26D28_metal",
+              "file": "textures/ad1f8cdb2245c6b709dd0be8263cd91bc2de9d1e9c3c31c0b50b009a3bf404a6.png",
+              "sha256": "ad1f8cdb2245c6b709dd0be8263cd91bc2de9d1e9c3c31c0b50b009a3bf404a6",
+              "width": 16,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 16,
+              "name": "image_16",
+              "file": "textures/f3e17fbf7d87d0df89a1546b4f008c127be1bb77043fec0df376def727993bf9.png",
+              "sha256": "f3e17fbf7d87d0df89a1546b4f008c127be1bb77043fec0df376def727993bf9",
+              "width": 64,
+              "height": 64,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 17,
+              "name": "Wolf_white_wool_lining",
+              "file": "textures/f89e5aafbf8459841e8c5b2eb97eb5a19f99ea898ce28b25dd377b9ffa3199f3.png",
+              "sha256": "f89e5aafbf8459841e8c5b2eb97eb5a19f99ea898ce28b25dd377b9ffa3199f3",
+              "width": 64,
+              "height": 64,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 18,
+              "name": "image_18",
+              "file": "textures/c877b1b7dd9d57271cb5f20e86989ed8f650ddbadca23c5009c3290a67753d94.png",
+              "sha256": "c877b1b7dd9d57271cb5f20e86989ed8f650ddbadca23c5009c3290a67753d94",
+              "width": 16,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            }
+          ],
+          "transforms": "Preserved byte-for-byte from the reviewed GLB.",
+          "label": "Title detail"
+        },
+        "on_foot": {
+          "file": "characters/wolf/on_foot/body.glb",
+          "sha256": "df24d004d2ee6b39cf5bb43920196d4f1c756b5469f5a846397dfc80df018e5a",
+          "bytes": 153352,
+          "triangles": 162,
+          "nodes": 22,
+          "meshes": 14,
+          "skins": [],
+          "animations": [
+            {
+              "name": "D_versus_301CCE4",
+              "duration_seconds": 0.03333333507180214,
+              "maximum_samples": 2,
+              "channels": 19
+            },
+            {
+              "name": "D_versus_301CFEC",
+              "duration_seconds": 0.9666666388511658,
+              "maximum_samples": 30,
+              "channels": 19
+            },
+            {
+              "name": "D_versus_301D3DC",
+              "duration_seconds": 0.03333333507180214,
+              "maximum_samples": 2,
+              "channels": 19
+            },
+            {
+              "name": "Run as Krystal",
+              "duration_seconds": 1.9666666984558105,
+              "maximum_samples": 60,
+              "channels": 14
+            },
+            {
+              "name": "Run as Kami",
+              "duration_seconds": 1.9666666984558105,
+              "maximum_samples": 60,
+              "channels": 14
+            },
+            {
+              "name": "Run as Panther",
+              "duration_seconds": 1.9666666984558105,
+              "maximum_samples": 60,
+              "channels": 14
+            },
+            {
+              "name": "Run as Pigma",
+              "duration_seconds": 1.9666666984558105,
+              "maximum_samples": 60,
+              "channels": 14
+            }
+          ],
+          "textures": [
+            {
+              "image_index": 0,
+              "name": "ast_versus_28130_glove",
+              "file": "textures/26651554f2e1eb1519766e265b44bcd2a15777bd8db305dc8b8c1cc12a6da6ac.png",
+              "sha256": "26651554f2e1eb1519766e265b44bcd2a15777bd8db305dc8b8c1cc12a6da6ac",
+              "width": 8,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 2,
+              "name": "ast_versus_26A38_metal",
+              "file": "textures/2ec445b259b48c081e90253e014826d075bfe6222865117aa7d51fc8e1914263.png",
+              "sha256": "2ec445b259b48c081e90253e014826d075bfe6222865117aa7d51fc8e1914263",
+              "width": 8,
+              "height": 8,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 4,
+              "name": "ast_versus_E680_equipment",
+              "file": "textures/c50a1146880f7877a152a851e84a23feb623c982aee3639d0ad0e4fe756dabf0.png",
+              "sha256": "c50a1146880f7877a152a851e84a23feb623c982aee3639d0ad0e4fe756dabf0",
+              "width": 16,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 5,
+              "name": "ast_versus_EA80_equipment",
+              "file": "textures/005480918ef53853f41263bdbe8d152ff620e72e215981e4829925e67ab610c5.png",
+              "sha256": "005480918ef53853f41263bdbe8d152ff620e72e215981e4829925e67ab610c5",
+              "width": 16,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 6,
+              "name": "ast_versus_28230_equipment",
+              "file": "textures/1c03b63515bfa992e6ca35f54f8c4273d5ae0fb341b62c52cbd262f2a3f4adea.png",
+              "sha256": "1c03b63515bfa992e6ca35f54f8c4273d5ae0fb341b62c52cbd262f2a3f4adea",
+              "width": 32,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 7,
+              "name": "ast_versus_26CB8_eye_fur",
+              "file": "textures/d82e81d02bda5d444655cfaee408864d1308a75848d1795a8bdb7233e9fd8ed7.png",
+              "sha256": "d82e81d02bda5d444655cfaee408864d1308a75848d1795a8bdb7233e9fd8ed7",
+              "width": 16,
+              "height": 8,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 8,
+              "name": "ast_versus_26DB8_eye_fur",
+              "file": "textures/eb75f268e8e7f6fdf44b06a99a5620b80028944eefd58dd7deae702e1e5072d8.png",
+              "sha256": "eb75f268e8e7f6fdf44b06a99a5620b80028944eefd58dd7deae702e1e5072d8",
+              "width": 16,
+              "height": 8,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 9,
+              "name": "ast_versus_26AB8_fur",
+              "file": "textures/105feb7000403b076c16356786704f8b945c250bf5e9dc404a8dc190f4632eec.png",
+              "sha256": "105feb7000403b076c16356786704f8b945c250bf5e9dc404a8dc190f4632eec",
+              "width": 8,
+              "height": 8,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 10,
+              "name": "ast_versus_26B38_fur",
+              "file": "textures/da8a977407236fdfed547016caab6b3a8593b8407392de7196e027f2a01c8eed.png",
+              "sha256": "da8a977407236fdfed547016caab6b3a8593b8407392de7196e027f2a01c8eed",
+              "width": 8,
+              "height": 8,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 11,
+              "name": "ast_versus_26BB8_fur",
+              "file": "textures/86e7a7204e36b64baad6b94fe6272cabe5ec5b6fee10331691ab7b85ae0b1ce6.png",
+              "sha256": "86e7a7204e36b64baad6b94fe6272cabe5ec5b6fee10331691ab7b85ae0b1ce6",
+              "width": 8,
+              "height": 8,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 12,
+              "name": "ast_versus_26C38_fur",
+              "file": "textures/2e72451d76ca9e2e1f6104e28a8bfd68d233f739a5269066d3c6fa4bff4be961.png",
+              "sha256": "2e72451d76ca9e2e1f6104e28a8bfd68d233f739a5269066d3c6fa4bff4be961",
+              "width": 8,
+              "height": 8,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 13,
+              "name": "ast_versus_26EB8_fur",
+              "file": "textures/f3f3ed76f5ff6db342301a2921626006b3f933ebcd24b1004fec97a652366897.png",
+              "sha256": "f3f3ed76f5ff6db342301a2921626006b3f933ebcd24b1004fec97a652366897",
+              "width": 16,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 14,
+              "name": "ast_versus_27268_vest",
+              "file": "textures/a3fda823918dcb87ecf9c811317be2322ad1e10e3217060a0748ccdef4b8e76a.png",
+              "sha256": "a3fda823918dcb87ecf9c811317be2322ad1e10e3217060a0748ccdef4b8e76a",
+              "width": 32,
+              "height": 32,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 15,
+              "name": "ast_versus_1C9B0_eye_fur",
+              "file": "textures/b8b82490a1cc325225487add2189ec316e4a2cce667fb658ce563dd6ee8e3431.png",
+              "sha256": "b8b82490a1cc325225487add2189ec316e4a2cce667fb658ce563dd6ee8e3431",
+              "width": 16,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 16,
+              "name": "image_16",
+              "file": "textures/f3e17fbf7d87d0df89a1546b4f008c127be1bb77043fec0df376def727993bf9.png",
+              "sha256": "f3e17fbf7d87d0df89a1546b4f008c127be1bb77043fec0df376def727993bf9",
+              "width": 64,
+              "height": 64,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 17,
+              "name": "Wolf_white_wool_lining",
+              "file": "textures/f89e5aafbf8459841e8c5b2eb97eb5a19f99ea898ce28b25dd377b9ffa3199f3.png",
+              "sha256": "f89e5aafbf8459841e8c5b2eb97eb5a19f99ea898ce28b25dd377b9ffa3199f3",
+              "width": 64,
+              "height": 64,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 18,
+              "name": "image_18",
+              "file": "textures/c877b1b7dd9d57271cb5f20e86989ed8f650ddbadca23c5009c3290a67753d94.png",
+              "sha256": "c877b1b7dd9d57271cb5f20e86989ed8f650ddbadca23c5009c3290a67753d94",
+              "width": 16,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            }
+          ],
+          "transforms": "Preserved byte-for-byte from the reviewed GLB.",
+          "label": "On-foot detail"
+        }
+      }
+    },
+    "krystal": {
+      "label": "Krystal",
+      "variants": {
+        "title": {
+          "file": "characters/krystal/title/body.glb",
+          "sha256": "c6952d4d9d222321dfc0d17850bb6fde589b8bba02744cc5408d6c9d369509a8",
+          "bytes": 505684,
+          "triangles": 1136,
+          "nodes": 29,
+          "meshes": 21,
+          "skins": [],
+          "animations": [
+            {
+              "name": "aFoxRunningAnim",
+              "duration_seconds": 1.9666666984558105,
+              "maximum_samples": 60,
+              "channels": 24
+            },
+            {
+              "name": "aFoxAnim",
+              "duration_seconds": 6.633333206176758,
+              "maximum_samples": 200,
+              "channels": 22
+            },
+            {
+              "name": "Run as Krystal",
+              "duration_seconds": 1.9666666984558105,
+              "maximum_samples": 60,
+              "channels": 18
+            },
+            {
+              "name": "Run as Kami",
+              "duration_seconds": 1.9666666984558105,
+              "maximum_samples": 60,
+              "channels": 18
+            },
+            {
+              "name": "Run as Panther",
+              "duration_seconds": 1.9666666984558105,
+              "maximum_samples": 60,
+              "channels": 18
+            },
+            {
+              "name": "Run as Pigma",
+              "duration_seconds": 1.9666666984558105,
+              "maximum_samples": 60,
+              "channels": 18
+            }
+          ],
+          "textures": [
+            {
+              "image_index": 0,
+              "name": "Krystal_D_TITLE_602DF30",
+              "file": "textures/c9282879c799932a862362a6944e14131c593b57b4990486ee50ff99d5d32e84.png",
+              "sha256": "c9282879c799932a862362a6944e14131c593b57b4990486ee50ff99d5d32e84",
+              "width": 16,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 1,
+              "name": "Krystal_D_TITLE_602DB30",
+              "file": "textures/f1b05c859a1e18d11f5b4634c778062996acaed85783ecc67e950e5cc4a6cacb.png",
+              "sha256": "f1b05c859a1e18d11f5b4634c778062996acaed85783ecc67e950e5cc4a6cacb",
+              "width": 16,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 5,
+              "name": "Krystal_D_TITLE_60214F8",
+              "file": "textures/59700bcc9d7536c0bc582fdbbf461e4efcd164c460d5eb3a6a8f0a6e2f9088d1.png",
+              "sha256": "59700bcc9d7536c0bc582fdbbf461e4efcd164c460d5eb3a6a8f0a6e2f9088d1",
+              "width": 16,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 10,
+              "name": "Krystal_D_TITLE_6028988",
+              "file": "textures/b7e4bbdc0cad93309dcd0312a36f7141685129f4c14d84923f93a50cc5e7f7cf.png",
+              "sha256": "b7e4bbdc0cad93309dcd0312a36f7141685129f4c14d84923f93a50cc5e7f7cf",
+              "width": 16,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 11,
+              "name": "Krystal_D_TITLE_6024340",
+              "file": "textures/48530f4a0a3821deb6ae2cbafc30043dc9475050d3b8337e979c058f9ef8d5f6.png",
+              "sha256": "48530f4a0a3821deb6ae2cbafc30043dc9475050d3b8337e979c058f9ef8d5f6",
+              "width": 16,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 15,
+              "name": "Krystal_D_TITLE_6026D28",
+              "file": "textures/ece89f6f51d6632b439da72c183943daedaff0aaa73aec4d5deb9499a913adcf.png",
+              "sha256": "ece89f6f51d6632b439da72c183943daedaff0aaa73aec4d5deb9499a913adcf",
+              "width": 16,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 16,
+              "name": "Krystal_details_palette",
+              "file": "textures/b9dc43c6a6a93ae9879dae2bb05fdc7fe617ca1f1c38ea1d925f7d84b26632cf.png",
+              "sha256": "b9dc43c6a6a93ae9879dae2bb05fdc7fe617ca1f1c38ea1d925f7d84b26632cf",
+              "width": 128,
+              "height": 128,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 17,
+              "name": "Krystal64_adapted_atlas",
+              "file": "textures/f0469bbdc57986c72a10da89ba69ab0649b733c9e8a18c5641c25e87e176ec0a.png",
+              "sha256": "f0469bbdc57986c72a10da89ba69ab0649b733c9e8a18c5641c25e87e176ec0a",
+              "width": 128,
+              "height": 128,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 18,
+              "name": "Krystal_OEM_Regressor_outfit",
+              "file": "textures/e9f390ec46f291b8d8714a1dc2e5fff8cba6ab76f192b516196a8790748be163.png",
+              "sha256": "e9f390ec46f291b8d8714a1dc2e5fff8cba6ab76f192b516196a8790748be163",
+              "width": 128,
+              "height": 128,
+              "roles": [
+                "baseColorTexture"
+              ]
+            }
+          ],
+          "transforms": "Preserved byte-for-byte from the reviewed GLB.",
+          "label": "Title detail"
+        },
+        "on_foot": {
+          "file": "characters/krystal/on_foot/body.glb",
+          "sha256": "2f1a1c0b2121b5c15c9ac2d7bb1620fd5e72d81cbc32de717ec1171a523d09cf",
+          "bytes": 286224,
+          "triangles": 583,
+          "nodes": 26,
+          "meshes": 18,
+          "skins": [],
+          "animations": [
+            {
+              "name": "D_versus_301CCE4",
+              "duration_seconds": 0.03333333507180214,
+              "maximum_samples": 2,
+              "channels": 19
+            },
+            {
+              "name": "D_versus_301CFEC",
+              "duration_seconds": 0.9666666388511658,
+              "maximum_samples": 30,
+              "channels": 21
+            },
+            {
+              "name": "D_versus_301D3DC",
+              "duration_seconds": 0.03333333507180214,
+              "maximum_samples": 2,
+              "channels": 19
+            },
+            {
+              "name": "Run as Krystal",
+              "duration_seconds": 1.9666666984558105,
+              "maximum_samples": 60,
+              "channels": 16
+            },
+            {
+              "name": "Run as Kami",
+              "duration_seconds": 1.9666666984558105,
+              "maximum_samples": 60,
+              "channels": 16
+            },
+            {
+              "name": "Run as Panther",
+              "duration_seconds": 1.9666666984558105,
+              "maximum_samples": 60,
+              "channels": 16
+            },
+            {
+              "name": "Run as Pigma",
+              "duration_seconds": 1.9666666984558105,
+              "maximum_samples": 60,
+              "channels": 16
+            }
+          ],
+          "textures": [
+            {
+              "image_index": 2,
+              "name": "Krystal_D_versus_3026A38",
+              "file": "textures/d1c8f9c72b51552e539e6b29b88a8de2b0130fd59cc51be9cd3b927398816e4f.png",
+              "sha256": "d1c8f9c72b51552e539e6b29b88a8de2b0130fd59cc51be9cd3b927398816e4f",
+              "width": 8,
+              "height": 8,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 4,
+              "name": "Krystal_D_versus_300E680",
+              "file": "textures/1847551f937c3f5664198148cbd6e977d680af950f49d8be2306e5b1cace2a37.png",
+              "sha256": "1847551f937c3f5664198148cbd6e977d680af950f49d8be2306e5b1cace2a37",
+              "width": 16,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 5,
+              "name": "Krystal_D_versus_300EA80",
+              "file": "textures/276d4a4d921d95307dcf9a6312062a8edbd5f6933b1876f9737612d1c7ff051f.png",
+              "sha256": "276d4a4d921d95307dcf9a6312062a8edbd5f6933b1876f9737612d1c7ff051f",
+              "width": 16,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 6,
+              "name": "Krystal_D_versus_3028230",
+              "file": "textures/870eb426f2a39f6dd590df316b7a6285c652ce497a2118fbc374961e7bbbfd22.png",
+              "sha256": "870eb426f2a39f6dd590df316b7a6285c652ce497a2118fbc374961e7bbbfd22",
+              "width": 32,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 7,
+              "name": "Krystal_D_versus_3026CB8",
+              "file": "textures/460e6f92261ecf2592a0b4abcd28b10585b0c2d95c6a419baf5917c046493f17.png",
+              "sha256": "460e6f92261ecf2592a0b4abcd28b10585b0c2d95c6a419baf5917c046493f17",
+              "width": 16,
+              "height": 8,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 8,
+              "name": "Krystal_D_versus_3026DB8",
+              "file": "textures/460e6f92261ecf2592a0b4abcd28b10585b0c2d95c6a419baf5917c046493f17.png",
+              "sha256": "460e6f92261ecf2592a0b4abcd28b10585b0c2d95c6a419baf5917c046493f17",
+              "width": 16,
+              "height": 8,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 9,
+              "name": "Krystal_D_versus_3026AB8",
+              "file": "textures/d5f5ab206158f98c12b1fbf562387973b9d3d36d362bd4fa855ddf903a0634b2.png",
+              "sha256": "d5f5ab206158f98c12b1fbf562387973b9d3d36d362bd4fa855ddf903a0634b2",
+              "width": 8,
+              "height": 8,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 10,
+              "name": "Krystal_D_versus_3026B38",
+              "file": "textures/07a142327d8fd3eddf46addc4e4def057a4851342de2bde5caa2ce0921f38c91.png",
+              "sha256": "07a142327d8fd3eddf46addc4e4def057a4851342de2bde5caa2ce0921f38c91",
+              "width": 8,
+              "height": 8,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 11,
+              "name": "Krystal_D_versus_3026BB8",
+              "file": "textures/e0a8217124080cf7f506949b0b439c4c7e6e4e4b72ff067762e39d0149e1aaeb.png",
+              "sha256": "e0a8217124080cf7f506949b0b439c4c7e6e4e4b72ff067762e39d0149e1aaeb",
+              "width": 8,
+              "height": 8,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 12,
+              "name": "Krystal_D_versus_3026C38",
+              "file": "textures/2ecaebc4262d2b4f2d62cc53eea982bd36702d55ec215db62bb6b9a0c8d5d866.png",
+              "sha256": "2ecaebc4262d2b4f2d62cc53eea982bd36702d55ec215db62bb6b9a0c8d5d866",
+              "width": 8,
+              "height": 8,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 13,
+              "name": "Krystal_D_versus_3026EB8",
+              "file": "textures/05db39d694247b2ba4c0c5bc95ca642855aa83f7f30a7200c25b2529658d207f.png",
+              "sha256": "05db39d694247b2ba4c0c5bc95ca642855aa83f7f30a7200c25b2529658d207f",
+              "width": 16,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 16,
+              "name": "Krystal_details_palette",
+              "file": "textures/b9dc43c6a6a93ae9879dae2bb05fdc7fe617ca1f1c38ea1d925f7d84b26632cf.png",
+              "sha256": "b9dc43c6a6a93ae9879dae2bb05fdc7fe617ca1f1c38ea1d925f7d84b26632cf",
+              "width": 128,
+              "height": 128,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 17,
+              "name": "Krystal64_adapted_atlas",
+              "file": "textures/f0469bbdc57986c72a10da89ba69ab0649b733c9e8a18c5641c25e87e176ec0a.png",
+              "sha256": "f0469bbdc57986c72a10da89ba69ab0649b733c9e8a18c5641c25e87e176ec0a",
+              "width": 128,
+              "height": 128,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 18,
+              "name": "Krystal_OEM_Regressor_outfit",
+              "file": "textures/e9f390ec46f291b8d8714a1dc2e5fff8cba6ab76f192b516196a8790748be163.png",
+              "sha256": "e9f390ec46f291b8d8714a1dc2e5fff8cba6ab76f192b516196a8790748be163",
+              "width": 128,
+              "height": 128,
+              "roles": [
+                "baseColorTexture"
+              ]
+            }
+          ],
+          "transforms": "Preserved byte-for-byte from the reviewed GLB.",
+          "label": "On-foot detail"
+        }
+      }
+    },
+    "kami": {
+      "label": "Kami",
+      "variants": {
+        "title": {
+          "file": "characters/kami/title/body.glb",
+          "sha256": "163184877a17f0c35274d8a535f715927a559c941f6f144753b7bb2bd862465b",
+          "bytes": 2098444,
+          "triangles": 1212,
+          "nodes": 31,
+          "meshes": 17,
+          "skins": [],
+          "animations": [
+            {
+              "name": "aFoxRunningAnim",
+              "duration_seconds": 1.9666666984558105,
+              "maximum_samples": 60,
+              "channels": 24
+            },
+            {
+              "name": "aFoxAnim",
+              "duration_seconds": 6.633333206176758,
+              "maximum_samples": 200,
+              "channels": 22
+            },
+            {
+              "name": "Run as Krystal",
+              "duration_seconds": 1.9666666984558105,
+              "maximum_samples": 60,
+              "channels": 18
+            },
+            {
+              "name": "Run as Kami",
+              "duration_seconds": 1.9666666984558105,
+              "maximum_samples": 60,
+              "channels": 18
+            },
+            {
+              "name": "Run as Panther",
+              "duration_seconds": 1.9666666984558105,
+              "maximum_samples": 60,
+              "channels": 18
+            },
+            {
+              "name": "Run as Pigma",
+              "duration_seconds": 1.9666666984558105,
+              "maximum_samples": 60,
+              "channels": 18
+            }
+          ],
+          "textures": [
+            {
+              "image_index": 15,
+              "name": "Krystal_D_TITLE_6026D28",
+              "file": "textures/ece89f6f51d6632b439da72c183943daedaff0aaa73aec4d5deb9499a913adcf.png",
+              "sha256": "ece89f6f51d6632b439da72c183943daedaff0aaa73aec4d5deb9499a913adcf",
+              "width": 16,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 16,
+              "name": "Krystal_details_palette",
+              "file": "textures/b9dc43c6a6a93ae9879dae2bb05fdc7fe617ca1f1c38ea1d925f7d84b26632cf.png",
+              "sha256": "b9dc43c6a6a93ae9879dae2bb05fdc7fe617ca1f1c38ea1d925f7d84b26632cf",
+              "width": 128,
+              "height": 128,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 18,
+              "name": "Kami_retained_head_and_spiral_tail",
+              "file": "textures/c62ff8ff86d749c01f69407b987291114a0838a00a62ae50ef7908a19c2b1c59.png",
+              "sha256": "c62ff8ff86d749c01f69407b987291114a0838a00a62ae50ef7908a19c2b1c59",
+              "width": 512,
+              "height": 512,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 19,
+              "name": "Kami_cyan_pink_skin_bands",
+              "file": "textures/b8ef125574587c0c63cdc74c978a7b97204d49ef4b321d3b89fa5f6924240356.png",
+              "sha256": "b8ef125574587c0c63cdc74c978a7b97204d49ef4b321d3b89fa5f6924240356",
+              "width": 64,
+              "height": 128,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 20,
+              "name": "Kami_black_boot_panels_and_sole",
+              "file": "textures/e636538a4f174e1fca747612333795bdaa669f55578b15b0340358cc6c9fa8be.png",
+              "sha256": "e636538a4f174e1fca747612333795bdaa669f55578b15b0340358cc6c9fa8be",
+              "width": 64,
+              "height": 64,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 21,
+              "name": "Kami_eight_view_head",
+              "file": "textures/b29864ddb775f773cf8866862c006a9dc9562fc921bbe3c29b1aab31618e6012.png",
+              "sha256": "b29864ddb775f773cf8866862c006a9dc9562fc921bbe3c29b1aab31618e6012",
+              "width": 2048,
+              "height": 1024,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 23,
+              "name": "image_23",
+              "file": "textures/69e696a7ceabfb42bdeba65b41fd0c6783185506515903d4257003cb5defda30.png",
+              "sha256": "69e696a7ceabfb42bdeba65b41fd0c6783185506515903d4257003cb5defda30",
+              "width": 1,
+              "height": 1,
+              "roles": [
+                "baseColorTexture"
+              ]
+            }
+          ],
+          "transforms": "Preserved byte-for-byte from the reviewed GLB.",
+          "label": "Title detail"
+        },
+        "on_foot": {
+          "file": "characters/kami/on_foot/body.glb",
+          "sha256": "47cf5896cc72241cb0e5ab134ce7cc1d02b8ef4c0d8897f06bbd1083c90e36fb",
+          "bytes": 1760864,
+          "triangles": 690,
+          "nodes": 28,
+          "meshes": 15,
+          "skins": [],
+          "animations": [
+            {
+              "name": "D_versus_301CCE4",
+              "duration_seconds": 0.03333333507180214,
+              "maximum_samples": 2,
+              "channels": 19
+            },
+            {
+              "name": "D_versus_301CFEC",
+              "duration_seconds": 0.9666666388511658,
+              "maximum_samples": 30,
+              "channels": 21
+            },
+            {
+              "name": "D_versus_301D3DC",
+              "duration_seconds": 0.03333333507180214,
+              "maximum_samples": 2,
+              "channels": 19
+            },
+            {
+              "name": "Run as Krystal",
+              "duration_seconds": 1.9666666984558105,
+              "maximum_samples": 60,
+              "channels": 16
+            },
+            {
+              "name": "Run as Kami",
+              "duration_seconds": 1.9666666984558105,
+              "maximum_samples": 60,
+              "channels": 16
+            },
+            {
+              "name": "Run as Panther",
+              "duration_seconds": 1.9666666984558105,
+              "maximum_samples": 60,
+              "channels": 16
+            },
+            {
+              "name": "Run as Pigma",
+              "duration_seconds": 1.9666666984558105,
+              "maximum_samples": 60,
+              "channels": 16
+            }
+          ],
+          "textures": [
+            {
+              "image_index": 4,
+              "name": "Krystal_D_versus_300E680",
+              "file": "textures/1847551f937c3f5664198148cbd6e977d680af950f49d8be2306e5b1cace2a37.png",
+              "sha256": "1847551f937c3f5664198148cbd6e977d680af950f49d8be2306e5b1cace2a37",
+              "width": 16,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 5,
+              "name": "Krystal_D_versus_300EA80",
+              "file": "textures/276d4a4d921d95307dcf9a6312062a8edbd5f6933b1876f9737612d1c7ff051f.png",
+              "sha256": "276d4a4d921d95307dcf9a6312062a8edbd5f6933b1876f9737612d1c7ff051f",
+              "width": 16,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 6,
+              "name": "Krystal_D_versus_3028230",
+              "file": "textures/870eb426f2a39f6dd590df316b7a6285c652ce497a2118fbc374961e7bbbfd22.png",
+              "sha256": "870eb426f2a39f6dd590df316b7a6285c652ce497a2118fbc374961e7bbbfd22",
+              "width": 32,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 16,
+              "name": "Krystal_details_palette",
+              "file": "textures/b9dc43c6a6a93ae9879dae2bb05fdc7fe617ca1f1c38ea1d925f7d84b26632cf.png",
+              "sha256": "b9dc43c6a6a93ae9879dae2bb05fdc7fe617ca1f1c38ea1d925f7d84b26632cf",
+              "width": 128,
+              "height": 128,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 18,
+              "name": "Kami_retained_head_and_spiral_tail",
+              "file": "textures/c62ff8ff86d749c01f69407b987291114a0838a00a62ae50ef7908a19c2b1c59.png",
+              "sha256": "c62ff8ff86d749c01f69407b987291114a0838a00a62ae50ef7908a19c2b1c59",
+              "width": 512,
+              "height": 512,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 19,
+              "name": "Kami_cyan_pink_skin_bands",
+              "file": "textures/b8ef125574587c0c63cdc74c978a7b97204d49ef4b321d3b89fa5f6924240356.png",
+              "sha256": "b8ef125574587c0c63cdc74c978a7b97204d49ef4b321d3b89fa5f6924240356",
+              "width": 64,
+              "height": 128,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 20,
+              "name": "Kami_black_boot_panels_and_sole",
+              "file": "textures/e636538a4f174e1fca747612333795bdaa669f55578b15b0340358cc6c9fa8be.png",
+              "sha256": "e636538a4f174e1fca747612333795bdaa669f55578b15b0340358cc6c9fa8be",
+              "width": 64,
+              "height": 64,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 21,
+              "name": "Kami_eight_view_head",
+              "file": "textures/b29864ddb775f773cf8866862c006a9dc9562fc921bbe3c29b1aab31618e6012.png",
+              "sha256": "b29864ddb775f773cf8866862c006a9dc9562fc921bbe3c29b1aab31618e6012",
+              "width": 2048,
+              "height": 1024,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 23,
+              "name": "image_23",
+              "file": "textures/69e696a7ceabfb42bdeba65b41fd0c6783185506515903d4257003cb5defda30.png",
+              "sha256": "69e696a7ceabfb42bdeba65b41fd0c6783185506515903d4257003cb5defda30",
+              "width": 1,
+              "height": 1,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 24,
+              "name": "image_24",
+              "file": "textures/69e696a7ceabfb42bdeba65b41fd0c6783185506515903d4257003cb5defda30.png",
+              "sha256": "69e696a7ceabfb42bdeba65b41fd0c6783185506515903d4257003cb5defda30",
+              "width": 1,
+              "height": 1,
+              "roles": [
+                "baseColorTexture"
+              ]
+            }
+          ],
+          "transforms": "Preserved byte-for-byte from the reviewed GLB.",
+          "label": "On-foot detail"
+        }
+      }
+    },
+    "panther": {
+      "label": "Panther",
+      "variants": {
+        "title": {
+          "file": "characters/panther/title/body.glb",
+          "sha256": "3cbe2364102146d6be78d5d6e4c2969f186977b9b4b1075994460fa77b862c2c",
+          "bytes": 335608,
+          "triangles": 600,
+          "nodes": 25,
+          "meshes": 17,
+          "skins": [],
+          "animations": [
+            {
+              "name": "aFalcoRunningAnim",
+              "duration_seconds": 1.9666666984558105,
+              "maximum_samples": 60,
+              "channels": 26
+            },
+            {
+              "name": "aFalcoAnim",
+              "duration_seconds": 6.633333206176758,
+              "maximum_samples": 200,
+              "channels": 24
+            },
+            {
+              "name": "Run as Krystal",
+              "duration_seconds": 1.9666666984558105,
+              "maximum_samples": 60,
+              "channels": 20
+            },
+            {
+              "name": "Run as Kami",
+              "duration_seconds": 1.9666666984558105,
+              "maximum_samples": 60,
+              "channels": 20
+            },
+            {
+              "name": "Run as Panther",
+              "duration_seconds": 1.9666666984558105,
+              "maximum_samples": 60,
+              "channels": 20
+            },
+            {
+              "name": "Run as Pigma",
+              "duration_seconds": 1.9666666984558105,
+              "maximum_samples": 60,
+              "channels": 20
+            }
+          ],
+          "textures": [
+            {
+              "image_index": 3,
+              "name": "D_TITLE_6023B40",
+              "file": "textures/0d706758b96e7b27fbd68796d6749cae7962bfc63bdfb55419cbd32daf2607a4.png",
+              "sha256": "0d706758b96e7b27fbd68796d6749cae7962bfc63bdfb55419cbd32daf2607a4",
+              "width": 32,
+              "height": 32,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 4,
+              "name": "D_TITLE_6024340",
+              "file": "textures/8879a0f2c5395e41a87767a424942c6212b61de7935053f4e99f2306dd3573d9.png",
+              "sha256": "8879a0f2c5395e41a87767a424942c6212b61de7935053f4e99f2306dd3573d9",
+              "width": 16,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 5,
+              "name": "Panther_purple_cloth",
+              "file": "textures/4bb2175723d8452084b2cc60b951a6eb98837195acd7ce88325ee5e78ae2edc6.png",
+              "sha256": "4bb2175723d8452084b2cc60b951a6eb98837195acd7ce88325ee5e78ae2edc6",
+              "width": 32,
+              "height": 32,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 6,
+              "name": "D_TITLE_6028988",
+              "file": "textures/2a9cdd1bfb0456501f9257d5f7f48f743c66b98b638aad98d64a3e5cccbd1b98.png",
+              "sha256": "2a9cdd1bfb0456501f9257d5f7f48f743c66b98b638aad98d64a3e5cccbd1b98",
+              "width": 16,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 11,
+              "name": "D_TITLE_6026D28",
+              "file": "textures/f0dc83e49423f9c2c5b32d3190eff81ee7cc463e92b1a60764101a41c8e6e7d6.png",
+              "sha256": "f0dc83e49423f9c2c5b32d3190eff81ee7cc463e92b1a60764101a41c8e6e7d6",
+              "width": 16,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 12,
+              "name": "Panther_yellow_handkerchief",
+              "file": "textures/7ebac6d26bc24e5bb75d9636a49da32b6d2bb404544a8bcd1619ee560033df0a.png",
+              "sha256": "7ebac6d26bc24e5bb75d9636a49da32b6d2bb404544a8bcd1619ee560033df0a",
+              "width": 32,
+              "height": 32,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 14,
+              "name": "Panther_head_palette",
+              "file": "textures/d986093faa0a6c2a194610b3553d806a2387f919816b45580a3bef0b53b93cbc.png",
+              "sha256": "d986093faa0a6c2a194610b3553d806a2387f919816b45580a3bef0b53b93cbc",
+              "width": 128,
+              "height": 128,
+              "roles": [
+                "baseColorTexture"
+              ]
+            }
+          ],
+          "transforms": "Preserved byte-for-byte from the reviewed GLB.",
+          "label": "Title detail"
+        },
+        "on_foot": {
+          "file": "characters/panther/on_foot/body.glb",
+          "sha256": "ba99dc9b3f93b14702b39a2e86eb82062fe00145e9431654cbbcfd7b42ac8641",
+          "bytes": 190756,
+          "triangles": 270,
+          "nodes": 22,
+          "meshes": 15,
+          "skins": [],
+          "animations": [
+            {
+              "name": "D_versus_301C0A4",
+              "duration_seconds": 0.03333333507180214,
+              "maximum_samples": 2,
+              "channels": 21
+            },
+            {
+              "name": "D_versus_301C3A8",
+              "duration_seconds": 0.9666666388511658,
+              "maximum_samples": 30,
+              "channels": 23
+            },
+            {
+              "name": "D_versus_301C79C",
+              "duration_seconds": 0.03333333507180214,
+              "maximum_samples": 2,
+              "channels": 21
+            },
+            {
+              "name": "Run as Krystal",
+              "duration_seconds": 1.9666666984558105,
+              "maximum_samples": 60,
+              "channels": 18
+            },
+            {
+              "name": "Run as Kami",
+              "duration_seconds": 1.9666666984558105,
+              "maximum_samples": 60,
+              "channels": 18
+            },
+            {
+              "name": "Run as Panther",
+              "duration_seconds": 1.9666666984558105,
+              "maximum_samples": 60,
+              "channels": 18
+            },
+            {
+              "name": "Run as Pigma",
+              "duration_seconds": 1.9666666984558105,
+              "maximum_samples": 60,
+              "channels": 18
+            }
+          ],
+          "textures": [
+            {
+              "image_index": 1,
+              "name": "D_versus_3025C68",
+              "file": "textures/b02c5f30beb6b1c4cd0c94b28a9e57cc0f38cd4580526183b03fba8373c6e6b2.png",
+              "sha256": "b02c5f30beb6b1c4cd0c94b28a9e57cc0f38cd4580526183b03fba8373c6e6b2",
+              "width": 16,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 2,
+              "name": "D_versus_3026A38",
+              "file": "textures/5dc4e5b1b728554176a181caf4b81c58f957ebbbf686c6c3246c0f5476a59817.png",
+              "sha256": "5dc4e5b1b728554176a181caf4b81c58f957ebbbf686c6c3246c0f5476a59817",
+              "width": 8,
+              "height": 8,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 3,
+              "name": "Panther_purple_cloth",
+              "file": "textures/7681f8ce13c8eab1c6e966477729fca36972b8d8c65ee85ae005b85988de3215.png",
+              "sha256": "7681f8ce13c8eab1c6e966477729fca36972b8d8c65ee85ae005b85988de3215",
+              "width": 8,
+              "height": 8,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 8,
+              "name": "Panther_yellow_handkerchief",
+              "file": "textures/bee1708458b6da16a5f86587f02fea780a4fb6ee32fff10e74024ac823eef22d.png",
+              "sha256": "bee1708458b6da16a5f86587f02fea780a4fb6ee32fff10e74024ac823eef22d",
+              "width": 32,
+              "height": 32,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 9,
+              "name": "Panther_head_palette",
+              "file": "textures/d986093faa0a6c2a194610b3553d806a2387f919816b45580a3bef0b53b93cbc.png",
+              "sha256": "d986093faa0a6c2a194610b3553d806a2387f919816b45580a3bef0b53b93cbc",
+              "width": 128,
+              "height": 128,
+              "roles": [
+                "baseColorTexture"
+              ]
+            }
+          ],
+          "transforms": "Preserved byte-for-byte from the reviewed GLB.",
+          "label": "On-foot detail"
+        }
+      }
+    },
+    "pigma": {
+      "label": "Pigma",
+      "variants": {
+        "title": {
+          "file": "characters/pigma/title/body.glb",
+          "sha256": "797761bfde14f2055756c2992f32ec50ec82f6f50bd1317a1adf0b41c6a80bf3",
+          "bytes": 254640,
+          "triangles": 473,
+          "nodes": 21,
+          "meshes": 13,
+          "skins": [],
+          "animations": [
+            {
+              "name": "aSlippyRunningAnim",
+              "duration_seconds": 1.9666666984558105,
+              "maximum_samples": 60,
+              "channels": 20
+            },
+            {
+              "name": "aSlippyAnim",
+              "duration_seconds": 6.633333206176758,
+              "maximum_samples": 200,
+              "channels": 20
+            },
+            {
+              "name": "Run as Krystal",
+              "duration_seconds": 1.9666666984558105,
+              "maximum_samples": 60,
+              "channels": 14
+            },
+            {
+              "name": "Run as Kami",
+              "duration_seconds": 1.9666666984558105,
+              "maximum_samples": 60,
+              "channels": 14
+            },
+            {
+              "name": "Run as Panther",
+              "duration_seconds": 1.9666666984558105,
+              "maximum_samples": 60,
+              "channels": 14
+            },
+            {
+              "name": "Run as Pigma",
+              "duration_seconds": 1.9666666984558105,
+              "maximum_samples": 60,
+              "channels": 14
+            }
+          ],
+          "textures": [
+            {
+              "image_index": 2,
+              "name": "D_TITLE_6023B40",
+              "file": "textures/367f0a24b9903b55092631ed2ea5696d7e446a182c10471da8374a27706172f3.png",
+              "sha256": "367f0a24b9903b55092631ed2ea5696d7e446a182c10471da8374a27706172f3",
+              "width": 32,
+              "height": 32,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 3,
+              "name": "D_TITLE_6028788",
+              "file": "textures/c5120c474d794aa49a0ede591260c4a4191216c74a50311decedac8203b4c37a.png",
+              "sha256": "c5120c474d794aa49a0ede591260c4a4191216c74a50311decedac8203b4c37a",
+              "width": 16,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 4,
+              "name": "D_TITLE_6024340",
+              "file": "textures/8879a0f2c5395e41a87767a424942c6212b61de7935053f4e99f2306dd3573d9.png",
+              "sha256": "8879a0f2c5395e41a87767a424942c6212b61de7935053f4e99f2306dd3573d9",
+              "width": 16,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 5,
+              "name": "D_TITLE_6026F28",
+              "file": "textures/b1a6bde5c696d38421d143f6d244739556fc852b5a739df3e06cb2a060b5683f.png",
+              "sha256": "b1a6bde5c696d38421d143f6d244739556fc852b5a739df3e06cb2a060b5683f",
+              "width": 16,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 6,
+              "name": "D_TITLE_6024340",
+              "file": "textures/8879a0f2c5395e41a87767a424942c6212b61de7935053f4e99f2306dd3573d9.png",
+              "sha256": "8879a0f2c5395e41a87767a424942c6212b61de7935053f4e99f2306dd3573d9",
+              "width": 16,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 7,
+              "name": "D_TITLE_6028988",
+              "file": "textures/2a9cdd1bfb0456501f9257d5f7f48f743c66b98b638aad98d64a3e5cccbd1b98.png",
+              "sha256": "2a9cdd1bfb0456501f9257d5f7f48f743c66b98b638aad98d64a3e5cccbd1b98",
+              "width": 16,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 11,
+              "name": "D_TITLE_6023340",
+              "file": "textures/32d3788b083fc47125acd1e78d36f9d62ea81623782bf68b860a745f4ba6b2be.png",
+              "sha256": "32d3788b083fc47125acd1e78d36f9d62ea81623782bf68b860a745f4ba6b2be",
+              "width": 32,
+              "height": 32,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 12,
+              "name": "D_TITLE_6026D28",
+              "file": "textures/f0dc83e49423f9c2c5b32d3190eff81ee7cc463e92b1a60764101a41c8e6e7d6.png",
+              "sha256": "f0dc83e49423f9c2c5b32d3190eff81ee7cc463e92b1a60764101a41c8e6e7d6",
+              "width": 16,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 13,
+              "name": "Pigma_head_palette",
+              "file": "textures/92822ec7ab055f959cc09744e2af861ddd4549797ee5bbff127fb6389e673591.png",
+              "sha256": "92822ec7ab055f959cc09744e2af861ddd4549797ee5bbff127fb6389e673591",
+              "width": 128,
+              "height": 128,
+              "roles": [
+                "baseColorTexture"
+              ]
+            }
+          ],
+          "transforms": "Preserved byte-for-byte from the reviewed GLB.",
+          "label": "Title detail"
+        },
+        "on_foot": {
+          "file": "characters/pigma/on_foot/body.glb",
+          "sha256": "b5886fbfaf67f48685a78c8d30cb658025ef2ab773c21c10f89789b73932685e",
+          "bytes": 161380,
+          "triangles": 210,
+          "nodes": 19,
+          "meshes": 12,
+          "skins": [],
+          "animations": [
+            {
+              "name": "D_versus_301DEA4",
+              "duration_seconds": 0.9666666388511658,
+              "maximum_samples": 30,
+              "channels": 18
+            },
+            {
+              "name": "D_versus_301E19C",
+              "duration_seconds": 0.9666666388511658,
+              "maximum_samples": 30,
+              "channels": 18
+            },
+            {
+              "name": "D_versus_301E560",
+              "duration_seconds": 0.9666666388511658,
+              "maximum_samples": 30,
+              "channels": 18
+            },
+            {
+              "name": "Run as Krystal",
+              "duration_seconds": 1.9666666984558105,
+              "maximum_samples": 60,
+              "channels": 13
+            },
+            {
+              "name": "Run as Kami",
+              "duration_seconds": 1.9666666984558105,
+              "maximum_samples": 60,
+              "channels": 13
+            },
+            {
+              "name": "Run as Panther",
+              "duration_seconds": 1.9666666984558105,
+              "maximum_samples": 60,
+              "channels": 13
+            },
+            {
+              "name": "Run as Pigma",
+              "duration_seconds": 1.9666666984558105,
+              "maximum_samples": 60,
+              "channels": 13
+            }
+          ],
+          "textures": [
+            {
+              "image_index": 0,
+              "name": "D_versus_3026A38",
+              "file": "textures/5dc4e5b1b728554176a181caf4b81c58f957ebbbf686c6c3246c0f5476a59817.png",
+              "sha256": "5dc4e5b1b728554176a181caf4b81c58f957ebbbf686c6c3246c0f5476a59817",
+              "width": 8,
+              "height": 8,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 1,
+              "name": "D_versus_30226D0",
+              "file": "textures/5a49148c874f66b9f843ddfc8a25577162e11a5ada6b73c6a2b4ac31d6624f66.png",
+              "sha256": "5a49148c874f66b9f843ddfc8a25577162e11a5ada6b73c6a2b4ac31d6624f66",
+              "width": 8,
+              "height": 8,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 2,
+              "name": "D_versus_3023F68",
+              "file": "textures/ac0261796dba9b3391f2e1727e5c3494da156256fb095d0b7835462099da546a.png",
+              "sha256": "ac0261796dba9b3391f2e1727e5c3494da156256fb095d0b7835462099da546a",
+              "width": 8,
+              "height": 8,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 3,
+              "name": "D_versus_3025C68",
+              "file": "textures/8ef5fb6077d503e3f4253971e2b4256bcbba57e811a224535ac1e554c040ed1c.png",
+              "sha256": "8ef5fb6077d503e3f4253971e2b4256bcbba57e811a224535ac1e554c040ed1c",
+              "width": 16,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 4,
+              "name": "D_versus_300E280",
+              "file": "textures/c7510a2ca2ed870ac89f1f260f24862166661dac9819b734675ce3615b61d09d.png",
+              "sha256": "c7510a2ca2ed870ac89f1f260f24862166661dac9819b734675ce3615b61d09d",
+              "width": 32,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 5,
+              "name": "D_versus_300E680",
+              "file": "textures/c50a1146880f7877a152a851e84a23feb623c982aee3639d0ad0e4fe756dabf0.png",
+              "sha256": "c50a1146880f7877a152a851e84a23feb623c982aee3639d0ad0e4fe756dabf0",
+              "width": 16,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 6,
+              "name": "D_versus_300EA80",
+              "file": "textures/005480918ef53853f41263bdbe8d152ff620e72e215981e4829925e67ab610c5.png",
+              "sha256": "005480918ef53853f41263bdbe8d152ff620e72e215981e4829925e67ab610c5",
+              "width": 16,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 10,
+              "name": "D_versus_3023238",
+              "file": "textures/741fb00a76db25df37d623d8908914b6116b643aa9b5bfb1248a6dd228372062.png",
+              "sha256": "741fb00a76db25df37d623d8908914b6116b643aa9b5bfb1248a6dd228372062",
+              "width": 32,
+              "height": 32,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 11,
+              "name": "Pigma_head_palette",
+              "file": "textures/92822ec7ab055f959cc09744e2af861ddd4549797ee5bbff127fb6389e673591.png",
+              "sha256": "92822ec7ab055f959cc09744e2af861ddd4549797ee5bbff127fb6389e673591",
+              "width": 128,
+              "height": 128,
+              "roles": [
+                "baseColorTexture"
+              ]
+            }
+          ],
+          "transforms": "Preserved byte-for-byte from the reviewed GLB.",
+          "label": "On-foot detail"
+        }
+      }
+    },
+    "fox": {
+      "label": "Fox",
+      "variants": {
+        "title": {
+          "file": "characters/fox/title/body.glb",
+          "sha256": "4942f00311d9d87822d70b8fd26f3528073505803c1dda0d093b9cd6968f8097",
+          "bytes": 262892,
+          "triangles": 461,
+          "nodes": 23,
+          "meshes": 16,
+          "skins": [],
+          "animations": [
+            {
+              "name": "aFoxRunningAnim",
+              "duration_seconds": 1.9666666984558105,
+              "maximum_samples": 60,
+              "channels": 22
+            },
+            {
+              "name": "aFoxAnim",
+              "duration_seconds": 6.633333206176758,
+              "maximum_samples": 200,
+              "channels": 22
+            },
+            {
+              "name": "Run as Krystal",
+              "duration_seconds": 1.9666666984558105,
+              "maximum_samples": 60,
+              "channels": 16
+            },
+            {
+              "name": "Run as Kami",
+              "duration_seconds": 1.9666666984558105,
+              "maximum_samples": 60,
+              "channels": 16
+            },
+            {
+              "name": "Run as Panther",
+              "duration_seconds": 1.9666666984558105,
+              "maximum_samples": 60,
+              "channels": 16
+            },
+            {
+              "name": "Run as Pigma",
+              "duration_seconds": 1.9666666984558105,
+              "maximum_samples": 60,
+              "channels": 14
+            }
+          ],
+          "textures": [
+            {
+              "image_index": 0,
+              "name": "D_TITLE_602DF30",
+              "file": "textures/68bb1658be041e5b89204f06759a6950cfde509c32fb0a34e3a248934d4751c4.png",
+              "sha256": "68bb1658be041e5b89204f06759a6950cfde509c32fb0a34e3a248934d4751c4",
+              "width": 16,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 1,
+              "name": "D_TITLE_602DB30",
+              "file": "textures/10d6df281b86b7da4c818871526ad1586c17b39826d5a25c9f689538fd70e908.png",
+              "sha256": "10d6df281b86b7da4c818871526ad1586c17b39826d5a25c9f689538fd70e908",
+              "width": 16,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 2,
+              "name": "D_TITLE_601F200",
+              "file": "textures/0d424441144093bd4f80a10f49bba823b2747e9d28e869c5ecc703cf7d7a25d1.png",
+              "sha256": "0d424441144093bd4f80a10f49bba823b2747e9d28e869c5ecc703cf7d7a25d1",
+              "width": 16,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 3,
+              "name": "D_TITLE_601F400",
+              "file": "textures/ecd81b073fb0e58a768c93bba2a81767bc3f9becb70333a872d6daf8cbb76f9d.png",
+              "sha256": "ecd81b073fb0e58a768c93bba2a81767bc3f9becb70333a872d6daf8cbb76f9d",
+              "width": 16,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 4,
+              "name": "D_TITLE_601EA00",
+              "file": "textures/4fa582c77f6c1fa438fd492af386618a145985ff522cf1df89534ad63fb3c887.png",
+              "sha256": "4fa582c77f6c1fa438fd492af386618a145985ff522cf1df89534ad63fb3c887",
+              "width": 32,
+              "height": 32,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 5,
+              "name": "D_TITLE_60214F8",
+              "file": "textures/1c36b971ecafe2b59bca9c6ff7a66bfc0d22d3bc6962c1f6c98b1b23dbddedc9.png",
+              "sha256": "1c36b971ecafe2b59bca9c6ff7a66bfc0d22d3bc6962c1f6c98b1b23dbddedc9",
+              "width": 16,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 6,
+              "name": "D_TITLE_6023B40",
+              "file": "textures/0d706758b96e7b27fbd68796d6749cae7962bfc63bdfb55419cbd32daf2607a4.png",
+              "sha256": "0d706758b96e7b27fbd68796d6749cae7962bfc63bdfb55419cbd32daf2607a4",
+              "width": 32,
+              "height": 32,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 7,
+              "name": "D_TITLE_6021F10",
+              "file": "textures/a68112c5e5cb3505e752087cd005123dab2fdc8f896440bb4cbfa6ed8ece9e2f.png",
+              "sha256": "a68112c5e5cb3505e752087cd005123dab2fdc8f896440bb4cbfa6ed8ece9e2f",
+              "width": 16,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 8,
+              "name": "D_TITLE_60426E0",
+              "file": "textures/6aab98565c14145ef18de2c1b3d68701922359999a6dde97e20bab9e33698517.png",
+              "sha256": "6aab98565c14145ef18de2c1b3d68701922359999a6dde97e20bab9e33698517",
+              "width": 16,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 9,
+              "name": "D_TITLE_6041CF0",
+              "file": "textures/3baee6931bc9ca523c7f40670cc80fd285c44cc81b5a55a35904e3aac3d7f123.png",
+              "sha256": "3baee6931bc9ca523c7f40670cc80fd285c44cc81b5a55a35904e3aac3d7f123",
+              "width": 32,
+              "height": 32,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 10,
+              "name": "D_TITLE_6028988",
+              "file": "textures/2a9cdd1bfb0456501f9257d5f7f48f743c66b98b638aad98d64a3e5cccbd1b98.png",
+              "sha256": "2a9cdd1bfb0456501f9257d5f7f48f743c66b98b638aad98d64a3e5cccbd1b98",
+              "width": 16,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 11,
+              "name": "D_TITLE_6024340",
+              "file": "textures/8879a0f2c5395e41a87767a424942c6212b61de7935053f4e99f2306dd3573d9.png",
+              "sha256": "8879a0f2c5395e41a87767a424942c6212b61de7935053f4e99f2306dd3573d9",
+              "width": 16,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 12,
+              "name": "D_TITLE_6025FA8",
+              "file": "textures/587d2e4c2e6a699a9d35e3a3fc42669e93504e8823a3f1ebbc03f7523fff5458.png",
+              "sha256": "587d2e4c2e6a699a9d35e3a3fc42669e93504e8823a3f1ebbc03f7523fff5458",
+              "width": 32,
+              "height": 32,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 13,
+              "name": "D_TITLE_6023340",
+              "file": "textures/db47d5d1a1293b3fc916a7519ab8395ff20386fa1ad894ab2e5f9db828ef548d.png",
+              "sha256": "db47d5d1a1293b3fc916a7519ab8395ff20386fa1ad894ab2e5f9db828ef548d",
+              "width": 32,
+              "height": 32,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 14,
+              "name": "D_TITLE_6022B40",
+              "file": "textures/5672d0e85cc7f17474dc7a2e0e503d564a01e8f573ffbff776ae6cb1faadbbe6.png",
+              "sha256": "5672d0e85cc7f17474dc7a2e0e503d564a01e8f573ffbff776ae6cb1faadbbe6",
+              "width": 32,
+              "height": 32,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 15,
+              "name": "D_TITLE_6026D28",
+              "file": "textures/f0dc83e49423f9c2c5b32d3190eff81ee7cc463e92b1a60764101a41c8e6e7d6.png",
+              "sha256": "f0dc83e49423f9c2c5b32d3190eff81ee7cc463e92b1a60764101a41c8e6e7d6",
+              "width": 16,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            }
+          ],
+          "transforms": "Preserved byte-for-byte from the reviewed GLB.",
+          "label": "Title detail"
+        },
+        "on_foot": {
+          "file": "characters/fox/on_foot/body.glb",
+          "sha256": "f727d1be33e7c7f60f8d5ec3c9b2aa82657599df95cfc41c44d44d111be56361",
+          "bytes": 135060,
+          "triangles": 122,
+          "nodes": 20,
+          "meshes": 13,
+          "skins": [],
+          "animations": [
+            {
+              "name": "D_versus_301CCE4",
+              "duration_seconds": 0.03333333507180214,
+              "maximum_samples": 2,
+              "channels": 19
+            },
+            {
+              "name": "D_versus_301CFEC",
+              "duration_seconds": 0.9666666388511658,
+              "maximum_samples": 30,
+              "channels": 19
+            },
+            {
+              "name": "D_versus_301D3DC",
+              "duration_seconds": 0.03333333507180214,
+              "maximum_samples": 2,
+              "channels": 19
+            },
+            {
+              "name": "Run as Krystal",
+              "duration_seconds": 1.9666666984558105,
+              "maximum_samples": 60,
+              "channels": 14
+            },
+            {
+              "name": "Run as Kami",
+              "duration_seconds": 1.9666666984558105,
+              "maximum_samples": 60,
+              "channels": 14
+            },
+            {
+              "name": "Run as Panther",
+              "duration_seconds": 1.9666666984558105,
+              "maximum_samples": 60,
+              "channels": 14
+            },
+            {
+              "name": "Run as Pigma",
+              "duration_seconds": 1.9666666984558105,
+              "maximum_samples": 60,
+              "channels": 14
+            }
+          ],
+          "textures": [
+            {
+              "image_index": 0,
+              "name": "D_versus_3028130",
+              "file": "textures/e2389f71332d001571e07425b11b83c0b489e8c56a4d389944a525d972913a16.png",
+              "sha256": "e2389f71332d001571e07425b11b83c0b489e8c56a4d389944a525d972913a16",
+              "width": 8,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 1,
+              "name": "D_versus_3025C68",
+              "file": "textures/b02c5f30beb6b1c4cd0c94b28a9e57cc0f38cd4580526183b03fba8373c6e6b2.png",
+              "sha256": "b02c5f30beb6b1c4cd0c94b28a9e57cc0f38cd4580526183b03fba8373c6e6b2",
+              "width": 16,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 2,
+              "name": "D_versus_3026A38",
+              "file": "textures/5dc4e5b1b728554176a181caf4b81c58f957ebbbf686c6c3246c0f5476a59817.png",
+              "sha256": "5dc4e5b1b728554176a181caf4b81c58f957ebbbf686c6c3246c0f5476a59817",
+              "width": 8,
+              "height": 8,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 3,
+              "name": "D_versus_30261A0",
+              "file": "textures/5249a247df351533f370bf02e234ebfc16a99e3f2160834cdc584c6583e827b5.png",
+              "sha256": "5249a247df351533f370bf02e234ebfc16a99e3f2160834cdc584c6583e827b5",
+              "width": 8,
+              "height": 8,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 4,
+              "name": "D_versus_300E680",
+              "file": "textures/c50a1146880f7877a152a851e84a23feb623c982aee3639d0ad0e4fe756dabf0.png",
+              "sha256": "c50a1146880f7877a152a851e84a23feb623c982aee3639d0ad0e4fe756dabf0",
+              "width": 16,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 5,
+              "name": "D_versus_300EA80",
+              "file": "textures/005480918ef53853f41263bdbe8d152ff620e72e215981e4829925e67ab610c5.png",
+              "sha256": "005480918ef53853f41263bdbe8d152ff620e72e215981e4829925e67ab610c5",
+              "width": 16,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 6,
+              "name": "D_versus_3028230",
+              "file": "textures/1c03b63515bfa992e6ca35f54f8c4273d5ae0fb341b62c52cbd262f2a3f4adea.png",
+              "sha256": "1c03b63515bfa992e6ca35f54f8c4273d5ae0fb341b62c52cbd262f2a3f4adea",
+              "width": 32,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 7,
+              "name": "D_versus_3026CB8",
+              "file": "textures/922233ac00e9ff60b9f71ab1e70fb628fd517910a64ea69d5ef65ab356723e11.png",
+              "sha256": "922233ac00e9ff60b9f71ab1e70fb628fd517910a64ea69d5ef65ab356723e11",
+              "width": 16,
+              "height": 8,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 8,
+              "name": "D_versus_3026DB8",
+              "file": "textures/cf96edfc967b130d6a77159fa7b70c220abedc3f5c067a512a9924959b14b453.png",
+              "sha256": "cf96edfc967b130d6a77159fa7b70c220abedc3f5c067a512a9924959b14b453",
+              "width": 16,
+              "height": 8,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 9,
+              "name": "D_versus_3026AB8",
+              "file": "textures/917dab7021e4efd8fa7517411858da040d6c9bfe49fb5e33283b76e47ae77d08.png",
+              "sha256": "917dab7021e4efd8fa7517411858da040d6c9bfe49fb5e33283b76e47ae77d08",
+              "width": 8,
+              "height": 8,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 10,
+              "name": "D_versus_3026B38",
+              "file": "textures/90f4661fcd60519df69230f331a78ba5b7f17253296b1bd47cfbc84f0f72e9ce.png",
+              "sha256": "90f4661fcd60519df69230f331a78ba5b7f17253296b1bd47cfbc84f0f72e9ce",
+              "width": 8,
+              "height": 8,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 11,
+              "name": "D_versus_3026BB8",
+              "file": "textures/5e41e137aa918ab92fea85dfaee0abd2cc9588286584aa42827dad54ef31fe7d.png",
+              "sha256": "5e41e137aa918ab92fea85dfaee0abd2cc9588286584aa42827dad54ef31fe7d",
+              "width": 8,
+              "height": 8,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 12,
+              "name": "D_versus_3026C38",
+              "file": "textures/5512106e47bbfba69f45a896469c01e57cb9681b20f33c0667753d0606ece648.png",
+              "sha256": "5512106e47bbfba69f45a896469c01e57cb9681b20f33c0667753d0606ece648",
+              "width": 8,
+              "height": 8,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 13,
+              "name": "D_versus_3026EB8",
+              "file": "textures/0c7e2f3fbc80acbf692519d0c8ba46a7f9a614a9af018d8953e3dc692518a5cd.png",
+              "sha256": "0c7e2f3fbc80acbf692519d0c8ba46a7f9a614a9af018d8953e3dc692518a5cd",
+              "width": 16,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 14,
+              "name": "D_versus_3027268",
+              "file": "textures/4b0614064ae86c97b2dad96c62095472891249430ba1a51ff8428a3f63031afc.png",
+              "sha256": "4b0614064ae86c97b2dad96c62095472891249430ba1a51ff8428a3f63031afc",
+              "width": 32,
+              "height": 32,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 15,
+              "name": "D_versus_301C9B0",
+              "file": "textures/db5a6ff5081f495583231d5f2c39691f7e1c674799f9080e553e66a7e9f0ba04.png",
+              "sha256": "db5a6ff5081f495583231d5f2c39691f7e1c674799f9080e553e66a7e9f0ba04",
+              "width": 16,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            }
+          ],
+          "transforms": "Preserved byte-for-byte from the reviewed GLB.",
+          "label": "On-foot detail"
+        }
+      }
+    },
+    "falco": {
+      "label": "Falco",
+      "variants": {
+        "title": {
+          "file": "characters/falco/title/body.glb",
+          "sha256": "17925926576eefbcb838809fa79e8d71042ca40a2960e10162c3c71463db2093",
+          "bytes": 261768,
+          "triangles": 480,
+          "nodes": 23,
+          "meshes": 16,
+          "skins": [],
+          "animations": [
+            {
+              "name": "aFalcoRunningAnim",
+              "duration_seconds": 1.9666666984558105,
+              "maximum_samples": 60,
+              "channels": 22
+            },
+            {
+              "name": "aFalcoAnim",
+              "duration_seconds": 6.633333206176758,
+              "maximum_samples": 200,
+              "channels": 22
+            },
+            {
+              "name": "Run as Krystal",
+              "duration_seconds": 1.9666666984558105,
+              "maximum_samples": 60,
+              "channels": 16
+            },
+            {
+              "name": "Run as Kami",
+              "duration_seconds": 1.9666666984558105,
+              "maximum_samples": 60,
+              "channels": 16
+            },
+            {
+              "name": "Run as Panther",
+              "duration_seconds": 1.9666666984558105,
+              "maximum_samples": 60,
+              "channels": 16
+            },
+            {
+              "name": "Run as Pigma",
+              "duration_seconds": 1.9666666984558105,
+              "maximum_samples": 60,
+              "channels": 14
+            }
+          ],
+          "textures": [
+            {
+              "image_index": 0,
+              "name": "D_TITLE_60214F8",
+              "file": "textures/1c36b971ecafe2b59bca9c6ff7a66bfc0d22d3bc6962c1f6c98b1b23dbddedc9.png",
+              "sha256": "1c36b971ecafe2b59bca9c6ff7a66bfc0d22d3bc6962c1f6c98b1b23dbddedc9",
+              "width": 16,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 1,
+              "name": "D_TITLE_6025BA8",
+              "file": "textures/69f929e785e637ada3999c7220c7a87a8b841bf210e205d15092fd81dfe28ebd.png",
+              "sha256": "69f929e785e637ada3999c7220c7a87a8b841bf210e205d15092fd81dfe28ebd",
+              "width": 16,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 2,
+              "name": "D_TITLE_60257A8",
+              "file": "textures/a1ac919b4c66a9a61ddcedc4c8005dc8aa18f3581bdcc4d497123299750fc821.png",
+              "sha256": "a1ac919b4c66a9a61ddcedc4c8005dc8aa18f3581bdcc4d497123299750fc821",
+              "width": 16,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 3,
+              "name": "D_TITLE_6023B40",
+              "file": "textures/0d706758b96e7b27fbd68796d6749cae7962bfc63bdfb55419cbd32daf2607a4.png",
+              "sha256": "0d706758b96e7b27fbd68796d6749cae7962bfc63bdfb55419cbd32daf2607a4",
+              "width": 32,
+              "height": 32,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 4,
+              "name": "D_TITLE_6024340",
+              "file": "textures/8879a0f2c5395e41a87767a424942c6212b61de7935053f4e99f2306dd3573d9.png",
+              "sha256": "8879a0f2c5395e41a87767a424942c6212b61de7935053f4e99f2306dd3573d9",
+              "width": 16,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 5,
+              "name": "D_TITLE_6043F68",
+              "file": "textures/b2510efcf754ab40ea9e2d1d8ceaa08f1b9445a7dfc3c9920f99e1c6444cf200.png",
+              "sha256": "b2510efcf754ab40ea9e2d1d8ceaa08f1b9445a7dfc3c9920f99e1c6444cf200",
+              "width": 32,
+              "height": 32,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 6,
+              "name": "D_TITLE_6028988",
+              "file": "textures/2a9cdd1bfb0456501f9257d5f7f48f743c66b98b638aad98d64a3e5cccbd1b98.png",
+              "sha256": "2a9cdd1bfb0456501f9257d5f7f48f743c66b98b638aad98d64a3e5cccbd1b98",
+              "width": 16,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 7,
+              "name": "D_TITLE_6025FA8",
+              "file": "textures/587d2e4c2e6a699a9d35e3a3fc42669e93504e8823a3f1ebbc03f7523fff5458.png",
+              "sha256": "587d2e4c2e6a699a9d35e3a3fc42669e93504e8823a3f1ebbc03f7523fff5458",
+              "width": 32,
+              "height": 32,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 8,
+              "name": "D_TITLE_6028A08",
+              "file": "textures/5ce21567807ce636953763ade90013a67f6dc06c2afb937d7108c66e0d585e18.png",
+              "sha256": "5ce21567807ce636953763ade90013a67f6dc06c2afb937d7108c66e0d585e18",
+              "width": 16,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 9,
+              "name": "D_TITLE_60259A8",
+              "file": "textures/91e5bef8e67bb82471d2aa45d0a5002367005206372cdba7067483952526906c.png",
+              "sha256": "91e5bef8e67bb82471d2aa45d0a5002367005206372cdba7067483952526906c",
+              "width": 16,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 10,
+              "name": "D_TITLE_6025DA8",
+              "file": "textures/bee056b35f47f24b50baa9fce616cb5a4be73a751e1e1549892b2568fb89d881.png",
+              "sha256": "bee056b35f47f24b50baa9fce616cb5a4be73a751e1e1549892b2568fb89d881",
+              "width": 16,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 11,
+              "name": "D_TITLE_6026D28",
+              "file": "textures/f0dc83e49423f9c2c5b32d3190eff81ee7cc463e92b1a60764101a41c8e6e7d6.png",
+              "sha256": "f0dc83e49423f9c2c5b32d3190eff81ee7cc463e92b1a60764101a41c8e6e7d6",
+              "width": 16,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 12,
+              "name": "D_TITLE_6023340",
+              "file": "textures/db47d5d1a1293b3fc916a7519ab8395ff20386fa1ad894ab2e5f9db828ef548d.png",
+              "sha256": "db47d5d1a1293b3fc916a7519ab8395ff20386fa1ad894ab2e5f9db828ef548d",
+              "width": 32,
+              "height": 32,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 13,
+              "name": "D_TITLE_6021F10",
+              "file": "textures/a68112c5e5cb3505e752087cd005123dab2fdc8f896440bb4cbfa6ed8ece9e2f.png",
+              "sha256": "a68112c5e5cb3505e752087cd005123dab2fdc8f896440bb4cbfa6ed8ece9e2f",
+              "width": 16,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            }
+          ],
+          "transforms": "Preserved byte-for-byte from the reviewed GLB.",
+          "label": "Title detail"
+        },
+        "on_foot": {
+          "file": "characters/falco/on_foot/body.glb",
+          "sha256": "dbbc2c0649a665cbb7ca8023265f2ff8a9d059e3b8043aadbc4afeabbb49ae22",
+          "bytes": 128812,
+          "triangles": 112,
+          "nodes": 20,
+          "meshes": 13,
+          "skins": [],
+          "animations": [
+            {
+              "name": "D_versus_301C0A4",
+              "duration_seconds": 0.03333333507180214,
+              "maximum_samples": 2,
+              "channels": 19
+            },
+            {
+              "name": "D_versus_301C3A8",
+              "duration_seconds": 0.9666666388511658,
+              "maximum_samples": 30,
+              "channels": 19
+            },
+            {
+              "name": "D_versus_301C79C",
+              "duration_seconds": 0.03333333507180214,
+              "maximum_samples": 2,
+              "channels": 19
+            },
+            {
+              "name": "Run as Krystal",
+              "duration_seconds": 1.9666666984558105,
+              "maximum_samples": 60,
+              "channels": 14
+            },
+            {
+              "name": "Run as Kami",
+              "duration_seconds": 1.9666666984558105,
+              "maximum_samples": 60,
+              "channels": 14
+            },
+            {
+              "name": "Run as Panther",
+              "duration_seconds": 1.9666666984558105,
+              "maximum_samples": 60,
+              "channels": 14
+            },
+            {
+              "name": "Run as Pigma",
+              "duration_seconds": 1.9666666984558105,
+              "maximum_samples": 60,
+              "channels": 14
+            }
+          ],
+          "textures": [
+            {
+              "image_index": 0,
+              "name": "D_versus_3028CE0",
+              "file": "textures/58acb9352e99bee7de699d536bea06be7dfa51e90543dd55cfa666605f68efab.png",
+              "sha256": "58acb9352e99bee7de699d536bea06be7dfa51e90543dd55cfa666605f68efab",
+              "width": 16,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 1,
+              "name": "D_versus_3025C68",
+              "file": "textures/b02c5f30beb6b1c4cd0c94b28a9e57cc0f38cd4580526183b03fba8373c6e6b2.png",
+              "sha256": "b02c5f30beb6b1c4cd0c94b28a9e57cc0f38cd4580526183b03fba8373c6e6b2",
+              "width": 16,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 2,
+              "name": "D_versus_3026A38",
+              "file": "textures/5dc4e5b1b728554176a181caf4b81c58f957ebbbf686c6c3246c0f5476a59817.png",
+              "sha256": "5dc4e5b1b728554176a181caf4b81c58f957ebbbf686c6c3246c0f5476a59817",
+              "width": 8,
+              "height": 8,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 3,
+              "name": "D_versus_3028C60",
+              "file": "textures/6c0cd6cd5212e741d36900a69c0d9536095789edd6c72cd2a73e812d96e32db9.png",
+              "sha256": "6c0cd6cd5212e741d36900a69c0d9536095789edd6c72cd2a73e812d96e32db9",
+              "width": 8,
+              "height": 8,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 4,
+              "name": "D_versus_300E280",
+              "file": "textures/c7510a2ca2ed870ac89f1f260f24862166661dac9819b734675ce3615b61d09d.png",
+              "sha256": "c7510a2ca2ed870ac89f1f260f24862166661dac9819b734675ce3615b61d09d",
+              "width": 32,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 5,
+              "name": "D_versus_300E680",
+              "file": "textures/c50a1146880f7877a152a851e84a23feb623c982aee3639d0ad0e4fe756dabf0.png",
+              "sha256": "c50a1146880f7877a152a851e84a23feb623c982aee3639d0ad0e4fe756dabf0",
+              "width": 16,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 6,
+              "name": "D_versus_300EA80",
+              "file": "textures/005480918ef53853f41263bdbe8d152ff620e72e215981e4829925e67ab610c5.png",
+              "sha256": "005480918ef53853f41263bdbe8d152ff620e72e215981e4829925e67ab610c5",
+              "width": 16,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 7,
+              "name": "D_versus_3029160",
+              "file": "textures/617931edc25a4f45c16c32a8302c40a70e62b43cdf6dee476669029a52cac822.png",
+              "sha256": "617931edc25a4f45c16c32a8302c40a70e62b43cdf6dee476669029a52cac822",
+              "width": 8,
+              "height": 8,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 8,
+              "name": "D_versus_3029388",
+              "file": "textures/9935351d59ec0aee5739be051f0d287e66ec1e8700cc5d7b93adb32093aa0536.png",
+              "sha256": "9935351d59ec0aee5739be051f0d287e66ec1e8700cc5d7b93adb32093aa0536",
+              "width": 32,
+              "height": 32,
+              "roles": [
+                "baseColorTexture"
+              ]
+            }
+          ],
+          "transforms": "Preserved byte-for-byte from the reviewed GLB.",
+          "label": "On-foot detail"
+        }
+      }
+    },
+    "peppy": {
+      "label": "Peppy",
+      "variants": {
+        "title": {
+          "file": "characters/peppy/title/body.glb",
+          "sha256": "ce22a3f891e2bba1c634591eaf83a8246a0ba4147406a4f48389f74f6156b867",
+          "bytes": 265068,
+          "triangles": 507,
+          "nodes": 23,
+          "meshes": 16,
+          "skins": [],
+          "animations": [
+            {
+              "name": "aPeppyRunningAnim",
+              "duration_seconds": 1.9666666984558105,
+              "maximum_samples": 60,
+              "channels": 22
+            },
+            {
+              "name": "aPeppyAnim",
+              "duration_seconds": 6.633333206176758,
+              "maximum_samples": 200,
+              "channels": 22
+            },
+            {
+              "name": "Run as Krystal",
+              "duration_seconds": 1.9666666984558105,
+              "maximum_samples": 60,
+              "channels": 16
+            },
+            {
+              "name": "Run as Kami",
+              "duration_seconds": 1.9666666984558105,
+              "maximum_samples": 60,
+              "channels": 16
+            },
+            {
+              "name": "Run as Panther",
+              "duration_seconds": 1.9666666984558105,
+              "maximum_samples": 60,
+              "channels": 16
+            },
+            {
+              "name": "Run as Pigma",
+              "duration_seconds": 1.9666666984558105,
+              "maximum_samples": 60,
+              "channels": 14
+            }
+          ],
+          "textures": [
+            {
+              "image_index": 0,
+              "name": "D_TITLE_602DF30",
+              "file": "textures/68bb1658be041e5b89204f06759a6950cfde509c32fb0a34e3a248934d4751c4.png",
+              "sha256": "68bb1658be041e5b89204f06759a6950cfde509c32fb0a34e3a248934d4751c4",
+              "width": 16,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 1,
+              "name": "D_TITLE_602DB30",
+              "file": "textures/10d6df281b86b7da4c818871526ad1586c17b39826d5a25c9f689538fd70e908.png",
+              "sha256": "10d6df281b86b7da4c818871526ad1586c17b39826d5a25c9f689538fd70e908",
+              "width": 16,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 2,
+              "name": "D_TITLE_601EA00",
+              "file": "textures/4fa582c77f6c1fa438fd492af386618a145985ff522cf1df89534ad63fb3c887.png",
+              "sha256": "4fa582c77f6c1fa438fd492af386618a145985ff522cf1df89534ad63fb3c887",
+              "width": 32,
+              "height": 32,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 3,
+              "name": "D_TITLE_601F200",
+              "file": "textures/0d424441144093bd4f80a10f49bba823b2747e9d28e869c5ecc703cf7d7a25d1.png",
+              "sha256": "0d424441144093bd4f80a10f49bba823b2747e9d28e869c5ecc703cf7d7a25d1",
+              "width": 16,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 4,
+              "name": "D_TITLE_601F400",
+              "file": "textures/ecd81b073fb0e58a768c93bba2a81767bc3f9becb70333a872d6daf8cbb76f9d.png",
+              "sha256": "ecd81b073fb0e58a768c93bba2a81767bc3f9becb70333a872d6daf8cbb76f9d",
+              "width": 16,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 5,
+              "name": "D_TITLE_6023B40",
+              "file": "textures/0d706758b96e7b27fbd68796d6749cae7962bfc63bdfb55419cbd32daf2607a4.png",
+              "sha256": "0d706758b96e7b27fbd68796d6749cae7962bfc63bdfb55419cbd32daf2607a4",
+              "width": 32,
+              "height": 32,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 6,
+              "name": "D_TITLE_6024340",
+              "file": "textures/8879a0f2c5395e41a87767a424942c6212b61de7935053f4e99f2306dd3573d9.png",
+              "sha256": "8879a0f2c5395e41a87767a424942c6212b61de7935053f4e99f2306dd3573d9",
+              "width": 16,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 7,
+              "name": "D_TITLE_6021D10",
+              "file": "textures/e5eabe6b7806affe6f694e0733df25b15d4e3d1d7927d0a0ea57f4d55f32867b.png",
+              "sha256": "e5eabe6b7806affe6f694e0733df25b15d4e3d1d7927d0a0ea57f4d55f32867b",
+              "width": 16,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 8,
+              "name": "D_TITLE_6028988",
+              "file": "textures/2a9cdd1bfb0456501f9257d5f7f48f743c66b98b638aad98d64a3e5cccbd1b98.png",
+              "sha256": "2a9cdd1bfb0456501f9257d5f7f48f743c66b98b638aad98d64a3e5cccbd1b98",
+              "width": 16,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 9,
+              "name": "D_TITLE_6025FA8",
+              "file": "textures/587d2e4c2e6a699a9d35e3a3fc42669e93504e8823a3f1ebbc03f7523fff5458.png",
+              "sha256": "587d2e4c2e6a699a9d35e3a3fc42669e93504e8823a3f1ebbc03f7523fff5458",
+              "width": 32,
+              "height": 32,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 10,
+              "name": "D_TITLE_602DD30",
+              "file": "textures/7577935bb728a32c5fa8ed92d6e8a39a780ed1a62ae5088c7273894424bdd87f.png",
+              "sha256": "7577935bb728a32c5fa8ed92d6e8a39a780ed1a62ae5088c7273894424bdd87f",
+              "width": 16,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 11,
+              "name": "D_TITLE_602D930",
+              "file": "textures/2b0308a664323003ea52600121d3d1c14fd7d8636411d7bfe8e69cb2494d94ab.png",
+              "sha256": "2b0308a664323003ea52600121d3d1c14fd7d8636411d7bfe8e69cb2494d94ab",
+              "width": 16,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 12,
+              "name": "D_TITLE_6021F10",
+              "file": "textures/a68112c5e5cb3505e752087cd005123dab2fdc8f896440bb4cbfa6ed8ece9e2f.png",
+              "sha256": "a68112c5e5cb3505e752087cd005123dab2fdc8f896440bb4cbfa6ed8ece9e2f",
+              "width": 16,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 13,
+              "name": "D_TITLE_6023340",
+              "file": "textures/db47d5d1a1293b3fc916a7519ab8395ff20386fa1ad894ab2e5f9db828ef548d.png",
+              "sha256": "db47d5d1a1293b3fc916a7519ab8395ff20386fa1ad894ab2e5f9db828ef548d",
+              "width": 32,
+              "height": 32,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 14,
+              "name": "D_TITLE_6026D28",
+              "file": "textures/f0dc83e49423f9c2c5b32d3190eff81ee7cc463e92b1a60764101a41c8e6e7d6.png",
+              "sha256": "f0dc83e49423f9c2c5b32d3190eff81ee7cc463e92b1a60764101a41c8e6e7d6",
+              "width": 16,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            }
+          ],
+          "transforms": "Preserved byte-for-byte from the reviewed GLB.",
+          "label": "Title detail"
+        },
+        "on_foot": {
+          "file": "characters/peppy/on_foot/body.glb",
+          "sha256": "08eb0d374f3a9b5d855dabaf2d6b11ff007aa10219183792162d6da835dc6b57",
+          "bytes": 161504,
+          "triangles": 124,
+          "nodes": 25,
+          "meshes": 16,
+          "skins": [],
+          "animations": [
+            {
+              "name": "D_versus_301D568",
+              "duration_seconds": 0.9666666388511658,
+              "maximum_samples": 30,
+              "channels": 24
+            },
+            {
+              "name": "D_versus_301D888",
+              "duration_seconds": 0.9666666388511658,
+              "maximum_samples": 30,
+              "channels": 24
+            },
+            {
+              "name": "D_versus_301DD6C",
+              "duration_seconds": 0.9666666388511658,
+              "maximum_samples": 30,
+              "channels": 24
+            },
+            {
+              "name": "Run as Krystal",
+              "duration_seconds": 1.9666666984558105,
+              "maximum_samples": 60,
+              "channels": 14
+            },
+            {
+              "name": "Run as Kami",
+              "duration_seconds": 1.9666666984558105,
+              "maximum_samples": 60,
+              "channels": 14
+            },
+            {
+              "name": "Run as Panther",
+              "duration_seconds": 1.9666666984558105,
+              "maximum_samples": 60,
+              "channels": 14
+            },
+            {
+              "name": "Run as Pigma",
+              "duration_seconds": 1.9666666984558105,
+              "maximum_samples": 60,
+              "channels": 14
+            }
+          ],
+          "textures": [
+            {
+              "image_index": 0,
+              "name": "D_versus_30246E8",
+              "file": "textures/bc8882072ea67b1b698957c433ef7ce868771b720d3e2a631231b660f476e10b.png",
+              "sha256": "bc8882072ea67b1b698957c433ef7ce868771b720d3e2a631231b660f476e10b",
+              "width": 8,
+              "height": 8,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 1,
+              "name": "D_versus_3026B38",
+              "file": "textures/90f4661fcd60519df69230f331a78ba5b7f17253296b1bd47cfbc84f0f72e9ce.png",
+              "sha256": "90f4661fcd60519df69230f331a78ba5b7f17253296b1bd47cfbc84f0f72e9ce",
+              "width": 8,
+              "height": 8,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 2,
+              "name": "D_versus_3025C68",
+              "file": "textures/b02c5f30beb6b1c4cd0c94b28a9e57cc0f38cd4580526183b03fba8373c6e6b2.png",
+              "sha256": "b02c5f30beb6b1c4cd0c94b28a9e57cc0f38cd4580526183b03fba8373c6e6b2",
+              "width": 16,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 3,
+              "name": "D_versus_3026A38",
+              "file": "textures/5dc4e5b1b728554176a181caf4b81c58f957ebbbf686c6c3246c0f5476a59817.png",
+              "sha256": "5dc4e5b1b728554176a181caf4b81c58f957ebbbf686c6c3246c0f5476a59817",
+              "width": 8,
+              "height": 8,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 4,
+              "name": "D_versus_30242D0",
+              "file": "textures/fea85738144b07f1c6974f694d41675b2414ba2bb9a5a1ae49fa1c680467dc21.png",
+              "sha256": "fea85738144b07f1c6974f694d41675b2414ba2bb9a5a1ae49fa1c680467dc21",
+              "width": 8,
+              "height": 8,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 5,
+              "name": "D_versus_300E280",
+              "file": "textures/c7510a2ca2ed870ac89f1f260f24862166661dac9819b734675ce3615b61d09d.png",
+              "sha256": "c7510a2ca2ed870ac89f1f260f24862166661dac9819b734675ce3615b61d09d",
+              "width": 32,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 6,
+              "name": "D_versus_300E680",
+              "file": "textures/c50a1146880f7877a152a851e84a23feb623c982aee3639d0ad0e4fe756dabf0.png",
+              "sha256": "c50a1146880f7877a152a851e84a23feb623c982aee3639d0ad0e4fe756dabf0",
+              "width": 16,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 7,
+              "name": "D_versus_300EA80",
+              "file": "textures/005480918ef53853f41263bdbe8d152ff620e72e215981e4829925e67ab610c5.png",
+              "sha256": "005480918ef53853f41263bdbe8d152ff620e72e215981e4829925e67ab610c5",
+              "width": 16,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 8,
+              "name": "D_versus_3026AB8",
+              "file": "textures/917dab7021e4efd8fa7517411858da040d6c9bfe49fb5e33283b76e47ae77d08.png",
+              "sha256": "917dab7021e4efd8fa7517411858da040d6c9bfe49fb5e33283b76e47ae77d08",
+              "width": 8,
+              "height": 8,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 9,
+              "name": "D_versus_3024C30",
+              "file": "textures/222a490a4aa5481c83e2a8b4e5f5c24cf54ae706b0f3d00666f64c9f0555007a.png",
+              "sha256": "222a490a4aa5481c83e2a8b4e5f5c24cf54ae706b0f3d00666f64c9f0555007a",
+              "width": 16,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 10,
+              "name": "D_versus_3025938",
+              "file": "textures/fea85738144b07f1c6974f694d41675b2414ba2bb9a5a1ae49fa1c680467dc21.png",
+              "sha256": "fea85738144b07f1c6974f694d41675b2414ba2bb9a5a1ae49fa1c680467dc21",
+              "width": 8,
+              "height": 8,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 11,
+              "name": "D_versus_3025138",
+              "file": "textures/115437287713b4a128fbe105348ad4eb4ae94d1f8b656a4960dc911d4276a675.png",
+              "sha256": "115437287713b4a128fbe105348ad4eb4ae94d1f8b656a4960dc911d4276a675",
+              "width": 32,
+              "height": 32,
+              "roles": [
+                "baseColorTexture"
+              ]
+            }
+          ],
+          "transforms": "Preserved byte-for-byte from the reviewed GLB.",
+          "label": "On-foot detail"
+        }
+      }
+    },
+    "slippy": {
+      "label": "Slippy",
+      "variants": {
+        "title": {
+          "file": "characters/slippy/title/body.glb",
+          "sha256": "96f672fe2a405353feb135b46b1f5f99746c152a82bce06225d32a5b3a527381",
+          "bytes": 239156,
+          "triangles": 453,
+          "nodes": 21,
+          "meshes": 14,
+          "skins": [],
+          "animations": [
+            {
+              "name": "aSlippyRunningAnim",
+              "duration_seconds": 1.9666666984558105,
+              "maximum_samples": 60,
+              "channels": 20
+            },
+            {
+              "name": "aSlippyAnim",
+              "duration_seconds": 6.633333206176758,
+              "maximum_samples": 200,
+              "channels": 20
+            },
+            {
+              "name": "Run as Krystal",
+              "duration_seconds": 1.9666666984558105,
+              "maximum_samples": 60,
+              "channels": 14
+            },
+            {
+              "name": "Run as Kami",
+              "duration_seconds": 1.9666666984558105,
+              "maximum_samples": 60,
+              "channels": 14
+            },
+            {
+              "name": "Run as Panther",
+              "duration_seconds": 1.9666666984558105,
+              "maximum_samples": 60,
+              "channels": 14
+            },
+            {
+              "name": "Run as Pigma",
+              "duration_seconds": 1.9666666984558105,
+              "maximum_samples": 60,
+              "channels": 14
+            }
+          ],
+          "textures": [
+            {
+              "image_index": 0,
+              "name": "D_TITLE_602DB30",
+              "file": "textures/10d6df281b86b7da4c818871526ad1586c17b39826d5a25c9f689538fd70e908.png",
+              "sha256": "10d6df281b86b7da4c818871526ad1586c17b39826d5a25c9f689538fd70e908",
+              "width": 16,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 1,
+              "name": "D_TITLE_6028A08",
+              "file": "textures/5ce21567807ce636953763ade90013a67f6dc06c2afb937d7108c66e0d585e18.png",
+              "sha256": "5ce21567807ce636953763ade90013a67f6dc06c2afb937d7108c66e0d585e18",
+              "width": 16,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 2,
+              "name": "D_TITLE_6023B40",
+              "file": "textures/0d706758b96e7b27fbd68796d6749cae7962bfc63bdfb55419cbd32daf2607a4.png",
+              "sha256": "0d706758b96e7b27fbd68796d6749cae7962bfc63bdfb55419cbd32daf2607a4",
+              "width": 32,
+              "height": 32,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 3,
+              "name": "D_TITLE_6028788",
+              "file": "textures/88e8895ac90792e209621da93cd97bf157e0cd82fc7227f774f6316640267ebf.png",
+              "sha256": "88e8895ac90792e209621da93cd97bf157e0cd82fc7227f774f6316640267ebf",
+              "width": 16,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 4,
+              "name": "D_TITLE_6024340",
+              "file": "textures/8879a0f2c5395e41a87767a424942c6212b61de7935053f4e99f2306dd3573d9.png",
+              "sha256": "8879a0f2c5395e41a87767a424942c6212b61de7935053f4e99f2306dd3573d9",
+              "width": 16,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 5,
+              "name": "D_TITLE_6026F28",
+              "file": "textures/a5152292e6e80787d8cf4e63341bb0d8656a67d42a65c0540859dbf4a88a82b4.png",
+              "sha256": "a5152292e6e80787d8cf4e63341bb0d8656a67d42a65c0540859dbf4a88a82b4",
+              "width": 16,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 6,
+              "name": "D_TITLE_6024340",
+              "file": "textures/8879a0f2c5395e41a87767a424942c6212b61de7935053f4e99f2306dd3573d9.png",
+              "sha256": "8879a0f2c5395e41a87767a424942c6212b61de7935053f4e99f2306dd3573d9",
+              "width": 16,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 7,
+              "name": "D_TITLE_6028988",
+              "file": "textures/2a9cdd1bfb0456501f9257d5f7f48f743c66b98b638aad98d64a3e5cccbd1b98.png",
+              "sha256": "2a9cdd1bfb0456501f9257d5f7f48f743c66b98b638aad98d64a3e5cccbd1b98",
+              "width": 16,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 8,
+              "name": "D_TITLE_6028C08",
+              "file": "textures/7287669f638565b3b2107b3ced7a544d904eb749e9bf6f0c25c7c36716b8c3ea.png",
+              "sha256": "7287669f638565b3b2107b3ced7a544d904eb749e9bf6f0c25c7c36716b8c3ea",
+              "width": 32,
+              "height": 32,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 9,
+              "name": "D_TITLE_6028508",
+              "file": "textures/2c35c5f0d0e139ea4ff297be9e8f663b92e61f044873d08cbcc45f06570f8027.png",
+              "sha256": "2c35c5f0d0e139ea4ff297be9e8f663b92e61f044873d08cbcc45f06570f8027",
+              "width": 16,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 10,
+              "name": "D_TITLE_6028708",
+              "file": "textures/3acd975e77dd1e70aa40da44244ad04d735032179f68cbc8faa59b093068f903.png",
+              "sha256": "3acd975e77dd1e70aa40da44244ad04d735032179f68cbc8faa59b093068f903",
+              "width": 8,
+              "height": 8,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 11,
+              "name": "D_TITLE_6023340",
+              "file": "textures/db47d5d1a1293b3fc916a7519ab8395ff20386fa1ad894ab2e5f9db828ef548d.png",
+              "sha256": "db47d5d1a1293b3fc916a7519ab8395ff20386fa1ad894ab2e5f9db828ef548d",
+              "width": 32,
+              "height": 32,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 12,
+              "name": "D_TITLE_6026D28",
+              "file": "textures/f0dc83e49423f9c2c5b32d3190eff81ee7cc463e92b1a60764101a41c8e6e7d6.png",
+              "sha256": "f0dc83e49423f9c2c5b32d3190eff81ee7cc463e92b1a60764101a41c8e6e7d6",
+              "width": 16,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            }
+          ],
+          "transforms": "Preserved byte-for-byte from the reviewed GLB.",
+          "label": "Title detail"
+        },
+        "on_foot": {
+          "file": "characters/slippy/on_foot/body.glb",
+          "sha256": "0e2277607f7574ce6add6dde2ab4f9562ff4b2b60c05a57ecc8fade5e22c6866",
+          "bytes": 138500,
+          "triangles": 108,
+          "nodes": 19,
+          "meshes": 12,
+          "skins": [],
+          "animations": [
+            {
+              "name": "D_versus_301DEA4",
+              "duration_seconds": 0.9666666388511658,
+              "maximum_samples": 30,
+              "channels": 18
+            },
+            {
+              "name": "D_versus_301E19C",
+              "duration_seconds": 0.9666666388511658,
+              "maximum_samples": 30,
+              "channels": 18
+            },
+            {
+              "name": "D_versus_301E560",
+              "duration_seconds": 0.9666666388511658,
+              "maximum_samples": 30,
+              "channels": 18
+            },
+            {
+              "name": "Run as Krystal",
+              "duration_seconds": 1.9666666984558105,
+              "maximum_samples": 60,
+              "channels": 13
+            },
+            {
+              "name": "Run as Kami",
+              "duration_seconds": 1.9666666984558105,
+              "maximum_samples": 60,
+              "channels": 13
+            },
+            {
+              "name": "Run as Panther",
+              "duration_seconds": 1.9666666984558105,
+              "maximum_samples": 60,
+              "channels": 13
+            },
+            {
+              "name": "Run as Pigma",
+              "duration_seconds": 1.9666666984558105,
+              "maximum_samples": 60,
+              "channels": 13
+            }
+          ],
+          "textures": [
+            {
+              "image_index": 0,
+              "name": "D_versus_3026A38",
+              "file": "textures/5dc4e5b1b728554176a181caf4b81c58f957ebbbf686c6c3246c0f5476a59817.png",
+              "sha256": "5dc4e5b1b728554176a181caf4b81c58f957ebbbf686c6c3246c0f5476a59817",
+              "width": 8,
+              "height": 8,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 1,
+              "name": "D_versus_30226D0",
+              "file": "textures/814d6f88421b0c79813381b46ffa454ec66687bb87fccd8c31a0f296243561eb.png",
+              "sha256": "814d6f88421b0c79813381b46ffa454ec66687bb87fccd8c31a0f296243561eb",
+              "width": 8,
+              "height": 8,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 2,
+              "name": "D_versus_3023F68",
+              "file": "textures/8acd897e8c142e51411ab3a3430807ad78749702b580a0dd31c5eca7a4a47421.png",
+              "sha256": "8acd897e8c142e51411ab3a3430807ad78749702b580a0dd31c5eca7a4a47421",
+              "width": 8,
+              "height": 8,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 3,
+              "name": "D_versus_3025C68",
+              "file": "textures/b02c5f30beb6b1c4cd0c94b28a9e57cc0f38cd4580526183b03fba8373c6e6b2.png",
+              "sha256": "b02c5f30beb6b1c4cd0c94b28a9e57cc0f38cd4580526183b03fba8373c6e6b2",
+              "width": 16,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 4,
+              "name": "D_versus_300E280",
+              "file": "textures/c7510a2ca2ed870ac89f1f260f24862166661dac9819b734675ce3615b61d09d.png",
+              "sha256": "c7510a2ca2ed870ac89f1f260f24862166661dac9819b734675ce3615b61d09d",
+              "width": 32,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 5,
+              "name": "D_versus_300E680",
+              "file": "textures/c50a1146880f7877a152a851e84a23feb623c982aee3639d0ad0e4fe756dabf0.png",
+              "sha256": "c50a1146880f7877a152a851e84a23feb623c982aee3639d0ad0e4fe756dabf0",
+              "width": 16,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 6,
+              "name": "D_versus_300EA80",
+              "file": "textures/005480918ef53853f41263bdbe8d152ff620e72e215981e4829925e67ab610c5.png",
+              "sha256": "005480918ef53853f41263bdbe8d152ff620e72e215981e4829925e67ab610c5",
+              "width": 16,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 7,
+              "name": "D_versus_3026AB8",
+              "file": "textures/917dab7021e4efd8fa7517411858da040d6c9bfe49fb5e33283b76e47ae77d08.png",
+              "sha256": "917dab7021e4efd8fa7517411858da040d6c9bfe49fb5e33283b76e47ae77d08",
+              "width": 8,
+              "height": 8,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 8,
+              "name": "D_versus_3022DE0",
+              "file": "textures/b201e2de7fd1a6eee7faf6b18a27ff99e0816f951b5d826f2c0b8436e0b60320.png",
+              "sha256": "b201e2de7fd1a6eee7faf6b18a27ff99e0816f951b5d826f2c0b8436e0b60320",
+              "width": 8,
+              "height": 8,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 9,
+              "name": "D_versus_3022E60",
+              "file": "textures/69a80d9fb759c55c206bacc1804a850637991d35bb3c15e62b716a3fb8f2582a.png",
+              "sha256": "69a80d9fb759c55c206bacc1804a850637991d35bb3c15e62b716a3fb8f2582a",
+              "width": 16,
+              "height": 16,
+              "roles": [
+                "baseColorTexture"
+              ]
+            },
+            {
+              "image_index": 10,
+              "name": "D_versus_3023238",
+              "file": "textures/2e571f77f5da9cc495ce1caf137783e57433cef5f39336a70daa35c60953d7f9.png",
+              "sha256": "2e571f77f5da9cc495ce1caf137783e57433cef5f39336a70daa35c60953d7f9",
+              "width": 32,
+              "height": 32,
+              "roles": [
+                "baseColorTexture"
+              ]
+            }
+          ],
+          "transforms": "Preserved byte-for-byte from the reviewed GLB.",
+          "label": "On-foot detail"
+        }
+      }
+    }
+  },
+  "pilot_heads": {
+    "wolf": {
+      "file": "heads/wolf/head.glb",
+      "sha256": "442e3ff78bc87f57e6030089e4d6f5d11f0d38415bdc7bb213e452cf1568ea66",
+      "bytes": 33832,
+      "triangles": 225,
+      "nodes": 2,
+      "meshes": 1,
+      "skins": [],
+      "animations": [
+        {
+          "name": "Pilot idle",
+          "duration_seconds": 6.0,
+          "maximum_samples": 5,
+          "channels": 1
+        },
+        {
+          "name": "Look around",
+          "duration_seconds": 6.0,
+          "maximum_samples": 5,
+          "channels": 1
+        }
+      ],
+      "textures": [
+        {
+          "image_index": 0,
+          "name": "ast_title_2DF30_mouth",
+          "file": "textures/68bb1658be041e5b89204f06759a6950cfde509c32fb0a34e3a248934d4751c4.png",
+          "sha256": "68bb1658be041e5b89204f06759a6950cfde509c32fb0a34e3a248934d4751c4",
+          "width": 16,
+          "height": 16,
+          "roles": [
+            "baseColorTexture"
+          ]
+        },
+        {
+          "image_index": 1,
+          "name": "ast_title_2DB30_fur",
+          "file": "textures/927ce3456b44031b9afb8f3445b8076c65a454e21a57e2efab7f943ffba9ee9b.png",
+          "sha256": "927ce3456b44031b9afb8f3445b8076c65a454e21a57e2efab7f943ffba9ee9b",
+          "width": 16,
+          "height": 16,
+          "roles": [
+            "baseColorTexture"
+          ]
+        },
+        {
+          "image_index": 2,
+          "name": "ast_title_214F8_fur",
+          "file": "textures/34424610318cfaf6c4ba86ca22cd178137df701005461e29158a4ee9235d3398.png",
+          "sha256": "34424610318cfaf6c4ba86ca22cd178137df701005461e29158a4ee9235d3398",
+          "width": 16,
+          "height": 16,
+          "roles": [
+            "baseColorTexture"
+          ]
+        },
+        {
+          "image_index": 3,
+          "name": "ast_title_28988_mouth",
+          "file": "textures/2a9cdd1bfb0456501f9257d5f7f48f743c66b98b638aad98d64a3e5cccbd1b98.png",
+          "sha256": "2a9cdd1bfb0456501f9257d5f7f48f743c66b98b638aad98d64a3e5cccbd1b98",
+          "width": 16,
+          "height": 16,
+          "roles": [
+            "baseColorTexture"
+          ]
+        },
+        {
+          "image_index": 4,
+          "name": "ast_title_24340_fur",
+          "file": "textures/3739284e997525abdd20925fcd46d4322e97e371c6e29a4e31235769b7d4f08f.png",
+          "sha256": "3739284e997525abdd20925fcd46d4322e97e371c6e29a4e31235769b7d4f08f",
+          "width": 16,
+          "height": 16,
+          "roles": [
+            "baseColorTexture"
+          ]
+        },
+        {
+          "image_index": 5,
+          "name": "ast_title_25FA8_eye",
+          "file": "textures/ff6d8a889ed8ea4e6dfe723ee10ae42bcf376e876e2f8463215438a274c21924.png",
+          "sha256": "ff6d8a889ed8ea4e6dfe723ee10ae42bcf376e876e2f8463215438a274c21924",
+          "width": 32,
+          "height": 32,
+          "roles": [
+            "baseColorTexture"
+          ]
+        },
+        {
+          "image_index": 6,
+          "name": "image_6",
+          "file": "textures/c877b1b7dd9d57271cb5f20e86989ed8f650ddbadca23c5009c3290a67753d94.png",
+          "sha256": "c877b1b7dd9d57271cb5f20e86989ed8f650ddbadca23c5009c3290a67753d94",
+          "width": 16,
+          "height": 16,
+          "roles": [
+            "baseColorTexture"
+          ]
+        }
+      ],
+      "transforms": "Preserved byte-for-byte from the reviewed GLB."
+    },
+    "krystal": {
+      "file": "heads/krystal/head.glb",
+      "sha256": "98520debe8002ffb520cd23000fb5410ec661164776160d38962bd7606eb15d5",
+      "bytes": 71412,
+      "triangles": 520,
+      "nodes": 2,
+      "meshes": 1,
+      "skins": [],
+      "animations": [
+        {
+          "name": "Pilot idle",
+          "duration_seconds": 6.0,
+          "maximum_samples": 5,
+          "channels": 1
+        },
+        {
+          "name": "Look around",
+          "duration_seconds": 6.0,
+          "maximum_samples": 5,
+          "channels": 1
+        }
+      ],
+      "textures": [
+        {
+          "image_index": 0,
+          "name": "Krystal_D_TITLE_602DF30",
+          "file": "textures/c9282879c799932a862362a6944e14131c593b57b4990486ee50ff99d5d32e84.png",
+          "sha256": "c9282879c799932a862362a6944e14131c593b57b4990486ee50ff99d5d32e84",
+          "width": 16,
+          "height": 16,
+          "roles": [
+            "baseColorTexture"
+          ]
+        },
+        {
+          "image_index": 1,
+          "name": "Krystal_D_TITLE_602DB30",
+          "file": "textures/f1b05c859a1e18d11f5b4634c778062996acaed85783ecc67e950e5cc4a6cacb.png",
+          "sha256": "f1b05c859a1e18d11f5b4634c778062996acaed85783ecc67e950e5cc4a6cacb",
+          "width": 16,
+          "height": 16,
+          "roles": [
+            "baseColorTexture"
+          ]
+        },
+        {
+          "image_index": 2,
+          "name": "Krystal_D_TITLE_60214F8",
+          "file": "textures/59700bcc9d7536c0bc582fdbbf461e4efcd164c460d5eb3a6a8f0a6e2f9088d1.png",
+          "sha256": "59700bcc9d7536c0bc582fdbbf461e4efcd164c460d5eb3a6a8f0a6e2f9088d1",
+          "width": 16,
+          "height": 16,
+          "roles": [
+            "baseColorTexture"
+          ]
+        },
+        {
+          "image_index": 3,
+          "name": "Krystal_D_TITLE_6028988",
+          "file": "textures/b7e4bbdc0cad93309dcd0312a36f7141685129f4c14d84923f93a50cc5e7f7cf.png",
+          "sha256": "b7e4bbdc0cad93309dcd0312a36f7141685129f4c14d84923f93a50cc5e7f7cf",
+          "width": 16,
+          "height": 16,
+          "roles": [
+            "baseColorTexture"
+          ]
+        },
+        {
+          "image_index": 4,
+          "name": "Krystal_D_TITLE_6024340",
+          "file": "textures/48530f4a0a3821deb6ae2cbafc30043dc9475050d3b8337e979c058f9ef8d5f6.png",
+          "sha256": "48530f4a0a3821deb6ae2cbafc30043dc9475050d3b8337e979c058f9ef8d5f6",
+          "width": 16,
+          "height": 16,
+          "roles": [
+            "baseColorTexture"
+          ]
+        },
+        {
+          "image_index": 5,
+          "name": "Krystal_details_palette",
+          "file": "textures/b9dc43c6a6a93ae9879dae2bb05fdc7fe617ca1f1c38ea1d925f7d84b26632cf.png",
+          "sha256": "b9dc43c6a6a93ae9879dae2bb05fdc7fe617ca1f1c38ea1d925f7d84b26632cf",
+          "width": 128,
+          "height": 128,
+          "roles": [
+            "baseColorTexture"
+          ]
+        },
+        {
+          "image_index": 6,
+          "name": "Krystal64_adapted_atlas",
+          "file": "textures/f0469bbdc57986c72a10da89ba69ab0649b733c9e8a18c5641c25e87e176ec0a.png",
+          "sha256": "f0469bbdc57986c72a10da89ba69ab0649b733c9e8a18c5641c25e87e176ec0a",
+          "width": 128,
+          "height": 128,
+          "roles": [
+            "baseColorTexture"
+          ]
+        }
+      ],
+      "transforms": "Preserved byte-for-byte from the reviewed GLB."
+    },
+    "kami": {
+      "file": "heads/kami/head.glb",
+      "sha256": "98f0534d3b974eb346b11fd1189c9500cfe91f2df44e65b3a72bdff23944d464",
+      "bytes": 58716,
+      "triangles": 536,
+      "nodes": 2,
+      "meshes": 1,
+      "skins": [],
+      "animations": [
+        {
+          "name": "Pilot idle",
+          "duration_seconds": 6.0,
+          "maximum_samples": 5,
+          "channels": 1
+        },
+        {
+          "name": "Look around",
+          "duration_seconds": 6.0,
+          "maximum_samples": 5,
+          "channels": 1
+        }
+      ],
+      "textures": [
+        {
+          "image_index": 0,
+          "name": "Kami_retained_head_and_spiral_tail",
+          "file": "textures/c62ff8ff86d749c01f69407b987291114a0838a00a62ae50ef7908a19c2b1c59.png",
+          "sha256": "c62ff8ff86d749c01f69407b987291114a0838a00a62ae50ef7908a19c2b1c59",
+          "width": 512,
+          "height": 512,
+          "roles": [
+            "baseColorTexture"
+          ]
+        }
+      ],
+      "transforms": "Preserved byte-for-byte from the reviewed GLB."
+    },
+    "panther": {
+      "file": "heads/panther/head.glb",
+      "sha256": "9b7a6022af91125862099a2cd35a672f2e25633d2a9a900a7d5e632b0ef26c41",
+      "bytes": 20372,
+      "triangles": 169,
+      "nodes": 2,
+      "meshes": 1,
+      "skins": [],
+      "animations": [
+        {
+          "name": "Pilot idle",
+          "duration_seconds": 6.0,
+          "maximum_samples": 5,
+          "channels": 1
+        },
+        {
+          "name": "Look around",
+          "duration_seconds": 6.0,
+          "maximum_samples": 5,
+          "channels": 1
+        }
+      ],
+      "textures": [
+        {
+          "image_index": 0,
+          "name": "Panther_head_palette",
+          "file": "textures/d986093faa0a6c2a194610b3553d806a2387f919816b45580a3bef0b53b93cbc.png",
+          "sha256": "d986093faa0a6c2a194610b3553d806a2387f919816b45580a3bef0b53b93cbc",
+          "width": 128,
+          "height": 128,
+          "roles": [
+            "baseColorTexture"
+          ]
+        }
+      ],
+      "transforms": "Preserved byte-for-byte from the reviewed GLB."
+    },
+    "pigma": {
+      "file": "heads/pigma/head.glb",
+      "sha256": "43eea1e383ff8114e195eeb956a381409049d8ec05218a45e01a4843700c1a35",
+      "bytes": 24424,
+      "triangles": 212,
+      "nodes": 2,
+      "meshes": 1,
+      "skins": [],
+      "animations": [
+        {
+          "name": "Pilot idle",
+          "duration_seconds": 6.0,
+          "maximum_samples": 5,
+          "channels": 1
+        },
+        {
+          "name": "Look around",
+          "duration_seconds": 6.0,
+          "maximum_samples": 5,
+          "channels": 1
+        }
+      ],
+      "textures": [
+        {
+          "image_index": 0,
+          "name": "Pigma_head_palette",
+          "file": "textures/92822ec7ab055f959cc09744e2af861ddd4549797ee5bbff127fb6389e673591.png",
+          "sha256": "92822ec7ab055f959cc09744e2af861ddd4549797ee5bbff127fb6389e673591",
+          "width": 128,
+          "height": 128,
+          "roles": [
+            "baseColorTexture"
+          ]
+        }
+      ],
+      "transforms": "Preserved byte-for-byte from the reviewed GLB."
+    },
+    "fox": {
+      "file": "heads/fox/head.glb",
+      "sha256": "77f3d127022568f3039fcc0abb6de2a312c1232f7bf0394af6e362c7c74d5d8b",
+      "bytes": 31828,
+      "triangles": 215,
+      "nodes": 2,
+      "meshes": 1,
+      "skins": [],
+      "animations": [
+        {
+          "name": "Pilot idle",
+          "duration_seconds": 6.0,
+          "maximum_samples": 5,
+          "channels": 1
+        },
+        {
+          "name": "Look around",
+          "duration_seconds": 6.0,
+          "maximum_samples": 5,
+          "channels": 1
+        }
+      ],
+      "textures": [
+        {
+          "image_index": 0,
+          "name": "D_TITLE_602DF30",
+          "file": "textures/68bb1658be041e5b89204f06759a6950cfde509c32fb0a34e3a248934d4751c4.png",
+          "sha256": "68bb1658be041e5b89204f06759a6950cfde509c32fb0a34e3a248934d4751c4",
+          "width": 16,
+          "height": 16,
+          "roles": [
+            "baseColorTexture"
+          ]
+        },
+        {
+          "image_index": 1,
+          "name": "D_TITLE_602DB30",
+          "file": "textures/10d6df281b86b7da4c818871526ad1586c17b39826d5a25c9f689538fd70e908.png",
+          "sha256": "10d6df281b86b7da4c818871526ad1586c17b39826d5a25c9f689538fd70e908",
+          "width": 16,
+          "height": 16,
+          "roles": [
+            "baseColorTexture"
+          ]
+        },
+        {
+          "image_index": 2,
+          "name": "D_TITLE_60214F8",
+          "file": "textures/1c36b971ecafe2b59bca9c6ff7a66bfc0d22d3bc6962c1f6c98b1b23dbddedc9.png",
+          "sha256": "1c36b971ecafe2b59bca9c6ff7a66bfc0d22d3bc6962c1f6c98b1b23dbddedc9",
+          "width": 16,
+          "height": 16,
+          "roles": [
+            "baseColorTexture"
+          ]
+        },
+        {
+          "image_index": 3,
+          "name": "D_TITLE_6028988",
+          "file": "textures/2a9cdd1bfb0456501f9257d5f7f48f743c66b98b638aad98d64a3e5cccbd1b98.png",
+          "sha256": "2a9cdd1bfb0456501f9257d5f7f48f743c66b98b638aad98d64a3e5cccbd1b98",
+          "width": 16,
+          "height": 16,
+          "roles": [
+            "baseColorTexture"
+          ]
+        },
+        {
+          "image_index": 4,
+          "name": "D_TITLE_6024340",
+          "file": "textures/8879a0f2c5395e41a87767a424942c6212b61de7935053f4e99f2306dd3573d9.png",
+          "sha256": "8879a0f2c5395e41a87767a424942c6212b61de7935053f4e99f2306dd3573d9",
+          "width": 16,
+          "height": 16,
+          "roles": [
+            "baseColorTexture"
+          ]
+        },
+        {
+          "image_index": 5,
+          "name": "D_TITLE_6025FA8",
+          "file": "textures/587d2e4c2e6a699a9d35e3a3fc42669e93504e8823a3f1ebbc03f7523fff5458.png",
+          "sha256": "587d2e4c2e6a699a9d35e3a3fc42669e93504e8823a3f1ebbc03f7523fff5458",
+          "width": 32,
+          "height": 32,
+          "roles": [
+            "baseColorTexture"
+          ]
+        }
+      ],
+      "transforms": "Preserved byte-for-byte from the reviewed GLB."
+    },
+    "falco": {
+      "file": "heads/falco/head.glb",
+      "sha256": "1ea101018cc3ed6334db42deb79b4a3f723997b0c9932050fe5d611f94224f38",
+      "bytes": 29656,
+      "triangles": 170,
+      "nodes": 2,
+      "meshes": 1,
+      "skins": [],
+      "animations": [
+        {
+          "name": "Pilot idle",
+          "duration_seconds": 6.0,
+          "maximum_samples": 5,
+          "channels": 1
+        },
+        {
+          "name": "Look around",
+          "duration_seconds": 6.0,
+          "maximum_samples": 5,
+          "channels": 1
+        }
+      ],
+      "textures": [
+        {
+          "image_index": 0,
+          "name": "D_TITLE_60214F8",
+          "file": "textures/1c36b971ecafe2b59bca9c6ff7a66bfc0d22d3bc6962c1f6c98b1b23dbddedc9.png",
+          "sha256": "1c36b971ecafe2b59bca9c6ff7a66bfc0d22d3bc6962c1f6c98b1b23dbddedc9",
+          "width": 16,
+          "height": 16,
+          "roles": [
+            "baseColorTexture"
+          ]
+        },
+        {
+          "image_index": 1,
+          "name": "D_TITLE_6025BA8",
+          "file": "textures/69f929e785e637ada3999c7220c7a87a8b841bf210e205d15092fd81dfe28ebd.png",
+          "sha256": "69f929e785e637ada3999c7220c7a87a8b841bf210e205d15092fd81dfe28ebd",
+          "width": 16,
+          "height": 16,
+          "roles": [
+            "baseColorTexture"
+          ]
+        },
+        {
+          "image_index": 2,
+          "name": "D_TITLE_60257A8",
+          "file": "textures/a1ac919b4c66a9a61ddcedc4c8005dc8aa18f3581bdcc4d497123299750fc821.png",
+          "sha256": "a1ac919b4c66a9a61ddcedc4c8005dc8aa18f3581bdcc4d497123299750fc821",
+          "width": 16,
+          "height": 16,
+          "roles": [
+            "baseColorTexture"
+          ]
+        },
+        {
+          "image_index": 3,
+          "name": "D_TITLE_6028988",
+          "file": "textures/2a9cdd1bfb0456501f9257d5f7f48f743c66b98b638aad98d64a3e5cccbd1b98.png",
+          "sha256": "2a9cdd1bfb0456501f9257d5f7f48f743c66b98b638aad98d64a3e5cccbd1b98",
+          "width": 16,
+          "height": 16,
+          "roles": [
+            "baseColorTexture"
+          ]
+        },
+        {
+          "image_index": 4,
+          "name": "D_TITLE_6025FA8",
+          "file": "textures/587d2e4c2e6a699a9d35e3a3fc42669e93504e8823a3f1ebbc03f7523fff5458.png",
+          "sha256": "587d2e4c2e6a699a9d35e3a3fc42669e93504e8823a3f1ebbc03f7523fff5458",
+          "width": 32,
+          "height": 32,
+          "roles": [
+            "baseColorTexture"
+          ]
+        },
+        {
+          "image_index": 5,
+          "name": "D_TITLE_6028A08",
+          "file": "textures/5ce21567807ce636953763ade90013a67f6dc06c2afb937d7108c66e0d585e18.png",
+          "sha256": "5ce21567807ce636953763ade90013a67f6dc06c2afb937d7108c66e0d585e18",
+          "width": 16,
+          "height": 16,
+          "roles": [
+            "baseColorTexture"
+          ]
+        },
+        {
+          "image_index": 6,
+          "name": "D_TITLE_60259A8",
+          "file": "textures/91e5bef8e67bb82471d2aa45d0a5002367005206372cdba7067483952526906c.png",
+          "sha256": "91e5bef8e67bb82471d2aa45d0a5002367005206372cdba7067483952526906c",
+          "width": 16,
+          "height": 16,
+          "roles": [
+            "baseColorTexture"
+          ]
+        },
+        {
+          "image_index": 7,
+          "name": "D_TITLE_6025DA8",
+          "file": "textures/bee056b35f47f24b50baa9fce616cb5a4be73a751e1e1549892b2568fb89d881.png",
+          "sha256": "bee056b35f47f24b50baa9fce616cb5a4be73a751e1e1549892b2568fb89d881",
+          "width": 16,
+          "height": 16,
+          "roles": [
+            "baseColorTexture"
+          ]
+        }
+      ],
+      "transforms": "Preserved byte-for-byte from the reviewed GLB."
+    },
+    "peppy": {
+      "file": "heads/peppy/head.glb",
+      "sha256": "a43c74d04a6a46db4f654280ff07090838f54bb896b51a34f9980a1b8cb34bbe",
+      "bytes": 33164,
+      "triangles": 227,
+      "nodes": 2,
+      "meshes": 1,
+      "skins": [],
+      "animations": [
+        {
+          "name": "Pilot idle",
+          "duration_seconds": 6.0,
+          "maximum_samples": 5,
+          "channels": 1
+        },
+        {
+          "name": "Look around",
+          "duration_seconds": 6.0,
+          "maximum_samples": 5,
+          "channels": 1
+        }
+      ],
+      "textures": [
+        {
+          "image_index": 0,
+          "name": "D_TITLE_602DF30",
+          "file": "textures/68bb1658be041e5b89204f06759a6950cfde509c32fb0a34e3a248934d4751c4.png",
+          "sha256": "68bb1658be041e5b89204f06759a6950cfde509c32fb0a34e3a248934d4751c4",
+          "width": 16,
+          "height": 16,
+          "roles": [
+            "baseColorTexture"
+          ]
+        },
+        {
+          "image_index": 1,
+          "name": "D_TITLE_602DB30",
+          "file": "textures/10d6df281b86b7da4c818871526ad1586c17b39826d5a25c9f689538fd70e908.png",
+          "sha256": "10d6df281b86b7da4c818871526ad1586c17b39826d5a25c9f689538fd70e908",
+          "width": 16,
+          "height": 16,
+          "roles": [
+            "baseColorTexture"
+          ]
+        },
+        {
+          "image_index": 2,
+          "name": "D_TITLE_6028988",
+          "file": "textures/2a9cdd1bfb0456501f9257d5f7f48f743c66b98b638aad98d64a3e5cccbd1b98.png",
+          "sha256": "2a9cdd1bfb0456501f9257d5f7f48f743c66b98b638aad98d64a3e5cccbd1b98",
+          "width": 16,
+          "height": 16,
+          "roles": [
+            "baseColorTexture"
+          ]
+        },
+        {
+          "image_index": 3,
+          "name": "D_TITLE_6025FA8",
+          "file": "textures/587d2e4c2e6a699a9d35e3a3fc42669e93504e8823a3f1ebbc03f7523fff5458.png",
+          "sha256": "587d2e4c2e6a699a9d35e3a3fc42669e93504e8823a3f1ebbc03f7523fff5458",
+          "width": 32,
+          "height": 32,
+          "roles": [
+            "baseColorTexture"
+          ]
+        },
+        {
+          "image_index": 4,
+          "name": "D_TITLE_602DD30",
+          "file": "textures/7577935bb728a32c5fa8ed92d6e8a39a780ed1a62ae5088c7273894424bdd87f.png",
+          "sha256": "7577935bb728a32c5fa8ed92d6e8a39a780ed1a62ae5088c7273894424bdd87f",
+          "width": 16,
+          "height": 16,
+          "roles": [
+            "baseColorTexture"
+          ]
+        },
+        {
+          "image_index": 5,
+          "name": "D_TITLE_602D930",
+          "file": "textures/2b0308a664323003ea52600121d3d1c14fd7d8636411d7bfe8e69cb2494d94ab.png",
+          "sha256": "2b0308a664323003ea52600121d3d1c14fd7d8636411d7bfe8e69cb2494d94ab",
+          "width": 16,
+          "height": 16,
+          "roles": [
+            "baseColorTexture"
+          ]
+        }
+      ],
+      "transforms": "Preserved byte-for-byte from the reviewed GLB."
+    },
+    "slippy": {
+      "file": "heads/slippy/head.glb",
+      "sha256": "a412551298c1a87375622f4ce442598e98f9688e02b58fae3071f573d8caa66c",
+      "bytes": 30340,
+      "triangles": 192,
+      "nodes": 2,
+      "meshes": 1,
+      "skins": [],
+      "animations": [
+        {
+          "name": "Pilot idle",
+          "duration_seconds": 6.0,
+          "maximum_samples": 5,
+          "channels": 1
+        },
+        {
+          "name": "Look around",
+          "duration_seconds": 6.0,
+          "maximum_samples": 5,
+          "channels": 1
+        }
+      ],
+      "textures": [
+        {
+          "image_index": 0,
+          "name": "D_TITLE_602DB30",
+          "file": "textures/10d6df281b86b7da4c818871526ad1586c17b39826d5a25c9f689538fd70e908.png",
+          "sha256": "10d6df281b86b7da4c818871526ad1586c17b39826d5a25c9f689538fd70e908",
+          "width": 16,
+          "height": 16,
+          "roles": [
+            "baseColorTexture"
+          ]
+        },
+        {
+          "image_index": 1,
+          "name": "D_TITLE_6028A08",
+          "file": "textures/5ce21567807ce636953763ade90013a67f6dc06c2afb937d7108c66e0d585e18.png",
+          "sha256": "5ce21567807ce636953763ade90013a67f6dc06c2afb937d7108c66e0d585e18",
+          "width": 16,
+          "height": 16,
+          "roles": [
+            "baseColorTexture"
+          ]
+        },
+        {
+          "image_index": 2,
+          "name": "D_TITLE_6028788",
+          "file": "textures/88e8895ac90792e209621da93cd97bf157e0cd82fc7227f774f6316640267ebf.png",
+          "sha256": "88e8895ac90792e209621da93cd97bf157e0cd82fc7227f774f6316640267ebf",
+          "width": 16,
+          "height": 16,
+          "roles": [
+            "baseColorTexture"
+          ]
+        },
+        {
+          "image_index": 3,
+          "name": "D_TITLE_6028988",
+          "file": "textures/2a9cdd1bfb0456501f9257d5f7f48f743c66b98b638aad98d64a3e5cccbd1b98.png",
+          "sha256": "2a9cdd1bfb0456501f9257d5f7f48f743c66b98b638aad98d64a3e5cccbd1b98",
+          "width": 16,
+          "height": 16,
+          "roles": [
+            "baseColorTexture"
+          ]
+        },
+        {
+          "image_index": 4,
+          "name": "D_TITLE_6028C08",
+          "file": "textures/7287669f638565b3b2107b3ced7a544d904eb749e9bf6f0c25c7c36716b8c3ea.png",
+          "sha256": "7287669f638565b3b2107b3ced7a544d904eb749e9bf6f0c25c7c36716b8c3ea",
+          "width": 32,
+          "height": 32,
+          "roles": [
+            "baseColorTexture"
+          ]
+        },
+        {
+          "image_index": 5,
+          "name": "D_TITLE_6028508",
+          "file": "textures/2c35c5f0d0e139ea4ff297be9e8f663b92e61f044873d08cbcc45f06570f8027.png",
+          "sha256": "2c35c5f0d0e139ea4ff297be9e8f663b92e61f044873d08cbcc45f06570f8027",
+          "width": 16,
+          "height": 16,
+          "roles": [
+            "baseColorTexture"
+          ]
+        },
+        {
+          "image_index": 6,
+          "name": "D_TITLE_6028708",
+          "file": "textures/3acd975e77dd1e70aa40da44244ad04d735032179f68cbc8faa59b093068f903.png",
+          "sha256": "3acd975e77dd1e70aa40da44244ad04d735032179f68cbc8faa59b093068f903",
+          "width": 8,
+          "height": 8,
+          "roles": [
+            "baseColorTexture"
+          ]
+        }
+      ],
+      "transforms": "Preserved byte-for-byte from the reviewed GLB."
+    },
+    "vitzy": {
+      "file": "heads/vitzy/head.glb",
+      "sha256": "c9fc1ddc10ed5a90e58c4da6eb79c52b4513bfb1967209c02d0233c97c94c864",
+      "bytes": 116504,
+      "triangles": 206,
+      "nodes": 9,
+      "meshes": 2,
+      "skins": [
+        {
+          "name": "Vitzy_head_rig",
+          "joints": 6
+        }
+      ],
+      "animations": [
+        {
+          "name": "Pilot idle",
+          "duration_seconds": 6.0,
+          "maximum_samples": 6,
+          "channels": 3
+        },
+        {
+          "name": "Talking",
+          "duration_seconds": 2.4000000953674316,
+          "maximum_samples": 17,
+          "channels": 2
+        },
+        {
+          "name": "Look around",
+          "duration_seconds": 6.0,
+          "maximum_samples": 6,
+          "channels": 3
+        },
+        {
+          "name": "Blink",
+          "duration_seconds": 6.0,
+          "maximum_samples": 6,
+          "channels": 2
+        }
+      ],
+      "textures": [
+        {
+          "image_index": 0,
+          "name": "image_0",
+          "file": "textures/4eeef3afd75fc84b781b8a2604525ac3038abccf74fd8c1eb407acd6c8d6410f.png",
+          "sha256": "4eeef3afd75fc84b781b8a2604525ac3038abccf74fd8c1eb407acd6c8d6410f",
+          "width": 512,
+          "height": 512,
+          "roles": [
+            "baseColorTexture"
+          ]
+        }
+      ],
+      "transforms": "Preserved byte-for-byte from the reviewed GLB.",
+      "triangle_budget": 216
+    }
+  },
+  "cockpits": {
+    "vitzy": {
+      "file": "cockpits/vitzy/bill.glb",
+      "sha256": "8782a6ddeb2d20e8348b3c62f9978eee4ac84b7259c912bc02123dd24f84554d",
+      "bytes": 242624,
+      "triangles": 950,
+      "nodes": 10,
+      "meshes": 3,
+      "skins": [
+        {
+          "name": "Vitzy_head_rig",
+          "joints": 6
+        }
+      ],
+      "animations": [
+        {
+          "name": "Pilot idle",
+          "duration_seconds": 6.0,
+          "maximum_samples": 6,
+          "channels": 3
+        },
+        {
+          "name": "Talking",
+          "duration_seconds": 2.4000000953674316,
+          "maximum_samples": 17,
+          "channels": 2
+        },
+        {
+          "name": "Look around",
+          "duration_seconds": 6.0,
+          "maximum_samples": 6,
+          "channels": 3
+        },
+        {
+          "name": "Blink",
+          "duration_seconds": 6.0,
+          "maximum_samples": 6,
+          "channels": 2
+        }
+      ],
+      "textures": [
+        {
+          "image_index": 0,
+          "name": "image_0",
+          "file": "textures/4eeef3afd75fc84b781b8a2604525ac3038abccf74fd8c1eb407acd6c8d6410f.png",
+          "sha256": "4eeef3afd75fc84b781b8a2604525ac3038abccf74fd8c1eb407acd6c8d6410f",
+          "width": 512,
+          "height": 512,
+          "roles": [
+            "baseColorTexture"
+          ]
+        }
+      ],
+      "transforms": "Preserved byte-for-byte from the reviewed GLB."
+    }
+  },
+  "laser_defaults": {
+    "wolf": {
+      "name": "Red",
+      "hex": "#ff4d64"
+    },
+    "krystal": {
+      "name": "Cyan",
+      "hex": "#66ddff"
+    },
+    "kami": {
+      "name": "Red",
+      "hex": "#ff4d64"
+    },
+    "panther": {
+      "name": "Red",
+      "hex": "#ff4d64"
+    },
+    "pigma": {
+      "name": "Red",
+      "hex": "#ff4d64"
+    },
+    "fox": {
+      "name": "Green",
+      "hex": "#64ff7a"
+    },
+    "falco": {
+      "name": "Green",
+      "hex": "#64ff7a"
+    },
+    "peppy": {
+      "name": "Green",
+      "hex": "#64ff7a"
+    },
+    "slippy": {
+      "name": "Green",
+      "hex": "#64ff7a"
+    },
+    "vitzy": {
+      "name": "Pink",
+      "hex": "#ff80dc"
+    }
+  },
+  "counts": {
+    "full_characters": 9,
+    "body_variants": 18,
+    "pilot_heads": 10,
+    "cockpits": 1,
+    "unique_texture_images": 125
+  },
+  "files": {
+    "CREDITS.md": {
+      "sha256": "70265117f629f08ca29bcf719c5a50a3867134fd9582848a858be6e99306d624",
+      "bytes": 5856
+    },
+    "Kami_CREDITS.md": {
+      "sha256": "922de01c4618161d9498980bc6146e8ba68288d2deb042ab0b2dcd730e6b5c48",
+      "bytes": 2905
+    },
+    "README.md": {
+      "sha256": "1e105b2c8980a38918a2a3e7cafde281cdc025b534d12b6a77707bbe465abd39",
+      "bytes": 2949
+    },
+    "README_TheRegressor.txt": {
+      "sha256": "7000b587d99ecb45317835cdfaa5e6d699dd7b9a9321e4e99f5f468490a298ce",
+      "bytes": 2028
+    },
+    "Vitzy_README.md": {
+      "sha256": "52b2853c79bd9b5847b4495940e12870bb8b33312ed8dec8eed89dca859878d8",
+      "bytes": 1432
+    },
+    "characters/falco/on_foot/body.glb": {
+      "sha256": "dbbc2c0649a665cbb7ca8023265f2ff8a9d059e3b8043aadbc4afeabbb49ae22",
+      "bytes": 128812
+    },
+    "characters/falco/title/body.glb": {
+      "sha256": "17925926576eefbcb838809fa79e8d71042ca40a2960e10162c3c71463db2093",
+      "bytes": 261768
+    },
+    "characters/fox/on_foot/body.glb": {
+      "sha256": "f727d1be33e7c7f60f8d5ec3c9b2aa82657599df95cfc41c44d44d111be56361",
+      "bytes": 135060
+    },
+    "characters/fox/title/body.glb": {
+      "sha256": "4942f00311d9d87822d70b8fd26f3528073505803c1dda0d093b9cd6968f8097",
+      "bytes": 262892
+    },
+    "characters/kami/on_foot/body.glb": {
+      "sha256": "47cf5896cc72241cb0e5ab134ce7cc1d02b8ef4c0d8897f06bbd1083c90e36fb",
+      "bytes": 1760864
+    },
+    "characters/kami/title/body.glb": {
+      "sha256": "163184877a17f0c35274d8a535f715927a559c941f6f144753b7bb2bd862465b",
+      "bytes": 2098444
+    },
+    "characters/krystal/on_foot/body.glb": {
+      "sha256": "2f1a1c0b2121b5c15c9ac2d7bb1620fd5e72d81cbc32de717ec1171a523d09cf",
+      "bytes": 286224
+    },
+    "characters/krystal/title/body.glb": {
+      "sha256": "c6952d4d9d222321dfc0d17850bb6fde589b8bba02744cc5408d6c9d369509a8",
+      "bytes": 505684
+    },
+    "characters/panther/on_foot/body.glb": {
+      "sha256": "ba99dc9b3f93b14702b39a2e86eb82062fe00145e9431654cbbcfd7b42ac8641",
+      "bytes": 190756
+    },
+    "characters/panther/title/body.glb": {
+      "sha256": "3cbe2364102146d6be78d5d6e4c2969f186977b9b4b1075994460fa77b862c2c",
+      "bytes": 335608
+    },
+    "characters/peppy/on_foot/body.glb": {
+      "sha256": "08eb0d374f3a9b5d855dabaf2d6b11ff007aa10219183792162d6da835dc6b57",
+      "bytes": 161504
+    },
+    "characters/peppy/title/body.glb": {
+      "sha256": "ce22a3f891e2bba1c634591eaf83a8246a0ba4147406a4f48389f74f6156b867",
+      "bytes": 265068
+    },
+    "characters/pigma/on_foot/body.glb": {
+      "sha256": "b5886fbfaf67f48685a78c8d30cb658025ef2ab773c21c10f89789b73932685e",
+      "bytes": 161380
+    },
+    "characters/pigma/title/body.glb": {
+      "sha256": "797761bfde14f2055756c2992f32ec50ec82f6f50bd1317a1adf0b41c6a80bf3",
+      "bytes": 254640
+    },
+    "characters/slippy/on_foot/body.glb": {
+      "sha256": "0e2277607f7574ce6add6dde2ab4f9562ff4b2b60c05a57ecc8fade5e22c6866",
+      "bytes": 138500
+    },
+    "characters/slippy/title/body.glb": {
+      "sha256": "96f672fe2a405353feb135b46b1f5f99746c152a82bce06225d32a5b3a527381",
+      "bytes": 239156
+    },
+    "characters/wolf/on_foot/body.glb": {
+      "sha256": "df24d004d2ee6b39cf5bb43920196d4f1c756b5469f5a846397dfc80df018e5a",
+      "bytes": 153352
+    },
+    "characters/wolf/title/body.glb": {
+      "sha256": "342ddb4eab60d2ff18588881daf0e84454c4b2a269fce4659039db6a5baf86ea",
+      "bytes": 280892
+    },
+    "cockpits/vitzy/bill.glb": {
+      "sha256": "8782a6ddeb2d20e8348b3c62f9978eee4ac84b7259c912bc02123dd24f84554d",
+      "bytes": 242624
+    },
+    "heads/falco/head.glb": {
+      "sha256": "1ea101018cc3ed6334db42deb79b4a3f723997b0c9932050fe5d611f94224f38",
+      "bytes": 29656
+    },
+    "heads/fox/head.glb": {
+      "sha256": "77f3d127022568f3039fcc0abb6de2a312c1232f7bf0394af6e362c7c74d5d8b",
+      "bytes": 31828
+    },
+    "heads/kami/head.glb": {
+      "sha256": "98f0534d3b974eb346b11fd1189c9500cfe91f2df44e65b3a72bdff23944d464",
+      "bytes": 58716
+    },
+    "heads/krystal/head.glb": {
+      "sha256": "98520debe8002ffb520cd23000fb5410ec661164776160d38962bd7606eb15d5",
+      "bytes": 71412
+    },
+    "heads/panther/head.glb": {
+      "sha256": "9b7a6022af91125862099a2cd35a672f2e25633d2a9a900a7d5e632b0ef26c41",
+      "bytes": 20372
+    },
+    "heads/peppy/head.glb": {
+      "sha256": "a43c74d04a6a46db4f654280ff07090838f54bb896b51a34f9980a1b8cb34bbe",
+      "bytes": 33164
+    },
+    "heads/pigma/head.glb": {
+      "sha256": "43eea1e383ff8114e195eeb956a381409049d8ec05218a45e01a4843700c1a35",
+      "bytes": 24424
+    },
+    "heads/slippy/head.glb": {
+      "sha256": "a412551298c1a87375622f4ce442598e98f9688e02b58fae3071f573d8caa66c",
+      "bytes": 30340
+    },
+    "heads/vitzy/head.glb": {
+      "sha256": "c9fc1ddc10ed5a90e58c4da6eb79c52b4513bfb1967209c02d0233c97c94c864",
+      "bytes": 116504
+    },
+    "heads/wolf/head.glb": {
+      "sha256": "442e3ff78bc87f57e6030089e4d6f5d11f0d38415bdc7bb213e452cf1568ea66",
+      "bytes": 33832
+    },
+    "textures/005480918ef53853f41263bdbe8d152ff620e72e215981e4829925e67ab610c5.png": {
+      "sha256": "005480918ef53853f41263bdbe8d152ff620e72e215981e4829925e67ab610c5",
+      "bytes": 132
+    },
+    "textures/0477a90798b132162fbb65de59bf562c37058b7db04c087196fac64d3b863e51.png": {
+      "sha256": "0477a90798b132162fbb65de59bf562c37058b7db04c087196fac64d3b863e51",
+      "bytes": 234
+    },
+    "textures/05db39d694247b2ba4c0c5bc95ca642855aa83f7f30a7200c25b2529658d207f.png": {
+      "sha256": "05db39d694247b2ba4c0c5bc95ca642855aa83f7f30a7200c25b2529658d207f",
+      "bytes": 129
+    },
+    "textures/07a142327d8fd3eddf46addc4e4def057a4851342de2bde5caa2ce0921f38c91.png": {
+      "sha256": "07a142327d8fd3eddf46addc4e4def057a4851342de2bde5caa2ce0921f38c91",
+      "bytes": 140
+    },
+    "textures/0c7e2f3fbc80acbf692519d0c8ba46a7f9a614a9af018d8953e3dc692518a5cd.png": {
+      "sha256": "0c7e2f3fbc80acbf692519d0c8ba46a7f9a614a9af018d8953e3dc692518a5cd",
+      "bytes": 99
+    },
+    "textures/0d424441144093bd4f80a10f49bba823b2747e9d28e869c5ecc703cf7d7a25d1.png": {
+      "sha256": "0d424441144093bd4f80a10f49bba823b2747e9d28e869c5ecc703cf7d7a25d1",
+      "bytes": 300
+    },
+    "textures/0d706758b96e7b27fbd68796d6749cae7962bfc63bdfb55419cbd32daf2607a4.png": {
+      "sha256": "0d706758b96e7b27fbd68796d6749cae7962bfc63bdfb55419cbd32daf2607a4",
+      "bytes": 619
+    },
+    "textures/105feb7000403b076c16356786704f8b945c250bf5e9dc404a8dc190f4632eec.png": {
+      "sha256": "105feb7000403b076c16356786704f8b945c250bf5e9dc404a8dc190f4632eec",
+      "bytes": 84
+    },
+    "textures/10d6df281b86b7da4c818871526ad1586c17b39826d5a25c9f689538fd70e908.png": {
+      "sha256": "10d6df281b86b7da4c818871526ad1586c17b39826d5a25c9f689538fd70e908",
+      "bytes": 332
+    },
+    "textures/115437287713b4a128fbe105348ad4eb4ae94d1f8b656a4960dc911d4276a675.png": {
+      "sha256": "115437287713b4a128fbe105348ad4eb4ae94d1f8b656a4960dc911d4276a675",
+      "bytes": 567
+    },
+    "textures/1847551f937c3f5664198148cbd6e977d680af950f49d8be2306e5b1cace2a37.png": {
+      "sha256": "1847551f937c3f5664198148cbd6e977d680af950f49d8be2306e5b1cace2a37",
+      "bytes": 110
+    },
+    "textures/1c03b63515bfa992e6ca35f54f8c4273d5ae0fb341b62c52cbd262f2a3f4adea.png": {
+      "sha256": "1c03b63515bfa992e6ca35f54f8c4273d5ae0fb341b62c52cbd262f2a3f4adea",
+      "bytes": 329
+    },
+    "textures/1c36b971ecafe2b59bca9c6ff7a66bfc0d22d3bc6962c1f6c98b1b23dbddedc9.png": {
+      "sha256": "1c36b971ecafe2b59bca9c6ff7a66bfc0d22d3bc6962c1f6c98b1b23dbddedc9",
+      "bytes": 281
+    },
+    "textures/222a490a4aa5481c83e2a8b4e5f5c24cf54ae706b0f3d00666f64c9f0555007a.png": {
+      "sha256": "222a490a4aa5481c83e2a8b4e5f5c24cf54ae706b0f3d00666f64c9f0555007a",
+      "bytes": 251
+    },
+    "textures/26651554f2e1eb1519766e265b44bcd2a15777bd8db305dc8b8c1cc12a6da6ac.png": {
+      "sha256": "26651554f2e1eb1519766e265b44bcd2a15777bd8db305dc8b8c1cc12a6da6ac",
+      "bytes": 106
+    },
+    "textures/276d4a4d921d95307dcf9a6312062a8edbd5f6933b1876f9737612d1c7ff051f.png": {
+      "sha256": "276d4a4d921d95307dcf9a6312062a8edbd5f6933b1876f9737612d1c7ff051f",
+      "bytes": 130
+    },
+    "textures/2a9cdd1bfb0456501f9257d5f7f48f743c66b98b638aad98d64a3e5cccbd1b98.png": {
+      "sha256": "2a9cdd1bfb0456501f9257d5f7f48f743c66b98b638aad98d64a3e5cccbd1b98",
+      "bytes": 232
+    },
+    "textures/2b0308a664323003ea52600121d3d1c14fd7d8636411d7bfe8e69cb2494d94ab.png": {
+      "sha256": "2b0308a664323003ea52600121d3d1c14fd7d8636411d7bfe8e69cb2494d94ab",
+      "bytes": 296
+    },
+    "textures/2c35c5f0d0e139ea4ff297be9e8f663b92e61f044873d08cbcc45f06570f8027.png": {
+      "sha256": "2c35c5f0d0e139ea4ff297be9e8f663b92e61f044873d08cbcc45f06570f8027",
+      "bytes": 204
+    },
+    "textures/2e571f77f5da9cc495ce1caf137783e57433cef5f39336a70daa35c60953d7f9.png": {
+      "sha256": "2e571f77f5da9cc495ce1caf137783e57433cef5f39336a70daa35c60953d7f9",
+      "bytes": 473
+    },
+    "textures/2e72451d76ca9e2e1f6104e28a8bfd68d233f739a5269066d3c6fa4bff4be961.png": {
+      "sha256": "2e72451d76ca9e2e1f6104e28a8bfd68d233f739a5269066d3c6fa4bff4be961",
+      "bytes": 84
+    },
+    "textures/2ec445b259b48c081e90253e014826d075bfe6222865117aa7d51fc8e1914263.png": {
+      "sha256": "2ec445b259b48c081e90253e014826d075bfe6222865117aa7d51fc8e1914263",
+      "bytes": 130
+    },
+    "textures/2ecaebc4262d2b4f2d62cc53eea982bd36702d55ec215db62bb6b9a0c8d5d866.png": {
+      "sha256": "2ecaebc4262d2b4f2d62cc53eea982bd36702d55ec215db62bb6b9a0c8d5d866",
+      "bytes": 85
+    },
+    "textures/32cc457cd3f374419234ac07addb3bc26cf268ce5646c670c72cbf40367c394e.png": {
+      "sha256": "32cc457cd3f374419234ac07addb3bc26cf268ce5646c670c72cbf40367c394e",
+      "bytes": 495
+    },
+    "textures/32d3788b083fc47125acd1e78d36f9d62ea81623782bf68b860a745f4ba6b2be.png": {
+      "sha256": "32d3788b083fc47125acd1e78d36f9d62ea81623782bf68b860a745f4ba6b2be",
+      "bytes": 1256
+    },
+    "textures/34424610318cfaf6c4ba86ca22cd178137df701005461e29158a4ee9235d3398.png": {
+      "sha256": "34424610318cfaf6c4ba86ca22cd178137df701005461e29158a4ee9235d3398",
+      "bytes": 226
+    },
+    "textures/367f0a24b9903b55092631ed2ea5696d7e446a182c10471da8374a27706172f3.png": {
+      "sha256": "367f0a24b9903b55092631ed2ea5696d7e446a182c10471da8374a27706172f3",
+      "bytes": 871
+    },
+    "textures/3739284e997525abdd20925fcd46d4322e97e371c6e29a4e31235769b7d4f08f.png": {
+      "sha256": "3739284e997525abdd20925fcd46d4322e97e371c6e29a4e31235769b7d4f08f",
+      "bytes": 204
+    },
+    "textures/3acd975e77dd1e70aa40da44244ad04d735032179f68cbc8faa59b093068f903.png": {
+      "sha256": "3acd975e77dd1e70aa40da44244ad04d735032179f68cbc8faa59b093068f903",
+      "bytes": 101
+    },
+    "textures/3baee6931bc9ca523c7f40670cc80fd285c44cc81b5a55a35904e3aac3d7f123.png": {
+      "sha256": "3baee6931bc9ca523c7f40670cc80fd285c44cc81b5a55a35904e3aac3d7f123",
+      "bytes": 443
+    },
+    "textures/3e530a90e86f1366762e478d341f565c39408990f5f9accd54d4445d314e11b9.png": {
+      "sha256": "3e530a90e86f1366762e478d341f565c39408990f5f9accd54d4445d314e11b9",
+      "bytes": 252
+    },
+    "textures/460e6f92261ecf2592a0b4abcd28b10585b0c2d95c6a419baf5917c046493f17.png": {
+      "sha256": "460e6f92261ecf2592a0b4abcd28b10585b0c2d95c6a419baf5917c046493f17",
+      "bytes": 81
+    },
+    "textures/48530f4a0a3821deb6ae2cbafc30043dc9475050d3b8337e979c058f9ef8d5f6.png": {
+      "sha256": "48530f4a0a3821deb6ae2cbafc30043dc9475050d3b8337e979c058f9ef8d5f6",
+      "bytes": 245
+    },
+    "textures/4b0614064ae86c97b2dad96c62095472891249430ba1a51ff8428a3f63031afc.png": {
+      "sha256": "4b0614064ae86c97b2dad96c62095472891249430ba1a51ff8428a3f63031afc",
+      "bytes": 451
+    },
+    "textures/4bb2175723d8452084b2cc60b951a6eb98837195acd7ce88325ee5e78ae2edc6.png": {
+      "sha256": "4bb2175723d8452084b2cc60b951a6eb98837195acd7ce88325ee5e78ae2edc6",
+      "bytes": 1436
+    },
+    "textures/4eeef3afd75fc84b781b8a2604525ac3038abccf74fd8c1eb407acd6c8d6410f.png": {
+      "sha256": "4eeef3afd75fc84b781b8a2604525ac3038abccf74fd8c1eb407acd6c8d6410f",
+      "bytes": 71791
+    },
+    "textures/4fa582c77f6c1fa438fd492af386618a145985ff522cf1df89534ad63fb3c887.png": {
+      "sha256": "4fa582c77f6c1fa438fd492af386618a145985ff522cf1df89534ad63fb3c887",
+      "bytes": 264
+    },
+    "textures/5249a247df351533f370bf02e234ebfc16a99e3f2160834cdc584c6583e827b5.png": {
+      "sha256": "5249a247df351533f370bf02e234ebfc16a99e3f2160834cdc584c6583e827b5",
+      "bytes": 75
+    },
+    "textures/5512106e47bbfba69f45a896469c01e57cb9681b20f33c0667753d0606ece648.png": {
+      "sha256": "5512106e47bbfba69f45a896469c01e57cb9681b20f33c0667753d0606ece648",
+      "bytes": 84
+    },
+    "textures/5672d0e85cc7f17474dc7a2e0e503d564a01e8f573ffbff776ae6cb1faadbbe6.png": {
+      "sha256": "5672d0e85cc7f17474dc7a2e0e503d564a01e8f573ffbff776ae6cb1faadbbe6",
+      "bytes": 831
+    },
+    "textures/587d2e4c2e6a699a9d35e3a3fc42669e93504e8823a3f1ebbc03f7523fff5458.png": {
+      "sha256": "587d2e4c2e6a699a9d35e3a3fc42669e93504e8823a3f1ebbc03f7523fff5458",
+      "bytes": 364
+    },
+    "textures/58acb9352e99bee7de699d536bea06be7dfa51e90543dd55cfa666605f68efab.png": {
+      "sha256": "58acb9352e99bee7de699d536bea06be7dfa51e90543dd55cfa666605f68efab",
+      "bytes": 290
+    },
+    "textures/59700bcc9d7536c0bc582fdbbf461e4efcd164c460d5eb3a6a8f0a6e2f9088d1.png": {
+      "sha256": "59700bcc9d7536c0bc582fdbbf461e4efcd164c460d5eb3a6a8f0a6e2f9088d1",
+      "bytes": 533
+    },
+    "textures/5a49148c874f66b9f843ddfc8a25577162e11a5ada6b73c6a2b4ac31d6624f66.png": {
+      "sha256": "5a49148c874f66b9f843ddfc8a25577162e11a5ada6b73c6a2b4ac31d6624f66",
+      "bytes": 210
+    },
+    "textures/5ce21567807ce636953763ade90013a67f6dc06c2afb937d7108c66e0d585e18.png": {
+      "sha256": "5ce21567807ce636953763ade90013a67f6dc06c2afb937d7108c66e0d585e18",
+      "bytes": 262
+    },
+    "textures/5dc4e5b1b728554176a181caf4b81c58f957ebbbf686c6c3246c0f5476a59817.png": {
+      "sha256": "5dc4e5b1b728554176a181caf4b81c58f957ebbbf686c6c3246c0f5476a59817",
+      "bytes": 133
+    },
+    "textures/5e41e137aa918ab92fea85dfaee0abd2cc9588286584aa42827dad54ef31fe7d.png": {
+      "sha256": "5e41e137aa918ab92fea85dfaee0abd2cc9588286584aa42827dad54ef31fe7d",
+      "bytes": 93
+    },
+    "textures/617931edc25a4f45c16c32a8302c40a70e62b43cdf6dee476669029a52cac822.png": {
+      "sha256": "617931edc25a4f45c16c32a8302c40a70e62b43cdf6dee476669029a52cac822",
+      "bytes": 80
+    },
+    "textures/68bb1658be041e5b89204f06759a6950cfde509c32fb0a34e3a248934d4751c4.png": {
+      "sha256": "68bb1658be041e5b89204f06759a6950cfde509c32fb0a34e3a248934d4751c4",
+      "bytes": 134
+    },
+    "textures/69a80d9fb759c55c206bacc1804a850637991d35bb3c15e62b716a3fb8f2582a.png": {
+      "sha256": "69a80d9fb759c55c206bacc1804a850637991d35bb3c15e62b716a3fb8f2582a",
+      "bytes": 156
+    },
+    "textures/69e696a7ceabfb42bdeba65b41fd0c6783185506515903d4257003cb5defda30.png": {
+      "sha256": "69e696a7ceabfb42bdeba65b41fd0c6783185506515903d4257003cb5defda30",
+      "bytes": 70
+    },
+    "textures/69f929e785e637ada3999c7220c7a87a8b841bf210e205d15092fd81dfe28ebd.png": {
+      "sha256": "69f929e785e637ada3999c7220c7a87a8b841bf210e205d15092fd81dfe28ebd",
+      "bytes": 285
+    },
+    "textures/6aab98565c14145ef18de2c1b3d68701922359999a6dde97e20bab9e33698517.png": {
+      "sha256": "6aab98565c14145ef18de2c1b3d68701922359999a6dde97e20bab9e33698517",
+      "bytes": 257
+    },
+    "textures/6c0cd6cd5212e741d36900a69c0d9536095789edd6c72cd2a73e812d96e32db9.png": {
+      "sha256": "6c0cd6cd5212e741d36900a69c0d9536095789edd6c72cd2a73e812d96e32db9",
+      "bytes": 153
+    },
+    "textures/7287669f638565b3b2107b3ced7a544d904eb749e9bf6f0c25c7c36716b8c3ea.png": {
+      "sha256": "7287669f638565b3b2107b3ced7a544d904eb749e9bf6f0c25c7c36716b8c3ea",
+      "bytes": 591
+    },
+    "textures/741fb00a76db25df37d623d8908914b6116b643aa9b5bfb1248a6dd228372062.png": {
+      "sha256": "741fb00a76db25df37d623d8908914b6116b643aa9b5bfb1248a6dd228372062",
+      "bytes": 666
+    },
+    "textures/7577935bb728a32c5fa8ed92d6e8a39a780ed1a62ae5088c7273894424bdd87f.png": {
+      "sha256": "7577935bb728a32c5fa8ed92d6e8a39a780ed1a62ae5088c7273894424bdd87f",
+      "bytes": 407
+    },
+    "textures/7681f8ce13c8eab1c6e966477729fca36972b8d8c65ee85ae005b85988de3215.png": {
+      "sha256": "7681f8ce13c8eab1c6e966477729fca36972b8d8c65ee85ae005b85988de3215",
+      "bytes": 221
+    },
+    "textures/7ebac6d26bc24e5bb75d9636a49da32b6d2bb404544a8bcd1619ee560033df0a.png": {
+      "sha256": "7ebac6d26bc24e5bb75d9636a49da32b6d2bb404544a8bcd1619ee560033df0a",
+      "bytes": 1429
+    },
+    "textures/814d6f88421b0c79813381b46ffa454ec66687bb87fccd8c31a0f296243561eb.png": {
+      "sha256": "814d6f88421b0c79813381b46ffa454ec66687bb87fccd8c31a0f296243561eb",
+      "bytes": 158
+    },
+    "textures/86e7a7204e36b64baad6b94fe6272cabe5ec5b6fee10331691ab7b85ae0b1ce6.png": {
+      "sha256": "86e7a7204e36b64baad6b94fe6272cabe5ec5b6fee10331691ab7b85ae0b1ce6",
+      "bytes": 93
+    },
+    "textures/870eb426f2a39f6dd590df316b7a6285c652ce497a2118fbc374961e7bbbfd22.png": {
+      "sha256": "870eb426f2a39f6dd590df316b7a6285c652ce497a2118fbc374961e7bbbfd22",
+      "bytes": 466
+    },
+    "textures/8879a0f2c5395e41a87767a424942c6212b61de7935053f4e99f2306dd3573d9.png": {
+      "sha256": "8879a0f2c5395e41a87767a424942c6212b61de7935053f4e99f2306dd3573d9",
+      "bytes": 215
+    },
+    "textures/88e8895ac90792e209621da93cd97bf157e0cd82fc7227f774f6316640267ebf.png": {
+      "sha256": "88e8895ac90792e209621da93cd97bf157e0cd82fc7227f774f6316640267ebf",
+      "bytes": 287
+    },
+    "textures/8acd897e8c142e51411ab3a3430807ad78749702b580a0dd31c5eca7a4a47421.png": {
+      "sha256": "8acd897e8c142e51411ab3a3430807ad78749702b580a0dd31c5eca7a4a47421",
+      "bytes": 138
+    },
+    "textures/8c49a46649dd34f20fce71e57a949a9716aea7a9e2af241674fc55d56bee1e0a.png": {
+      "sha256": "8c49a46649dd34f20fce71e57a949a9716aea7a9e2af241674fc55d56bee1e0a",
+      "bytes": 209
+    },
+    "textures/8ef5fb6077d503e3f4253971e2b4256bcbba57e811a224535ac1e554c040ed1c.png": {
+      "sha256": "8ef5fb6077d503e3f4253971e2b4256bcbba57e811a224535ac1e554c040ed1c",
+      "bytes": 422
+    },
+    "textures/90f4661fcd60519df69230f331a78ba5b7f17253296b1bd47cfbc84f0f72e9ce.png": {
+      "sha256": "90f4661fcd60519df69230f331a78ba5b7f17253296b1bd47cfbc84f0f72e9ce",
+      "bytes": 136
+    },
+    "textures/917dab7021e4efd8fa7517411858da040d6c9bfe49fb5e33283b76e47ae77d08.png": {
+      "sha256": "917dab7021e4efd8fa7517411858da040d6c9bfe49fb5e33283b76e47ae77d08",
+      "bytes": 82
+    },
+    "textures/91e5bef8e67bb82471d2aa45d0a5002367005206372cdba7067483952526906c.png": {
+      "sha256": "91e5bef8e67bb82471d2aa45d0a5002367005206372cdba7067483952526906c",
+      "bytes": 364
+    },
+    "textures/922233ac00e9ff60b9f71ab1e70fb628fd517910a64ea69d5ef65ab356723e11.png": {
+      "sha256": "922233ac00e9ff60b9f71ab1e70fb628fd517910a64ea69d5ef65ab356723e11",
+      "bytes": 142
+    },
+    "textures/927ce3456b44031b9afb8f3445b8076c65a454e21a57e2efab7f943ffba9ee9b.png": {
+      "sha256": "927ce3456b44031b9afb8f3445b8076c65a454e21a57e2efab7f943ffba9ee9b",
+      "bytes": 190
+    },
+    "textures/92822ec7ab055f959cc09744e2af861ddd4549797ee5bbff127fb6389e673591.png": {
+      "sha256": "92822ec7ab055f959cc09744e2af861ddd4549797ee5bbff127fb6389e673591",
+      "bytes": 1242
+    },
+    "textures/9935351d59ec0aee5739be051f0d287e66ec1e8700cc5d7b93adb32093aa0536.png": {
+      "sha256": "9935351d59ec0aee5739be051f0d287e66ec1e8700cc5d7b93adb32093aa0536",
+      "bytes": 684
+    },
+    "textures/a1ac919b4c66a9a61ddcedc4c8005dc8aa18f3581bdcc4d497123299750fc821.png": {
+      "sha256": "a1ac919b4c66a9a61ddcedc4c8005dc8aa18f3581bdcc4d497123299750fc821",
+      "bytes": 318
+    },
+    "textures/a3fda823918dcb87ecf9c811317be2322ad1e10e3217060a0748ccdef4b8e76a.png": {
+      "sha256": "a3fda823918dcb87ecf9c811317be2322ad1e10e3217060a0748ccdef4b8e76a",
+      "bytes": 376
+    },
+    "textures/a5152292e6e80787d8cf4e63341bb0d8656a67d42a65c0540859dbf4a88a82b4.png": {
+      "sha256": "a5152292e6e80787d8cf4e63341bb0d8656a67d42a65c0540859dbf4a88a82b4",
+      "bytes": 306
+    },
+    "textures/a68112c5e5cb3505e752087cd005123dab2fdc8f896440bb4cbfa6ed8ece9e2f.png": {
+      "sha256": "a68112c5e5cb3505e752087cd005123dab2fdc8f896440bb4cbfa6ed8ece9e2f",
+      "bytes": 275
+    },
+    "textures/ac0261796dba9b3391f2e1727e5c3494da156256fb095d0b7835462099da546a.png": {
+      "sha256": "ac0261796dba9b3391f2e1727e5c3494da156256fb095d0b7835462099da546a",
+      "bytes": 205
+    },
+    "textures/ad1f8cdb2245c6b709dd0be8263cd91bc2de9d1e9c3c31c0b50b009a3bf404a6.png": {
+      "sha256": "ad1f8cdb2245c6b709dd0be8263cd91bc2de9d1e9c3c31c0b50b009a3bf404a6",
+      "bytes": 175
+    },
+    "textures/b02c5f30beb6b1c4cd0c94b28a9e57cc0f38cd4580526183b03fba8373c6e6b2.png": {
+      "sha256": "b02c5f30beb6b1c4cd0c94b28a9e57cc0f38cd4580526183b03fba8373c6e6b2",
+      "bytes": 303
+    },
+    "textures/b1a6bde5c696d38421d143f6d244739556fc852b5a739df3e06cb2a060b5683f.png": {
+      "sha256": "b1a6bde5c696d38421d143f6d244739556fc852b5a739df3e06cb2a060b5683f",
+      "bytes": 420
+    },
+    "textures/b201e2de7fd1a6eee7faf6b18a27ff99e0816f951b5d826f2c0b8436e0b60320.png": {
+      "sha256": "b201e2de7fd1a6eee7faf6b18a27ff99e0816f951b5d826f2c0b8436e0b60320",
+      "bytes": 75
+    },
+    "textures/b2510efcf754ab40ea9e2d1d8ceaa08f1b9445a7dfc3c9920f99e1c6444cf200.png": {
+      "sha256": "b2510efcf754ab40ea9e2d1d8ceaa08f1b9445a7dfc3c9920f99e1c6444cf200",
+      "bytes": 905
+    },
+    "textures/b29864ddb775f773cf8866862c006a9dc9562fc921bbe3c29b1aab31618e6012.png": {
+      "sha256": "b29864ddb775f773cf8866862c006a9dc9562fc921bbe3c29b1aab31618e6012",
+      "bytes": 551545
+    },
+    "textures/b7e4bbdc0cad93309dcd0312a36f7141685129f4c14d84923f93a50cc5e7f7cf.png": {
+      "sha256": "b7e4bbdc0cad93309dcd0312a36f7141685129f4c14d84923f93a50cc5e7f7cf",
+      "bytes": 393
+    },
+    "textures/b8b82490a1cc325225487add2189ec316e4a2cce667fb658ce563dd6ee8e3431.png": {
+      "sha256": "b8b82490a1cc325225487add2189ec316e4a2cce667fb658ce563dd6ee8e3431",
+      "bytes": 147
+    },
+    "textures/b8ef125574587c0c63cdc74c978a7b97204d49ef4b321d3b89fa5f6924240356.png": {
+      "sha256": "b8ef125574587c0c63cdc74c978a7b97204d49ef4b321d3b89fa5f6924240356",
+      "bytes": 347
+    },
+    "textures/b9dc43c6a6a93ae9879dae2bb05fdc7fe617ca1f1c38ea1d925f7d84b26632cf.png": {
+      "sha256": "b9dc43c6a6a93ae9879dae2bb05fdc7fe617ca1f1c38ea1d925f7d84b26632cf",
+      "bytes": 2824
+    },
+    "textures/bc8882072ea67b1b698957c433ef7ce868771b720d3e2a631231b660f476e10b.png": {
+      "sha256": "bc8882072ea67b1b698957c433ef7ce868771b720d3e2a631231b660f476e10b",
+      "bytes": 84
+    },
+    "textures/bee056b35f47f24b50baa9fce616cb5a4be73a751e1e1549892b2568fb89d881.png": {
+      "sha256": "bee056b35f47f24b50baa9fce616cb5a4be73a751e1e1549892b2568fb89d881",
+      "bytes": 205
+    },
+    "textures/bee1708458b6da16a5f86587f02fea780a4fb6ee32fff10e74024ac823eef22d.png": {
+      "sha256": "bee1708458b6da16a5f86587f02fea780a4fb6ee32fff10e74024ac823eef22d",
+      "bytes": 914
+    },
+    "textures/c50a1146880f7877a152a851e84a23feb623c982aee3639d0ad0e4fe756dabf0.png": {
+      "sha256": "c50a1146880f7877a152a851e84a23feb623c982aee3639d0ad0e4fe756dabf0",
+      "bytes": 102
+    },
+    "textures/c5120c474d794aa49a0ede591260c4a4191216c74a50311decedac8203b4c37a.png": {
+      "sha256": "c5120c474d794aa49a0ede591260c4a4191216c74a50311decedac8203b4c37a",
+      "bytes": 424
+    },
+    "textures/c62ff8ff86d749c01f69407b987291114a0838a00a62ae50ef7908a19c2b1c59.png": {
+      "sha256": "c62ff8ff86d749c01f69407b987291114a0838a00a62ae50ef7908a19c2b1c59",
+      "bytes": 4378
+    },
+    "textures/c7510a2ca2ed870ac89f1f260f24862166661dac9819b734675ce3615b61d09d.png": {
+      "sha256": "c7510a2ca2ed870ac89f1f260f24862166661dac9819b734675ce3615b61d09d",
+      "bytes": 352
+    },
+    "textures/c877b1b7dd9d57271cb5f20e86989ed8f650ddbadca23c5009c3290a67753d94.png": {
+      "sha256": "c877b1b7dd9d57271cb5f20e86989ed8f650ddbadca23c5009c3290a67753d94",
+      "bytes": 88
+    },
+    "textures/c9282879c799932a862362a6944e14131c593b57b4990486ee50ff99d5d32e84.png": {
+      "sha256": "c9282879c799932a862362a6944e14131c593b57b4990486ee50ff99d5d32e84",
+      "bytes": 168
+    },
+    "textures/cf96edfc967b130d6a77159fa7b70c220abedc3f5c067a512a9924959b14b453.png": {
+      "sha256": "cf96edfc967b130d6a77159fa7b70c220abedc3f5c067a512a9924959b14b453",
+      "bytes": 142
+    },
+    "textures/d1c8f9c72b51552e539e6b29b88a8de2b0130fd59cc51be9cd3b927398816e4f.png": {
+      "sha256": "d1c8f9c72b51552e539e6b29b88a8de2b0130fd59cc51be9cd3b927398816e4f",
+      "bytes": 170
+    },
+    "textures/d5f5ab206158f98c12b1fbf562387973b9d3d36d362bd4fa855ddf903a0634b2.png": {
+      "sha256": "d5f5ab206158f98c12b1fbf562387973b9d3d36d362bd4fa855ddf903a0634b2",
+      "bytes": 85
+    },
+    "textures/d82e81d02bda5d444655cfaee408864d1308a75848d1795a8bdb7233e9fd8ed7.png": {
+      "sha256": "d82e81d02bda5d444655cfaee408864d1308a75848d1795a8bdb7233e9fd8ed7",
+      "bytes": 139
+    },
+    "textures/d986093faa0a6c2a194610b3553d806a2387f919816b45580a3bef0b53b93cbc.png": {
+      "sha256": "d986093faa0a6c2a194610b3553d806a2387f919816b45580a3bef0b53b93cbc",
+      "bytes": 1302
+    },
+    "textures/da8a977407236fdfed547016caab6b3a8593b8407392de7196e027f2a01c8eed.png": {
+      "sha256": "da8a977407236fdfed547016caab6b3a8593b8407392de7196e027f2a01c8eed",
+      "bytes": 132
+    },
+    "textures/db47d5d1a1293b3fc916a7519ab8395ff20386fa1ad894ab2e5f9db828ef548d.png": {
+      "sha256": "db47d5d1a1293b3fc916a7519ab8395ff20386fa1ad894ab2e5f9db828ef548d",
+      "bytes": 852
+    },
+    "textures/db5a6ff5081f495583231d5f2c39691f7e1c674799f9080e553e66a7e9f0ba04.png": {
+      "sha256": "db5a6ff5081f495583231d5f2c39691f7e1c674799f9080e553e66a7e9f0ba04",
+      "bytes": 156
+    },
+    "textures/e0a8217124080cf7f506949b0b439c4c7e6e4e4b72ff067762e39d0149e1aaeb.png": {
+      "sha256": "e0a8217124080cf7f506949b0b439c4c7e6e4e4b72ff067762e39d0149e1aaeb",
+      "bytes": 103
+    },
+    "textures/e2389f71332d001571e07425b11b83c0b489e8c56a4d389944a525d972913a16.png": {
+      "sha256": "e2389f71332d001571e07425b11b83c0b489e8c56a4d389944a525d972913a16",
+      "bytes": 105
+    },
+    "textures/e5eabe6b7806affe6f694e0733df25b15d4e3d1d7927d0a0ea57f4d55f32867b.png": {
+      "sha256": "e5eabe6b7806affe6f694e0733df25b15d4e3d1d7927d0a0ea57f4d55f32867b",
+      "bytes": 296
+    },
+    "textures/e636538a4f174e1fca747612333795bdaa669f55578b15b0340358cc6c9fa8be.png": {
+      "sha256": "e636538a4f174e1fca747612333795bdaa669f55578b15b0340358cc6c9fa8be",
+      "bytes": 290
+    },
+    "textures/e9f390ec46f291b8d8714a1dc2e5fff8cba6ab76f192b516196a8790748be163.png": {
+      "sha256": "e9f390ec46f291b8d8714a1dc2e5fff8cba6ab76f192b516196a8790748be163",
+      "bytes": 1797
+    },
+    "textures/eb75f268e8e7f6fdf44b06a99a5620b80028944eefd58dd7deae702e1e5072d8.png": {
+      "sha256": "eb75f268e8e7f6fdf44b06a99a5620b80028944eefd58dd7deae702e1e5072d8",
+      "bytes": 138
+    },
+    "textures/ecd81b073fb0e58a768c93bba2a81767bc3f9becb70333a872d6daf8cbb76f9d.png": {
+      "sha256": "ecd81b073fb0e58a768c93bba2a81767bc3f9becb70333a872d6daf8cbb76f9d",
+      "bytes": 300
+    },
+    "textures/ece89f6f51d6632b439da72c183943daedaff0aaa73aec4d5deb9499a913adcf.png": {
+      "sha256": "ece89f6f51d6632b439da72c183943daedaff0aaa73aec4d5deb9499a913adcf",
+      "bytes": 229
+    },
+    "textures/ed12e4935ca7d19767ae34e07ee6e60e554b78f2771302bf28d7ee73e7d33a05.png": {
+      "sha256": "ed12e4935ca7d19767ae34e07ee6e60e554b78f2771302bf28d7ee73e7d33a05",
+      "bytes": 281
+    },
+    "textures/efac22aadbe7b14937d98546dd5f61bf8a16585eeffa954c08cbf09ce6677922.png": {
+      "sha256": "efac22aadbe7b14937d98546dd5f61bf8a16585eeffa954c08cbf09ce6677922",
+      "bytes": 205
+    },
+    "textures/f0469bbdc57986c72a10da89ba69ab0649b733c9e8a18c5641c25e87e176ec0a.png": {
+      "sha256": "f0469bbdc57986c72a10da89ba69ab0649b733c9e8a18c5641c25e87e176ec0a",
+      "bytes": 4528
+    },
+    "textures/f0dc83e49423f9c2c5b32d3190eff81ee7cc463e92b1a60764101a41c8e6e7d6.png": {
+      "sha256": "f0dc83e49423f9c2c5b32d3190eff81ee7cc463e92b1a60764101a41c8e6e7d6",
+      "bytes": 163
+    },
+    "textures/f1b05c859a1e18d11f5b4634c778062996acaed85783ecc67e950e5cc4a6cacb.png": {
+      "sha256": "f1b05c859a1e18d11f5b4634c778062996acaed85783ecc67e950e5cc4a6cacb",
+      "bytes": 490
+    },
+    "textures/f3e17fbf7d87d0df89a1546b4f008c127be1bb77043fec0df376def727993bf9.png": {
+      "sha256": "f3e17fbf7d87d0df89a1546b4f008c127be1bb77043fec0df376def727993bf9",
+      "bytes": 4719
+    },
+    "textures/f3f3ed76f5ff6db342301a2921626006b3f933ebcd24b1004fec97a652366897.png": {
+      "sha256": "f3f3ed76f5ff6db342301a2921626006b3f933ebcd24b1004fec97a652366897",
+      "bytes": 101
+    },
+    "textures/f89e5aafbf8459841e8c5b2eb97eb5a19f99ea898ce28b25dd377b9ffa3199f3.png": {
+      "sha256": "f89e5aafbf8459841e8c5b2eb97eb5a19f99ea898ce28b25dd377b9ffa3199f3",
+      "bytes": 1091
+    },
+    "textures/fea85738144b07f1c6974f694d41675b2414ba2bb9a5a1ae49fa1c680467dc21.png": {
+      "sha256": "fea85738144b07f1c6974f694d41675b2414ba2bb9a5a1ae49fa1c680467dc21",
+      "bytes": 75
+    },
+    "textures/ff6d8a889ed8ea4e6dfe723ee10ae42bcf376e876e2f8463215438a274c21924.png": {
+      "sha256": "ff6d8a889ed8ea4e6dfe723ee10ae42bcf376e876e2f8463215438a274c21924",
+      "bytes": 300
+    },
+    "textures/ff899b00f949b6dec7896cd5ccaebc3dc0ee4eae1b8bfb1347baaa32d35059f8.png": {
+      "sha256": "ff899b00f949b6dec7896cd5ccaebc3dc0ee4eae1b8bfb1347baaa32d35059f8",
+      "bytes": 247
+    }
+  }
+}

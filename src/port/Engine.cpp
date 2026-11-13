@@ -163,13 +163,18 @@ GameEngine::GameEngine() {
     );
     auto controlDeck = std::make_shared<LUS::ControlDeck>(std::vector<CONTROLLERBUTTONS_T>(), defaultMappings);
 
-    this->context->InitResourceManager(archiveFiles, {}, 3); // without this line InitWindow fails in Gui::Init()
+#ifdef __EMSCRIPTEN__
+    constexpr uint32_t resourceThreadReservation = 1000000; // One resource worker on browser devices.
+#else
+    constexpr uint32_t resourceThreadReservation = 3;
+#endif
+    this->context->InitResourceManager(archiveFiles, {}, resourceThreadReservation); // without this line InitWindow fails in Gui::Init()
     this->context->InitConsole(); // without this line the GuiWindow constructor fails in ConsoleWindow::InitElement()
 
     auto window = std::make_shared<Fast::Fast3dWindow>(std::vector<std::shared_ptr<Ship::GuiWindow>>({}));
 
     auto audioChannelsSetting = Ship::Context::GetInstance()->GetConfig()->GetCurrentAudioChannelsSetting();
-    this->context->Init(archiveFiles, {}, 3, { 32000, 1024, 1680, audioChannelsSetting }, window, controlDeck);
+    this->context->Init(archiveFiles, {}, resourceThreadReservation, { 32000, 1024, 1680, audioChannelsSetting }, window, controlDeck);
 
 #ifndef __SWITCH__
     Ship::Context::GetInstance()->GetLogger()->set_level(

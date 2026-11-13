@@ -1,0 +1,150 @@
+{
+  "emscripten": "7.0.0",
+  "emsdk_repository": "https://github.com/emscripten-core/emsdk.git",
+  "emsdk_commit": "1693ce7359fc9694f198694f902a2cc061239b86",
+  "emscripten_release": "6afbd83493d647051772d491124187d4e9a0cda9",
+  "submodules": {
+    "libultraship": "eaaf9d0fc91e2c400f49ef2a1f8547a691ce4d3c",
+    "tools/Torch": "cd92cc0f161c5e79e36f5dda0d0029edd3fc8d50"
+  },
+  "sources": {
+    "zlib": {
+      "version": "1.3.1",
+      "commit": "51b7f2abdade71cd9bb0e7a373ef2610ec6f9daf",
+      "url": "https://codeload.github.com/madler/zlib/tar.gz/51b7f2abdade71cd9bb0e7a373ef2610ec6f9daf",
+      "sha256": "d9e270d46252734aa49770fbc544125391617956266f220bd63216c834f3a522",
+      "tree_sha256": "78e153727430fb0d34ddb612327dfefeaa23ac2446a08a879d395fcde0d93bbc"
+    },
+    "libzip": {
+      "version": "1.11.3",
+      "commit": "f30f5290de485348442d168cd7b2eb714d1f20f9",
+      "url": "https://codeload.github.com/nih-at/libzip/tar.gz/f30f5290de485348442d168cd7b2eb714d1f20f9",
+      "sha256": "c907216099516380d513600a99e8051a4ff6a99bf150bd64b09b5fe7b84e554e",
+      "tree_sha256": "e1ec32d285a4d6f1f69c1975db53ce61b72172a07cfd59992c601e5f5f9aa16c"
+    },
+    "json": {
+      "version": "3.11.3",
+      "commit": "9cca280a4d0ccf0c08f47a99aa71d1b0e52f8d03",
+      "url": "https://codeload.github.com/nlohmann/json/tar.gz/9cca280a4d0ccf0c08f47a99aa71d1b0e52f8d03",
+      "sha256": "0dbc5e40a01ff142e7e68c03e85247a4dcede2f592d12d3677dee3664d17975a",
+      "tree_sha256": "e6d23ff9d2139c96bb0b74d4a0c55e76f586a875caf35df11fa1a2767c240c1b"
+    },
+    "tinyxml2": {
+      "version": "10.0.0",
+      "commit": "321ea883b7190d4e85cae5512a12e5eaa8f8731f",
+      "url": "https://codeload.github.com/leethomason/tinyxml2/tar.gz/321ea883b7190d4e85cae5512a12e5eaa8f8731f",
+      "sha256": "d5ae097578717b42b4f05f2c6b2d09f473a1c30d1552ca4e2dcb4eab5b34de84",
+      "tree_sha256": "1b934c97dc04eb5f9bb75e31d8980d03effba9593ffbf0eb3127e079efcadb17"
+    },
+    "spdlog": {
+      "version": "1.15.2",
+      "commit": "48bcf39a661a13be22666ac64db8a7f886f2637e",
+      "url": "https://codeload.github.com/gabime/spdlog/tar.gz/48bcf39a661a13be22666ac64db8a7f886f2637e",
+      "sha256": "1ccf44afac2792791c20e060b048cba684dbc291b8acd3df15433739027d7b8b",
+      "tree_sha256": "8a9da6111bde0d2b0fbd03949fca8391e1520680743d9eca5bc6178ddfba65d0"
+    },
+    "ogg": {
+      "version": "1.3.5",
+      "commit": "e1774cd77f471443541596e09078e78fdc342e4f",
+      "url": "https://codeload.github.com/xiph/ogg/tar.gz/e1774cd77f471443541596e09078e78fdc342e4f",
+      "sha256": "588af45a3329b89b4506e5205fd1c99e57f088f492b2a247fe9472f42ffe8e5f",
+      "tree_sha256": "7d7b036f45f5698d6e80d213c206f47f57e61795dc8eb5023364a660ba82d064"
+    },
+    "vorbis": {
+      "version": "1.3.7",
+      "commit": "0657aee69dec8508a0011f47f3b69d7538e9d262",
+      "url": "https://codeload.github.com/xiph/vorbis/tar.gz/0657aee69dec8508a0011f47f3b69d7538e9d262",
+      "sha256": "6ccc3fa4cfd3072f9a772025cc8fd712098d081c00171b09b6627ffced7faa88",
+      "tree_sha256": "0dc8febfb8cc4dc55c1aaccc4c6e07b6152b034926779a22f5701db7caf0ed23"
+    },
+    "yaml-cpp": {
+      "version": "upstream-pin",
+      "commit": "2f86d13775d119edbb69af52e5f566fd65c6953b",
+      "url": "https://codeload.github.com/jbeder/yaml-cpp/tar.gz/2f86d13775d119edbb69af52e5f566fd65c6953b",
+      "sha256": "923b2298148581b14ef21d9ce29d83eca102ff671a547dfdbd227245a199bcd8",
+      "tree_sha256": "cffe0995cfa128bcb73d711ddedf1785963970ec00359c23a1ad9808a2a41d76"
+    },
+    "dr_libs": {
+      "version": "upstream-pin",
+      "commit": "da35f9d6c7374a95353fd1df1d394d44ab66cf01",
+      "url": "https://codeload.github.com/mackron/dr_libs/tar.gz/da35f9d6c7374a95353fd1df1d394d44ab66cf01",
+      "sha256": "2704d347f480ca1bc92233fb01747e4550cc8031735b6ea62ca9990ebb8851ae",
+      "tree_sha256": "c0edeabdcd8dbdf7851816ef4de5e7015abeeb17e4e301c843379837639105f8"
+    },
+    "imgui": {
+      "version": "1.91.9b-docking",
+      "commit": "4806a1924ff6181180bf5e4b8b79ab4394118875",
+      "url": "https://codeload.github.com/ocornut/imgui/tar.gz/4806a1924ff6181180bf5e4b8b79ab4394118875",
+      "sha256": "cc35a88df717dff3c488e43b4b148dcfe968bd3ff6798f60751b106eb9bcee48",
+      "tree_sha256": "46f7161387c4436879035c21c579dd661d698b49b6d1d7008dfd283ef17f0e26"
+    },
+    "threadpool": {
+      "version": "4.1.0",
+      "commit": "097aa718f25d44315cadb80b407144ad455ee4f9",
+      "url": "https://codeload.github.com/bshoshany/thread-pool/tar.gz/097aa718f25d44315cadb80b407144ad455ee4f9",
+      "sha256": "8e54280b4d9af3e4d2fd3dfa3f8d1198fc1c3a572d6f22c5eaf1abe38f2db0a8",
+      "tree_sha256": "6d72e6d64a76eadb44e3a9b37c0fd76198b4d849fcc0f9294bf3203100f65a18"
+    },
+    "prism": {
+      "version": "upstream-pin",
+      "commit": "bbcbc7e3f890a5806b579361e7aa0336acd547e7",
+      "url": "https://codeload.github.com/KiritoDv/prism-processor/tar.gz/bbcbc7e3f890a5806b579361e7aa0336acd547e7",
+      "sha256": "9a874ff4e7e3c630d0d326fcf6b33a3f2d5c4b0559d50eb2c067e2d7c4d6c17d",
+      "tree_sha256": "c899df992d75f55a3f9d2dc9f6807cf02c3e2f43e6b9e56e2d360c0090f0ee0c"
+    },
+    "sdl2": {
+      "version": "2.32.4",
+      "commit": "2359383fc187386204c3bb22de89655a494cd128",
+      "url": "https://codeload.github.com/libsdl-org/SDL/tar.gz/2359383fc187386204c3bb22de89655a494cd128",
+      "sha256": "abb4bac5b1a1dc91be0d249e31a89bedddb4c982668b1644f40bebc7ebc5e523",
+      "tree_sha256": "8282ddfaaf72ed2062d2f56e18ef20a42f38efea8313a6516c8f194b696e9b90"
+    },
+    "gsl": {
+      "version": "upstream-conditional-pin",
+      "commit": "a3534567187d2edc428efd3f13466ff75fe5805c",
+      "url": "https://codeload.github.com/microsoft/GSL/tar.gz/a3534567187d2edc428efd3f13466ff75fe5805c",
+      "sha256": "c0379cff645543d5076216bc5b22a3426de57796fc043527a24a6e494628d8a6",
+      "tree_sha256": "48714b80a73a95f59554039d3ee886f977dba1ab6b86d692659f5e9c8cdcd19b"
+    }
+  },
+  "files": {
+    "sse2neon": {
+      "commit": "2272251cc3ad9cba8b8c47c4065811cfb396b802",
+      "url": "https://raw.githubusercontent.com/DLTcollab/sse2neon/2272251cc3ad9cba8b8c47c4065811cfb396b802/sse2neon.h",
+      "sha256": "932e41317cc325846256695d2aa83812ff6b6d065c8994b73a461efaf1f10bc3",
+      "filename": "sse2neon.h"
+    },
+    "controllers": {
+      "commit": "c0f11d40b91f57853ce9714c703e119d8243f91c",
+      "url": "https://raw.githubusercontent.com/gabomdq/SDL_GameControllerDB/c0f11d40b91f57853ce9714c703e119d8243f91c/gamecontrollerdb.txt",
+      "sha256": "a2299ef257b68c62b9fcce39fc59b5fb3a5a7068214f766a96c21595b55a11c3",
+      "filename": "gamecontrollerdb.txt"
+    },
+    "stb": {
+      "commit": "0bc88af4de5fb022db643c2d8e549a0927749354",
+      "url": "https://raw.githubusercontent.com/nothings/stb/0bc88af4de5fb022db643c2d8e549a0927749354/stb_image.h",
+      "sha256": "c54b15a689e6a1f32c75e2ec23afa442e3e0e37e894b73c1974d08679b20dd5c",
+      "filename": "stb_image.h"
+    }
+  },
+  "patches": {
+    "libultraship": {
+      "path": "tools/wasm/patches/libultraship.patch",
+      "sha256": "a0e11e17bb94bd9521fe0713c4baf42a02fc0fd8eed009883ac2302b0909a2f5"
+    },
+    "tools/Torch": {
+      "path": "tools/wasm/patches/torch.patch",
+      "sha256": "a37a9eca41340c6456b870efdac0ace67023e54f1c6d05ace36bfd4f8463e7ea"
+    }
+  },
+  "source_patches": {
+    "spdlog": {
+      "path": "tools/wasm/patches/spdlog.patch",
+      "sha256": "d78daa3aa337694a43693b2a8ab9b6ab4e7e27a8c1f34974ced2b27ebb879e54"
+    },
+    "sdl2": {
+      "path": "tools/wasm/patches/sdl2-audio.patch",
+      "sha256": "5ab1ee70a8d44a87165aafeb168a625033b04145bcf76ca860d2b3f92815c470"
+    }
+  }
+}

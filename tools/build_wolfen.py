@@ -365,6 +365,24 @@ class Builder:
         path = 'ast_common/D_101AF98'
         self.resources[path] = self.base.read(path)[:80] + data
 
+    def recolor_menu(self):
+        menu = self.segments['ovl_menu']
+        patches = [(0x27140 + index * 0x60, struct.pack('>4I', 20, 0, 75, 255),
+                    struct.pack('>4I', 75, 0, 0, 255)) for index in range(9)]
+        # Expert-mode selection arrows use immediate RGB arguments.
+        patches.extend((offset, struct.pack('>I', original), struct.pack('>I', replacement))
+                       for offset, original, replacement in (
+                           (0xC4C8, 0x24070014, 0x2407004B),
+                           (0xC4CC, 0x2418004B, 0x24180000),
+                           (0xC510, 0x24070014, 0x2407004B),
+                           (0xC514, 0x2408004B, 0x24080000),
+                       ))
+        for offset, original, replacement in patches:
+            if menu[offset:offset + len(original)] != original:
+                raise ValueError(f'Unexpected original menu color at {offset:#x}')
+            menu[offset:offset + len(replacement)] = replacement
+        self.menu_color_changes = patches
+
     def replace_intro_title(self):
         # Keep the original intro glyphs; W/L use a matching bold sans font.
         # The hexadecimal rows use the existing CI4 palette, so fades still work.
@@ -513,6 +531,8 @@ class Builder:
         full_address, full_stream = self.emit(full_sources, 'full')
         from wolfen_lod import build_lod
         build_lod(self, crc64)
+        from wolfen_icons import replace_icons
+        replace_icons(self)
         from medusa import install_medusa
         install_medusa(self, crc64)
         from wolf_portraits import replace_portraits
@@ -523,6 +543,7 @@ class Builder:
         build_character(self)
         from wolf_dialogue import replace_dialogue, replace_identity, mute_changed_dialogue
         replace_dialogue(self)
+        self.recolor_menu()
         replace_identity(self)
         mute_changed_dialogue(self)
         from vitzy_fighter import build_fighter
@@ -658,7 +679,12 @@ class Builder:
             if struct.unpack_from('>I', patched, offset)[0] != replacement:
                 raise ValueError('Browser flight color/position patch missing')
         from wolf_portraits import verify_portraits
-        common = verify_portraits(self)
+        common = bytearray(verify_portraits(self))
+        from wolfen_icons import verify_icons
+        verify_icons(self, patched)
+        for stem, _, offset, old, _ in self.small_icon_changes:
+            if stem == 'ast_common':
+                common[offset:offset + len(old)] = old
         if common[:0x1AF98] != self.original_common[:0x1AF98] or common[0x1B198:] != self.original_common[0x1B198:]:
             raise ValueError('An unrelated common asset, including hyper lasers, changed')
         pixels = struct.unpack_from('>256H', common, 0x1AF98)
@@ -694,6 +720,18 @@ def main():
         builder.resources["audio/crew_chatter"] = header + struct.pack("<I", len(data)) + data
         rom = builder.patched_rom()
         builder.verify(rom)
+        from site_characters import SiteCharacters
+        reviewed = SiteCharacters(builder)
+        reviewed.build()
+        rom = builder.patched_rom()
+        reviewed.patch_rom(rom)
+        struct.pack_into('>II', rom, 0x10, *cartridge_crc(rom))
+        reviewed.verify(rom)
+        if not args.check:
+            report = (ROOT / 'build-cmake/character-assets.json' if args.native.resolve() ==
+                      (ROOT / 'build-cmake/mods/wolfen.o2r').resolve() else args.native.with_suffix('.characters.json'))
+            report.parent.mkdir(parents=True, exist_ok=True)
+            report.write_text(__import__('json').dumps(reviewed.report(), indent=2) + '\n')
         browser_page = ROOT / 'browser/index.html'
         default_browser = args.browser.resolve() == (ROOT / 'browser/wolfen.z64').resolve()
         # EmulatorJS caches ROMs by URL and byte count. These builds are all
@@ -733,12 +771,11 @@ def main():
                 if updated != page:
                     browser_page.write_text(updated)
         print(f'{"Verified" if args.check else "Built"} {args.native} and {args.browser}')
-        print(f'Pilot lift {HEAD_LIFT:g}, cockpit drop {COCKPIT_DROP:g}, exhaust Y {HULL_Y:g}, Wolfen rear plate. Wolf character installed, head WIP. Wing joints: {sides}. Asset space {builder.cursor - 0x9B70:#x}/{0x131F0 - 0x9B70:#x} bytes.')
+        print(f'Pilot lift {HEAD_LIFT:g}, cockpit drop {COCKPIT_DROP:g}, exhaust Y {HULL_Y:g}, Wolfen rear plate. Reviewed character assets installed. Wing joints: {sides}. Asset space {builder.cursor - 0x9B70:#x}/{0x131F0 - 0x9B70:#x} bytes.')
         print(f'Mesh triangles: { {name: len(mesh) for name, mesh in builder.geometry.items()} }')
         print(f'Self-contained LOD bytes: {builder.lod_usage}')
         print(f'Medusa: {builder.medusa.triangle_count} hull triangles, upright fin removed, scale {builder.medusa.scale:.6f}, length {builder.medusa.rendered_bounds[1][2] - builder.medusa.rendered_bounds[0][2]}, green MEDUSA name, small Star Wolf marks, {builder.medusa.window_count} emissive windows, two deck light pools, {builder.medusa.engine_triangles} nozzle triangles, {builder.medusa.cursor:#x}/{0xDFB0:#x} hull bytes.')
-        print(f'Wolf character: {len(builder.character.draws)} display lists, {len(builder.character.materials)} private materials, {builder.character.changed_vertices} shaped/patch vertices. Original rigs and teammate assets preserved.')
-        print(f'Wolf cockpit head: {builder.character.cockpit_triangles} triangles; all 5 Fox portrait slots replaced.')
+        print(f'Reviewed crew: {reviewed.summary()}')
         print(f'Crew portraits: {len(builder.crew_portrait_changes)} textures installed for Panther, Krystal and Kami, including radio mouth frames, versus menus and map status.')
 
 

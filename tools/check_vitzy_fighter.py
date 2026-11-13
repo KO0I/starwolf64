@@ -13,6 +13,7 @@ import subprocess
 import tempfile
 import time
 import zipfile
+from PIL import Image
 
 from build_wolfen import crc64
 
@@ -174,6 +175,11 @@ def main():
         camera((40, 28, -75))
         debug([arwing(0x38, -75)])
         capture('cockpit')
+        head = Image.open(run / 'cockpit.png').convert('RGB').crop((505, 380, 540, 405))
+        pixels = head.load()
+        colored_head_pixels = sum(max(pixels[x, y]) - min(pixels[x, y]) > 40
+                                  for y in range(head.height) for x in range(head.width))
+        assert colored_head_pixels > 150, 'Vitzy head lost its atlas colors under the flight material state'
         debug([arwing(0x38, 0), arwing(0, 1, 'unsigned char'), arwing(1, 1, 'unsigned char')])
         broken = probe('vitzy-broken')
         assert '__OTR__ships/vitzy_fighter/LeftWingBrokenDL' in broken, broken
@@ -205,6 +211,7 @@ def main():
             effects[label] = environment(label)
         debug([f'set {{unsigned char}}((char*)&gActors + {actor_size * 59}) = 0', player(0x194, 0)])
         report = {'intact_draw_paths': paths, 'broken_draw_paths': broken, 'normal_mode_draw_paths': original, 'laser_paths': laser_paths, 'effects': effects,
+                  'colored_head_pixels': colored_head_pixels,
                   'screenshots': ['flight.png', 'quarter.png', 'front.png', 'rear.png', 'cockpit.png', 'broken.png', 'wolfen-default.png']}
         (run / 'report.json').write_text(json.dumps(report, indent=2) + '\n')
         print('Verified intact/broken Vitzy draws and normal-mode Wolfen, yellow/blue lasers, and engine palettes. Evidence:', run)

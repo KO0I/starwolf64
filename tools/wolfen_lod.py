@@ -40,7 +40,10 @@ def build_lod(builder, crc64):
         builder.resources[path] = header + struct.pack('<I', len(vertices)) + b''.join(struct.pack('<hhhHhhBBBB', *v) for v in vertices)
         vertex_data.append((path, b''.join(struct.pack('>hhhHhhBBBB', *v) for v in vertices)))
 
+    from wolf_portraits import load_portrait_segment
+    load_portrait_segment(builder, 'ast_map')
     layouts = {
+        'ast_map': (6, [(0x4A9F8, 0x4B750)], [(0x4A9F0, set())]),
         'ast_enmy_planet': (4, [(0x18B0, 0x24B8)], [(0x18A0, set())]),
         'ast_enmy_space': (4, [(0x3BE0, 0x47E8)], [(0x3BD0, set()), (0x7870, set())]),
         'ast_versus': (3, [(0xD560, 0xDE80), (0xEE90, 0xFB80), (0x10AA0, 0x11470), (0x11480, 0x11E40)], [(0xEE80, set()), (0x10A90, {'right'}), (0x11470, {'left'}), (0xD550, {'left', 'right'})]),
@@ -62,7 +65,20 @@ def build_lod(builder, crc64):
                     return segment << 24 | start
             raise ValueError(f'Wolfen LOD exceeds the retired {stem} geometry')
 
-        addresses = [allocate(data) for _, data in vertex_data]
+        local_vertices = vertex_data
+        if stem == 'ast_map':
+            local_vertices = []
+            for index, (_, data) in enumerate(vertex_data):
+                values = [list(v) for v in struct.iter_unpack('>hhhHhhBBBB', data)]
+                for v in values:
+                    x, y, z = v[:3]
+                    # Map ships face +Y with +Z up. Keep a proper rotation so
+                    # back-face culling and the forward direction still agree.
+                    v[:3] = [round(-x * .9), round(z * .9), round((y + 22) * .9)]
+                path = f'wolfen_player/map_lod_vtx_{index}'
+                builder.resources[path] = header + struct.pack('<I', len(values)) + b''.join(struct.pack('<hhhHhhBBBB', *v) for v in values)
+                local_vertices.append((path, b''.join(struct.pack('>hhhHhhBBBB', *v) for v in values)))
+        addresses = [allocate(data) for _, data in local_vertices]
         variants = {}
         for target, broken in targets:
             variant = frozenset(broken)
@@ -89,7 +105,7 @@ def build_lod(builder, crc64):
                     continue
                 count = len(points)
                 raw.append((0x04000000 | count << 10 | (count * 16 - 1), addresses[index]))
-                path = vertex_data[index][0]
+                path = local_vertices[index][0]
                 hashed = crc64(path)
                 native.extend(((0x32000000 | count << 12 | count << 1, 0), (hashed >> 32, hashed & 0xFFFFFFFF)))
                 for i in range(0, len(selected), 2):

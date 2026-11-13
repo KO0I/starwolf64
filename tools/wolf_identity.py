@@ -4,6 +4,8 @@ from PIL import Image, ImageDraw, ImageFont
 from wolf_portraits import load_portrait_segment
 
 CARDS = (
+    ('ast_title', 0xE980, 144, 28, 'IA8', ('MEDUSA',)),
+    ('ast_title', 0x11890, 112, 26, 'IA8', ('Wolfen',)),
     ('ast_title', 0x10FA0, 176, 13, 'IA8', ("WOLF O'DONNELL",)),
     ('ast_title', 0xF940, 144, 13, 'IA8', ('KAMI',)),
     ('ast_title', 0x10090, 120, 13, 'IA8', ('KRYSTAL',)),

@@ -172,42 +172,42 @@ f32 D_menu_801AE620[] = { 1.9f, 2.4f, 0.9f, 1.9f, 1.8f, 2.4f };
 
 OptionEntry sOptionCardList[] = {
     {
-        { 0, 0, aMainGameCardTex, 0, 72, 12, 126.0f, 46.0f, 1.0f, 1.0f, 20, 0, 75, 255 },
+        { 0, 0, aMainGameCardTex, 0, 72, 12, 126.0f, 46.0f, 1.0f, 1.0f, 75, 0, 0, 255 },
         { 0.0f, 30.0f, -130.0f, 0.2f, 0.11f },
         { -40.0f, 27.0f, 80.0f },
         1,
         1,
     },
     {
-        { 0, 0, aTrainingCardTex, 0, 80, 12, 126.0f, 184.0f, 1.0f, 1.0f, 20, 0, 75, 255 },
+        { 0, 0, aTrainingCardTex, 0, 80, 12, 126.0f, 184.0f, 1.0f, 1.0f, 75, 0, 0, 255 },
         { 0.0f, 18.0f, -130.0f, 0.2f, 0.11f },
         { -40.0f, 16.0f, 80.0f },
         1,
         1,
     },
     {
-        { 0, 0, aVsCardTex, 0, 32, 10, 126.0f, 184.0f, 1.0f, 1.0f, 20, 0, 75, 255 },
+        { 0, 0, aVsCardTex, 0, 32, 10, 126.0f, 184.0f, 1.0f, 1.0f, 75, 0, 0, 255 },
         { 0.0f, 6.0f, -130.0f, 0.2f, 0.11f },
         { -40.0f, 6.0f, 80.0f },
         1,
         1,
     },
     {
-        { 0, 0, aRankingCardTex, 0, 64, 12, 110.0f, 91.0f, 1.0f, 1.0f, 20, 0, 75, 255 },
+        { 0, 0, aRankingCardTex, 0, 64, 12, 110.0f, 91.0f, 1.0f, 1.0f, 75, 0, 0, 255 },
         { 0.0f, -6.0f, -130.0f, 0.2f, 0.11f },
         { -40.0f, -5.0f, 80.0f },
         1,
         1,
     },
     {
-        { 0, 0, aSoundCardTex, 0, 64, 10, 110.0f, 116.0f, 1.0f, 1.0f, 20, 0, 75, 255 },
+        { 0, 0, aSoundCardTex, 0, 64, 10, 110.0f, 116.0f, 1.0f, 1.0f, 75, 0, 0, 255 },
         { 0.0f, -18.0f, -130.0f, 0.2f, 0.11f },
         { -40.0f, -16.0f, 80.0f },
         1,
         1,
     },
     {
-        { 0, 0, aDataCardTex, 0, 80, 10, 126.0f, 184.0f, 1.0f, 1.0f, 20, 0, 75, 255 },
+        { 0, 0, aDataCardTex, 0, 80, 10, 126.0f, 184.0f, 1.0f, 1.0f, 75, 0, 0, 255 },
         { 0.0f, -30.0f, -130.0f, 0.2f, 0.11f },
         { -40.0f, -27.0f, 80.0f },
         1,
@@ -217,21 +217,21 @@ OptionEntry sOptionCardList[] = {
 
 OptionEntry sOptionVSCardList[] = {
     {
-        { 0, 0, aVsPointMatchCardTex, 0, 96, 13, 110.0f, 91.0f, 1.0f, 1.0f, 20, 0, 75, 255 },
+        { 0, 0, aVsPointMatchCardTex, 0, 96, 13, 110.0f, 91.0f, 1.0f, 1.0f, 75, 0, 0, 255 },
         { 0.0f, 11.0f, -130.0f, 0.2f, 0.11f },
         { -40.0f, 11.0f, 80.0f },
         1,
         1,
     },
     {
-        { 0, 0, aVsBattleRoyalCardTex, 0, 96, 10, 110.0f, 116.0f, 1.0f, 1.0f, 20, 0, 75, 255 },
+        { 0, 0, aVsBattleRoyalCardTex, 0, 96, 10, 110.0f, 116.0f, 1.0f, 1.0f, 75, 0, 0, 255 },
         { 0.0f, 0.0f, -130.0f, 0.2f, 0.11f },
         { -40.0f, 0.0f, 80.0f },
         1,
         1,
     },
     {
-        { 0, 0, aVsTimeTrialCardTex, 0, 96, 10, 110.0f, 138.0f, 1.0f, 1.0f, 20, 0, 75, 255 },
+        { 0, 0, aVsTimeTrialCardTex, 0, 96, 10, 110.0f, 138.0f, 1.0f, 1.0f, 75, 0, 0, 255 },
         { 0.0f, -11.0f, -130.0f, 0.2f, 0.11f },
         { -40.0f, -11.0f, 80.0f },
         1,
@@ -1091,10 +1091,10 @@ void Option_MainMenu_Draw(void) {
             continue;
         }
         if ((i == 0) && sExpertModesEnabled && ((sMainMenuState == 0) || (sMainMenuState == 1))) {
-            Option_VsSelectionArrows_Draw(106.0f, 56.0f, 98.0f, 20, 0, 75);
+            Option_VsSelectionArrows_Draw(106.0f, 56.0f, 98.0f, 75, 0, 0);
         }
         if ((i == 4) && sExpertModesEnabled && ((sMainMenuState == 0) || (sMainMenuState == 1))) {
-            Option_VsSelectionArrows_Draw(106.0f, 152.0f, 98.0f, 20, 0, 75);
+            Option_VsSelectionArrows_Draw(106.0f, 152.0f, 98.0f, 75, 0, 0);
         }
         Option_DrawCardLabel(sOptionCardList[i].tex);
     }

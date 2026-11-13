@@ -11,6 +11,8 @@ SOURCE_SHA256 = '9874b8d4b440c676fffb1eab0bff6a552a21b17dbcb63f2e54b82bf4dd71973
 SOURCE_ROOT = 0xC8D0
 FIN_DISPLAY_LIST = 0xAAA0
 GREEN_ACCENT_TEXTURE = 0x80A0
+# Single-cycle renderers must receive the same RGB and alpha equations.
+HULL_COMBINE = (0xFC127E24, 0xFFFFF9FC)
 STEM = 'ast_great_fox'
 SEGMENT = 0x0E000000
 HULL_END = 0xDFB0
@@ -65,6 +67,15 @@ def flattened(data, offset, active=(), omit=()):
         else:
             yield first, second
     raise ValueError('Unterminated recovered Battleship display list')
+
+
+def combine_equations(first, second):
+    return (
+        (((first >> 20) & 15, (second >> 28) & 15, (first >> 15) & 31, (second >> 15) & 7),
+         ((first >> 12) & 7, (second >> 12) & 7, (first >> 9) & 7, (second >> 9) & 7)),
+        (((first >> 5) & 15, (second >> 24) & 15, first & 31, (second >> 6) & 7),
+         ((second >> 21) & 7, (second >> 3) & 7, (second >> 18) & 7, second & 7)),
+    )
 
 
 class Medusa:
@@ -166,8 +177,15 @@ class Medusa:
             if pointer >> 24 != 6 or offset + count * 16 > len(self.source):
                 raise ValueError('Invalid recovered Battleship vertex range')
             values = [list(struct.unpack_from('>hhhHhhBBBB', self.source, offset + 16 * i)) for i in range(count)]
+            light = (.3, .85, .4)
+            light_length = math.sqrt(sum(component * component for component in light))
             for value in values:
                 value[:3] = self.position(value[:3])
+                normal = [component if component < 128 else component - 256 for component in value[6:9]]
+                length = math.sqrt(sum(component * component for component in normal)) or 1
+                diffuse = max(0, sum(normal[i] * light[i] for i in range(3)) / (length * light_length))
+                shade = round(255 * (.2 + .25 * diffuse))
+                value[6:9] = [shade] * 3
             path = f'medusa/vtx_{offset:04x}_{count}'
             self.vertices[key] = self.emit_vertices(values, path)
         return self.vertices[key]
@@ -205,6 +223,9 @@ class Medusa:
 
     def build(self):
         raw, native = [], []
+        # Hull shading includes ambient light even in an unlit cutscene.
+        raw.append((0xB6000000, 0x20000))
+        native.append((0xB6000000, 0x20000))
         for index, (first, second) in enumerate(self.stream):
             opcode = first >> 24
             if opcode == 4:
@@ -212,6 +233,9 @@ class Medusa:
                 address, path = self.vertex(second, count)
                 raw.append((first, address))
                 native.extend(self.native_reference(0x32000000 | count << 12 | (start + count) << 1, 0, path))
+            elif opcode == 0xFC:
+                raw.append(HULL_COMBINE)
+                native.append(HULL_COMBINE)
             elif opcode == 0xFD:
                 following = next(((word, value) for word, value in self.stream[index + 1:] if word >> 24 in (0xF3, 0xFD)), None)
                 if following is None or following[0] >> 24 != 0xF3 or first != 0xFD100000:
@@ -224,6 +248,8 @@ class Medusa:
                 raw.append((first, second))
                 native.append((first, second))
                 self.triangle_count += 2 if opcode == 0xB1 else int(opcode == 0xBF)
+        raw.append((0xB7000000, 0x20000))
+        native.append((0xB7000000, 0x20000))
         self.add_engines(raw, native)
         self.add_lighting(raw, native)
         self.add_markings(raw, native)
@@ -471,6 +497,13 @@ class Medusa:
         _, start, end, compressed = struct.unpack_from('>IIII', rom, entry)
         if compressed or rom[start:end] != ending:
             raise ValueError('Browser ending still uses the old Great Fox exhaust')
+        for first, second in self.raw_stream:
+            if first >> 24 == 0xB7 and second & 0x20000:
+                break
+            if first >> 24 == 0xFC:
+                cycle0, cycle1 = combine_equations(first, second)
+                if cycle0 != cycle1:
+                    raise ValueError('Medusa hull combiner differs between native and browser single-cycle rendering')
         if self.triangle_count != 623 or len(self.vertices) != 85 or len(self.textures) != 10:
             raise ValueError('Recovered Battleship lost part of its original mesh')
         if any(pointer & 0xFFFFFF < 0x290 for pointer, count in self.vertices):
@@ -489,8 +522,12 @@ class Medusa:
             else:
                 for (before,), (after,) in zip(struct.iter_unpack('>H', original), struct.iter_unpack('>H', payload)):
                     r, g, b = after >> 11, (after >> 6) & 31, (after >> 1) & 31
-                    if not 1 <= r == g == b <= 4 or before & 1 != after & 1:
+                    if not 6 <= r == g == b <= 11 or before & 1 != after & 1:
                         raise ValueError('Medusa hull is not dark neutral gray with its original transparency')
+        for _, path in self.vertices.values():
+            values = struct.iter_unpack('<hhhHhhBBBB', self.builder.resources[path][68:])
+            if any(not 51 <= value[6] == value[7] == value[8] <= 115 for value in values):
+                raise ValueError('Medusa hull lost its neutral ambient shading')
         for offset, payload, path in self.allocations:
             if path.startswith('medusa/tex_engine_'):
                 for pixel, in struct.iter_unpack('>H', payload):
