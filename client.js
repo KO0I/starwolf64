@@ -139,7 +139,6 @@ function running() {
   play.disabled = true; play.textContent = 'Launch';
   screen.dataset.state = 'running';
   splash.hidden = true;
-  document.querySelector('#disconnect').disabled = false;
   document.querySelector('#save').disabled = false;
   document.querySelector('#load').disabled = false;
   status.textContent = 'Running locally';
@@ -150,7 +149,6 @@ function pause() {
   clear(); active = false; chatter.stop(); emulator().pause();
   play.disabled = false; play.textContent = 'Resume';
   screen.dataset.state = 'paused';
-  document.querySelector('#disconnect').disabled = true;
   status.textContent = 'Paused';
 }
 window.EJS_onGameStart = () => {
@@ -193,7 +191,6 @@ play.onclick = () => {
   };
   document.body.append(loader);
 };
-document.querySelector('#disconnect').onclick = pause;
 sound.onclick = () => {
   const player = emulator();
   if (!player?.started) return;
@@ -235,27 +232,6 @@ document.querySelectorAll('[data-action]').forEach(button => {
 const stick = document.querySelector('#stick');
 const deck = document.querySelector('.deck');
 deck.id = 'flight-deck';
-const placement = document.createElement('button');
-placement.id = 'control-placement'; placement.type = 'button';
-document.querySelector('#disconnect').before(placement);
-const controlStyles=document.createElement('style');
-controlStyles.textContent=`
-#screen.controls-in-view>.deck{position:absolute;z-index:2;inset:auto 0 0;width:100%;max-width:none;margin:0;padding:6px 12px 12px;grid-template-columns:110px 110px;justify-content:space-between;gap:0;background:linear-gradient(0deg,#11121ae8,#11121a00);align-items:end}
-#screen.controls-in-view .grip{gap:4px}
-#screen.controls-in-view .dpad,#screen.controls-in-view .control-label{display:none}
-#screen.controls-in-view #stick{width:80px;height:80px;border-width:4px}
-#screen.controls-in-view .knob{width:40px;height:40px;margin:-20px}
-#screen.controls-in-view .shoulder{width:46px;height:24px;font-size:12px}
-#screen.controls-in-view .c-buttons{grid-template:repeat(3,28px)/repeat(3,28px)}
-#screen.controls-in-view .c-buttons .pad-button{width:30px;height:30px;font-size:10px}
-#screen.controls-in-view .ab-buttons{height:40px;gap:12px}
-#screen.controls-in-view .ab-buttons .pad-button{width:34px;height:34px;font-size:16px}
-#screen.controls-in-view .ab-buttons .a{margin-top:6px}
-#screen.controls-in-view .start-row{position:absolute;bottom:14px;left:calc(50% - 15px)}
-#screen.controls-in-view .start-row span{display:none}
-#screen.controls-in-view .start{width:30px;height:30px;font-size:9px}
-`;
-document.head.append(controlStyles);
 let stickPointer;
 function steer(event) {
   if (event.pointerId !== stickPointer) return;
@@ -298,22 +274,6 @@ document.addEventListener('touchmove',event=>{
 },{capture:true,passive:false});
 deck.addEventListener('contextmenu', event => event.preventDefault());
 deck.addEventListener('dragstart', event => event.preventDefault());
-function setControlPlacement(inViewer, persist = true) {
-  clear();
-  if (inViewer) screen.append(deck);
-  else document.querySelector('#controls').insertBefore(deck, document.querySelector('#controls .hint'));
-  screen.classList.toggle('controls-in-view', inViewer);
-  placement.textContent = inViewer ? 'Controls: viewer' : 'Controls: below';
-  placement.setAttribute('aria-pressed', String(inViewer));
-  placement.title = inViewer ? 'Move flight controls below the viewer' : 'Move flight controls into the viewer';
-  if (persist) {
-    try {localStorage.setItem('starwolf64.controlPlacement', inViewer ? 'viewer' : 'below');} catch {}
-  }
-}
-let controlsInViewer = false;
-try {controlsInViewer = localStorage.getItem('starwolf64.controlPlacement') === 'viewer';} catch {}
-setControlPlacement(controlsInViewer, false);
-placement.onclick = () => setControlPlacement(!screen.classList.contains('controls-in-view'));
 document.addEventListener('fullscreenchange', clear);
 window.addEventListener('keydown', event => {
   const action = keyActions[event.code];
