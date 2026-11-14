@@ -1,0 +1,13 @@
+{
+  "source": "panther_head.glb",
+  "source_sha256": "63d7beb0d00f671730d9b9ced79f120416649ca43f9814a240f0d821e0b78bac",
+  "yaw": 0,
+  "pitch": 0,
+  "bones": [],
+  "size": [
+    360,
+    420
+  ],
+  "crop": null,
+  "sha256_png": "ade47de0bf4835d95b0926d696ea9eda587133cb90aaa8f6852f82db9999cb7b"
+}

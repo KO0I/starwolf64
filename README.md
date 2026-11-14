@@ -4,6 +4,8 @@ A playable Star Wolf mod built on HarbourMasters/Starship. The default browser e
 
 [Play on GitHub Pages](https://ko0i.github.io/starwolf64/) and [build or host your own copy](browser/README.md). The game domain is play.starwolf64.com. Squarespace can forward starwolf64.com there.
 
+Create layouts with the [local level editor](docs/level-editor.md). One JSON file exports to a native mod archive and a browser ROM patch. The first supported stage is Corneria on rails.
+
 The original Starship instructions and credits follow.
 
 [comment]: <> (Todo: Make Light Mode Image)

@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#10102f">
+  <title>Starwolf · Level editor</title>
+  <link rel="stylesheet" href="/editor.css">
+<style id="flight-club-theme">
+/* Lylat Flight Club theme, matching tools/multiplayer/web/styles.css in the multiplayer worktree. */
+body.flight-club {
+  --club-bg: #030310; --club-panel: #10102f; --club-text: #f1edff;
+  --club-cyan: #75ffff; --club-yellow: #fff075; --club-edge: #b6b4d0;
+  --club-title: linear-gradient(90deg, #3d0967, #181557);
+  --club-stars: radial-gradient(circle at 18px 29px,#fff 0 1px,transparent 1.5px),radial-gradient(circle at 119px 68px,#91c9ff 0 1px,transparent 1.5px),radial-gradient(circle at 62px 141px,#e8b9ff 0 1px,transparent 1.5px),radial-gradient(circle at 183px 107px,#fff 0 .7px,transparent 1.2px),radial-gradient(circle at 34px 184px,#4c527d 0 1px,transparent 1.5px);
+  color-scheme: dark; color: var(--club-text); background-color: var(--club-bg);
+  background-image: var(--club-stars); background-size: 211px 223px,283px 197px,173px 239px,307px 271px,157px 181px;
+  font-family: "Times New Roman", Georgia, serif;
+}
+.flight-club a { color: #75ffff; text-decoration: underline; }
+.flight-club a:visited { color: #f7a3ff; }
+.flight-club a:hover { color: #fff275; }
+.flight-club button:not(.pad-button), .flight-club input, .flight-club select, .flight-club input::file-selector-button { border-radius: 0; }
+.flight-club button:not(.pad-button), .flight-club input::file-selector-button {
+  background: #c4c4d2; color: #171127; border-color: #efedf8 #737083 #737083 #efedf8; border-style: outset;
+  box-shadow: inset 1px 1px #dedce9, inset -1px -1px #9b98ac; text-shadow: none;
+  font-family: Arial, sans-serif; font-weight: bold;
+}
+.flight-club button:not(.pad-button):hover:enabled { background: #e4e4f1; color: #171127; }
+.flight-club button:not(.pad-button):active:enabled { border-style: inset; }
+.flight-club button:disabled { color: #636174; background: #9291a7; opacity: .7; }
+.flight-club input:not([type=range]), .flight-club select {
+  background: #020417; color: #a5ffff; border-color: #6f6c85 #c6c3d6 #c6c3d6 #6f6c85; border-style: inset;
+  font-family: "Courier New", monospace;
+}
+.flight-club input::placeholder { color: #a3a3b8; opacity: 1; }
+.flight-club button:focus-visible, .flight-club input:focus-visible, .flight-club select:focus-visible, .flight-club summary:focus-visible {
+  outline: 2px solid #7effff; outline-offset: -3px;
+}
+.flight-club .club-logo {
+  color: #f3dfff; font-family: Georgia, serif; font-style: italic; font-weight: 900;
+  text-shadow: 2px 2px 0 #a3007a,3px 3px 0 #42005d,-1px -1px 0 #76ffff;
+}
+@supports (background-clip:text) {
+  .flight-club .club-logo {
+    background: linear-gradient(#fff 12%,#c8c0e9 35%,#8970b6 48%,#fff 51%,#f09dff 65%,#c928c7 85%);
+    background-clip: text; -webkit-background-clip: text; color: transparent; -webkit-text-stroke: .3px #f3dfff;
+  }
+}
+.flight-club .club-badge { background: #ffe82d; color: #210030; border: 1px outset #fff295; font-family: "Courier New",monospace; font-weight: bold; text-shadow: none; }
+/* The editor keeps its fixed-height workspace and mobile scrub dock. */
+body.club-editor { --bg:#030310; --panel:#10102f; --line:#6c658b; --text:#f1edff; --muted:#c0b8da; --green:#9cffff; }
+.club-editor .app-header { background-color: #030318; background-image: var(--club-stars); background-size: inherit; border-bottom: 2px ridge #b7adc8; box-shadow: none; }
+.club-editor .brand strong { font-size: 22px; letter-spacing: -1px; line-height: 1.12; }
+.club-editor .brand div > span { color: #fff071; font-family: "Courier New",monospace; }
+.club-editor .mark { color: #ffe82d; text-shadow: 1px 1px #a3007a; }
+.club-editor .document-state { color: #f1c2ff; font-family: "Courier New",monospace; }
+.club-editor .project-menu, .club-editor .workspace-toolbar, .club-editor .mobile-nav { background: #10102f; border-color: #9891ba; box-shadow: inset 0 1px #6b598a; }
+.club-editor .project-menu.open { border-color: #b7adc8; box-shadow: 4px 4px #000a; }
+.club-editor #message { color: #fff071; background: #210745; border-color: #b7adc8; font-family: "Courier New",monospace; box-shadow: none; }
+.club-editor #message.error { background:#4d123c; color:#fff2a2; }
+.club-editor aside { background: #10102ff5; }
+.club-editor .panel-heading { padding:3px 6px; color:#fff5a3; background:var(--club-title); box-shadow:inset 0 -1px #a1a0c3; }
+.club-editor h2, .club-editor label, .club-editor h3 { font-family:"Courier New",monospace; }
+.club-editor .panel-heading > span { color:#f1c2ff; }
+.club-editor #object-list { background:#05051a; border-color:#545079; }
+.club-editor #object-list button { background:transparent; color:#f1edff; box-shadow:none; font-weight:normal; }
+.club-editor #object-list button:hover { background:#272046; }
+.club-editor #object-list button[aria-selected=true] { background:#3d0967; color:#fff; box-shadow:inset 3px 0 #fff075; }
+.club-editor #object-list button small { color:#bff7ff; }
+.club-editor button.primary, .club-editor button.play { background:#fff075; color:#210030; border-color:#fff3aa #9d8436 #9d8436 #fff3aa; }
+.club-editor .view-switch button[aria-pressed=true], .club-editor .library-tabs button[aria-pressed=true], .club-editor .mobile-nav button[aria-pressed=true] {
+  color:#fff5a3; background:var(--club-title); border-color:#b6b4d0; box-shadow:inset 0 -2px #75ffff;
+}
+.club-editor .mobile-nav button:not([aria-pressed=true]) { background:#c4c4d2; color:#171127; }
+.club-editor .canvas-wrap { border-color:#77708c #b6b4d0 #b6b4d0 #77708c; }
+.club-editor .viewport-tag { padding:3px 5px; color:#fff5a3; background:#210745d9; font-family:"Courier New",monospace; }
+.club-editor .live-dot { background:#75ffff; box-shadow:0 0 3px #75ffff66; }
+.club-editor .legend, .club-editor #empty, .club-editor #empty h2 { color:#eae2ff; }
+.club-editor .view-footer { background:#09071be8; color:#bff7ff; }
+.club-editor .timeline { background:#10102f; border-color:#b6b4d0; box-shadow:inset 0 1px #b83bce; }
+.club-editor .scrub-heading > label { color:#fff075; }
+.club-editor .scrub-heading > output { color:#9cffff; font-family:"Courier New",monospace; }
+.club-editor #flight-distance { color:#a5ffff; background:#020417; border-color:#6f6c85 #c6c3d6 #c6c3d6 #6f6c85; }
+.club-editor #distance::-webkit-slider-runnable-track { background:#210745; border-color:#77708c #b6b4d0 #b6b4d0 #77708c; }
+.club-editor #distance::-webkit-slider-thumb { background:#fff075; border-color:#fff3aa #9d8436 #9d8436 #fff3aa; }
+.club-editor #distance::-moz-range-track { background:#210745; }
+.club-editor #distance::-moz-range-thumb { background:#fff075; border-color:#fff3aa #9d8436 #9d8436 #fff3aa; }
+.club-editor .scrub-hint { color:#c7bed9; }
+.club-editor #camera-settings summary { background:#210745; color:#fff5a3; box-shadow:inset 1px 1px #74618e,inset -1px -1px #030310; }
+.club-editor #flight-camera-fields { background:#10102f; border-color:#b6b4d0; box-shadow:4px 4px #000a; }
+.club-editor .notes h3 { color:#f1cdf9; }
+/* ROM preparation page. */
+body.club-player { display:flow-root; }
+.club-player #setup {
+  width:min(860px,calc(100% - 24px)); max-width:860px; margin:14px auto; padding:22px 28px 16px;
+  background:#030318f0; border:4px ridge #9891ba; box-shadow:5px 5px #000;
+}
+.club-player #setup > header { display:flex; flex-direction:column; text-align:center; gap:8px; letter-spacing:0; }
+.club-player #setup .club-logo { display:block; margin:5px 0 8px; font-size:clamp(32px,7.8vw,76px); line-height:1.12; letter-spacing:-3px; }
+.club-player #setup header span { display:inline-block; border-radius:0; padding:4px 12px; font-size:11px; letter-spacing:2px; }
+.club-player #headline { color:#fff; font:bold 22px/1.25 Georgia,serif; text-align:center; margin:20px 0 12px; letter-spacing:0; }
+.club-player #intro { color:#f1edff; text-align:center; font-size:16px; }
+.club-player #setup section { border:3px ridge #b6b4d0; border-radius:0; background:#10102f; padding:18px; box-shadow:3px 3px #000; }
+.club-player #setup label { color:#fff5a3; font:bold 14px "Courier New",monospace; }
+.club-player #setup input { padding:10px; max-width:100%; }
+.club-player #setup input::file-selector-button { border:2px outset #d8d8e4; padding:9px 10px; margin-right:8px; }
+.club-player #setup small, .club-player #setup footer, .club-player #setup p { color:#c7bed9; }
+.club-player #setup #status { color:#bff7ff; font:13px/1.5 "Courier New",monospace; }
+.club-player #setup #error { color:#ffe1ef; background:#4d123c; border:2px ridge #ffb3d9; padding:10px; }
+.club-player #setup #play:enabled { background:#fff075; color:#210030; border-color:#fff3aa; }
+.club-player #setup #actions { justify-content:center; }
+.club-player #setup footer { margin-top:18px; padding-top:10px; border-top:2px ridge #9a94b3; text-align:center; }
+.club-player #toolbar { background:var(--club-title); color:#fff5a3; }
+.club-player #toolbar button { font-size:12px; }
+.club-player #play-status { color:#bff7ff; font-family:"Courier New",monospace; }
+/* Runtime flight deck and the legacy emulator keep controller geometry unchanged. */
+.club-runtime #console { background:#030318eb; border-inline:2px ridge #9891ba; }
+.club-runtime header { border-bottom:2px ridge #b7adc8; padding-bottom:8px; }
+.club-runtime .brand { color:#f3dfff; font-style:italic; font-family:Georgia,serif; }
+.club-runtime .brand small { color:#fff071; font:9px "Courier New",monospace; }
+.club-runtime #game-state, .club-runtime .control-label, .club-runtime .start-row span, .club-runtime footer { color:#c7bed9; }
+.club-runtime #screen { border-radius:0; border-color:#b6b4d0; box-shadow:3px 3px #000; }
+.club-runtime #boot-panel { background:#10102f; }
+.club-runtime #boot-panel h1 { color:#f3dfff; font-family:Georgia,serif; font-style:italic; }
+.club-runtime #preloaded-label, .club-runtime #diagnostics { color:#c7bed9; }
+.club-runtime #launch { border:2px outset #fff3aa; border-radius:0; box-shadow:2px 2px #000; }
+.club-runtime #launch:enabled { background:#fff075; color:#210030; }
+.club-runtime #status { background:#020417; border-color:#a2a2b0; border-radius:0; color:#bff7ff; }
+.club-runtime #console:fullscreen { background-color:#030310; }
+.club-emulator { font-family:"Times New Roman",Georgia,serif; }
+.club-emulator > main { background:#030318f0; border-color:#9891ba; }
+.club-emulator > main > header { background:var(--club-title); border-color:#b6b4d0; }
+.club-emulator > main > header h1.club-logo { font-style:italic; font-family:Georgia,serif; text-shadow:2px 2px 0 #a3007a,3px 3px 0 #42005d,-1px -1px 0 #ff9a32; }
+.club-emulator #status { color:#bff7ff; font-family:"Courier New",monospace; }
+.club-emulator #screen { border-color:#b6b4d0; box-shadow:0 2px #b83bce; }
+.club-emulator #controls { background:#10102f; border-color:#9891ba; }
+.club-emulator .rom-picker { background:#210745; border:2px ridge #b7adc8; color:#fff5a3; }
+.club-emulator .rom-picker p, .club-emulator .hint, .club-emulator details { color:#c7bed9; }
+.club-emulator .rom-picker a { color:#75ffff; }
+.club-emulator #connect:not(:disabled) { background:#fff075; color:#210030; }
+.club-emulator #connect:disabled { color:#636174; background:#9291a7; box-shadow:none; }
+@media (max-width:1000px) {
+  .club-editor .brand strong { font-size:18px; }
+  .club-editor .mobile-nav { background:#10102f; }
+}
+@media (max-width:550px) {
+  .club-player #setup { width:calc(100% - 16px); padding:18px 14px 14px; margin:8px auto; }
+  .club-player #setup .club-logo { letter-spacing:-1px; }
+  .club-player #setup header span { font-size:10px; letter-spacing:1px; }
+  .club-player #setup section { padding:14px; }
+  .club-player #actions { display:grid; grid-template-columns:minmax(0,1fr); }
+  .club-player #setup input { font-size:16px; }
+}
+@media (max-width:360px) { .club-editor .brand strong { font-size:14px; } }
+
+</style>
+</head>
+<body data-panel="preview" data-library="placed" data-view="plan" class="flight-club club-editor">
+<header class="app-header">
+  <div class="brand"><span class="mark" aria-hidden="true">✦</span><div><strong class="club-logo">STARWOLF</strong><span>LEVEL EDITOR · CORNERIA</span></div></div>
+  <div class="document-state" id="document-state">Loading layout…</div>
+  <div class="header-actions"><button id="save" class="primary">Save layout</button><button id="files-toggle" aria-controls="project-menu" aria-expanded="false">Files <span aria-hidden="true">⌄</span></button></div>
+</header>
+<div id="files-backdrop" hidden></div>
+<nav id="project-menu" class="project-menu" aria-label="Layout files and exports">
+  <div class="menu-heading"><h2>Layout files</h2><button id="files-close" aria-label="Close Files menu">Close</button></div>
+  <div class="action-group"><button id="new">New layout</button><button id="stock">Load stock</button><button id="open">Open layout…</button><input id="file" type="file" accept=".json,application/json" hidden></div>
+  <div class="action-group history-actions"><button id="undo" title="Undo · Ctrl or Command Z">Undo</button><button id="redo" title="Redo · Ctrl or Command Shift Z">Redo</button></div>
+  <div class="action-group exports"><button id="native">Export native mod</button><button id="browser">Export browser patch</button><button id="play" class="play">▶ Playtest</button></div>
+</nav>
+<div id="message" role="status" aria-live="polite">Loading the local Corneria layout…</div>
+<main>
+  <aside class="library" id="library-panel" aria-labelledby="objects-title">
+    <div class="panel-heading"><h2 id="objects-title">Objects</h2><span id="count">0 / 803</span></div>
+    <div class="library-tabs" role="group" aria-label="Object library"><button id="placed-tab" aria-pressed="true">In this layout</button><button id="palette-tab" aria-pressed="false">Add object</button></div>
+    <div class="placed-objects">
+      <label for="search">Find in this layout</label><input id="search" type="search" placeholder="Name, type or ID">
+      <div id="object-list" role="listbox" aria-label="Objects in this layout"></div>
+    </div>
+    <section class="palette" aria-labelledby="palette-title">
+      <h2 id="palette-title">Add an object</h2>
+      <label for="category">Category</label><select id="category"><option value="">All categories</option></select>
+      <label for="palette-search">Find a type</label><input id="palette-search" type="search" placeholder="Building, ring, event…">
+      <label for="palette">Object type</label><select id="palette"></select>
+      <button id="add" class="primary">+ Add to layout</button>
+      <p id="capacity-note" class="subtle">Types already used by Corneria. Existing scripts supply their behavior.</p>
+    </section>
+  </aside>
+  <section class="workspace" aria-label="Layout preview">
+    <div class="workspace-toolbar">
+      <div class="view-switch" role="group" aria-label="Preview mode">
+        <button id="flight" aria-pressed="false">Flight</button><button id="scene" aria-pressed="false">Scene 3D</button><button id="plan" aria-pressed="true">Plan</button><button id="elevation" aria-pressed="false">Side</button>
+      </div>
+      <div class="view-actions"><span id="axis-label">Lateral X · flight distance</span><button id="fit" title="Fit layout or return to route start">Fit</button><button id="focus" title="Focus selected object">Focus</button><button id="zoom-out" aria-label="Zoom out">−</button><button id="zoom-in" aria-label="Zoom in">+</button></div>
+    </div>
+    <div class="canvas-wrap">
+      <canvas id="viewport" tabindex="0" aria-label="Level layout. Select objects in the list or click and drag their markers."></canvas>
+      <canvas id="scene-viewport" hidden tabindex="0" aria-label="3D scene preview. Drag to orbit. Pinch to zoom or use two fingers to pan."></canvas>
+      <div class="viewport-tag"><span class="live-dot"></span><span id="view-tag">SCHEMATIC VIEW</span></div>
+      <div id="empty" hidden><h2>Your route starts here</h2><p>Open Objects, then Add object to begin.</p></div>
+      <div class="legend"><span class="scenery">Scenery</span><span class="enemies">Enemies</span><span class="pickups">Pickups</span><span class="events">Events</span></div>
+      <div class="view-footer"><span id="view-help">Drag a marker to move · drag empty space to pan</span><span id="view-range"></span></div>
+    </div>
+    <section class="timeline" id="route-dock" aria-label="Route scrubber">
+      <div class="scrub-heading"><label for="distance">Scrub route</label><output id="distance-value" for="distance">0</output>
+        <details id="camera-settings"><summary>Camera</summary><div id="flight-camera-fields"><label for="flight-height">Height<input id="flight-height" type="number" min="50" max="5000" step="25" value="350" inputmode="decimal"></label><label for="flight-x">Lateral X<input id="flight-x" type="number" min="-10000" max="10000" step="100" value="0" inputmode="decimal"></label><p>Camera settings change the preview only.</p><button id="camera-close" type="button">Done</button></div></details>
+      </div>
+      <input id="distance" type="range" min="0" max="210000" step="1" value="0" aria-label="Scrub flight route">
+      <div id="flight-controls">
+        <button id="flight-start" aria-label="Jump to route start">Start</button><button id="flight-back" aria-label="Back 500 units">−500</button>
+        <label class="exact-distance" for="flight-distance"><span class="sr-only">Exact route distance</span><input id="flight-distance" type="number" min="0" step="any" value="0" inputmode="decimal" aria-label="Exact route distance"></label>
+        <button id="flight-forward" aria-label="Forward 500 units">+500</button><button id="flight-end" aria-label="Jump to route end">End</button>
+      </div>
+      <p class="scrub-hint">Drag to fly through the route. Preview does not run mission scripts.</p>
+    </section>
+  </section>
+  <aside class="inspector" id="inspector-panel" aria-labelledby="inspector-title">
+    <div class="panel-heading"><h2 id="inspector-title">Inspector</h2><span id="selection-index">—</span></div>
+    <button id="inspect-preview" class="mobile-only">Show in preview</button>
+    <label for="level-name">Layout name</label><input id="level-name" maxlength="120" value="Corneria">
+    <div id="no-selection"><p>Select an object in Preview or Objects to edit it.</p><button id="choose-object" class="mobile-only">Choose an object</button></div>
+    <fieldset id="fields" disabled>
+      <legend id="selected-name">Object</legend>
+      <label for="object-id">Object type</label><select id="object-id"></select>
+      <label for="path-distance">Spawn distance</label><input id="path-distance" type="number" min="0" step="any" inputmode="decimal">
+      <h3>Position offsets</h3><div class="triple"><label>X<input id="offset-x" type="number" min="-32768" max="32767" step="1" inputmode="decimal"></label><label>Y<input id="offset-y" type="number" min="-32768" max="32767" step="1" inputmode="decimal"></label><label>Z<input id="offset-z" type="number" min="-32768" max="32767" step="1" inputmode="decimal"></label></div>
+      <h3>Rotation · degrees</h3><div class="triple"><label>X<input id="rotation-x" type="number" min="-32768" max="32767" step="1" inputmode="decimal"></label><label>Y<input id="rotation-y" type="number" min="-32768" max="32767" step="1" inputmode="decimal"></label><label>Z<input id="rotation-z" type="number" min="-32768" max="32767" step="1" inputmode="decimal"></label></div>
+      <p id="uid" class="subtle"></p><div class="object-actions"><button id="duplicate">Duplicate</button><button id="delete" class="danger">Delete</button></div>
+    </fieldset>
+    <div class="notes"><h3>One layout. Both targets.</h3><p>Save layout to keep editing. Use Files to export a native mod or browser patch.</p><p>803 object slots. A new layout needs mission events to become a complete mission.</p><a id="preview-link" hidden target="_blank" rel="noopener">Open latest playtest ↗</a></div>
+  </aside>
+</main>
+<nav class="mobile-nav" aria-label="Editor panels"><button id="panel-preview" aria-controls="route-dock" aria-pressed="true">Preview</button><button id="panel-objects" aria-controls="library-panel" aria-pressed="false">Objects</button><button id="panel-inspector" aria-controls="inspector-panel" aria-pressed="false">Inspector</button></nav>
+<script type="module" src="/editor.mjs"></script>
+</body>
+</html>

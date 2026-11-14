@@ -240,8 +240,8 @@ class Compiler:
                     raise ValueError('Expected reviewed triangle primitives')
                 material = glb.doc.get('materials', [{}])[part.get('material', 0)]
                 precision = material.get('extras', {}).get('runtime_vertex_precision', 1)
-                if precision not in (1, 2, 4, 8):
-                    raise ValueError('Runtime vertex precision must be 1, 2, 4, or 8')
+                if precision not in (1, 2, 4, 8, 16):
+                    raise ValueError('Runtime vertex precision must be 1, 2, 4, 8, or 16')
                 address, texture_path, width, height, (cms, cmt), region, palette = self.texture(glb, material)
                 command(0xE7000000, 0)
                 nearest = material.get('extras', {}).get('runtime_texture_filter') == 'nearest'

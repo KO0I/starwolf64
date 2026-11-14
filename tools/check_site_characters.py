@@ -21,6 +21,7 @@ def main():
     parser.add_argument('--output', type=Path, default=ROOT / 'browser/runtime/characters-proof')
     parser.add_argument('--kami-closeup', action='store_true', help='Also capture Kami at three times title scale')
     parser.add_argument('--panther-closeup', action='store_true', help='Also capture Panther from front, quarter and profile')
+    parser.add_argument('--wolf-closeup', action='store_true', help='Capture the edited current Wolf head from four angles')
     parser.add_argument('--krystal-closeup', action='store_true', help='Capture Krystal from front, quarter and profile')
     args = parser.parse_args()
     run = args.output.resolve()
@@ -116,14 +117,14 @@ def main():
         time.sleep(.5)
         subprocess.run(['import', '-display', display, '-window', 'root', str(run / 'crew-next.png')],
                        env=env, check=True, timeout=5)
-        if args.kami_closeup or args.panther_closeup or args.krystal_closeup:
-            closeup_slot = 1 if args.panther_closeup else 2 if args.krystal_closeup else 3
-            closeup_name = 'panther' if args.panther_closeup else 'krystal' if args.krystal_closeup else 'kami'
-            commands = ['break Title_Screen_Draw', 'continue', f'set {{float}}&D_menu_801B84D4 = {0.7 if args.krystal_closeup else 1.5}',
+        if args.wolf_closeup or args.kami_closeup or args.panther_closeup or args.krystal_closeup:
+            closeup_slot = 0 if args.wolf_closeup else 1 if args.panther_closeup else 2 if args.krystal_closeup else 3
+            closeup_name = 'wolf' if args.wolf_closeup else 'panther' if args.panther_closeup else 'krystal' if args.krystal_closeup else 'kami'
+            commands = ['break Title_Screen_Draw', 'continue', f'set {{float}}&D_menu_801B84D4 = {0.95 if args.wolf_closeup else 0.7 if args.krystal_closeup else 1.5}',
                         'set {float}&sTitleStarfoxLogoXpos = 10000']
             for index in range(4):
                 base = f'(char*)&sTitleTeam + {index * team_size}'
-                for offset, value in [(team_pos, 0 if index == closeup_slot else 10000), (team_pos + 4, 15 if args.krystal_closeup else -350), (team_pos + 8, 0),
+                for offset, value in [(team_pos, 0 if index == closeup_slot else 10000), (team_pos + 4, -157.5 if args.wolf_closeup else 15 if args.krystal_closeup else -350), (team_pos + 8, 0),
                                       (team_rotation, 0), (team_rotation + 4, 0), (team_rotation + 8, 0)]:
                     commands.append(f'set {{float}}({base} + {offset}) = {value}')
             debug(commands)

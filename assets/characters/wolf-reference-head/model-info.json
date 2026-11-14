@@ -1,0 +1,130 @@
+{
+  "name": "Wolf reference head",
+  "triangles": 477,
+  "mesh_objects": 23,
+  "materials": 19,
+  "height_m": 0.3,
+  "glb_exported_triangles": 477,
+  "glb_reimported_triangles": 477,
+  "nondegenerate_triangles": true,
+  "minimum_triangle_area_m2": 4.6278216814243933e-07,
+  "external_textures": false,
+  "rigged": false,
+  "parts": [
+    {
+      "name": "Skull",
+      "triangles": 136,
+      "vertices": 70
+    },
+    {
+      "name": "Neck",
+      "triangles": 20,
+      "vertices": 12
+    },
+    {
+      "name": "Ear L",
+      "triangles": 8,
+      "vertices": 6
+    },
+    {
+      "name": "Ear inset L",
+      "triangles": 1,
+      "vertices": 3
+    },
+    {
+      "name": "Cheek ruff L",
+      "triangles": 34,
+      "vertices": 19
+    },
+    {
+      "name": "Ear R",
+      "triangles": 8,
+      "vertices": 6
+    },
+    {
+      "name": "Ear inset R",
+      "triangles": 1,
+      "vertices": 3
+    },
+    {
+      "name": "Cheek ruff R",
+      "triangles": 34,
+      "vertices": 19
+    },
+    {
+      "name": "Crown tuft",
+      "triangles": 8,
+      "vertices": 6
+    },
+    {
+      "name": "Cream muzzle",
+      "triangles": 44,
+      "vertices": 24
+    },
+    {
+      "name": "Lower jaw",
+      "triangles": 18,
+      "vertices": 11
+    },
+    {
+      "name": "Snout bridge",
+      "triangles": 12,
+      "vertices": 8
+    },
+    {
+      "name": "Mouth seam L",
+      "triangles": 4,
+      "vertices": 6
+    },
+    {
+      "name": "Mouth seam R",
+      "triangles": 4,
+      "vertices": 6
+    },
+    {
+      "name": "Nose",
+      "triangles": 20,
+      "vertices": 12
+    },
+    {
+      "name": "Exposed eye socket",
+      "triangles": 3,
+      "vertices": 5
+    },
+    {
+      "name": "Exposed eye",
+      "triangles": 2,
+      "vertices": 4
+    },
+    {
+      "name": "Russet iris",
+      "triangles": 6,
+      "vertices": 8
+    },
+    {
+      "name": "Pupil",
+      "triangles": 6,
+      "vertices": 8
+    },
+    {
+      "name": "Eye catchlight",
+      "triangles": 6,
+      "vertices": 8
+    },
+    {
+      "name": "Angled brow",
+      "triangles": 12,
+      "vertices": 8
+    },
+    {
+      "name": "Black eyepatch",
+      "triangles": 22,
+      "vertices": 13
+    },
+    {
+      "name": "Eyepatch strap",
+      "triangles": 68,
+      "vertices": 36
+    }
+  ]
+}

@@ -43,6 +43,7 @@ def export(build, output, *, domain=None):
         sources[name] = ROOT / "tools/wasm/web" / name
     for name in ("rom-file.mjs", "rom-patch.mjs", "coi-serviceworker.js"):
         sources[name] = ROOT / "browser" / name
+    sources["runtime/launch-background.jpg"] = ROOT / "browser/launch-background.jpg"
     for suffix in ("html", "js", "wasm", "data"):
         sources["runtime/Starship." + suffix] = build / ("Starship." + suffix)
     for suffix in ("mjs", "wasm", "data"):

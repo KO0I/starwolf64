@@ -22,6 +22,7 @@
 #include "assets/ast_area_6.h"
 #include "assets/ast_zoness.h"
 #include "port/hooks/Events.h"
+#include "port/Flight6DOF.h"
 
 extern float gCurrentScreenWidth;
 extern float gCurrentScreenHeight;
@@ -3742,6 +3743,55 @@ void Player_CheckBounds360(Player* player) {
     }
 }
 
+static bool Player_Uses6DOF(Player* player) {
+    return (player->form == FORM_ARWING) && CVarGetInteger("gSixDofFlight", 0);
+}
+
+static void Player_Update6DOFToggle(Player* player) {
+    if ((player->num != 0) || (player->form != FORM_ARWING) ||
+        (player->state != PLAYERSTATE_ACTIVE) || (gPlayState != PLAY_UPDATE) ||
+        (gLevelMode == LEVELMODE_TURRET) || player->somersault ||
+        !(gInputPress->button & R_CBUTTONS) || (gRadioState != 0) ||
+        (gCallTimer != 0) || (Audio_GetCurrentVoice() != 0)) {
+        return;
+    }
+
+    CVarSetInteger("gSixDofFlight", !CVarGetInteger("gSixDofFlight", 0));
+    CVarSave();
+    gInputPress->button &= ~R_CBUTTONS;
+}
+
+static void Player_Steer6DOF(Player* player, bool allRange) {
+    f32 pitchInput = gInputPress->stick_y * (CVarGetInteger("gInvertYAxis", 0) ? -1.0f : 1.0f);
+    f32 rollStep = -gInputPress->stick_x * (3.0f / 85.0f);
+    f32 extraRoll = player->zRotBank + player->zRotBarrelRoll;
+    f32 roll = Flight6DOF_Wrap(player->rot.z + extraRoll);
+    f32 flapPitch = pitchInput * 0.75f;
+    f32 flapRoll = gInputPress->stick_x * 0.75f;
+
+    Math_SmoothStepToF(&player->arwing.unk_28, 0.0f, 0.1f, 100.0f, 0.0f);
+    Math_SmoothStepToF(&player->arwing.upperRightFlapYrot, flapPitch + flapRoll, 0.1f, 100.0f, 0.0f);
+    Math_SmoothStepToF(&player->arwing.bottomRightFlapYrot, flapPitch + flapRoll, 0.1f, 100.0f, 0.0f);
+    Math_SmoothStepToF(&player->arwing.upperLeftFlapYrot, flapPitch - flapRoll, 0.1f, 100.0f, 0.0f);
+    Math_SmoothStepToF(&player->arwing.bottomLeftFlapYrot, flapPitch - flapRoll, 0.1f, 100.0f, 0.0f);
+
+    if (allRange) {
+        f32 pitch = player->xRot_120 + player->rot.x + player->aerobaticPitch;
+        f32 yaw = player->yRot_114 + player->rot.y;
+        Flight6DOF_Rotate(&pitch, &yaw, &roll, pitchInput * (1.8f / 85.0f), rollStep);
+        player->rot.x = pitch - player->xRot_120;
+        player->yRot_114 = yaw;
+        player->rot.y = player->yRotVel_11C = player->aerobaticPitch = 0.0f;
+    } else {
+        /* On rails, keep the nose within the stage's forward flight corridor. */
+        roll = Flight6DOF_Wrap(roll + rollStep);
+        Math_SmoothStepToAngle(&player->aerobaticPitch, 0.0f, 0.1f, 5.0f, 0.01f);
+        Math_SmoothStepToF(&player->rot.x, COS_DEG(roll) * pitchInput * 0.68f, 0.1f, 2.3f, 0.03f);
+        Math_SmoothStepToF(&player->rot.y, SIN_DEG(roll) * pitchInput * 0.68f, 0.1f, 2.3f, 0.03f);
+    }
+    player->rot.z = Flight6DOF_Wrap(roll - extraRoll);
+}
+
 void Player_MoveArwing360(Player* player) {
     f32 sp7C;
     f32 sp78;
@@ -3756,96 +3806,100 @@ void Player_MoveArwing360(Player* player) {
     Vec3f sp4C;
     Vec3f sp40;
 
-    gPlayerTurnRate = 2.3f;
-    gPlayerTurnStickMod = 0.68f;
+    if (Player_Uses6DOF(player)) {
+        Player_Steer6DOF(player, true);
+    } else {
+        gPlayerTurnRate = 2.3f;
+        gPlayerTurnStickMod = 0.68f;
 
-    sp7C = -gInputPress->stick_x;
+        sp7C = -gInputPress->stick_x;
 
-    sp78 = gInputPress->stick_y * (CVarGetInteger("gInvertYAxis", 0) == 1 ? -1 : 1);
+        sp78 = gInputPress->stick_y * (CVarGetInteger("gInvertYAxis", 0) == 1 ? -1 : 1);
 
-    Math_SmoothStepToAngle(&player->aerobaticPitch, 0.0f, 0.1f, 5.0f, 0.01f);
-    Matrix_RotateZ(gCalcMatrix, -player->zRotBank * M_DTOR, MTXF_NEW);
+        Math_SmoothStepToAngle(&player->aerobaticPitch, 0.0f, 0.1f, 5.0f, 0.01f);
+        Matrix_RotateZ(gCalcMatrix, -player->zRotBank * M_DTOR, MTXF_NEW);
 
-    sp4C.x = sp7C * 0.75f;
-    sp4C.y = sp78 * 0.75f;
-    sp4C.z = 0.0f;
+        sp4C.x = sp7C * 0.75f;
+        sp4C.y = sp78 * 0.75f;
+        sp4C.z = 0.0f;
 
-    Matrix_MultVec3fNoTranslate(gCalcMatrix, &sp4C, &sp40);
+        Matrix_MultVec3fNoTranslate(gCalcMatrix, &sp4C, &sp40);
 
-    sp60 = sp40.y;
-    sp5C = sp58 = 0.0f;
+        sp60 = sp40.y;
+        sp5C = sp58 = 0.0f;
 
-    if (sp40.x < -5.0f) {
-        sp5C = -sp40.x;
+        if (sp40.x < -5.0f) {
+            sp5C = -sp40.x;
+        }
+        if (sp40.x > 5.0f) {
+            sp58 = sp40.x;
+        }
+
+        Math_SmoothStepToF(&player->arwing.unk_28, 0.0f, 0.1f, 100.0f, 0.0f);
+        Math_SmoothStepToF(&player->arwing.upperRightFlapYrot, -sp60 + sp5C, 0.1f, 100.0f, 0.0f);
+        Math_SmoothStepToF(&player->arwing.bottomRightFlapYrot, -sp60 - sp5C, 0.1f, 100.0f, 0.0f);
+        Math_SmoothStepToF(&player->arwing.upperLeftFlapYrot, -sp60 + sp58, 0.1f, 100.0f, 0.0f);
+        Math_SmoothStepToF(&player->arwing.bottomLeftFlapYrot, -sp60 - sp58, 0.1f, 100.0f, 0.0f);
+
+        scale = 0.1f;
+        if ((player->zRotBank > 10.0f) && (sp7C > 0)) {
+            gPlayerTurnRate *= 2.0f;
+            scale = 0.2f;
+        }
+        if ((player->zRotBank < -10.0f) && (sp7C < 0)) {
+            gPlayerTurnRate *= 2.0f;
+            scale = 0.2f;
+        }
+
+        Math_SmoothStepToF(&player->rot.y, sp7C * gPlayerTurnStickMod, scale, gPlayerTurnRate, 0.03f);
+
+        scale = 0.03f;
+        if ((player->zRotBank > 10.0f) && (sp7C > 0)) {
+            scale = 0.05f;
+        }
+        if ((player->zRotBank < -10.0f) && (sp7C < 0)) {
+            scale = 0.05f;
+        }
+
+        Math_SmoothStepToF(&player->yRotVel_11C, player->rot.y * scale, 0.1f, 0.8f, 0.05f);
+
+        player->yRot_114 += player->yRotVel_11C;
+        if (player->yRot_114 >= 360.0f) {
+            player->yRot_114 -= 360.0f;
+        }
+        if (player->yRot_114 < 0.0f) {
+            player->yRot_114 += 360.0f;
+        }
+
+        gPlayerTurnRate = 2.3f;
+        var_fa1 = 0.1f;
+        temp = -sp78 * gPlayerTurnStickMod;
+
+        if ((temp <= 0.0f) && (player->pos.y < (gGroundHeight + 50.0f))) {
+            gPlayerTurnRate *= 2.0f;
+            temp = 0.0f;
+            var_fa1 = 0.2f;
+        }
+
+        Math_SmoothStepToF(&player->rot.x, temp, var_fa1, gPlayerTurnRate, 0.03f);
+
+        var_fv1 = 1.5f;
+        if (player->pos.y < (gGroundHeight + 70.0f)) {
+            var_fv1 = 0.8f;
+        }
+
+        if (!((gInputHold->button & R_TRIG) && (gInputHold->button & Z_TRIG)) &&
+            !(!(gInputHold->button & R_TRIG) && !(gInputHold->button & Z_TRIG))) {
+            var_fv1 = 0.1f;
+        }
+
+        var_fv0 = 4.0f;
+        if (sp7C == 0) {
+            var_fv0 = 1.0f;
+        }
+
+        Math_SmoothStepToF(&player->rot.z, sp7C * 0.6f * var_fv1, 0.1f, var_fv0, 0.03f);
     }
-    if (sp40.x > 5.0f) {
-        sp58 = sp40.x;
-    }
-
-    Math_SmoothStepToF(&player->arwing.unk_28, 0.0f, 0.1f, 100.0f, 0.0f);
-    Math_SmoothStepToF(&player->arwing.upperRightFlapYrot, -sp60 + sp5C, 0.1f, 100.0f, 0.0f);
-    Math_SmoothStepToF(&player->arwing.bottomRightFlapYrot, -sp60 - sp5C, 0.1f, 100.0f, 0.0f);
-    Math_SmoothStepToF(&player->arwing.upperLeftFlapYrot, -sp60 + sp58, 0.1f, 100.0f, 0.0f);
-    Math_SmoothStepToF(&player->arwing.bottomLeftFlapYrot, -sp60 - sp58, 0.1f, 100.0f, 0.0f);
-
-    scale = 0.1f;
-    if ((player->zRotBank > 10.0f) && (sp7C > 0)) {
-        gPlayerTurnRate *= 2.0f;
-        scale = 0.2f;
-    }
-    if ((player->zRotBank < -10.0f) && (sp7C < 0)) {
-        gPlayerTurnRate *= 2.0f;
-        scale = 0.2f;
-    }
-
-    Math_SmoothStepToF(&player->rot.y, sp7C * gPlayerTurnStickMod, scale, gPlayerTurnRate, 0.03f);
-
-    scale = 0.03f;
-    if ((player->zRotBank > 10.0f) && (sp7C > 0)) {
-        scale = 0.05f;
-    }
-    if ((player->zRotBank < -10.0f) && (sp7C < 0)) {
-        scale = 0.05f;
-    }
-
-    Math_SmoothStepToF(&player->yRotVel_11C, player->rot.y * scale, 0.1f, 0.8f, 0.05f);
-
-    player->yRot_114 += player->yRotVel_11C;
-    if (player->yRot_114 >= 360.0f) {
-        player->yRot_114 -= 360.0f;
-    }
-    if (player->yRot_114 < 0.0f) {
-        player->yRot_114 += 360.0f;
-    }
-
-    gPlayerTurnRate = 2.3f;
-    var_fa1 = 0.1f;
-    temp = -sp78 * gPlayerTurnStickMod;
-
-    if ((temp <= 0.0f) && (player->pos.y < (gGroundHeight + 50.0f))) {
-        gPlayerTurnRate *= 2.0f;
-        temp = 0.0f;
-        var_fa1 = 0.2f;
-    }
-
-    Math_SmoothStepToF(&player->rot.x, temp, var_fa1, gPlayerTurnRate, 0.03f);
-
-    var_fv1 = 1.5f;
-    if (player->pos.y < (gGroundHeight + 70.0f)) {
-        var_fv1 = 0.8f;
-    }
-
-    if (!((gInputHold->button & R_TRIG) && (gInputHold->button & Z_TRIG)) &&
-        !(!(gInputHold->button & R_TRIG) && !(gInputHold->button & Z_TRIG))) {
-        var_fv1 = 0.1f;
-    }
-
-    var_fv0 = 4.0f;
-    if (sp7C == 0) {
-        var_fv0 = 1.0f;
-    }
-
-    Math_SmoothStepToF(&player->rot.z, sp7C * 0.6f * var_fv1, 0.1f, var_fv0, 0.03f);
 
     player->bankAngle = player->rot.z + player->zRotBank + player->zRotBarrelRoll;
 
@@ -3999,98 +4053,102 @@ void Player_MoveArwingOnRails(Player* player) {
     Vec3f sp50;
     Vec3f sp44;
 
-    gPlayerTurnRate = 2.3f;
-    gPlayerTurnStickMod = 0.68f;
-
-    if ((gInputPress->stick_x != 0) || (gInputPress->stick_y != 0)) {
-        gPlayerTurnStickMod = 0.68f; //! FAKE ?
-    }
-
-    stickX = -gInputPress->stick_x;
-    stickY = gInputPress->stick_y * (CVarGetInteger("gInvertYAxis", 0) == 1 ? -1 : 1);
-
-    Math_SmoothStepToAngle(&player->aerobaticPitch, 0.0f, 0.1f, 5.0f, 0.01f);
-
-    if (player->alternateView) {
-        Matrix_RotateZ(gCalcMatrix, player->zRotBank * M_DTOR, MTXF_NEW);
-
-        sp68.z = 0.0f;
-        sp68.x = stickX;
-        sp68.y = stickY;
-
-        Matrix_MultVec3f(gCalcMatrix, &sp68, &sp5C);
-
-        stickX = sp5C.x;
-        stickY = sp5C.y;
+    if (Player_Uses6DOF(player)) {
+        Player_Steer6DOF(player, false);
     } else {
-        Matrix_RotateZ(gCalcMatrix, (-player->zRotBank) * M_DTOR, MTXF_NEW);
+        gPlayerTurnRate = 2.3f;
+        gPlayerTurnStickMod = 0.68f;
 
-        sp68.z = 0.0f;
-        sp68.x = stickX * 0.75f;
-        sp68.y = stickY * 0.75f;
-
-        Matrix_MultVec3fNoTranslate(gCalcMatrix, &sp68, &sp5C);
-
-        sp7C = sp5C.y;
-        sp78 = (sp74 = 0.0f);
-
-        if (sp5C.x < -5.0f) {
-            sp78 = -sp5C.x;
+        if ((gInputPress->stick_x != 0) || (gInputPress->stick_y != 0)) {
+            gPlayerTurnStickMod = 0.68f; //! FAKE ?
         }
-        if (sp5C.x > 5.0f) {
-            sp74 = sp5C.x;
+
+        stickX = -gInputPress->stick_x;
+        stickY = gInputPress->stick_y * (CVarGetInteger("gInvertYAxis", 0) == 1 ? -1 : 1);
+
+        Math_SmoothStepToAngle(&player->aerobaticPitch, 0.0f, 0.1f, 5.0f, 0.01f);
+
+        if (player->alternateView) {
+            Matrix_RotateZ(gCalcMatrix, player->zRotBank * M_DTOR, MTXF_NEW);
+
+            sp68.z = 0.0f;
+            sp68.x = stickX;
+            sp68.y = stickY;
+
+            Matrix_MultVec3f(gCalcMatrix, &sp68, &sp5C);
+
+            stickX = sp5C.x;
+            stickY = sp5C.y;
+        } else {
+            Matrix_RotateZ(gCalcMatrix, (-player->zRotBank) * M_DTOR, MTXF_NEW);
+
+            sp68.z = 0.0f;
+            sp68.x = stickX * 0.75f;
+            sp68.y = stickY * 0.75f;
+
+            Matrix_MultVec3fNoTranslate(gCalcMatrix, &sp68, &sp5C);
+
+            sp7C = sp5C.y;
+            sp78 = (sp74 = 0.0f);
+
+            if (sp5C.x < -5.0f) {
+                sp78 = -sp5C.x;
+            }
+            if (sp5C.x > 5.0f) {
+                sp74 = sp5C.x;
+            }
+            Math_SmoothStepToF(&player->arwing.unk_28, 0.0f, 0.1f, 100.0f, 0.0f);
+            Math_SmoothStepToF(&player->arwing.upperRightFlapYrot, (-sp7C) + sp78, 0.1f, 100.0f, 0.0f);
+            Math_SmoothStepToF(&player->arwing.bottomRightFlapYrot, (-sp7C) - sp78, 0.1f, 100.0f, 0.0f);
+            Math_SmoothStepToF(&player->arwing.upperLeftFlapYrot, (-sp7C) + sp74, 0.1f, 100.0f, 0.0f);
+            Math_SmoothStepToF(&player->arwing.bottomLeftFlapYrot, (-sp7C) - sp74, 0.1f, 100.0f, 0.0f);
         }
-        Math_SmoothStepToF(&player->arwing.unk_28, 0.0f, 0.1f, 100.0f, 0.0f);
-        Math_SmoothStepToF(&player->arwing.upperRightFlapYrot, (-sp7C) + sp78, 0.1f, 100.0f, 0.0f);
-        Math_SmoothStepToF(&player->arwing.bottomRightFlapYrot, (-sp7C) - sp78, 0.1f, 100.0f, 0.0f);
-        Math_SmoothStepToF(&player->arwing.upperLeftFlapYrot, (-sp7C) + sp74, 0.1f, 100.0f, 0.0f);
-        Math_SmoothStepToF(&player->arwing.bottomLeftFlapYrot, (-sp7C) - sp74, 0.1f, 100.0f, 0.0f);
+
+        sp84 = 0.1f;
+        if ((player->zRotBank > 10.0f) && (stickX > 0)) {
+            sp84 = 0.2f;
+            gPlayerTurnRate *= 2.0f;
+        }
+        if ((player->zRotBank < -10.0f) && (stickX < 0)) {
+            sp84 = 0.2f;
+            gPlayerTurnRate *= 2.0f;
+        }
+        if (player->rollState != 0) {
+            sp84 = 0.2f;
+            gPlayerTurnRate = 6.8999996f; // 690.0f * 0.01f
+        }
+
+        Math_SmoothStepToF(&player->rot.y, stickX * gPlayerTurnStickMod, sp84, gPlayerTurnRate, 0.03f);
+
+        gPlayerTurnRate = 2.3f;
+        sp84 = 0.1f;
+        var_fa1 = -stickY * gPlayerTurnStickMod;
+
+        if ((var_fa1 <= 0.0f) && (player->pos.y < (gGroundHeight + 50.0f))) {
+            var_fa1 = 0.0f;
+            sp84 = 0.2f;
+            gPlayerTurnRate *= 2.0f;
+        }
+
+        Math_SmoothStepToF(&player->rot.x, var_fa1, sp84, gPlayerTurnRate, 0.03f);
+
+        var_fv1 = 1.0f;
+        if (player->pos.y < (gGroundHeight + 70.0f)) {
+            var_fv1 = 0.8f;
+        }
+
+        if (!((gInputHold->button & R_TRIG) && (gInputHold->button & Z_TRIG)) &&
+            !(!(gInputHold->button & R_TRIG) && !(gInputHold->button & Z_TRIG))) {
+            var_fv1 = 0.1f;
+        }
+
+        var_fv0 = 4.0f;
+        if (stickX == 0) {
+            var_fv0 = 1.0f;
+        }
+
+        Math_SmoothStepToF(&player->rot.z, (stickX * 0.6f) * var_fv1, 0.1f, var_fv0, 0.03f);
     }
-
-    sp84 = 0.1f;
-    if ((player->zRotBank > 10.0f) && (stickX > 0)) {
-        sp84 = 0.2f;
-        gPlayerTurnRate *= 2.0f;
-    }
-    if ((player->zRotBank < -10.0f) && (stickX < 0)) {
-        sp84 = 0.2f;
-        gPlayerTurnRate *= 2.0f;
-    }
-    if (player->rollState != 0) {
-        sp84 = 0.2f;
-        gPlayerTurnRate = 6.8999996f; // 690.0f * 0.01f
-    }
-
-    Math_SmoothStepToF(&player->rot.y, stickX * gPlayerTurnStickMod, sp84, gPlayerTurnRate, 0.03f);
-
-    gPlayerTurnRate = 2.3f;
-    sp84 = 0.1f;
-    var_fa1 = -stickY * gPlayerTurnStickMod;
-
-    if ((var_fa1 <= 0.0f) && (player->pos.y < (gGroundHeight + 50.0f))) {
-        var_fa1 = 0.0f;
-        sp84 = 0.2f;
-        gPlayerTurnRate *= 2.0f;
-    }
-
-    Math_SmoothStepToF(&player->rot.x, var_fa1, sp84, gPlayerTurnRate, 0.03f);
-
-    var_fv1 = 1.0f;
-    if (player->pos.y < (gGroundHeight + 70.0f)) {
-        var_fv1 = 0.8f;
-    }
-
-    if (!((gInputHold->button & R_TRIG) && (gInputHold->button & Z_TRIG)) &&
-        !(!(gInputHold->button & R_TRIG) && !(gInputHold->button & Z_TRIG))) {
-        var_fv1 = 0.1f;
-    }
-
-    var_fv0 = 4.0f;
-    if (stickX == 0) {
-        var_fv0 = 1.0f;
-    }
-
-    Math_SmoothStepToF(&player->rot.z, (stickX * 0.6f) * var_fv1, 0.1f, var_fv0, 0.03f);
     Matrix_RotateY(gCalcMatrix, (player->rot.y + 180.0f) * M_DTOR, MTXF_NEW);
     Matrix_RotateX(gCalcMatrix, -((player->rot.x + player->aerobaticPitch) * M_DTOR), MTXF_APPLY);
 
@@ -5148,7 +5206,7 @@ void Player_ArwingBoost(Player* player) {
     if (gLoopBoostTimers[gPlayerNum] != 0) {
         gLoopBoostTimers[gPlayerNum]--;
     }
-    if (!player->somersault && (gDrawBackdrop < 5)) {
+    if (!Player_Uses6DOF(player) && !player->somersault && (gDrawBackdrop < 5)) {
         if (stickY >= -50) {
             gLoopDownTimers[gPlayerNum] = 5;
         }
@@ -5283,7 +5341,8 @@ void Player_ArwingBrake(Player* player) {
         gUturnDownTimers[gPlayerNum] = 5;
     }
 
-    if ((gUturnDownTimers[gPlayerNum] > 0) && (gUturnDownTimers[gPlayerNum] < 5) && (gDrawBackdrop < 5) &&
+    if (!Player_Uses6DOF(player) && (gUturnDownTimers[gPlayerNum] > 0) &&
+        (gUturnDownTimers[gPlayerNum] < 5) && (gDrawBackdrop < 5) &&
         (gUturnBrakeTimers[gPlayerNum] != 0)) {
         gUturnDownTimers[gPlayerNum] = 0;
         gUturnBrakeTimers[gPlayerNum] = 0;
@@ -5953,6 +6012,7 @@ void Player_Update(Player* player) {
         case PLAYERSTATE_ACTIVE:
             gShowHud = true;
             Player_LowHealthMsg(player);
+            Player_Update6DOFToggle(player);
             player->arwing.drawFace = false;
             D_hud_80161704 = 255;
 
@@ -6280,7 +6340,7 @@ void Camera_UpdateArwingOnRails(Player* player) {
     Math_SmoothStepToF(&player->cam.at.y, gCsCamAtY, player->unk_018, 1000.0f, 0.0f);
     Math_SmoothStepToF(&player->cam.at.z, gCsCamAtZ, player->unk_014, 1000.0f, 0.0f);
     Math_SmoothStepToF(&player->unk_014, 1.0f, 1.0f, 0.05f, 0.0f);
-    temp = -player->rot.z;
+    temp = Player_Uses6DOF(player) ? 0.0f : -player->rot.z;
     if (gLevelType == LEVELTYPE_PLANET) {
         Math_SmoothStepToF(&player->camRoll, temp * 0.3f, 0.1f, 1.5f, 0.0f);
     } else if (gLevelType == LEVELTYPE_SPACE) {
@@ -6401,6 +6461,31 @@ void Camera_FollowPlayer(Player* player, s32 playerNum, bool arg2) {
     Math_SmoothStepToF(&player->camRoll, 0.0f, 0.05f, 5.0f, 0.00001f);
 }
 
+static void Camera_Update6DOF(Player* player, bool snap) {
+    Vec3f offset = { 0.0f, 50.0f, -((player->alternateView ? 1000.0f : 300.0f) - player->camDist) };
+    Vec3f behind;
+    Vec3f ahead;
+    Vec3f forward = { 0.0f, 0.0f, 150.0f };
+    Matrix_RotateY(gCalcMatrix, (player->yRot_114 + player->rot.y + 180.0f) * M_DTOR, MTXF_NEW);
+    Matrix_RotateX(gCalcMatrix, -(player->xRot_120 + player->rot.x) * M_DTOR, MTXF_APPLY);
+    Matrix_MultVec3fNoTranslate(gCalcMatrix, &offset, &behind);
+    Matrix_MultVec3fNoTranslate(gCalcMatrix, &forward, &ahead);
+    if (snap) {
+        player->cam.eye.x = player->pos.x + behind.x;
+        player->cam.eye.y = player->pos.y + behind.y;
+        player->cam.eye.z = player->pos.z + behind.z;
+    } else {
+        Math_SmoothStepToF(&player->cam.eye.x, player->pos.x + behind.x, 0.2f, 30000.0f, 0.0f);
+        Math_SmoothStepToF(&player->cam.eye.y, player->pos.y + behind.y, 0.2f, 30000.0f, 0.0f);
+        Math_SmoothStepToF(&player->cam.eye.z, player->pos.z + behind.z, 0.2f, 30000.0f, 0.0f);
+    }
+    player->cam.at.x = player->pos.x + ahead.x;
+    player->cam.at.y = player->pos.y + ahead.y;
+    player->cam.at.z = player->pos.z + ahead.z;
+    /* The chase view keeps a horizon; the craft's roll stays visible. */
+    Math_SmoothStepToAngle(&player->camRoll, 0.0f, 0.1f, 5.0f, 0.0f);
+}
+
 void Camera_UpdateArwing360(Player* player, bool arg1) {
     Vec3f sp74;
     Vec3f sp68;
@@ -6414,6 +6499,11 @@ void Camera_UpdateArwing360(Player* player, bool arg1) {
     f32 atX;
     f32 atY;
     f32 atZ;
+
+    if (Player_Uses6DOF(player) && (player->state == PLAYERSTATE_ACTIVE) && !player->somersault) {
+        Camera_Update6DOF(player, arg1);
+        return;
+    }
 
     Matrix_RotateY(gCalcMatrix, (player->yRot_114 + (player->damageShake * 0.2f)) * M_DTOR, MTXF_NEW);
     Matrix_RotateX(gCalcMatrix, player->damageShake * 0.2f * M_DTOR, MTXF_APPLY);

@@ -11,6 +11,19 @@
   "reference": "assets/characters/panther-head/reference.jpg",
   "head_scale": 0.9,
   "body_head_drop": 0,
+  "fur_texture": {
+    "path": "assets/characters/panther-head/fur.png",
+    "size": [
+      64,
+      64
+    ],
+    "format": "CI4",
+    "parts": [
+      "ear",
+      "neck",
+      "projected_hull"
+    ]
+  },
   "registered_profiles": [
     [
       24.0,

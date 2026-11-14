@@ -1,3 +1,5 @@
+import {checkTitleText,checkRankingMenu} from './check-menu-text.mjs';
+import {checkSixDofFlight} from './check-6dof-flight.mjs';
 import {createServer} from 'node:http';
 import {readFile, writeFile, mkdir, mkdtemp, realpath, readdir} from 'node:fs/promises';
 import {resolve, sep, extname} from 'node:path';
@@ -277,6 +279,7 @@ with zipfile.ZipFile(sys.argv[1]) as z:
     if (result.glError !== 0 || result.checks?.length !== 3) throw Error('Incomplete renderer checks');
   }
   if (errors.length) throw Error('Browser errors: ' + JSON.stringify(errors));
+  if(game&&process.argv.includes('--menu-text')) result.menuText=await checkTitleText({call,value,sleep,output});
   if(game&&process.argv.includes('--launch-sequence')) {
     const samples=[];result.intro={samples};
     const introDeadline=Date.now()+Number(option('--intro-timeout-ms')||200000);
@@ -367,12 +370,20 @@ with zipfile.ZipFile(sys.argv[1]) as z:
     }
     if(menu?.gameState!==3) throw Error('Start key did not reach the menu: '+JSON.stringify(menu));
     result.afterStart=menu;
-    if(process.argv.includes('--training')||touch||collision) {
+    if(process.argv.includes('--menu-text')) result.menuText.list=await checkRankingMenu({call,value,sleep,output});
+    if(process.argv.includes('--training')||process.argv.includes('--six-dof')||touch||collision) {
       const menuShot=await call('Page.captureScreenshot',{format:'png'});
       await writeFile(resolve(output,'menu.png'),Buffer.from(menuShot.data,'base64'));
       const key=async(code,key,value,down)=>call('Input.dispatchKeyEvent',{
         type:down?'keyDown':'keyUp',key,code,windowsVirtualKeyCode:value,nativeVirtualKeyCode:value});
-      if(touch) {
+      if(process.argv.includes('--six-dof')) {
+        // Wait for the menu animation, then use a brief N64 press to avoid key repeat.
+        await sleep(2000);
+        await value('Module._Wasm_SetControllerState(0x0400,0,0)');await sleep(70);
+        await value('Module._Wasm_SetControllerState(0,0,0)');await sleep(300);
+        await value('Module._Wasm_SetControllerState(0x8000,0,0)');await sleep(70);
+        await value('Module._Wasm_SetControllerState(0,0,0)');
+      } else if(touch) {
         const point=await center('#stick');
         await finger('touchStart',1,point);await finger('touchMove',1,{x:point.x,y:point.y+30});
         await sleep(250);await finger('touchEnd',1);await sleep(250);await tap('[data-button="0x8000"]');
@@ -420,6 +431,7 @@ with zipfile.ZipFile(sys.argv[1]) as z:
       if(moved.frames<=beforeSteering.frames||Math.abs(moved.playerX-beforeSteering.playerX)<5)
         throw Error('Player did not respond to steering: '+JSON.stringify({training,moved}));
       result.training={before:training,beforeSteering,afterSteering:moved};
+      if(process.argv.includes('--six-dof')) result.sixDof=await checkSixDofFlight({value,sleep,call,output});
       if(touch) {
         if(!(moved.buttons&0x8000)||(collision?moved.stickX>=0:moved.stickX<=0)) throw Error('Touch stick and A did not reach the game together: '+JSON.stringify(moved));
         const waitPad=async predicate=>{

@@ -1,10 +1,12 @@
 """Reconstruct Panther from registered silhouette projections, then simplify the hull."""
+import io
 import json
 import struct
 import zipfile
 from pathlib import Path
 
 import numpy as np
+from PIL import Image
 
 from site_character_gfx import GLB
 from site_character_kami import append_accessor
@@ -171,6 +173,45 @@ def parts():
     return result, report
 
 
+FUR_PARTS = {'projected_hull', 'ear', 'neck'}
+
+
+def fur_texture(glb):
+    """Embed the same small fur tile used by the native CI4 compiler."""
+    data = (ROOT/'assets/characters/panther-head/fur.png').read_bytes()
+    padding = b'\0' * (-len(glb.binary) % 4)
+    offset = len(glb.binary) + len(padding)
+    glb.binary += padding + data
+    view = len(glb.doc['bufferViews'])
+    glb.doc['bufferViews'].append({'buffer': 0, 'byteOffset': offset, 'byteLength': len(data)})
+    glb.doc['buffers'][0]['byteLength'] = len(glb.binary)
+    image = len(glb.doc.setdefault('images', []))
+    glb.doc['images'].append({'name': 'Panther_low_poly_fur', 'bufferView': view, 'mimeType': 'image/png'})
+    sampler = len(glb.doc.setdefault('samplers', []))
+    glb.doc['samplers'].append({'magFilter': 9728, 'minFilter': 9728, 'wrapS': 10497, 'wrapT': 10497})
+    texture = len(glb.doc.setdefault('textures', []))
+    glb.doc['textures'].append({'source': image, 'sampler': sampler})
+    mean = np.asarray(Image.open(io.BytesIO(data)).convert('RGB'), dtype=float).mean(axis=(0, 1))/255
+    return texture, mean
+
+
+def fur_uv(faces):
+    """Wrap side tufts around the head, placing the seam at the back."""
+    uv = np.empty((*faces.shape[:2], 2))
+    uv[:, :, 0] = np.arctan2(faces[:, :, 0], faces[:, :, 2]+3)/(2*np.pi)+.5
+    uv[:, :, 1] = (94-faces[:, :, 1])/70
+    for face, coord in zip(faces, uv):
+        if np.ptp(coord[:, 0]) > .5:
+            coord[coord[:, 0] < .5, 0] += 1
+        normal = np.cross(face[1]-face[0], face[2]-face[0])
+        if abs(normal[1]) > np.linalg.norm(normal)*.7:
+            # Caps need a planar projection to avoid collapsing the entire tile to a line.
+            coord[:] = face[:, [0, 2]]/90+.5
+        else:
+            coord[:, 0] *= 4
+    return uv.reshape(-1, 2)
+
+
 def install(glb, variant):
     """Replace only the owned head mesh; keep all rig nodes, clips and transforms."""
     names = {'pilot': 'Panther_pilot_head', 'title': 'limb_19', 'on_foot': 'limb_16'}
@@ -193,7 +234,9 @@ def install(glb, variant):
         origin = np.array([low[0]-5*scale, (low[1]+high[1])/2, (low[2]+high[2])/2-9*scale])
     mesh['primitives'] = []
     geometry, report = parts()
+    texture, texture_mean = fur_texture(glb)
     for name, faces, rgb, ambient in geometry:
+        uv = fur_uv(faces) if name in FUR_PARTS else np.zeros((len(faces)*3, 2))
         if variant != 'pilot':
             faces = faces.copy()
             if name == 'neck':
@@ -210,14 +253,23 @@ def install(glb, variant):
             'extras': {'ambient': ambient, 'runtime_flat_normals': True, 'runtime_vertex_precision': 8,
                        'runtime_depth_decal': variant == 'title' and name in
                            ('eye_socket', 'yellow_eye', 'slit_pupil')}})
+        if name in FUR_PARTS:
+            material = glb.doc['materials'][-1]
+            material['pbrMetallicRoughness'].update(
+                baseColorTexture={'index': texture},
+                baseColorFactor=[*(np.array(rgb)/255/texture_mean).tolist(), 1])
+            material['extras'].update(runtime_texture_size=64, runtime_texture_format='CI4',
+                                      runtime_texture_filter='nearest')
         mesh['primitives'].append({'attributes': {
             'POSITION': append_accessor(glb, faces.reshape(-1, 3), 'VEC3'),
             'NORMAL': append_accessor(glb, np.repeat(normal, 3, axis=0), 'VEC3'),
-            'TEXCOORD_0': append_accessor(glb, np.zeros((len(faces)*3, 2)), 'VEC2')}, 'material': mat})
+            'TEXCOORD_0': append_accessor(glb, uv, 'VEC2')}, 'material': mat})
     report = {**report, 'source_triangles': old_count, 'added_triangles': report['triangles']-old_count,
               'method': 'registered silhouette half-plane intersection; redundant ring removal',
               'reference': 'assets/characters/panther-head/reference.jpg', 'head_scale': .9,
-              'body_head_drop': 0 if variant == 'pilot' else 12}
+              'body_head_drop': 0 if variant == 'pilot' else 12,
+              'fur_texture': {'path': 'assets/characters/panther-head/fur.png', 'size': [64, 64],
+                              'format': 'CI4', 'parts': sorted(FUR_PARTS)}}
     glb.doc.setdefault('asset', {}).setdefault('extras', {})['panther_reconstruction'] = report
     return report
 

@@ -1,0 +1,31 @@
+{
+  "tool": "built-in image_gen",
+  "date": "2026-11-13",
+  "character_reference": "references/kami-model-crop.jpg",
+  "style_reference": "../portraits/all-portraits.png",
+  "closed": {
+    "master": "masters/kami_closed.png",
+    "prompt": "Use case: precise-object-edit. Asset type: square Kami radio portrait for a 44x44 Star Fox 64 game texture. Image 1 is the EDIT TARGET. Image 2 is the original ROM portrait sheet and is ONLY a reference for how tightly faces are cropped. Make TWO specific changes to image 1: 1. CROP MUCH TIGHTER to her face, matching the face scale of Fox, Katt, Falco and Wolf in the ROM sheet. Reframe approximately to the square region x=280,y=470,x=1000,y=1190 of the original 1254x1254 image and enlarge that square to the output. Her eyes should sit halfway down the frame, nose around 61%, mouth around 72%, chin around 83%. The turquoise face should span roughly 80% of frame width. Cut off the tall ear tips and most of the upper hair mass beyond the top and sides, as needed, so we see face, lower bangs and just a little collar rather than her full head and shoulders. Do not zoom back out to fit the ears or entire hairstyle. 2. THICKEN HER LOWER EYELASHES significantly. Add bold black false lower lashes attached directly along the lower rim of each eye, with three clearly visible thick tapered triangular points projecting downward, especially at the outer half of each lower lid. They must read at 44x44: substantial dark lash roots and distinct angular downward points, not delicate single-hair lines. Keep her exact angled half-lidded eyes, purple pupils, pale sclera and focused expression; do not make the eyes rounder or larger. Preserve the angular purple model hair, turquoise forehead triangle and muzzle, magenta diamond nose and cheek markings, tiny closed mouth, chin, black collar, original polygon forms and the cockpit lighting and background already present. Keep a small amount of the blue and pale-yellow cockpit glow at the very edges if naturally visible in the tighter crop. Output ONE opaque square portrait, no inset, no sheet, no labels, no border."
+  },
+  "talking": {
+    "master": "masters/kami_talking.png",
+    "prompt": "Use case: precise-object-edit. Asset type: the talking frame for this exact Kami cockpit portrait, to be downsampled to 44x44. Change ONLY the small mouth below the turquoise muzzle near x=630,y=970 in this 1254x1254 square image. Open it slightly into a shallow dark-purple speaking mouth with the same two small white triangular upper canine fangs, preserving their placement. Limit the mouth edit to roughly x=430..850,y=940..1020. Keep the two thick black lower lash lines and all SIX bold triangular downward lower lashes EXACTLY unchanged. Keep the tight crop, eye shape and gaze, hair geometry, turquoise face, pink diamond nose, cheek marks, face silhouette, collar and cockpit EXACTLY unchanged. No tongue, smile, extra teeth, head movement, reframing or recoloring. One single square opaque portrait, same size as input."
+  },
+  "conversion": "python3 assets/crew_portraits/build_assets.py",
+  "initial_generation": {
+    "closed": {
+      "master": "masters/kami_closed.png",
+      "prompt": "Use case: compositing. Asset type: square game radio/cockpit portrait master for a native 44x44 Star Fox 64 texture. Image 1 is the EDIT TARGET and exact Kami character identity. Image 2 is ONLY a style and cockpit-background reference, the original ROM portrait contact sheet. Remake Kami's portrait by using the cropped low-polygon model in Image 1 and replacing its flat gray background with a dim Star Fox 64 fighter cockpit matching the ROM's tight pilot portraits. Preserve Kami's actual angular low-poly face, head shape, hair silhouette, expression and proportions very closely. Do not replace her with a different interpretation. Keep the deep purple faceted bob and broad blunt jagged fringe, tall turquoise pointed ears with pink bands, dark purple half-lidded sharply angled eyes with pale sclera and purple pupils, long narrow turquoise forehead triangle, small magenta diamond nose and pink cheek marks, turquoise muzzle and chin, black high collar, purple/magenta pilot shoulders. Keep her mouth CLOSED with the very small calm line in the source, and her focused downward-tilted gaze. Crop tightly to head and upper shoulders in a single SQUARE frame; head fills the image as the ROM Fox/Katt/Wolf portraits do. Ears nearly touch the upper corners, chin around the lower fifth with a little high collar beneath. Behind her only narrow dark teal/black cockpit seat panels, a muted blue light at one edge and warm pale-yellow cockpit window light at the other, like the original ROM radio backgrounds. Match the ROM's simple faceted shaded 3D forms and directional lighting, with sufficient teal-face and eye contrast to read at 44x44. A faithful game render, no photoreal fur, no glossy toy style, no smooth anime redesign, no enlarged round eyes, no helmet or new headset, no added ornaments, no illustration outlines, no text, border, HUD, collage or scanlines. Return one opaque square portrait, not a contact sheet."
+    },
+    "talking": {
+      "master": "masters/kami_talking.png",
+      "prompt": "Use case: precise-object-edit. Asset type: talking animation frame paired with this exact square Kami cockpit portrait for a 44x44 Star Fox 64 radio texture. Edit ONLY the tiny mouth immediately below the turquoise muzzle near x=630,y=982 in this 1254x1254 image. Open that mouth slightly for a subtle speaking frame, with a small dark purple mouth cavity and two small triangular upper canine fangs visible. Keep the mouth between approximately 43% and 59% of image width and 77% to 81% of image height. Preserve every other aspect of the input: identical character face, muzzle, nose, eye pose, eyebrows, angular purple hair and its facets, turquoise/pink ears, cheeks, chin, black collar, shoulders, cockpit, framing, lighting, colors and image dimensions. No smile, no tongue, no large open jaw, no extra teeth. Return the same single square portrait with only a small open talking mouth changed."
+    }
+  },
+  "mouth_patch_rect_xyxy": [
+    15,
+    33,
+    30,
+    36
+  ]
+}

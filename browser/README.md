@@ -27,6 +27,14 @@ Open http://127.0.0.1:8641/. Both export and preview commands default to WASM. T
 
 Publish only the exported directory. Keep its licenses and `.nojekyll` file. The `--domain` option writes a CNAME. Omit it for project-path hosting. The WASM workflow builds the same package on `starwolf/dev` and uploads it as an artifact. It does not publish it automatically.
 
+## Optional 6DOF flight mod
+
+Tap **C-right** during flight to toggle **6DOF flight**. On a keyboard, use the **Right arrow**. It is off by default, and the browser remembers your choice. Incoming calls and active dialogue keep C-right for radio actions; the toggle is available once messages finish. Holding C-right toggles only once per press.
+
+While enabled, a HUD attitude indicator shows a wireframe outline, a rotating horizon, a fixed craft marker, and a 6DOF label in the same green as the targeting reticle. A faint translucent green fill marks the ground-facing side; the sky-facing side stays clear. It disappears when the mode is disabled.
+
+For Arwings and Wolfens, left/right continuously roll, and releasing the stick holds the roll angle. Up pitches toward the craft's top and down toward its underside, including sideways and inverted flight. The native **Invert Y Axis** setting reverses pitch. All-range stages allow full rotation; on-rails stages keep their forward corridor. Shoulder banking and barrel rolls still work. Boost and brake retain their speed controls, with automatic pitch-gesture loops and U-turns disabled while this mod is active. Other vehicles retain their usual controls.
+
 ## Refresh assets and audio
 
 After changing mod sources, supply the verified base ROM, `sf64.o2r`, and its matching `audio_data` export, then run:
@@ -53,10 +61,14 @@ WebGL 2, SharedArrayBuffer, and cross-origin isolation are required. Local previ
 ## Verify the browser build
 
 ```sh
+python3 tools/test_6dof_flight.py -v
+python3 tools/check_6dof_native.py --native-build build-cmake
 python3 -m unittest discover -s tools/wasm -p 'test_*.py' -v
 node --test tools/wasm/web/zip.test.mjs browser/rom-file.test.mjs browser/rom-patch.test.mjs
 node tools/wasm/check-webgl.mjs --site --rom '/path/to/base.z64' --site-invalid --site-download --audio-session --audio-resume --touch --voice-blips --save-persistence --output build/wasm/default-browser-check
 ```
+
+Add `--six-dof` to the browser check to exercise the optional flight mod in Training, including the C-right toggle, radio gating, the rendered attitude indicator, roll retention, local pitch, its saved preference, and restoring standard controls.
 
 The browser check prepares a local ROM, validates the download, enters Training, exercises touch input, measures audio, verifies voice routing and mute, and reloads to compare persisted save bytes. It rejects upload requests.
 

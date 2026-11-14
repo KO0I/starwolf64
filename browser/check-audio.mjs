@@ -63,6 +63,7 @@ try {
       return {x: rect.x + rect.width / 2, y: rect.y + rect.height / 2};
     })()`);
     await call('Input.dispatchMouseEvent', {type: 'mousePressed', button: 'left', clickCount: 1, ...position});
+    await sleep(80);
     await call('Input.dispatchMouseEvent', {type: 'mouseReleased', button: 'left', clickCount: 1, ...position});
   };
   const boot = async () => {
@@ -178,7 +179,7 @@ try {
     await evaluate('EJS_emulator.saveSettings()');
     proof.muted = await measure();
     assert(proof.muted.muted && proof.muted.peak === 0 && proof.muted.stored.muted === false, 'Muting must silence this session without saving muted=true');
-    await click('#disconnect'); await click('#connect');
+    await click('[data-action=start]'); await sleep(300); await click('[data-action=start]');
     proof.mutedResume = await measure();
     assert(proof.mutedResume.muted && proof.mutedResume.peak === 0 && proof.mutedResume.stored.muted === false, 'Pause and Resume must preserve the current session mute');
     await call('Page.navigate', {url});
@@ -200,7 +201,7 @@ try {
     await click('#sound');
     proof.buttonRecovery = await measure();
     assert(audible(proof.buttonRecovery) && proof.buttonRecovery.stored.muted === false, 'Enable sound must resume suspended audio without muting it');
-    await click('#disconnect'); await click('#connect');
+    await click('[data-action=start]'); await sleep(300); await click('[data-action=start]');
     proof.resume = await measure();
     assert(audible(proof.resume), 'Pause and Resume must restore audible output');
     console.log('PASS: real game signal, mute resets on refresh, session mute, preserved volume, keyboard and sound-button recovery, pause/resume.');

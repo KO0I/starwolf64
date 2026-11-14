@@ -67,3 +67,6 @@ mods*/
 !tools/build_crew_chatter.py
 
 !assets/audio/chatter/bank.bin
+
+# Generated soundtrack exports and intermediate audio
+/exports/

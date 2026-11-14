@@ -8,6 +8,10 @@ The ear bases lie inside the skull. The pupils sit near the centers of the irise
 
 The source archive remains unchanged. Runtime replacements preserve the existing head nodes, transforms, bone ownership, and animation clips. [reconstruction.json](reconstruction.json) records the registered profiles and reduction counts. The original distribution credits in the parent archive still apply.
 
+[fur.png](fur.png) is the 64×64 fur tile applied to the skull, outer ears, and neck in all three rigs. Short angular tufts modulate the existing purple palette. The tile repeats around the sides with a seam at the back and a planar projection on the caps. Native and browser builds use opaque CI4 textures with nearest filtering. The facial markings and collar retain their flat colors, and the mesh remains at 172 triangles.
+
+[fur-source.png](fur-source.png) is the imagegen master. [fur-prompt.txt](fur-prompt.txt) records the built-in tool prompts. Resize the master to 64×64 with Pillow's Lanczos filter to reproduce the runtime tile.
+
 ## Rebuild the head and previews
 
 Run these commands from the repository root:
@@ -15,7 +19,7 @@ Run these commands from the repository root:
 ```sh
 python3 tools/site_character_panther.py
 python3 tools/preview_panther_head.py
-python3 tools/build_wolfen.py
+python3 tools/wasm/refresh_mod.py
 python3 tools/check_panther_head.py
 ```
 

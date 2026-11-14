@@ -2,7 +2,7 @@
 
 Panther, Krystal, and Kami each have a closed-mouth frame and a slightly-open talking frame. The artwork follows the supplied original SF64 portrait sheet's tight framing, directional lighting, and shaded 3D forms. Krystal has a red forehead gem and green eyes. Kami has pointed teeth in her talking frame.
 
-Panther's corrected design has near-black indigo fur, short rounded ears, a heavy dark muzzle, and narrow yellow eyes. His talking frame shows a red-pink mouth interior and two small upper canine fangs. Kami's revised eyes have round globes, half-closed purple upper lids, and pointed false lower lashes.
+Panther's corrected design has near-black indigo fur, short rounded ears, a heavy dark muzzle, and narrow yellow eyes. His talking frame shows a red-pink mouth interior and two small upper canine fangs. Kami uses the supplied model reference with a tight face crop, faceted purple hair, angled purple eyes, three thick pointed lower lashes per eye, turquoise face and pink markings in a cockpit based on the original ROM portraits. The reference and exact built-in image generation prompts are saved in `references/kami-model-crop.jpg` and `kami-generation.json`.
 
 ## Texture specification
 

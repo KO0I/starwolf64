@@ -23,8 +23,11 @@ def main():
         reviewed = SiteCharacters(builder)
         reviewed.build()
         hashes = {crc64(path): path for path in builder.resources}
-        for variant, bone in [('title', 19), ('on_foot', 16)]:
-            data = builder.resources[f'characters/kami/{variant}/limb_{bone:02d}']
+        heads = [('title', 'characters/kami/title/limb_19'),
+                 ('on_foot', 'characters/kami/on_foot/limb_16'),
+                 ('pilot', reviewed.heads['kami']['path'])]
+        for variant, path in heads:
+            data = builder.resources[path]
             position, texture, texture_path, palette, filtering, groups = 88, None, None, None, None, {}
             while position < len(data):
                 command, argument = struct.unpack_from('<II', data, position)
@@ -82,7 +85,17 @@ def main():
                 print(f'{variant}: {name} pupil/white luminance {pupil_light:.1f}/{white_light:.1f}', flush=True)
                 assert pupil_light < 155 and white_light > 185 and white_light - pupil_light > 55, (
                     f'{variant}: {name} pupil lost contrast against its eye white')
-    print('PASS: both Kami body heads retain their eye-bearing texture detail and fit N64 texture memory')
+            for name, low, high in [('left', .09, .40), ('right', .57, .90)]:
+                under_eye = rgba[round(.67 * height):round(.73 * height),
+                                 round(low * width):round(high * width), :3]
+                black_pixels = np.count_nonzero(under_eye.max(axis=2) < 40)
+                assert black_pixels <= 4, f'{variant}: {name} lower lashes form a dark under-eye smear'
+            for name, low, high in [('left', .35, .40), ('right', .57, .62)]:
+                fang = rgba[round(.79 * height):round(.84 * height),
+                            round(low * width):round(high * width), :3]
+                assert np.any(fang.min(axis=2) > 170), f'{variant}: {name} fang disappeared'
+            print(f'{variant}: light lower lashes and both white fangs survive texture quantization', flush=True)
+    print('PASS: all three Kami heads retain their rounded-eye, light-lash and fanged-mouth texture detail within N64 texture memory')
 
 
 if __name__ == '__main__':

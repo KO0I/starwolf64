@@ -1,0 +1,101 @@
+{
+  "version": 1,
+  "technique": "posed actual game-model renders; no generated artwork",
+  "historical_flashback": "Original James/Peppy/Pigma prologue is preserved unchanged.",
+  "assets": [
+    {
+      "id": "wolf_briefing_closed",
+      "source": "native/wolf_briefing_closed.png",
+      "targets": [
+        {
+          "segment": "ast_map",
+          "offset": 280608,
+          "width": 92,
+          "height": 51
+        }
+      ],
+      "sha256_rgba16": "e57a1380d2331555f6d353299e51ed926b8533beba03a4fc4299bf10cd7c4d37",
+      "model_renders": [
+        "assets/extended_portraits/renders/wolf_brief_closed.png"
+      ],
+      "notes": "Original cockpit/background; actual posed Wolf mesh."
+    },
+    {
+      "id": "wolf_briefing_mouth",
+      "source": "native/wolf_briefing_mouth.png",
+      "targets": [
+        {
+          "segment": "ast_map",
+          "offset": 290000,
+          "width": 32,
+          "height": 34
+        }
+      ],
+      "sha256_rgba16": "9ad351699c44a28962981f3c7683cfa243dd51a391cf1b7b3d8196b82db96428",
+      "model_renders": [
+        "assets/extended_portraits/renders/wolf_brief_talking.png"
+      ],
+      "notes": "Actual jaw-pose render, registered to the fixed mouth overlay at47,0."
+    },
+    {
+      "id": "team_prologue",
+      "source": "native/team_prologue.png",
+      "targets": [
+        {
+          "segment": "ast_map",
+          "offset": 248960,
+          "width": 96,
+          "height": 52
+        }
+      ],
+      "sha256_rgba16": "c39d612dd6c54357e1bf5027bf8a3cb8bed3c63f0d2c32c4f1c441cd58b02a60",
+      "model_renders": [
+        "assets/extended_portraits/renders/kami_team.png",
+        "assets/extended_portraits/renders/krystal_team.png",
+        "assets/extended_portraits/renders/panther_team.png",
+        "assets/extended_portraits/renders/wolf_team.png"
+      ],
+      "notes": "Wolf, Panther, Krystal and Kami posed from the current character models."
+    },
+    {
+      "id": "ending_expert_team",
+      "source": "native/ending_expert_team.png",
+      "targets": [
+        {
+          "segment": "ast_ending_expert",
+          "offset": 0,
+          "width": 316,
+          "height": 240
+        }
+      ],
+      "sha256_rgba16": "43b239b4bb27a7ddd61a1a62c5888a754f73c61ef9c9392787b59ba93932bd22",
+      "model_renders": [
+        "assets/extended_portraits/renders/kami_team.png",
+        "assets/extended_portraits/renders/krystal_team.png",
+        "assets/extended_portraits/renders/panther_team.png",
+        "assets/extended_portraits/renders/wolf_team.png"
+      ],
+      "notes": "Original GREAT! caption and scene; actual crew model renders."
+    },
+    {
+      "id": "invoice_team",
+      "source": "native/invoice_team.png",
+      "targets": [
+        {
+          "segment": "ast_option",
+          "offset": 57712,
+          "width": 188,
+          "height": 60
+        }
+      ],
+      "sha256_rgba16": "822601880762f36308c9d8e8a71e4f20999e4972b0e35e7601aa36e483a0cc49",
+      "model_renders": [
+        "assets/extended_portraits/renders/kami_collage.png",
+        "assets/extended_portraits/renders/krystal_collage.png",
+        "assets/extended_portraits/renders/wolf_collage.png",
+        "assets/extended_portraits/renders/panther_collage.png"
+      ],
+      "notes": "Actual team model thumbnails, Star Wolf wordmark, Wolf O'Donnell signature; original stamp preserved."
+    }
+  ]
+}

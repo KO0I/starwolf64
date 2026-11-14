@@ -11,12 +11,13 @@ import numpy as np
 
 from build_wolfen import crc64
 from site_character_gfx import GLB
-from site_character_panther import ROOT, PROFILES, hull_faces, simplified_rings, parts, install
+from site_character_panther import ROOT, PROFILES, hull_faces, simplified_rings, parts, install, FUR_PARTS
 
 
 def packed_faces(archive, path, names):
     stream = archive.read(path)
     cursor, precision, vertices, faces = 88, 1., None, []
+    textures = []
     while cursor < len(stream):
         command, argument = struct.unpack_from('<II', stream, cursor)
         cursor += 8
@@ -25,7 +26,9 @@ def packed_faces(archive, path, names):
             high, low = struct.unpack_from('<II', stream, cursor)
             cursor += 8
             resource = archive.read(names[high << 32 | low])
-            if opcode == 0x31:
+            if opcode == 0x20:
+                textures.append(resource)
+            elif opcode == 0x31:
                 matrix = ET.fromstring(resource).find('Matrix')
                 transform = archive.read(matrix.get('Path'))
                 precision = struct.unpack_from('<f', transform, 64)[0]
@@ -38,7 +41,7 @@ def packed_faces(archive, path, names):
             for encoded in ([command & 0xFFFFFF, argument] if opcode == 0xB1 else [argument]):
                 faces.append(vertices[[(encoded >> shift & 255)//2 for shift in (16, 8, 0)]])
     assert precision == 1., 'Head leaked a precision matrix'
-    return np.array(faces)
+    return np.array(faces), textures
 
 
 def main():
@@ -71,6 +74,19 @@ def main():
             assert glb.doc['nodes'] == original['nodes'], 'Head replacement changed rig nodes'
             assert glb.doc.get('animations') == original.get('animations'), 'Head replacement changed animation clips'
             assert details['head_scale'] == .9
+            node = next(n for n in glb.doc['nodes'] if n.get('name') ==
+                        {'pilot': 'Panther_pilot_head', 'title': 'limb_19', 'on_foot': 'limb_16'}[variant])
+            for primitive in glb.doc['meshes'][node['mesh']]['primitives']:
+                material = glb.doc['materials'][primitive['material']]
+                if material['name'].removeprefix('Panther_') in FUR_PARTS:
+                    texture = material['pbrMetallicRoughness']['baseColorTexture']['index']
+                    sampler = glb.doc['samplers'][glb.doc['textures'][texture]['sampler']]
+                    assert sampler['wrapS'] == sampler['wrapT'] == 10497
+                    uv = glb.accessor(primitive['attributes']['TEXCOORD_0'])
+                    assert (np.ptp(uv, axis=0) > 0).all(), 'Fur UVs collapsed to a solid color'
+                    assert material['extras']['runtime_texture_format'] == 'CI4'
+                else:
+                    assert 'baseColorTexture' not in material['pbrMetallicRoughness'], 'Fur obscures face or collar'
             if variant != 'pilot':
                 node_name = 'limb_19' if variant == 'title' else 'limb_16'
                 node = next(n for n in glb.doc['nodes'] if n.get('name') == node_name)
@@ -91,11 +107,16 @@ def main():
     with zipfile.ZipFile(ROOT/'build-cmake/mods/wolfen.o2r') as archive:
         names = {crc64(path): path for path in archive.namelist()}
         for path in paths:
-            faces = packed_faces(archive, path, names)
+            faces, textures = packed_faces(archive, path, names)
+            fur = [data for data in textures if struct.unpack_from('<I', data, 64)[0] == 3]
+            assert fur, (path, 'Compiled head has no CI4 fur')
+            for data in fur:
+                assert struct.unpack_from('<3I', data, 68) == (64, 64, 2048), 'Fur exceeds texture memory'
+                assert len(set(data[80:])) > 1, 'Compiled fur is a solid color'
             assert len(faces) == report['triangles'], (path, len(faces))
             areas = np.linalg.norm(np.cross(faces[:, 1]-faces[:, 0], faces[:, 2]-faces[:, 0]), axis=1)/2
             assert areas.min() > 0, (path, 'Triangle collapsed during native packing')
-            print(f'PASS: {path}: {len(faces)} triangles, minimum packed area {areas.min():.6f}')
+            print(f'PASS: {path}: {len(faces)} triangles, 64x64 CI4 fur, minimum packed area {areas.min():.6f}')
     print('PASS: closed outward hull, preserved projections, embedded ear bases, centered pupils, reduced heads seated at the shoulder collars and unchanged rigs/clips')
 
 

@@ -1,0 +1,13 @@
+{
+  "source": "krystal_head.glb",
+  "source_sha256": "83be2feace75392371d7cca8f50ba41c39124abcfb2239dc794cb4d4f48e7abc",
+  "yaw": -10.0,
+  "pitch": 0,
+  "bones": [],
+  "size": [
+    400,
+    420
+  ],
+  "crop": null,
+  "sha256_png": "fd9b0179f809accf25d63119a49a4a6f16645ef2cfc1366a159e5e0823466f7d"
+}

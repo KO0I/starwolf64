@@ -11,9 +11,11 @@ from build_wolfen import manifest, crc64
 from export_team_bodies import TITLE_ANIMS, VERSUS_ANIMS, matrix
 from package_site_characters import DEFAULT
 from site_character_gfx import GLB, Compiler
-from site_character_kami import add_details as add_kami_details
+from site_character_kami import add_details as add_kami_details, style_face_texture
 from site_character_edits import apply_budget, edit_kami_body, body_head
 from site_character_panther import install as install_panther_head
+from site_character_wolf import install as install_wolf_head
+from site_character_wolf_jacket import install as install_wolf_jacket
 from site_character_title_poses import standing_pose
 from site_character_krystal import focus_eyes as focus_krystal_eyes
 
@@ -192,18 +194,24 @@ class Bodies:
             expected_triangles = json.loads(archive.read('manifest.json'))['characters'][character]['variants'][variant]['triangles']
         glb.doc = copy.deepcopy(glb.doc)
         details = None
+        if character == 'wolf':
+            details = install_wolf_head(glb, variant)
         if character == 'panther':
             details = install_panther_head(glb, variant)
         if character == 'kami':
             for material in glb.doc['materials']:
                 if material.get('name') == 'Kami_eight_view_head':
                     material.setdefault('extras', {})['runtime_texture_region'] = [0, 0, .125, 1]
+            face_texture = style_face_texture(glb)
             focus_kami_face(glb)
             details = add_kami_details(glb)
+            details['face_texture'] = face_texture
         reduction = apply_budget(glb, character, variant)
         if character == 'krystal':
             focus_krystal_eyes(glb)
         styling = edit_kami_body(glb, variant) if character == 'kami' else None
+        if character == 'wolf':
+            styling = install_wolf_jacket(glb, variant)
         for node in glb.doc['nodes']:
             if node.get('name', '').endswith('_placement'):
                 for field in ('matrix', 'translation', 'rotation', 'scale'):

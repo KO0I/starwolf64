@@ -15,16 +15,16 @@ Save gDefaultSave = {
     99, // sfxVolume
     
     // rankNameEntry
-    'F', 'O', 'X', 
-    'P', 'E', 'P', 
-    'S', 'L', 'P', 
-    'F', 'A', 'L', 
-    'W', 'L', 'F', 
-    'L', 'O', 'N', 
-    'P', 'I', 'G', 
-    'A', 'N', 'R', 
-    'B', 'I', 'L', 
-    'K', 'A', 'T', 
+    'W', 'L', 'F',
+    'F', 'O', 'X',
+    'S', 'L', 'P',
+    'F', 'A', 'L',
+    'K', 'R', 'Y',
+    'L', 'O', 'N',
+    'P', 'I', 'G',
+    'K', 'A', 'M',
+    'B', 'I', 'L',
+    'K', 'A', 'T',
 
     // rankingRoute
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
@@ -148,6 +148,26 @@ s32 Save_Write(void) {
     return Save_WriteData();
 }
 
+static void Save_UpdateDefaultRankingNames(void) {
+    static const u8 originalNames[] = "FOXPEPSLPFALWLFLONPIGANRBILKAT";
+    s32 i;
+
+    for (i = 0; i < sizeof(gSaveFile.save.data.rankNameEntry); i++) {
+        if (gSaveFile.save.raw[0x18 + i] != originalNames[i]) {
+            return;
+        }
+    }
+    for (i = 0x36; i < 0xEA; i++) {
+        if (gSaveFile.save.raw[i] != gDefaultSave.raw[i]) {
+            return;
+        }
+    }
+    for (i = 0; i < sizeof(gSaveFile.save.data.rankNameEntry); i++) {
+        gSaveFile.save.raw[0x18 + i] = gDefaultSave.raw[0x18 + i];
+    }
+    Save_Write();
+}
+
 s32 Save_Read(void) {
     OSMesg* sp24;
     s32 i;
@@ -162,6 +182,7 @@ s32 Save_Read(void) {
 
     if (gSaveFile.save.checksum == Save_Checksum(&gSaveFile.save)) {
         PRINTF("ＥＥＰＲＯＭ ＲＯＭ［０］ 正常\n");
+        Save_UpdateDefaultRankingNames();
         return 0;
     }
 #ifdef AVOID_UB
@@ -175,6 +196,7 @@ s32 Save_Read(void) {
 
     if (gSaveFile.save.checksum == Save_Checksum(&gSaveFile.save)) {
         PRINTF("ＥＥＰＲＯＭ ＲＯＭ［1］ 正常\n");
+        Save_UpdateDefaultRankingNames();
         return 0;
     } else {
         PRINTF("ＥＥＰＲＯＭ ＲＯＭ［０］ ＆ ＲＯＭ［1］ 異常\n");

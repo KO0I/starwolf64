@@ -172,42 +172,42 @@ f32 D_menu_801AE620[] = { 1.9f, 2.4f, 0.9f, 1.9f, 1.8f, 2.4f };
 
 OptionEntry sOptionCardList[] = {
     {
-        { 0, 0, aMainGameCardTex, 0, 72, 12, 126.0f, 46.0f, 1.0f, 1.0f, 75, 0, 0, 255 },
+        { 0, 0, aMainGameCardTex, 0, 72, 12, 126.0f, 46.0f, 1.0f, 1.0f, 75, 0, 75, 255 },
         { 0.0f, 30.0f, -130.0f, 0.2f, 0.11f },
         { -40.0f, 27.0f, 80.0f },
         1,
         1,
     },
     {
-        { 0, 0, aTrainingCardTex, 0, 80, 12, 126.0f, 184.0f, 1.0f, 1.0f, 75, 0, 0, 255 },
+        { 0, 0, aTrainingCardTex, 0, 80, 12, 126.0f, 184.0f, 1.0f, 1.0f, 75, 0, 75, 255 },
         { 0.0f, 18.0f, -130.0f, 0.2f, 0.11f },
         { -40.0f, 16.0f, 80.0f },
         1,
         1,
     },
     {
-        { 0, 0, aVsCardTex, 0, 32, 10, 126.0f, 184.0f, 1.0f, 1.0f, 75, 0, 0, 255 },
+        { 0, 0, aVsCardTex, 0, 32, 10, 126.0f, 184.0f, 1.0f, 1.0f, 75, 0, 75, 255 },
         { 0.0f, 6.0f, -130.0f, 0.2f, 0.11f },
         { -40.0f, 6.0f, 80.0f },
         1,
         1,
     },
     {
-        { 0, 0, aRankingCardTex, 0, 64, 12, 110.0f, 91.0f, 1.0f, 1.0f, 75, 0, 0, 255 },
+        { 0, 0, aRankingCardTex, 0, 64, 12, 110.0f, 91.0f, 1.0f, 1.0f, 75, 0, 75, 255 },
         { 0.0f, -6.0f, -130.0f, 0.2f, 0.11f },
         { -40.0f, -5.0f, 80.0f },
         1,
         1,
     },
     {
-        { 0, 0, aSoundCardTex, 0, 64, 10, 110.0f, 116.0f, 1.0f, 1.0f, 75, 0, 0, 255 },
+        { 0, 0, aSoundCardTex, 0, 64, 10, 110.0f, 116.0f, 1.0f, 1.0f, 75, 0, 75, 255 },
         { 0.0f, -18.0f, -130.0f, 0.2f, 0.11f },
         { -40.0f, -16.0f, 80.0f },
         1,
         1,
     },
     {
-        { 0, 0, aDataCardTex, 0, 80, 10, 126.0f, 184.0f, 1.0f, 1.0f, 75, 0, 0, 255 },
+        { 0, 0, aDataCardTex, 0, 80, 10, 126.0f, 184.0f, 1.0f, 1.0f, 75, 0, 75, 255 },
         { 0.0f, -30.0f, -130.0f, 0.2f, 0.11f },
         { -40.0f, -27.0f, 80.0f },
         1,
@@ -217,21 +217,21 @@ OptionEntry sOptionCardList[] = {
 
 OptionEntry sOptionVSCardList[] = {
     {
-        { 0, 0, aVsPointMatchCardTex, 0, 96, 13, 110.0f, 91.0f, 1.0f, 1.0f, 75, 0, 0, 255 },
+        { 0, 0, aVsPointMatchCardTex, 0, 96, 13, 110.0f, 91.0f, 1.0f, 1.0f, 75, 0, 75, 255 },
         { 0.0f, 11.0f, -130.0f, 0.2f, 0.11f },
         { -40.0f, 11.0f, 80.0f },
         1,
         1,
     },
     {
-        { 0, 0, aVsBattleRoyalCardTex, 0, 96, 10, 110.0f, 116.0f, 1.0f, 1.0f, 75, 0, 0, 255 },
+        { 0, 0, aVsBattleRoyalCardTex, 0, 96, 10, 110.0f, 116.0f, 1.0f, 1.0f, 75, 0, 75, 255 },
         { 0.0f, 0.0f, -130.0f, 0.2f, 0.11f },
         { -40.0f, 0.0f, 80.0f },
         1,
         1,
     },
     {
-        { 0, 0, aVsTimeTrialCardTex, 0, 96, 10, 110.0f, 138.0f, 1.0f, 1.0f, 75, 0, 0, 255 },
+        { 0, 0, aVsTimeTrialCardTex, 0, 96, 10, 110.0f, 138.0f, 1.0f, 1.0f, 75, 0, 75, 255 },
         { 0.0f, -11.0f, -130.0f, 0.2f, 0.11f },
         { -40.0f, -11.0f, 80.0f },
         1,
@@ -551,7 +551,7 @@ void Option_Main(void) {
 #if 0 // Docs debug
     {
         RCP_SetupDL(&gMasterDisp, SETUPDL_83);
-        gDPSetPrimColor(gMasterDisp++, 0, 0, 255, 255, 0, 255);
+        gDPSetPrimColor(gMasterDisp++, 0, 0, 255, 0, 255, 255);
         Graphics_DisplaySmallNumber(80, 220, sVsSubMenuFromCancel);
     }
 #endif
@@ -1491,19 +1491,19 @@ void Option_Sound_Draw(void) {
     }
 
     colorGB = D_menu_801B9270[0];
-    gDPSetPrimColor(gMasterDisp++, 0, 0, 255, colorGB, colorGB, 255);
+    gDPSetPrimColor(gMasterDisp++, 0, 0, 255, colorGB, 255, 255);
     Lib_TextureRect_IA8(&gMasterDisp, D_OPT_8006280, 48, 13, D_menu_801AEFA8[2], D_menu_801AEFD4[2], 1.0f, 1.0f);
 
     colorGB = D_menu_801B9270[1];
-    gDPSetPrimColor(gMasterDisp++, 0, 0, 255, colorGB, colorGB, 255);
+    gDPSetPrimColor(gMasterDisp++, 0, 0, 255, colorGB, 255, 255);
     Lib_TextureRect_IA8(&gMasterDisp, D_OPT_80064F0, 88, 14, D_menu_801AEFA8[3], D_menu_801AEFD4[3], 1.0f, 1.0f);
 
     colorGB = D_menu_801B9270[2];
-    gDPSetPrimColor(gMasterDisp++, 0, 0, 255, colorGB, colorGB, 255);
+    gDPSetPrimColor(gMasterDisp++, 0, 0, 255, colorGB, 255, 255);
     Lib_TextureRect_IA8(&gMasterDisp, D_OPT_80069C0, 56, 15, D_menu_801AEFA8[4], D_menu_801AEFD4[4], 1.0f, 1.0f);
 
     colorGB = D_menu_801B9270[3];
-    gDPSetPrimColor(gMasterDisp++, 0, 0, 255, colorGB, colorGB, 255);
+    gDPSetPrimColor(gMasterDisp++, 0, 0, 255, colorGB, 255, 255);
     Lib_TextureRect_IA8(&gMasterDisp, D_OPT_8006D10, 24, 13, D_menu_801AEFA8[5], D_menu_801AEFD4[5], 1.0f, 1.0f);
 
     if (D_menu_801B9288 == 0) {
@@ -1995,14 +1995,14 @@ void Option_Data_Draw(void) {
 
         if ((gGameFrameCount & mask[1]) != 0) {
             sp7C[1] = D_menu_801AED20[1];
-            gDPSetPrimColor(gMasterDisp++, 0, 0, 255, sp7C[1], sp7C[1], 255);
+            gDPSetPrimColor(gMasterDisp++, 0, 0, 255, sp7C[1], 255, 255);
             Lib_TextureRect_IA8(&gMasterDisp, D_OPT_8009980, 32, 12, D_menu_801AF094[1], D_menu_801AF0AC[1], 1.0f,
                                 1.0f);
         }
 
         if ((gGameFrameCount & mask[0]) != 0) {
             sp7C[0] = D_menu_801AED20[0];
-            gDPSetPrimColor(gMasterDisp++, 0, 0, 255, sp7C[0], sp7C[0], 255);
+            gDPSetPrimColor(gMasterDisp++, 0, 0, 255, sp7C[0], 255, 255);
             Lib_TextureRect_IA8(&gMasterDisp, D_OPT_8009B00, 40, 12, D_menu_801AF094[2], D_menu_801AF0AC[2], 1.0f,
                                 1.0f);
         }
@@ -2027,7 +2027,7 @@ void Option_Data_Draw(void) {
             break;
 
         case 3:
-            gDPSetPrimColor(gMasterDisp++, 0, 0, 255, 32, 32, 255);
+            gDPSetPrimColor(gMasterDisp++, 0, 0, 255, 32, 255, 255);
 
             Lib_TextureRect_IA8(&gMasterDisp, D_OPT_800B680, 144, 41, D_menu_801AF094[5], D_menu_801AF0AC[5], 1.0f,
                                 1.0f);
@@ -2039,8 +2039,8 @@ void Option_Data_Draw(void) {
 
 char* sTeamLetter[3] = { "P", "S", "F" };
 s32 sTeamAlivePrimR[3] = { 255, 0, 30 };
-s32 sTeamAlivePrimG[3] = { 30, 179, 30 };
-s32 sTeamAlivePrimB[3] = { 0, 67, 255 };
+s32 sTeamAlivePrimG[3] = { 0, 179, 30 };
+s32 sTeamAlivePrimB[3] = { 255, 67, 255 };
 
 void Option_Ranking_Setup(void) {
     Title_GetRankTotalHits();
@@ -2168,7 +2168,7 @@ void Option_RankingMenu_Draw(void) {
                             1.0f);
     }
     RCP_SetupDL(&gMasterDisp, SETUPDL_83_OPTIONAL);
-    gDPSetPrimColor(gMasterDisp++, 0, 0, 255, 255, 0, 255);
+    gDPSetPrimColor(gMasterDisp++, 0, 0, 255, 0, 255, 255);
     Graphics_DisplaySmallText(242, 215, 1.0f, 1.0f, "PUSH A");
 }
 
@@ -2299,7 +2299,7 @@ void Option_RankingName_Draw(s32 rankIdx, s32 xPos, s32 yPos) {
     char rankName[4];
 
     RCP_SetupDL(&gMasterDisp, SETUPDL_83_OPTIONAL);
-    gDPSetPrimColor(gMasterDisp++, 0, 0, 255, 255, 0, 255);
+    gDPSetPrimColor(gMasterDisp++, 0, 0, 255, 0, 255, 255);
 
     rankName[0] = gSaveFile.save.data.rankNameEntry[rankIdx][0] & 0xFF;
     rankName[1] = gSaveFile.save.data.rankNameEntry[rankIdx][1] & 0xFF;
@@ -2315,7 +2315,7 @@ void Option_RankingTotalHits_Draw(s32 rankIdx, s32 xPos, s32 yPos) {
     gDPSetPrimColor(gMasterDisp++, 0, 0, 60, 60, 255, 170);
     Lib_TextureRect_IA8(&gMasterDisp, aMapOptionBgTex, 24, 17, xPos, yPos, 3.17f, 1.05f);
 
-    gDPSetPrimColor(gMasterDisp++, 0, 0, 255, 255, 0, 255);
+    gDPSetPrimColor(gMasterDisp++, 0, 0, 255, 0, 255, 255);
     Graphics_DisplaySmallText(xPos, yPos, 1.0f, 1.0f, "TOTAL HITS");
 
     gDPSetPrimColor(gMasterDisp++, 0, 0, 255, 255, 255, 255);
@@ -2413,7 +2413,7 @@ void Option_RankingHitCount_Draw(s32 rankIdx, s32 routeIdx, f32 xPos, f32 yPos) 
 
     if ((yPos > 22.0f) && (yPos < 162.0f)) {
         RCP_SetupDL(&gMasterDisp, SETUPDL_83);
-        gDPSetPrimColor(gMasterDisp++, 0, 0, 255, 255, 0, 255);
+        gDPSetPrimColor(gMasterDisp++, 0, 0, 255, 0, 255, 255);
         hitCount = (gSaveFile.save.data.stats[rankIdx][routeIdx].hitCountOver256 & 1) << 8;
         hitCount |= gSaveFile.save.data.stats[rankIdx][routeIdx].hitCount;
         Graphics_DisplaySmallNumber(xPos + 15.0f - (HUD_CountDigits(hitCount) - 1) * 8, yPos + 24.0f + 1.0f, hitCount);
@@ -2452,7 +2452,7 @@ void Option_RankingPlanetName_Draw(s32 rankIdx, s32 routeIdx, f32 xPos, f32 yPos
         planetName = D_menu_801AEEAC[planetIdx];
 
         RCP_SetupDL(&gMasterDisp, SETUPDL_83_OPTIONAL);
-        gDPSetPrimColor(gMasterDisp++, 0, 0, 255, 255, 0, 255);
+        gDPSetPrimColor(gMasterDisp++, 0, 0, 255, 0, 255, 255);
         textWidth = Graphics_GetSmallTextWidth(planetName) / 2.0f;
         Graphics_DisplaySmallText(xPos + 12.0f - textWidth, yPos - 8.0f, 1.0f, 1.0f, planetName);
     }
@@ -2810,8 +2810,8 @@ void Option_VS_HandicapSet_Draw(s32 PlayerIdx) {
         aVsPlayerNum4Tex,
     };
     static s32 sCharNameR[4] = { 177, 255, 0, 30 };
-    static s32 sCharNameG[4] = { 242, 30, 255, 30 };
-    static s32 sCharNameB[4] = { 12, 0, 67, 255 };
+    static s32 sCharNameG[4] = { 242, 0, 255, 30 };
+    static s32 sCharNameB[4] = { 12, 255, 67, 255 };
 
     RCP_SetupDL(&gMasterDisp, SETUPDL_85_OPTIONAL);
 
@@ -2835,12 +2835,12 @@ void Option_VS_HandicapSet_Draw(s32 PlayerIdx) {
     if ((gGameFrameCount & mask) != 0) {
         colorGB = D_menu_801B9358[PlayerIdx];
 
-        gDPSetPrimColor(gMasterDisp++, 0, 0, 255, colorGB, colorGB, 255);
+        gDPSetPrimColor(gMasterDisp++, 0, 0, 255, colorGB, 255, 255);
 
         Lib_TextureRect_IA8(&gMasterDisp, D_VS_MENU_7001030, 64, 9, sVsHandicapFrameXpos[PlayerIdx] + D_menu_801AF1BC,
                             sVsHandicapFrameYpos[PlayerIdx] + D_menu_801AF1C0, 1.0f, 1.0f);
 
-        gDPSetPrimColor(gMasterDisp++, 0, 0, 255, colorGB, colorGB, 255);
+        gDPSetPrimColor(gMasterDisp++, 0, 0, 255, colorGB, 255, 255);
 
         Lib_TextureRect_IA8(&gMasterDisp, sVsHandicapLvlTex[D_menu_801AED3C[PlayerIdx]], 40, 12,
                             sVsHandicapFrameXpos[PlayerIdx] + D_menu_801AF1C4,
@@ -3224,11 +3224,11 @@ void Option_VsPointMatch_Draw(void) {
     if ((gGameFrameCount & mask) != 0) {
         RCP_SetupDL(&gMasterDisp, SETUPDL_83);
 
-        gDPSetPrimColor(gMasterDisp++, 0, 0, 255, colorGB, colorGB, 255);
+        gDPSetPrimColor(gMasterDisp++, 0, 0, 255, colorGB, 255, 255);
 
         Lib_TextureRect_IA8(&gMasterDisp, D_menu_801AECF8[sp44], 16, 15, 109.0f, 45.0f, 1.0f, 1.0f);
 
-        gDPSetPrimColor(gMasterDisp++, 0, 0, 255, colorGB, colorGB, 255);
+        gDPSetPrimColor(gMasterDisp++, 0, 0, 255, colorGB, 255, 255);
 
         Lib_TextureRect_IA8(&gMasterDisp, D_VS_MENU_7001DF0, 80, 10, 122.0f, 49.0f, 1.0f, 1.0f);
     }
@@ -3279,12 +3279,12 @@ void Option_VsTimeTrial_Draw(void) {
     if ((gGameFrameCount & mask) != 0) {
         RCP_SetupDL(&gMasterDisp, SETUPDL_83);
 
-        gDPSetPrimColor(gMasterDisp++, 0, 0, 255, colorGB, colorGB, 255);
+        gDPSetPrimColor(gMasterDisp++, 0, 0, 255, colorGB, 255, 255);
 
         Lib_TextureRect_IA8(&gMasterDisp, sTimeTrialMinuteTextures[D_menu_801B9340], 40, 15,
                             D_menu_801AF25C[D_menu_801B9340 + 1], D_menu_801AF274[D_menu_801B9340 + 1], 1.0f, 1.0f);
 
-        gDPSetPrimColor(gMasterDisp++, 0, 0, 255, colorGB, colorGB, 255);
+        gDPSetPrimColor(gMasterDisp++, 0, 0, 255, colorGB, 255, 255);
 
         Lib_TextureRect_IA8(&gMasterDisp, D_VS_MENU_7002110, 80, 12, D_menu_801AF25C[0], D_menu_801AF274[0], 1.0f,
                             1.0f);
@@ -3329,7 +3329,7 @@ void Option_VsStageSelect_Draw(void) {
     if ((gGameFrameCount & mask) != 0) {
         RCP_SetupDL(&gMasterDisp, SETUPDL_83);
 
-        gDPSetPrimColor(gMasterDisp++, 0, 0, 255, colorGB, colorGB, 255);
+        gDPSetPrimColor(gMasterDisp++, 0, 0, 255, colorGB, 255, 255);
 
         Lib_TextureRect_IA8(&gMasterDisp, D_VS_MENU_7001270, 112, 12, D_menu_801AF2A0, D_menu_801AF2A4, 1.0f, 1.0f);
     }
@@ -3443,7 +3443,7 @@ void Option_VsOKConfirm_Draw(void) {
 
     if (gGameFrameCount & bitmask) {
         RCP_SetupDL(&gMasterDisp, SETUPDL_83);
-        gDPSetPrimColor(gMasterDisp++, 0, 0, 255, colorGB, colorGB, 255);
+        gDPSetPrimColor(gMasterDisp++, 0, 0, 255, colorGB, 255, 255);
         Lib_TextureRect_IA8(&gMasterDisp, D_VS_MENU_7003650, 40, 12, 143.0f, 210.0f, 1.0f, 1.0f);
     }
 }
@@ -4228,7 +4228,7 @@ void Option_NameEntry_Draw(void) {
         return;
     }
 
-    gDPSetPrimColor(gMasterDisp++, 0, 0, 255, 255, 0, 255);
+    gDPSetPrimColor(gMasterDisp++, 0, 0, 255, 0, 255, 255);
     Graphics_DisplaySmallText(D_menu_801AF30C[1], D_menu_801AF324[1], 1.0f, 1.0f, "RANK");
     Graphics_DisplaySmallText(D_menu_801AF30C[2], D_menu_801AF324[2], 1.0f, 1.0f, "TOTAL HITS");
 
@@ -4236,7 +4236,7 @@ void Option_NameEntry_Draw(void) {
 
     if (D_menu_801B9138 == 1) {
         if ((gGameFrameCount & 0x10) != 0) {
-            gDPSetPrimColor(gMasterDisp++, 0, 0, 255, 255, 0, 255);
+            gDPSetPrimColor(gMasterDisp++, 0, 0, 255, 0, 255, 255);
             Lib_TextureRect_IA8(&gMasterDisp, aTextEnd, 32, 8, D_menu_801AF30C[5], D_menu_801AF324[5], 1.0f, 1.0f);
         }
     }

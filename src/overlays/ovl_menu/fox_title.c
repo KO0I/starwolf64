@@ -381,7 +381,7 @@ void Title_Draw(void) {
 #if 0
     // @decomp Debug:
     RCP_SetupDL(&gMasterDisp, SETUPDL_83);
-    gDPSetPrimColor(gMasterDisp++, 0, 0, 255, 255, 0, 255);
+    gDPSetPrimColor(gMasterDisp++, 0, 0, 255, 0, 255, 255);
     Graphics_DisplaySmallNumber(80, 220, sSceneState);
 #endif
 }
@@ -439,7 +439,7 @@ void Title_Ranking_Update(void) {
 }
 
 void Title_Ranking_Draw(void) {
-    static char sSTARFOX_RANKING[] = "S T A R F O X     R A N K I N G";
+    static char sSTARWOLF_RANKING[] = "S T A R W O L F   R A N K I N G";
     s32 yPos = 20;
     s32 xPos = 36;
 
@@ -449,11 +449,11 @@ void Title_Ranking_Draw(void) {
     // Ranking header
     RCP_SetupDL(&gMasterDisp, SETUPDL_83_OPTIONAL);
 
-    gDPSetPrimColor(gMasterDisp++, 0, 0, 255, 255, 0, 255);
-    Graphics_DisplaySmallText(xPos, yPos, 1.0f, 1.0f, sSTARFOX_RANKING);
+    gDPSetPrimColor(gMasterDisp++, 0, 0, 255, 0, 255, 255);
+    Graphics_DisplaySmallText(xPos, yPos, 1.0f, 1.0f, sSTARWOLF_RANKING);
 
     gDPSetPrimColor(gMasterDisp++, 0, 0, 255, 255, 255, 255);
-    Lib_TextureRect_IA8(&gMasterDisp, aSmallText_6, 16, 8, 148.0f, yPos, 1.0f, 1.0f);
+    Lib_TextureRect_IA8(&gMasterDisp, aSmallText_6, 16, 8, 156.0f, yPos, 1.0f, 1.0f);
     Lib_TextureRect_IA8(&gMasterDisp, aSmallText_4, 16, 8, 164, yPos, 1.0f, 1.0f);
 
     RCP_SetupDL(&gMasterDisp, SETUPDL_83);
@@ -474,7 +474,7 @@ void Title_RankingData_Draw(void) {
 
     RCP_SetupDL(&gMasterDisp, SETUPDL_83_OPTIONAL);
 
-    gDPSetPrimColor(gMasterDisp++, 0, 0, 255, 255, 0, 255);
+    gDPSetPrimColor(gMasterDisp++, 0, 0, 255, 0, 255, 255);
 
     Graphics_DisplaySmallText(94, 38, 1.0f, 1.0f, "RANK");
     Graphics_DisplaySmallText(146, 38, 1.0f, 1.0f, "NAME");
@@ -484,7 +484,7 @@ void Title_RankingData_Draw(void) {
         gDPSetPrimColor(gMasterDisp++, 0, 0, 255, 255, 255, 255);
         Graphics_DisplaySmallNumber(105 - ((HUD_CountDigits(i + 1) - 1) * 8), yPos, i + 1);
 
-        gDPSetPrimColor(gMasterDisp++, 0, 0, 255, 255, 0, 255);
+        gDPSetPrimColor(gMasterDisp++, 0, 0, 255, 0, 255, 255);
         Graphics_DisplaySmallText(150, yPos, 1.0f, 1.0f, &sRankNameEntry[i][0]);
 
         gDPSetPrimColor(gMasterDisp++, 0, 0, 255, 255, 255, 255);
@@ -3023,14 +3023,14 @@ void Title_PressStart_Draw(void) {
 
             // No Controller
             RCP_SetupDL(&gMasterDisp, SETUPDL_83_OPTIONAL);
-            gDPSetPrimColor(gMasterDisp++, 0, 0, 255, (s32) sTitleTextPrimCol, (s32) sTitleTextPrimCol, 255);
+            gDPSetPrimColor(gMasterDisp++, 0, 0, 255, (s32) sTitleTextPrimCol, 255, 255);
 
             Lib_TextureRect_IA8(&gMasterDisp, aTitleNoControllerTex, 176, 24, D_menu_801AE474, D_menu_801AE478, 1.0f,
                                 1.0f);
         } else {
             // Press Start
             RCP_SetupDL(&gMasterDisp, SETUPDL_83_OPTIONAL);
-            gDPSetPrimColor(gMasterDisp++, 0, 0, 255, (s32) sTitleTextPrimCol, (s32) sTitleTextPrimCol, 255);
+            gDPSetPrimColor(gMasterDisp++, 0, 0, 255, (s32) sTitleTextPrimCol, 255, 255);
 
             Lib_TextureRect_IA8(&gMasterDisp, aTitlePressStartTex, 120, 13, 101.0f, yPos, 1.0f, 1.0f);
         }

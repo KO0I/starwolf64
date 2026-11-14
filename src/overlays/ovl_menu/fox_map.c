@@ -5578,7 +5578,7 @@ void Map_801A9DE8(void) {
 void Map_TotalHits_Draw(void) {
     RCP_SetupDL(&gMasterDisp, SETUPDL_83_OPTIONAL);
 
-    gDPSetPrimColor(gMasterDisp++, 0, 0, 255, 255, 0, 255);
+    gDPSetPrimColor(gMasterDisp++, 0, 0, 255, 0, 255, 255);
 
     Graphics_DisplaySmallText(24, 14, 1.0f, 1.0f, "TOTAL HITS");
     Graphics_DisplaySmallNumber(71 - (HUD_CountDigits(gTotalHits) * 8), 24, gTotalHits);
@@ -5686,11 +5686,11 @@ void Map_PathInfo_Draw(s32 missionIdx, f32 x, f32 y, s32 idx) {
     s32 curMission;
     static char* D_menu_801B6AD0[] = { "P", "S", "F" };
     static s32 D_menu_801B6ADC[] = { 255, 0, 30 };
-    static s32 D_menu_801B6AE8[] = { 30, 179, 30 };
-    static s32 D_menu_801B6AF4[] = { 0, 67, 255 };
+    static s32 D_menu_801B6AE8[] = { 0, 179, 30 };
+    static s32 D_menu_801B6AF4[] = { 255, 67, 255 };
 
     RCP_SetupDL(&gMasterDisp, SETUPDL_83_OPTIONAL);
-    gDPSetPrimColor(gMasterDisp++, 0, 0, 255, 255, 0, 255);
+    gDPSetPrimColor(gMasterDisp++, 0, 0, 255, 0, 255, 255);
 
     Graphics_DisplaySmallText(x + 12.0f - Graphics_GetSmallTextWidth(sPlanetNames[idx]) * 0.5f, y - 8.0f, 1.0f, 1.0f,
                               sPlanetNames[idx]);
@@ -6161,7 +6161,7 @@ void Map_BriefingRadio_Draw(s32 arg0) {
 
                         case 0:
                             RCP_SetupDL(&gMasterDisp, SETUPDL_83_OPTIONAL);
-                            gDPSetPrimColor(gMasterDisp++, 0, 0, 255, 255, 0, 255);
+                            gDPSetPrimColor(gMasterDisp++, 0, 0, 255, 0, 255, 255);
                             if ((gGameFrameCount & 0x10) != 0) {
                                 Graphics_DisplaySmallText(sTeamStatusPos[i], 131 + 28, 1.0f, 1.0f, "OK !");
                             }
@@ -6917,11 +6917,11 @@ void Map_RemainingLives_Draw(s32 xPos, s32 yPos, s32 number) {
     gDPSetPrimColor(gMasterDisp++, 0, 0, 255, 255, 255, 255);
     Lib_TextureRect_CI4(&gMasterDisp, aMapArwingIconTex, aMapArwingIconTLUT, 16, 16, xPos, yPos, 1.0f, 1.0f);
 
-    gDPSetPrimColor(gMasterDisp++, 0, 0, 255, 255, 0, 255);
+    gDPSetPrimColor(gMasterDisp++, 0, 0, 255, 0, 255, 255);
     Lib_TextureRect_CI4(&gMasterDisp, aMapXTex, aMapXTLUT, 16, 7, xPos + 18.0f, yPos + 9.0f, 1.0f, 1.0f);
 
     RCP_SetupDL(&gMasterDisp, SETUPDL_83_OPTIONAL);
-    gDPSetPrimColor(gMasterDisp++, 0, 0, 255, 255, 0, 255);
+    gDPSetPrimColor(gMasterDisp++, 0, 0, 255, 0, 255, 255);
 
     if (number >= 10) {
         Graphics_DisplaySmallNumber(xPos + 33.0f - ((HUD_CountDigits(number) - 1) * 8) + 3, yPos + 8.0f, number);

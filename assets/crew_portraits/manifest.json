@@ -73,24 +73,24 @@
     },
     "kami": {
       "mouth_patch_rect_xyxy": [
-        18,
-        32,
-        27,
+        15,
+        33,
+        30,
         36
       ],
-      "changed_pixels": 33,
+      "changed_pixels": 45,
       "frames": [
         {
           "frame": "closed",
           "png": "native/kami_closed.rgba16.png",
           "raw": "rgba16/kami_closed.rgba16.bin",
-          "sha256_rgba16": "c77944ee220c41452900f5a88a9faa18ee2ae251667cdd9144a8ecdb7d90296c"
+          "sha256_rgba16": "062ae125e503303dbe133f739a832571bb9d7c20393fadee95fac8ada0004607"
         },
         {
           "frame": "talking",
           "png": "native/kami_talking.rgba16.png",
           "raw": "rgba16/kami_talking.rgba16.bin",
-          "sha256_rgba16": "cc8e2d9bb7e7d814a9c927fc568f2370984b9abc217b8a8f7e4c5b88679c7d9a"
+          "sha256_rgba16": "a5c0bff52dc671dfb3c88e50537151ca94ec557b1fc488196b3920ed9425b6d0"
         }
       ]
     }

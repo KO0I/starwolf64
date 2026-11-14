@@ -1,5 +1,14 @@
 """Generate Kami's small faceted muzzle and surface-fitted black eye details."""
+import io
+from pathlib import Path
+
 import numpy as np
+from PIL import Image
+
+LOWER_LID_UV = ((.10, .55), (.14, .615), (.245, .65), (.335, .615), (.37, .55))
+LOWER_LASH_UV = ((.11, .59), (.15, .62), (.20, .645))
+FACE_REGIONS_UV = ((.075, .415, .385, .685), (.585, .415, .895, .685),
+                   (.285, .70, .70, .84))
 
 
 def append_accessor(glb, values, kind):
@@ -14,6 +23,41 @@ def append_accessor(glb, values, kind):
                                  'count': len(values), 'type': kind})
     glb.doc['buffers'][0]['byteLength'] = len(glb.binary)
     return index
+
+
+def style_face_texture(glb):
+    """Register Kami's round eyes, light lashes and fanged mouth onto her head atlas."""
+    material = next(material for material in glb.doc['materials']
+                    if material.get('name') == 'Kami_eight_view_head')
+    texture = glb.doc['textures'][material['pbrMetallicRoughness']['baseColorTexture']['index']]
+    image = glb.doc['images'][texture['source']]
+    view = glb.doc['bufferViews'][image['bufferView']]
+    offset = view.get('byteOffset', 0)
+    with Image.open(io.BytesIO(glb.binary[offset:offset + view['byteLength']])) as source:
+        atlas = source.convert('RGBA')
+    if atlas.size != (2048, 1024):
+        raise ValueError('Kami face anchors require the original 2048x1024 head atlas')
+    face = atlas.crop((72, 317, 190, 418))
+    source = Path(__file__).resolve().parents[1] / 'assets/characters/kami-face/face.png'
+    with Image.open(source) as master:
+        revised = master.convert('RGBA').resize(face.size, Image.Resampling.BOX)
+    for left, top, right, bottom in FACE_REGIONS_UV:
+        bounds = (round(left * face.width), round(top * face.height),
+                  round(right * face.width), round(bottom * face.height))
+        face.paste(revised.crop(bounds), bounds[:2])
+    atlas.paste(face, (72, 317))
+    output = io.BytesIO()
+    atlas.save(output, format='PNG')
+    encoded = output.getvalue()
+    padding = b'\0' * (-len(glb.binary) % 4)
+    offset = len(glb.binary) + len(padding)
+    glb.binary += padding + encoded
+    image['bufferView'] = len(glb.doc['bufferViews'])
+    glb.doc['bufferViews'].append({'buffer': 0, 'byteOffset': offset, 'byteLength': len(encoded)})
+    glb.doc['buffers'][0]['byteLength'] = len(glb.binary)
+    return {'atlas_size': list(atlas.size), 'lower_lashes_per_eye': 3,
+            'face_texture': source.relative_to(Path(__file__).resolve().parents[1]).as_posix(),
+            'eyes': 'rounded half-lidded', 'mouth': 'sideways brace with two fangs'}
 
 
 def add_details(glb, pilot=False):
@@ -79,7 +123,9 @@ def add_details(glb, pilot=False):
         material = len(glb.doc['materials'])
         glb.doc['materials'].append({'name': 'Kami_' + label, 'doubleSided': True,
             'pbrMetallicRoughness': {'baseColorFactor': [*color, 1], 'metallicFactor': 0, 'roughnessFactor': 1},
-            'extras': {'ambient': ambient, 'runtime_vertex_precision': 8, 'runtime_flat_normals': True}})
+            'extras': {'ambient': ambient,
+                       'runtime_vertex_precision': 16 if label == 'black_lashes_and_lower_liner' else 8,
+                       'runtime_flat_normals': True}})
         mesh['primitives'].append({'attributes': {
             'POSITION': append_accessor(glb, faces.reshape(-1, 3), 'VEC3'),
             'NORMAL': append_accessor(glb, np.repeat(directions, 3, axis=0), 'VEC3'),
@@ -115,21 +161,24 @@ def add_details(glb, pilot=False):
             line = [surface((side * x, y)) for x, y in
                     [(8.43, 51.76), (10.87, 48.46), (14.13, 46.90), (17.38, 48.66), (19.82, 52.24)]]
             roots = [surface((side * x, y)) for x, y in [(11.69, 61.47), (14.94, 61.56), (18.20, 61.46)]]
+            lower_roots = line[1:4]
         else:
-            line_uv = [(.12, .60), (.17, .63), (.25, .64), (.31, .63), (.37, .60)]
+            line_uv = list(LOWER_LID_UV)
             root_uv = [(.16, .49), (.23, .49), (.30, .49)]
             if side > 0:
                 line_uv = [(u + .47, v) for u, v in line_uv]
                 root_uv = [(u + .47, v) for u, v in root_uv]
             line, roots = [surface(uv) for uv in line_uv], [surface(uv) for uv in root_uv]
+            lower_uv = LOWER_LASH_UV if side < 0 else [(.975 - u, v) for u, v in LOWER_LASH_UV]
+            lower_roots = [surface(uv) for uv in lower_uv]
         for i in range(len(line) - 1):
             a, na = line[i]
             b, nb = line[i + 1]
             tangent = b - a
             width_a = np.cross(tangent, na)
             width_b = np.cross(tangent, nb)
-            width_a *= eye_span * .013 / np.linalg.norm(width_a)
-            width_b *= eye_span * .013 / np.linalg.norm(width_b)
+            width_a *= eye_span * .011 / np.linalg.norm(width_a)
+            width_b *= eye_span * .011 / np.linalg.norm(width_b)
             a, b = a + na * offset, b + nb * offset
             eye_faces.extend([[a - width_a, b - width_b, b + width_b],
                               [a - width_a, b + width_b, a + width_a]])
@@ -140,11 +189,11 @@ def add_details(glb, pilot=False):
             tip = root + up * (eye_span * (.080 + index * .012)) + across * (outward * eye_span * .035)
             tip += forward * (eye_span * .015)
             eye_faces.append([root - width, root + width, tip])
-        for index, (root, normal) in enumerate(line[1:4]):
+        for index, (root, normal) in enumerate(lower_roots):
             root = root + normal * (offset * 1.6)
-            width = across * (eye_span * .027)
+            width = across * (eye_span * .023)
             outward = side if pilot else -side
-            tip = root - up * (eye_span * (.070 + (.012 if index == 1 else 0)))
+            tip = root - up * (eye_span * (.045 + (.008 if index == 1 else 0)))
             tip += across * (outward * eye_span * (index - 1) * .016) + forward * (eye_span * .022)
             eye_faces.append([root - width, tip, root + width])
     primitive('black_lashes_and_lower_liner', eye_faces, [.004, .004, .006], 1.)

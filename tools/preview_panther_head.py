@@ -27,15 +27,28 @@ def triangles(glb):
             pbr = material['pbrMetallicRoughness']
             color = np.array(pbr.get('baseColorFactor', [1, 1, 1, 1]), dtype=float)[:3]
             texture = None
+            sampler = {}
             if 'baseColorTexture' in pbr:
                 tex = glb.doc['textures'][pbr['baseColorTexture']['index']]
+                if 'sampler' in tex:
+                    sampler = glb.doc['samplers'][tex['sampler']]
                 view = glb.doc['bufferViews'][glb.doc['images'][tex['source']]['bufferView']]
                 start = view.get('byteOffset', 0)
                 texture = np.asarray(Image.open(io.BytesIO(glb.binary[start:start+view['byteLength']])).convert('RGBA'))
             for face in ids:
                 result.append((xyz[face], normal[face], uv[face], color, texture,
-                               material.get('extras', {}).get('ambient', .6)))
+                               material.get('extras', {}).get('ambient', .6), sampler))
     return result
+
+
+def texture_index(coord, size, wrap):
+    index = np.floor(coord*size).astype(int)
+    if wrap == 33071:
+        return np.clip(index, 0, size-1)
+    if wrap == 33648:
+        index %= size*2
+        return np.minimum(index, size*2-1-index)
+    return index % size
 
 
 def render(glb, angle, size=360, wire=False):
@@ -50,7 +63,7 @@ def render(glb, angle, size=360, wire=False):
     pixels = np.full((size, size, 3), [220, 215, 227], dtype=np.uint8)
     depth = np.full((size, size), -np.inf)
     edges = []
-    for points, normals, uv, color, texture, ambient in faces:
+    for points, normals, uv, color, texture, ambient, sampler in faces:
         points = (points-center) @ rotation.T
         direction = np.cross(points[1]-points[0], points[2]-points[0])
         if direction[2] <= 0:
@@ -70,8 +83,8 @@ def render(glb, angle, size=360, wire=False):
         rgb = np.broadcast_to(color*255, (*xx.shape, 3)).copy()
         if texture is not None:
             coord = (weights.T @ uv).reshape(*xx.shape, 2)
-            tx = np.clip((coord[:, :, 0]*texture.shape[1]).astype(int), 0, texture.shape[1]-1)
-            ty = np.clip((coord[:, :, 1]*texture.shape[0]).astype(int), 0, texture.shape[0]-1)
+            tx = texture_index(coord[:, :, 0], texture.shape[1], sampler.get('wrapS', 10497))
+            ty = texture_index(coord[:, :, 1], texture.shape[0], sampler.get('wrapT', 10497))
             rgb *= texture[ty, tx, :3]/255
             mask &= texture[ty, tx, 3] >= 128
         light = np.array([-.4, .7, .5]) / np.linalg.norm([-.4, .7, .5])

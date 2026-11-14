@@ -513,7 +513,7 @@ void HUD_TeamShields_Draw(f32 xPos, f32 yPos, s32 arg2) {
     if ((arg2 <= 0) && (arg2 != -2) &&
         ((gPlayState == PLAY_PAUSE) || (gShowLevelClearStatusScreen == 1) || (gLevelStartStatusScreenTimer != 0))) {
         RCP_SetupDL(&gMasterDisp, SETUPDL_76_OPTIONAL);
-        gDPSetPrimColor(gMasterDisp++, 0, 0, 255, 255, 0, 255);
+        gDPSetPrimColor(gMasterDisp++, 0, 0, 255, 0, 255, 255);
         if ((arg2 == 0) && (gPlayer[0].state == PLAYERSTATE_LEVEL_COMPLETE)) {
             Graphics_DisplaySmallText(xPos + (8.0f * xScale) + 4.0f, yPos + 2.0f, 1.0f, 1.0f, " OK ");
         } else {
@@ -998,7 +998,7 @@ void HUD_LivesCount2_Draw(f32 x, f32 y, s32 number) {
     Lib_TextureRect_CI4(&gMasterDisp, sLivesCounterTexs[form], sLivesCounterTLUTs[form], 16, 16, x0, y0, 1.0f, 1.0f);
     Lib_TextureRect_CI4(&gMasterDisp, aXTex, aXTLUT, 16, 7, x1, y1, 1.0f, 1.0f);
 
-    gDPSetPrimColor(gMasterDisp++, 0, 0, 255, 255, 0, 255);
+    gDPSetPrimColor(gMasterDisp++, 0, 0, 255, 0, 255, 255);
     Graphics_DisplayHUDNumber(x2, y2, number);
 }
 
@@ -2275,7 +2275,7 @@ s32 ActorMissileSeek_ModeCheck(ActorMissileSeekMode mode) {
 void HUD_RadioCharacterName_Draw(void) {
     if (gGameState == GSTATE_PLAY) {
         RCP_SetupDL(&gMasterDisp, SETUPDL_76_OPTIONAL);
-        gDPSetPrimColor(gMasterDisp++, 0, 0, 255, 255, 0, 255);
+        gDPSetPrimColor(gMasterDisp++, 0, 0, 255, 0, 255, 255);
 
         f32 xPos;
         if (CVarGetInteger("gRadioCommBox.expand", 0) == 1) {
@@ -3296,7 +3296,7 @@ void HUD_DisplayCountdown(f32 xPos, f32 yPos, s32* countdown, f32 scale) {
                                 scale);
         } else {
             gSPDisplayList(gMasterDisp++, gRcpSetupDLs[SETUPDL_76_OPTIONAL]);
-            gDPSetPrimColor(gMasterDisp++, 0, 0, 255, 255, 0, 255);
+            gDPSetPrimColor(gMasterDisp++, 0, 0, 255, 0, 255, 255);
             HUD_DisplaySmallNumber((var_fs0 * scale) + xPos, yPos, scale, var_s2);
             var_fs0 += 9.0f;
         }
@@ -3694,6 +3694,77 @@ void HUD_SinglePlayer(void) {
     }
 }
 
+static void HUD_AttitudeSpan(s32 left, s32 right, s32 y) {
+    gDPFillWideRectangle(gMasterDisp++, left, y, right, y + 1);
+}
+
+static void HUD_AttitudeIndicator_Draw(void) {
+    const s32 centerX = 160, centerY = 66, radius = 19;
+    Player* player = &gPlayer[gPlayerNum];
+    if (!CVarGetInteger("gSixDofFlight", 0) || (player->form != FORM_ARWING) ||
+        (player->state != PLAYERSTATE_ACTIVE) || (gLevelMode == LEVELMODE_TURRET) ||
+        !gShowHud || (D_hud_80161708 == 0)) {
+        return;
+    }
+    f32 pitch = (player->xRot_120 + player->rot.x + player->aerobaticPitch) * M_DTOR;
+    f32 roll = player->bankAngle * M_DTOR;
+    f32 upX = cosf(pitch) * sinf(roll);
+    f32 upY = cosf(pitch) * cosf(roll);
+    f32 upZ = sinf(pitch);
+    s32 alpha = D_hud_80161708;
+
+    gDPPipeSync(gMasterDisp++);
+    gDPSetColorDither(gMasterDisp++, G_CD_DISABLE);
+    gDPSetAlphaDither(gMasterDisp++, G_AD_DISABLE);
+    gDPSetCycleType(gMasterDisp++, G_CYC_1CYCLE);
+    gDPSetCombineMode(gMasterDisp++, G_CC_PRIMITIVE, G_CC_PRIMITIVE);
+    gDPSetRenderMode(gMasterDisp++, G_RM_CLD_SURF, G_RM_CLD_SURF2);
+
+    gDPSetPrimColor(gMasterDisp++, 0, 0, 66, 255, 82, alpha);
+    for (s32 y = -radius - 2; y <= radius + 2; y++) {
+        s32 outer = (s32) sqrtf(SQ(radius + 2) - SQ(y));
+        if (ABS(y) > radius + 1) {
+            HUD_AttitudeSpan(centerX - outer, centerX + outer + 1, centerY + y);
+        } else {
+            s32 inner = (s32) sqrtf(SQ(radius + 1) - SQ(y));
+            HUD_AttitudeSpan(centerX - outer, centerX - inner, centerY + y);
+            HUD_AttitudeSpan(centerX + inner + 1, centerX + outer + 1, centerY + y);
+        }
+    }
+    /* Project world up onto the visible hemisphere, including vertical and inverted flight. */
+    for (s32 layer = 0; layer < 2; layer++) {
+        gDPPipeSync(gMasterDisp++);
+        gDPSetPrimColor(gMasterDisp++, 0, 0, 66, 255, 82, (layer == 0) ? alpha / 4 : alpha);
+        for (s32 y = -radius; y <= radius; y++) {
+            s32 halfWidth = (s32) sqrtf(SQ(radius) - SQ(y));
+            s32 runStart = -halfWidth;
+            bool inRun = false;
+            for (s32 x = -halfWidth; x <= halfWidth; x++) {
+                f32 z = sqrtf(MAX(0, SQ(radius) - SQ(x) - SQ(y)));
+                f32 height = upX * x - upY * y + upZ * z;
+                bool onSpan = (layer == 0) ? (height < -0.65f) : (fabsf(height) < 0.65f);
+                if (onSpan && !inRun) {
+                    runStart = x;
+                } else if (!onSpan && inRun) {
+                    HUD_AttitudeSpan(centerX + runStart, centerX + x, centerY + y);
+                }
+                inRun = onSpan;
+            }
+            if (inRun) {
+                HUD_AttitudeSpan(centerX + runStart, centerX + halfWidth + 1, centerY + y);
+            }
+        }
+    }
+    HUD_AttitudeSpan(centerX - 12, centerX - 4, centerY);
+    HUD_AttitudeSpan(centerX + 5, centerX + 13, centerY);
+    HUD_AttitudeSpan(centerX - 2, centerX + 3, centerY + 2);
+    HUD_AttitudeSpan(centerX - 1, centerX + 2, centerY + 3);
+    HUD_AttitudeSpan(centerX - 1, centerX + 2, centerY - radius - 4);
+    RCP_SetupDL(&gMasterDisp, SETUPDL_76_OPTIONAL);
+    gDPSetPrimColor(gMasterDisp++, 0, 0, 66, 255, 82, alpha);
+    Graphics_DisplaySmallText(centerX - 13.0f, centerY + radius + 5.0f, 0.7f, 0.7f, "6DOF");
+}
+
 void HUD_Draw(void) {
     s32 i;
     s32 goldRings;
@@ -3808,6 +3879,7 @@ void HUD_Draw(void) {
         HUD_SinglePlayer();
     }
     HUD_RadioDamage();
+    HUD_AttitudeIndicator_Draw();
     HUD_PauseScreen_Update();
     gDPSetTextureFilter(gMasterDisp++, G_TF_BILERP);
     CALL_EVENT(DrawGlobalHUDPostEvent);

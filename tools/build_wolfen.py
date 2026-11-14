@@ -368,7 +368,7 @@ class Builder:
     def recolor_menu(self):
         menu = self.segments['ovl_menu']
         patches = [(0x27140 + index * 0x60, struct.pack('>4I', 20, 0, 75, 255),
-                    struct.pack('>4I', 75, 0, 0, 255)) for index in range(9)]
+                    struct.pack('>4I', 75, 0, 75, 255)) for index in range(9)]
         # Expert-mode selection arrows use immediate RGB arguments.
         patches.extend((offset, struct.pack('>I', original), struct.pack('>I', replacement))
                        for offset, original, replacement in (
@@ -382,6 +382,8 @@ class Builder:
                 raise ValueError(f'Unexpected original menu color at {offset:#x}')
             menu[offset:offset + len(replacement)] = replacement
         self.menu_color_changes = patches
+        from wolf_menu_text import apply_menu
+        apply_menu(self)
 
     def replace_intro_title(self):
         # Keep the original intro glyphs; W/L use a matching bold sans font.
@@ -467,11 +469,33 @@ class Builder:
             self.resources[f'ast_arwing/{name}'] = original[:64] + struct.pack('<HHI', frame_count, limb_count, key_count) + b''.join(struct.pack('<6H', *k) for k in keys) + struct.pack('<I', len(frames)) + struct.pack(f'<{len(frames)}H', *frames)
         self.matrices, _ = skeleton_matrices(self.output)
 
+    def swap_shadows(self):
+        slots = (('ast_common', 0x32808), ('ast_star_wolf', 0x14398))
+        originals = []
+        for stem, offset in slots:
+            name, fields = self.assets[stem, offset]
+            path = f'{stem}/{name}'
+            original = self.base.read(path)
+            if (fields['format'], int(fields['width']), int(fields['height'])) != ('IA8', 32, 32):
+                raise ValueError('Unexpected ship shadow format: ' + path)
+            if struct.unpack_from('<4I', original, 64) != (8, 32, 32, 1024) or len(original) != 1104:
+                raise ValueError('Unexpected ship shadow allocation: ' + path)
+            if self.segments[stem][offset:offset + 1024] != original[80:]:
+                raise ValueError('Ship shadow differs from the base asset: ' + path)
+            originals.append((path, original))
+        self.shadow_changes = []
+        for (stem, offset), (path, original), (_, source) in zip(slots, originals, reversed(originals)):
+            payload = source[80:]
+            self.resources[path] = original[:80] + payload
+            self.segments[stem][offset:offset + len(payload)] = payload
+            self.shadow_changes.append((stem, path, offset, original[80:], payload))
+
     def build(self):
         from wolf_logo import replace_title_logo
         replace_title_logo(self)
         self.replace_intro_title()
         self.recolor_lasers()
+        self.swap_shadows()
         self.reverse_wing_mounts()
         hull = [[1, 0, 0, 0], [0, 1, 0, HULL_Y], [0, 0, 1, 0], [0, 0, 0, 1]]
 
@@ -560,8 +584,6 @@ class Builder:
                 raise ValueError(f'Unexpected color instruction at {offset:x}')
             struct.pack_into('>I', out, offset, replacement)
         for stem, data in self.segments.items():
-            if stem == 'ast_star_wolf':
-                continue
             start = (len(out) + 15) & ~15
             out.extend(b'\0' * (start - len(out)))
             out.extend(data)
@@ -574,11 +596,15 @@ class Builder:
         self.medusa.patch_rom(out)
         from wolf_dialogue import patch_dialogue_voice
         patch_dialogue_voice(self, out)
+        from wolf_menu_text import patch_rom as patch_text
+        patch_text(self, out)
         out.extend(b'\0' * (0x1000000 - len(out)))
         struct.pack_into('>II', out, 0x10, *cartridge_crc(out))
         return out
 
     def verify(self, patched):
+        from wolf_menu_text import verify as verify_menu_text
+        verify_menu_text(self, patched)
         from vitzy_fighter import verify_fighter
         verify_fighter(self)
         title = self.segments['ast_title']
@@ -693,6 +719,14 @@ class Builder:
             if stem == 'ast_common':
                 common[offset:offset + len(old)] = old
         restore_common(self, common)
+        for stem, path, offset, original, expected in self.shadow_changes:
+            if self.resources[path][80:] != expected or self.segments[stem][offset:offset + len(expected)] != expected:
+                raise ValueError('Native/browser ship shadow mismatch: ' + path)
+            _, start, end, compressed = struct.unpack_from('>IIII', patched, TABLE + 16 * self.table_indices[stem])
+            if compressed or offset + len(expected) > end - start or patched[start + offset:start + offset + len(expected)] != expected:
+                raise ValueError('Ship shadow missing from browser ROM: ' + path)
+            if stem == 'ast_common':
+                common[offset:offset + len(original)] = original
         if common[:0x1AF98] != self.original_common[:0x1AF98] or common[0x1B198:] != self.original_common[0x1B198:]:
             raise ValueError('An unrelated common asset, including hyper lasers, changed')
         pixels = struct.unpack_from('>256H', common, 0x1AF98)

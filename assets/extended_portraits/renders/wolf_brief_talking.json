@@ -1,0 +1,19 @@
+{
+  "source": "wolf_body.glb",
+  "source_sha256": "dc9500711565de33ff4b9c39d6c6496ba4716ee031ca91e838f22461626ff988",
+  "yaw": 8.0,
+  "pitch": 0.0,
+  "bones": [
+    "limb_01:8,0,0"
+  ],
+  "world_bones": [
+    "limb_19:-32,-45,0"
+  ],
+  "pose": "falco-crossed",
+  "size": [
+    500,
+    500
+  ],
+  "crop": 0.48,
+  "sha256_png": "4b5ca2ac9f2db3f4d3235854b3ddf6b4dc8e15b3c14acb1909a823ec3bf1d812"
+}

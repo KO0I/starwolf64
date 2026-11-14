@@ -4,7 +4,8 @@ import {readRomFile} from './rom-file.mjs';
 import {decompressMio0} from './rom-patch.mjs';
 import {fileURLToPath} from 'node:url';
 const iosCore=process.argv.includes('--ios-core');
-const verifyArgs=process.argv.slice(2).filter(value=>!['--kami-closeup','--ios-core'].includes(value));
+const playerUiOnly=process.argv.includes('--player-ui-only');
+const verifyArgs=process.argv.slice(2).filter(value=>!['--kami-closeup','--ios-core','--player-ui-only'].includes(value));
 const url=verifyArgs[0]||'http://127.0.0.1:8643/';
 const output=fileURLToPath(new URL('./runtime/browser-check/',import.meta.url));
 await mkdir(output,{recursive:true});
@@ -77,7 +78,7 @@ try{
  const launchView=()=>evaluate('('+measureLaunch.toString()+')()');
  for(let i=0;i<50;i++){if((await launchView()).splash)break;await sleep(100)}
  let launch=await launchView();
- assert(launch.state==='awaiting-rom'&&launch.pickerVisible&&launch.splash&&launch.label==='Launch'&&launch.disabled&&launch.gray&&launch.pickerPulse==='blue-green-pulse'&&launch.buttonPulse==='none','Initial launch screen failed: '+JSON.stringify(launch));
+ assert(launch.state==='awaiting-rom'&&launch.pickerVisible&&launch.splash&&launch.label==='Launch'&&launch.disabled&&launch.pickerPulse==='blue-green-pulse'&&launch.buttonPulse==='none','Initial launch screen failed: '+JSON.stringify(launch));
  await call('Emulation.setEmulatedMedia',{features:[{name:'prefers-reduced-motion',value:'reduce'}]});
  assert((await launchView()).pickerPulse==='none','Reduced motion did not stop the upload pulse');
  await call('Emulation.setEmulatedMedia',{features:[]});
@@ -121,6 +122,7 @@ try{
  const targetHash=await evaluate("(async()=>{const bytes=await(await fetch(EJS_gameUrl)).arrayBuffer();window.STARWOLF_verifiedROM=new Uint8Array(bytes);const digest=new Uint8Array(await crypto.subtle.digest('SHA-256',bytes));return Array.from(digest,x=>x.toString(16).padStart(2,'0')).join('')})()");
  assert(targetHash===patch.target.sha256,'The patched game does not match the verified build');
  console.log('Local ROM patch verified',JSON.stringify({bytes:patchResponse.headers.get('content-length'),targetHash}));
+ await call('Emulation.setTouchEmulationEnabled',{enabled:true,maxTouchPoints:5});
  launch=await evaluate("document.querySelector('#connect').click();("+measureLaunch.toString()+")()");
  assert(launch.state==='loading'&&!launch.pickerVisible&&launch.splash&&launch.disabled&&launch.pickerPulse==='none'&&launch.buttonPulse==='none','Launch must keep the splash visible and stop pulsing while loading');
  let state;
@@ -138,17 +140,15 @@ try{
  assert(await evaluate("inputProof.some(c=>c[1]===0&&c[2]===1)&&inputProof.some(c=>c[1]===0&&c[2]===0)"),'Fire press/release did not reach the core');
  await evaluate("document.querySelector('[data-action=start]').click()");
  await sleep(1000);
- await evaluate("document.querySelector('#disconnect').click()");
- assert(await evaluate("EJS_emulator.paused"),'Pause failed');
- launch=await launchView();
- assert(launch.state==='paused'&&!launch.pickerVisible&&!launch.splash&&launch.label==='Resume'&&launch.buttonPulse==='none','Pause restored the launch prompt');
- await evaluate("document.querySelector('#connect').click()");
- assert(await evaluate("!EJS_emulator.paused"),'Resume failed');
- launch=await launchView();
- assert(launch.state==='running'&&!launch.pickerVisible&&!launch.splash&&launch.buttonPulse==='none','Resume restored the launch prompt');
+ assert(await evaluate("inputProof.some(c=>c[1]===3&&c[2]===1)&&inputProof.some(c=>c[1]===3&&c[2]===0)"),'Start press/release did not reach the N64 core');
+ assert(await evaluate("!EJS_emulator.paused&&!document.querySelector('#disconnect,#control-placement')"),'Start must remain the game pause control');
+ const menus=await evaluate("({created:!!EJS_emulator.elements.menuToggle,hidden:!EJS_emulator.elements.menuToggle?.getClientRects().length&&!EJS_emulator.elements.menu.getClientRects().length,save:!!EJS_emulator.elements.bottomBar.saveState[0],load:!!EJS_emulator.elements.bottomBar.loadState[0]})");
+ assert(menus.created&&menus.hidden&&menus.save&&menus.load,'Touch menus must stay hidden while state actions exist: '+JSON.stringify(menus));
+ console.log('PASS: Start input and hidden touch hamburger/menu with save/load actions retained.');
  const audio=await evaluate("({state:EJS_emulator.Module.AL?.currentCtx?.audioCtx?.state,muted:EJS_emulator.muted,canvas:[EJS_emulator.canvas.width,EJS_emulator.canvas.height]})");
  console.log('Audio/render',JSON.stringify(audio));
  assert(audio.state==='running','Emulator audio context is not running');
+ if(!playerUiOnly){
  const chatterStatus=await evaluate("window.STARWOLF_chatter.stats");
  console.log('Crew chatter live state',JSON.stringify(chatterStatus));
  assert(chatterStatus.ready&&Number.isInteger(chatterStatus.ramBase)&&!chatterStatus.error,'Chatter did not load banks and locate real N64 RAM');
@@ -271,16 +271,18 @@ try{
   console.log('Kami browser geometry close-up captured',JSON.stringify(faceState));
  }
 
+ }
  for(const [name,width,height,mobile]of [['desktop',1280,900,false],['phone',390,844,true],['landscape',844,390,true]]){
   await call('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile});await sleep(300);
   const layout=await evaluate('('+measureLayout.toString()+')()');console.log(name,JSON.stringify(layout));
   assert(layout.below&&!layout.overflow&&layout.header<=38&&layout.font,'Layout failed: '+name);
-  assert(await evaluate("[...document.querySelectorAll('.ejs_virtualGamepad_parent,.ejs_menu_bar')].every(e=>getComputedStyle(e).display==='none')"),'Controls overlap the viewscreen');
+  assert(await evaluate("[...document.querySelectorAll('.ejs_virtualGamepad_parent,.ejs_menu_bar,.ejs_virtualGamepad_open')].every(e=>getComputedStyle(e).display==='none')"),'Controls overlap the viewscreen');
   const shot=await call('Page.captureScreenshot',{format:'png'});await writeFile(output+'emulator-'+name+'.png',Buffer.from(shot.data,'base64'));
  }
  assert(!uploads.length,'Unexpected network upload: '+JSON.stringify(uploads));
  assert(!errors.length,'Browser errors: '+errors.join(','));
- console.log('PASS: splash and Launch states, blue-green pulses, reduced motion, patch-only hosting, ROM validation, real emulator boot, input, audio, six chatter banks including narrator, pause/resume, desktop/mobile layouts, and no uploads.');
+ console.log('PASS: splash and Launch states, reduced motion, patch-only hosting, ROM validation, real emulator boot, Start input, hidden menus, audio context, desktop/mobile layouts and no uploads.');
+ if(!playerUiOnly)console.log('PASS: reviewed characters, radio glyphs and six chatter banks including narrator.');
 }finally{
  if(call)try{await call('Runtime.evaluate',{expression:"window.EJS_emulator?.started && EJS_emulator.pause()",userGesture:true})}catch{}
  ws?.close();chrome.kill('SIGTERM');

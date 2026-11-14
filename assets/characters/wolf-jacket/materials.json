@@ -1,0 +1,36 @@
+{
+  "exterior_materials": [
+    "ast_title_23B40_jacket",
+    "Wolf_black_violet_leather"
+  ],
+  "lining_material": "Wolf_eggshell_sheepswool_lining",
+  "geometry_changed": false,
+  "native_texture_format": "CI4",
+  "native_texture_size": [
+    32,
+    32
+  ],
+  "style": "low-detail N64",
+  "palette_limits": {
+    "leather": 4,
+    "wool": 6
+  },
+  "textures": {
+    "leather": {
+      "file": "assets/characters/wolf-jacket/textures/black-violet-leather.png",
+      "sha256": "52d92da76daa012721ef7d0cdccadba5408be6bfa3eec519f5c10406e2832a07",
+      "dimensions": [
+        32,
+        32
+      ]
+    },
+    "wool": {
+      "file": "assets/characters/wolf-jacket/textures/eggshell-sheepswool.png",
+      "sha256": "1caf97134bc0d2870f99ed7ef4b1b559a9ead4a8e3d554d6d3953aa359a347f1",
+      "dimensions": [
+        32,
+        32
+      ]
+    }
+  }
+}

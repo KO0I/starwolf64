@@ -16,6 +16,7 @@ from site_character_bodies import Bodies
 from site_character_edits import apply_budget, triangle_count
 from site_character_storage import Storage
 from site_character_panther import install as install_panther_head
+from site_character_wolf import install as install_wolf_head
 from extract_team_bodies import dependencies
 
 # Original US 1.1 instructions, checked before every replacement.
@@ -100,6 +101,7 @@ class SiteCharacters:
         wolf = self.read('heads/wolf/head.glb')
         low, high = self.bounds(wolf)
         center = (low + high) * 2.5
+        wolf_fit_bounds = (low.copy(), high.copy())
         for name, offset in HEAD_SLOTS.items():
             source = f'heads/{name}/head.glb'
             if name == 'kami':
@@ -111,6 +113,8 @@ class SiteCharacters:
                 glb = wolf if name == 'wolf' else self.read(source)
                 details = None
                 reduction = apply_budget(glb, name, 'pilot')
+                if name == 'wolf':
+                    details = install_wolf_head(glb, 'pilot')
                 if name == 'krystal':
                     focus_krystal_eyes(glb)
                 if name == 'panther':
@@ -119,6 +123,9 @@ class SiteCharacters:
             trim = glb.doc.get('asset', {}).get('extras', {}).get('runtime_hair_trim')
             bounds = self.bounds(glb, referenced_only=True)
             low, high = np.asarray(trim['fit_bounds']) if trim else self.bounds(glb)
+            if name == 'wolf':
+                bounds = wolf_fit_bounds
+                low, high = wolf_fit_bounds
             scale = min(5.0, * (np.array([554., 623., 636.]) / (high - low)))
             if name == 'panther':
                 scale *= 1.1
@@ -281,7 +288,7 @@ class SiteCharacters:
         for stem, source in self.final_segments.items():
             table = 0xDE480 + b.table_indices[stem] * 16
             _, start, end, compressed = struct.unpack_from('>IIII', rom, table)
-            if stem != 'ast_star_wolf' and (compressed or rom[start:end] != source):
+            if compressed or rom[start:end] != source:
                 raise ValueError(f'Reviewed native/browser segment mismatch: {stem}')
         for offset, (_, value) in self.rom_patches.items():
             if struct.unpack_from('>I', rom, offset)[0] != value:

@@ -67,33 +67,30 @@ try {
   };
   const ready = async () => {
     for (let i = 0; i < 80; i++) {
-      try {if (await evaluate(`!!window.STARWOLF_chatter && (${inputsOnly} || !!document.querySelector('#control-placement')?.title)`)) return;} catch {}
+      try {if (await evaluate(`!!window.STARWOLF_chatter && !!document.querySelector('#flight-deck')`)) return;} catch {}
       await sleep(100);
     }
     throw Error('Control module did not load');
   };
   const startStub = async () => {
     await evaluate(`(()=>{
-      window.inputProof=[];
+      window.inputProof=[];window.stateProof=[];
       STARWOLF_chatter.resume=()=>{};STARWOLF_chatter.stop=()=>{};
       window.EJS_emulator={started:true,paused:false,muted:false,volume:.7,Module:{},
         gameManager:{simulateInput:(...args)=>inputProof.push(args)},
         saveSettings(){},setVolume(value){this.volume=value},toggleVirtualGamepad(){},
         pause(){this.paused=true},play(){this.paused=false},
-        elements:{bottomBar:{saveState:[{click(){}}],loadState:[{click(){}}]}}};
+        elements:{bottomBar:{saveState:[{click(){stateProof.push('save')}}],loadState:[{click(){stateProof.push('load')}}]}}};
       EJS_onGameStart();
     })()`);
   };
   const lastInput = input => evaluate(`inputProof.filter(call=>call[1]===${input}).at(-1)?.[2]`);
   const assertInput = async (input, value, message) => assert(await lastInput(input) === value, message);
   const assertAxis=async(input,message)=>{const value=await lastInput(input);assert(value>0&&value<=32767,message+': '+value);};
+  const buttonInputs = [['fire',0,1],['bomb',1,1],['start',3,1],['dpad_up',4,1],['dpad_down',5,1],['dpad_left',6,1],['dpad_right',7,1],['shoulder_left',10,1],['roll_right',11,1],['roll_left',12,1],['c_up',23,32767],['c_down',22,32767],['c_left',21,32767],['c_right',20,32767]];
   const metrics = async (width, height, mobile) => {
     await call('Emulation.setDeviceMetricsOverride', {width, height, deviceScaleFactor: 1, mobile});
     await sleep(150);
-  };
-  const placement = async viewer => {
-    await evaluate(`(()=>{const screen=document.querySelector('#screen');if(screen.classList.contains('controls-in-view')!==${viewer})document.querySelector('#control-placement').click()})()`);
-    await sleep(100);
   };
   const screenshot = async name => {
     const shot = await call('Page.captureScreenshot', {format: 'png'});
@@ -101,6 +98,63 @@ try {
   };
   const touch = async (type, points) => call('Input.dispatchTouchEvent', {type, touchPoints: points});
   const stickCenter = async () => evaluate(`(()=>{const r=document.querySelector('#stick').getBoundingClientRect();return{x:r.left+r.width/2,y:r.top+r.height/2}})()`);
+
+  const verifyButtonMargins = async () => {
+    await evaluate("document.querySelector('.deck').scrollIntoView({block:'center'})");
+    const center = await stickCenter();
+    const held = {x: center.x + 18, y: center.y, id: 30};
+    const nearButton = action => evaluate(`(()=>{
+      const button=document.querySelector('[data-action=${action}]');
+      if(!button.getClientRects().length)return null;
+      const r=button.getBoundingClientRect(),deck=document.querySelector('.deck').getBoundingClientRect();
+      const others=[document.querySelector('#stick'),...document.querySelectorAll('.deck [data-action]')]
+        .filter(e=>e!==button&&e.getClientRects().length).map(e=>e.getBoundingClientRect());
+      const distance=(p,r)=>Math.hypot(Math.max(r.left-p.x,0,p.x-r.right),Math.max(r.top-p.y,0,p.y-r.bottom));
+      const candidates=[{x:r.left+r.width/2,y:r.top-4},{x:r.left-4,y:r.top+r.height/2},
+        {x:r.right+4,y:r.top+r.height/2},{x:r.left+r.width/2,y:r.bottom+4}];
+      const point=candidates.find(p=>p.x>=Math.max(0,deck.left)&&p.x<Math.min(innerWidth,deck.right)
+        &&p.y>=Math.max(0,deck.top)&&p.y<Math.min(innerHeight,deck.bottom)&&others.every(r=>distance(p,r)>6));
+      if(!point)throw Error('No clear outside test point for ${action}');
+      return point;
+    })()`);
+    await touch('touchStart', [{...center, id: held.id}]);
+    await touch('touchMove', [held]);
+    await assertAxis(16, 'Joystick failed before expanded-target test');
+    const strength = await lastInput(16);
+    for (const [action,input,value] of buttonInputs) {
+      const point = await nearButton(action);
+      if (!point) continue;
+      const finger = {...point, id: 31};
+      await touch('touchStart', [held, finger]);
+      await assertInput(input, value, `Outside-edge ${action} press failed while steering`);
+      await assertInput(16, strength, `Pressing ${action} changed the joystick`);
+      await touch('touchMove', [{...held, x: held.x + 2}, finger]);
+      await assertInput(input, value, `Moving the joystick released ${action}`);
+      await assertAxis(16, `Joystick stopped while holding ${action}`);
+      await touch('touchEnd', [finger]);
+      await assertInput(input, 0, `Releasing ${action} left it held`);
+      await touch('touchMove', [held]);
+      await assertInput(16, strength, `Releasing ${action} stopped steering`);
+    }
+    const fire = {...await nearButton('fire'), id: 32};
+    const bomb = {...await nearButton('bomb'), id: 33};
+    for (let repeat=0;repeat<2;repeat++) {
+      await touch('touchStart', [held, fire]);
+      await assertInput(0, 1, 'Repeated fire press failed while steering');
+      await touch('touchStart', [held, fire, bomb]);
+      await assertInput(0, 1, 'Bomb press interrupted fire');
+      await assertInput(1, 1, 'Simultaneous bomb press failed');
+      await touch('touchEnd', [fire]);
+      await assertInput(0, 0, 'Fire stayed held');
+      await assertInput(1, 1, 'Fire release interrupted bomb');
+      await touch('touchEnd', [bomb]);
+      await assertInput(1, 0, 'Bomb stayed held');
+      await assertInput(16, strength, 'Action fingers interrupted steering');
+    }
+    await touch('touchEnd', []);
+    await assertInput(16, 0, 'Expanded-target test left the stick held');
+    console.log(`PASS: expanded targets for every visible button, continued steering, and repeated fire+bomb+stick.`);
+  };
 
   await call('Runtime.enable');
   await call('Page.enable');
@@ -111,9 +165,9 @@ try {
   await metrics(1280, 900, false);
   await ready();
   await startStub();
-  if (!inputsOnly) assert(await evaluate("document.querySelector('#flight-deck').parentElement.id==='controls'"), 'Deck should start below the viewer');
+  assert(await evaluate("document.querySelector('#flight-deck').parentElement.id==='controls'"), 'Deck should start below the viewer');
   assert(await evaluate("document.querySelectorAll('.deck [data-action]').length")===14,'Expected all 14 N64 buttons');
-  for(const [action,input,value] of [['fire',0,1],['bomb',1,1],['start',3,1],['dpad_up',4,1],['dpad_down',5,1],['dpad_left',6,1],['dpad_right',7,1],['shoulder_left',10,1],['roll_right',11,1],['roll_left',12,1],['c_up',23,32767],['c_down',22,32767],['c_left',21,32767],['c_right',20,32767]]) {
+  for(const [action,input,value] of buttonInputs) {
     const point=await evaluate(`(()=>{const button=document.querySelector('[data-action=${action}]');button.scrollIntoView({block:'center'});const r=button.getBoundingClientRect();return{x:r.x+r.width/2,y:r.y+r.height/2};})()`);
     await call('Input.dispatchMouseEvent',{type:'mousePressed',...point,button:'left',buttons:1,clickCount:1});
     await assertInput(input,value,'N64 mapping failed for '+action);
@@ -165,7 +219,6 @@ try {
 
   await metrics(390, 844, true);
   await call('Emulation.setTouchEmulationEnabled', {enabled: true, maxTouchPoints: 5});
-  if (!inputsOnly) await placement(false);
   await evaluate("document.querySelector('#stick').scrollIntoView({block:'center'})");
   await sleep(100);
   let scroll = await evaluate('scrollY');
@@ -201,6 +254,9 @@ try {
   await touch('touchEnd', []);
   await assertInput(0, 0, 'Real fire finger release left fire held');
   console.log('PASS: real two-finger steering/fire with independent releases.');
+  if (!inputsOnly) {
+    await verifyButtonMargins();
+  }
 
   await evaluate(`(()=>{
     const stick=document.querySelector('#stick'),r=stick.getBoundingClientRect();
@@ -239,54 +295,31 @@ try {
   await call('Input.dispatchKeyEvent', {type: 'keyUp', key: 'x', code: 'KeyX', windowsVirtualKeyCode: 88});
   console.log('PASS: real fullscreen entry and exit clear held keyboard input.');
 
-  if (!inputsOnly) {
-    await metrics(1280, 900, false);
-    await placement(true);
-    assert(await evaluate("document.querySelector('#flight-deck').parentElement.id==='screen'"), 'Deck did not move into the viewer');
-    assert(await evaluate("localStorage.getItem('starwolf64.controlPlacement')==='viewer'"), 'Viewer placement was not persisted');
-    let layout = await evaluate(`(()=>{const s=document.querySelector('#screen').getBoundingClientRect(),d=document.querySelector('#flight-deck').getBoundingClientRect();return{inside:d.left>=s.left&&d.right<=s.right&&d.top>=s.top&&d.bottom<=s.bottom+1,overflow:document.documentElement.scrollWidth>innerWidth}})()`);
-    assert(layout.inside && !layout.overflow, 'Desktop overlay escaped the viewer');
-    await screenshot('desktop-viewer');
-
-    await metrics(390, 844, true);
-    await evaluate('scrollTo(0,0)');
-    layout = await evaluate(`(()=>{const s=document.querySelector('#screen').getBoundingClientRect(),d=document.querySelector('#flight-deck').getBoundingClientRect(),visible=[...document.querySelectorAll('#flight-deck [data-action]')].filter(b=>b.getClientRects().length),bad=visible.filter(b=>{const r=b.getBoundingClientRect();return r.left<s.left||r.right>s.right||r.top<s.top||r.bottom>s.bottom}).map(b=>({action:b.dataset.action,rect:b.getBoundingClientRect().toJSON()}));return{screen:s.toJSON(),inside:d.left>=s.left&&d.right<=s.right&&d.top>=s.top&&d.bottom<=s.bottom+1,overflow:document.documentElement.scrollWidth>innerWidth,buttons:!bad.length,bad}})()`);
-    await screenshot('mobile-viewer-layout');
-    assert(layout.inside && !layout.overflow && layout.buttons, 'Phone overlay is clipped or overflows: ' + JSON.stringify(layout));
-    scroll = await evaluate('scrollY');
-    point = await stickCenter();
-    await touch('touchStart', [{x: point.x, y: point.y, id: 3}]);
-    await touch('touchMove', [{x: point.x + 25, y: point.y + 40, id: 3}]);
-    await touch('touchEnd', []);
-    assert(await evaluate('scrollY') === scroll, 'Overlay joystick scrolled the page');
-    await assertInput(16, 0, 'Overlay touch left steering held');
-    await screenshot('mobile-viewer');
-
-    for (const [width, height] of [[320,568], [360,800], [390,844], [414,896], [620,844], [621,844], [844,390], [1280,900]]) {
-      await metrics(width, height, width < 1000);
-      await evaluate('scrollTo(0,0)');
-      const fit = await evaluate(`(()=>{
-        const screen=document.querySelector('#screen').getBoundingClientRect();
-        const elements=[document.querySelector('#stick'),...document.querySelectorAll('#flight-deck [data-action]')].filter(e=>e.getClientRects().length);
-        const bad=elements.filter(e=>{
-          const r=e.getBoundingClientRect(),hit=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2);
-          return r.left<screen.left||r.right>screen.right||r.top<screen.top||r.bottom>screen.bottom||!e.contains(hit);
-        }).map(e=>e.dataset.action||e.id);
-        return {bad,overflow:document.documentElement.scrollWidth>innerWidth};
-      })()`);
-      assert(!fit.bad.length && !fit.overflow, `Overlay failed at ${width}x${height}: ` + JSON.stringify(fit));
-    }
-    console.log('PASS: overlay containment and hit targets at 320, 360, 390, 414, 620, 621, 844 and 1280px.');
-
-    await call('Page.navigate', {url: new URL('?controls-reload=1', url).href});
-    await sleep(1000);
-    await ready();
-    const restored = await evaluate("({parent:document.querySelector('#flight-deck').parentElement.id,stored:localStorage.getItem('starwolf64.controlPlacement'),pressed:document.querySelector('#control-placement').getAttribute('aria-pressed')})");
-    assert(restored.parent === 'screen' && restored.stored === 'viewer' && restored.pressed === 'true', 'Saved placement did not survive reload: ' + JSON.stringify(restored) + '; errors: ' + errors.join(','));
+  assert(await evaluate("document.title==='A Wolf In Space'&&document.querySelector('header h1').textContent==='A Wolf In Space'"), 'Page title capitalization');
+  assert(await evaluate("!document.querySelector('#disconnect,#control-placement')"), 'Removed toolbar controls returned');
+  await evaluate("document.querySelector('#save').click();document.querySelector('#load').click()");
+  assert(await evaluate("stateProof.join(',')==='save,load'"), 'State buttons must invoke their emulator actions');
+  for (const [width, height] of [[320,568], [360,800], [390,844], [414,896], [620,844], [621,844], [844,390], [1280,900]]) {
+    await metrics(width, height, width < 1000);
+    await evaluate("document.querySelector('.state-controls').scrollIntoView({block:'center'})");
+    const fit = await evaluate(`(()=>{
+      const start=document.querySelector('[data-action=start]').getBoundingClientRect();
+      const buttons=[document.querySelector('#save'),document.querySelector('#load')];
+      return {below:buttons.every(e=>e.getBoundingClientRect().top>=start.bottom),
+        fit:buttons.every(e=>{const r=e.getBoundingClientRect();return r.height>=44&&r.left>=0&&r.right<=innerWidth}),
+        parent:document.querySelector('#flight-deck').parentElement.id,overflow:document.documentElement.scrollWidth>innerWidth};
+    })()`);
+    assert(fit.below&&fit.fit&&fit.parent==='controls'&&!fit.overflow, `State controls failed at ${width}x${height}: `+JSON.stringify(fit));
+    if(width===390||width===1280)await screenshot('state-controls-'+width);
   }
+  await evaluate("localStorage.setItem('starwolf64.controlPlacement','viewer')");
+  await call('Page.navigate', {url: new URL('?controls-reload=1', url).href});
+  await sleep(1000);await ready();
+  assert(await evaluate("document.querySelector('#flight-deck').parentElement.id==='controls'&&!document.querySelector('#control-placement')"), 'Old placement preference must not restore the overlay');
+  console.log('PASS: titles, state callbacks, state controls below Start at eight widths and old preference ignored.');
   assert(!errors.length, 'Browser errors: ' + errors.join(','));
   assert(!badResponses.length, 'Failed requests: ' + badResponses.join(','));
-  console.log('PASS: outside release, touch scroll prevention, touch cancel, capture loss, independent multi-touch, keyboard blur/fullscreen reset' + (inputsOnly ? '.' : ', placement persistence, desktop/phone overlay layout, and no browser/request errors.'));
+  console.log('PASS: outside release, touch scroll prevention, touch cancel, capture loss, independent multi-touch, keyboard blur/fullscreen reset' + '.');
   console.log('Screenshots: ' + output);
 } finally {
   if (call && ws?.readyState === WebSocket.OPEN) try {await call('Runtime.evaluate', {expression: 'window.EJS_emulator?.started&&EJS_emulator.pause()', userGesture: true});} catch {}

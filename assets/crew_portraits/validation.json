@@ -36,12 +36,12 @@
   {
     "character": "kami",
     "mouth_difference_bbox": [
-      18,
-      32,
-      27,
+      15,
+      33,
+      30,
       36
     ],
-    "changed_pixels": 33,
+    "changed_pixels": 45,
     "non_mouth_changed_pixels": 0,
     "png_dimensions": [
       44,
