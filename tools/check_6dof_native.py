@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run the real engine steering helper with native Player and controller types."""
+"""Run the real engine steering and camera helpers with native Player and controller types."""
 import argparse
 import json
 import os
@@ -17,6 +17,14 @@ OSContPad* gInputPress = &pad;
 static int enabled, inverted, currentVoice, saves;
 s32 gPlayState, gRadioState, gCallTimer;
 LevelMode gLevelMode;
+u8 gLevelType;
+s32 gFovYMode;
+f32 gGroundHeight, gPathProgress;
+f32 gCsCamEyeX, gCsCamEyeY, gCsCamEyeZ, gCsCamAtX, gCsCamAtY, gCsCamAtZ;
+void FrameInterpolation_RecordMatrixRotate1Coord(Matrix* matrix, u32 coord, f32 angle, u8 mode) {}
+void FrameInterpolation_RecordMatrixMultVec3fNoTranslate(Matrix* matrix, Vec3f src, Vec3f dst) {}
+float __sinf(float angle) { return sinf(angle); }
+float __cosf(float angle) { return cosf(angle); }
 s32 Audio_GetCurrentVoice(void) { return currentVoice; }
 void CVarSetInteger(const char* name, int32_t value) {
     if (!strcmp(name, "gSixDofFlight")) enabled = value;
@@ -145,7 +153,49 @@ int main(void) {
     player.zRotBank = 90;
     Player_Steer6DOF(&player, true);
     CHECK(player.yRot_114 > 0 && fabsf(player.rot.x) < 0.0001f);
-    puts("PASS: C-right edge toggle, message/call/voice gating, input consumption, pause/cutscene/vehicle scope, and flight steering");
+    pad.stick_x = pad.stick_y = 0;
+    enabled = 1;
+    const float cameraBanks[] = {90, 180, -90, 179, -179, 450};
+    for (int type = LEVELTYPE_PLANET; type <= LEVELTYPE_SPACE; type++) {
+        gLevelType = type;
+        for (int i = 0; i < 6; i++) {
+            memset(&player, 0, sizeof(player));
+            player.form = FORM_ARWING;
+            player.state = PLAYERSTATE_ACTIVE;
+            player.pos.y = 350;
+            player.bankAngle = cameraBanks[i];
+            Camera_UpdateArwingOnRails(&player);
+            CHECK(fabsf(Flight6DOF_Wrap(player.camRoll + cameraBanks[i])) < 0.001f);
+            Camera_UpdateArwingOnRails(&player);
+            CHECK(fabsf(Flight6DOF_Wrap(player.camRoll + cameraBanks[i])) < 0.001f);
+        }
+    }
+    Matrix cameraMatrix;
+    gCalcMatrix = &cameraMatrix;
+    for (int view = 0; view < 2; view++) {
+        for (int i = 0; i < 6; i++) {
+            memset(&player, 0, sizeof(player));
+            player.bankAngle = cameraBanks[i];
+            player.alternateView = view;
+            player.pos.y = 350;
+            Camera_Update6DOF(&player, true);
+            CHECK(fabsf(Flight6DOF_Wrap(player.camRoll + cameraBanks[i])) < 0.001f);
+            CHECK(fabsf(player.cam.eye.x + 50 * SIN_DEG(cameraBanks[i])) < 0.001f);
+            CHECK(fabsf(player.cam.eye.y - 350 - 50 * COS_DEG(cameraBanks[i])) < 0.001f);
+            CHECK(fabsf(player.cam.eye.z - (view ? 1000 : 300)) < 0.001f);
+            CHECK(fabsf(player.cam.at.x) < 0.001f && fabsf(player.cam.at.y - 350) < 0.001f);
+            CHECK(fabsf(player.cam.at.z + 150) < 0.001f);
+        }
+    }
+    memset(&player, 0, sizeof(player));
+    player.form = FORM_ARWING;
+    player.state = PLAYERSTATE_ACTIVE;
+    player.rot.z = player.bankAngle = 90;
+    enabled = 0;
+    gLevelType = LEVELTYPE_PLANET;
+    Camera_UpdateArwingOnRails(&player);
+    CHECK(fabsf(player.camRoll + 1.5f) < 0.001f);
+    puts("PASS: flight steering, radio gating, full camera roll on rails and all-range, rolled chase offset, and standard camera behavior");
     return 0;
 }
 '''
@@ -173,7 +223,7 @@ def main():
         harness.write_text(HARNESS)
         executable = directory/'steering'
         command = [*flags, '-O0', '-ffunction-sections', '-fdata-sections', str(harness),
-                   str(ROOT/'src/engine/fox_std_lib.c'), '-Wl,--gc-sections', '-lm', '-o', str(executable)]
+                   str(ROOT/'src/engine/fox_std_lib.c'), str(ROOT/'src/sys/sys_matrix.c'), '-Wl,--gc-sections', '-lm', '-o', str(executable)]
         log = output/'native-steering.log'
         with log.open('w') as stream:
             code = subprocess.run(command, cwd=ROOT, env=dict(os.environ, TMPDIR=str(directory)),

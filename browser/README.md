@@ -33,7 +33,7 @@ Tap **C-right** during flight to toggle **6DOF flight**. On a keyboard, use the 
 
 While enabled, a HUD attitude indicator shows a wireframe outline, a rotating horizon, a fixed craft marker, and a 6DOF label in the same green as the targeting reticle. A faint translucent green fill marks the ground-facing side; the sky-facing side stays clear. It disappears when the mode is disabled.
 
-For Arwings and Wolfens, left/right continuously roll, and releasing the stick holds the roll angle. Up pitches toward the craft's top and down toward its underside, including sideways and inverted flight. The native **Invert Y Axis** setting reverses pitch. All-range stages allow full rotation; on-rails stages keep their forward corridor. Shoulder banking and barrel rolls still work. Boost and brake retain their speed controls, with automatic pitch-gesture loops and U-turns disabled while this mod is active. Other vehicles retain their usual controls.
+For Arwings and Wolfens, left/right continuously roll, and releasing the stick holds the roll angle. The camera rolls with the ship through sideways and inverted flight, and holds that orientation when the stick is released. Up pitches toward the craft's top and down toward its underside, including sideways and inverted flight. The native **Invert Y Axis** setting reverses pitch. All-range stages allow full rotation; on-rails stages keep their forward corridor. Shoulder banking and barrel rolls still work. Boost and brake retain their speed controls, with automatic pitch-gesture loops and U-turns disabled while this mod is active. Other vehicles retain their usual controls.
 
 ## Refresh assets and audio
 

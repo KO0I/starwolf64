@@ -6340,7 +6340,11 @@ void Camera_UpdateArwingOnRails(Player* player) {
     Math_SmoothStepToF(&player->cam.at.y, gCsCamAtY, player->unk_018, 1000.0f, 0.0f);
     Math_SmoothStepToF(&player->cam.at.z, gCsCamAtZ, player->unk_014, 1000.0f, 0.0f);
     Math_SmoothStepToF(&player->unk_014, 1.0f, 1.0f, 0.05f, 0.0f);
-    temp = Player_Uses6DOF(player) ? 0.0f : -player->rot.z;
+    if (Player_Uses6DOF(player) && (player->state == PLAYERSTATE_ACTIVE) && !player->somersault) {
+        player->camRoll = Flight6DOF_Wrap(-player->bankAngle);
+        return;
+    }
+    temp = -player->rot.z;
     if (gLevelType == LEVELTYPE_PLANET) {
         Math_SmoothStepToF(&player->camRoll, temp * 0.3f, 0.1f, 1.5f, 0.0f);
     } else if (gLevelType == LEVELTYPE_SPACE) {
@@ -6468,6 +6472,7 @@ static void Camera_Update6DOF(Player* player, bool snap) {
     Vec3f forward = { 0.0f, 0.0f, 150.0f };
     Matrix_RotateY(gCalcMatrix, (player->yRot_114 + player->rot.y + 180.0f) * M_DTOR, MTXF_NEW);
     Matrix_RotateX(gCalcMatrix, -(player->xRot_120 + player->rot.x) * M_DTOR, MTXF_APPLY);
+    Matrix_RotateZ(gCalcMatrix, -player->bankAngle * M_DTOR, MTXF_APPLY);
     Matrix_MultVec3fNoTranslate(gCalcMatrix, &offset, &behind);
     Matrix_MultVec3fNoTranslate(gCalcMatrix, &forward, &ahead);
     if (snap) {
@@ -6482,8 +6487,7 @@ static void Camera_Update6DOF(Player* player, bool snap) {
     player->cam.at.x = player->pos.x + ahead.x;
     player->cam.at.y = player->pos.y + ahead.y;
     player->cam.at.z = player->pos.z + ahead.z;
-    /* The chase view keeps a horizon; the craft's roll stays visible. */
-    Math_SmoothStepToAngle(&player->camRoll, 0.0f, 0.1f, 5.0f, 0.0f);
+    player->camRoll = Flight6DOF_Wrap(-player->bankAngle);
 }
 
 void Camera_UpdateArwing360(Player* player, bool arg1) {

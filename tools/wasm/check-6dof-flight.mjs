@@ -70,7 +70,8 @@ export async function checkSixDofFlight({value, sleep, call, output}) {
       const pitch=current.playerPitch*Math.PI/180,roll=current.playerRoll*Math.PI/180;
       const ground=pixels.groundSamples.filter(point=>{
         const height=Math.cos(pitch)*(Math.sin(roll)*point.x-Math.cos(roll)*point.y)+Math.sin(pitch)*Math.sqrt(19*19-point.x*point.x-point.y*point.y);
-        return height < -3 && palette[4].every((v,c)=>Math.abs(v-point.rgb[c])<8);
+        // Scenery beneath the translucent fill can only raise the black-background tint.
+        return height < -3 && palette[4].every((v,c)=>point.rgb[c]>=v-8);
       });
       if(!ground.length) throw Error('Translucent ground fill does not follow craft attitude: '+JSON.stringify({current,pixels,expected:palette[4]}));
       const interior=points.filter(point=>point.x*point.x+point.y*point.y<16*16);
@@ -97,6 +98,12 @@ export async function checkSixDofFlight({value, sleep, call, output}) {
       await frames(20);
       const banked=await state();
       const held=await frames(40);
+      for(const current of [banked,held]) {
+        if(!Number.isFinite(current.cameraRoll)||Math.abs(angle(current.cameraRoll+current.playerRoll))>.01)
+          throw Error('Camera did not match the ship roll: '+JSON.stringify(current));
+      }
+      const cameraShot=await call('Page.captureScreenshot',{format:'png'});
+      await writeFile(resolve(output,'6dof-camera-'+phase+'.png'),Buffer.from(cameraShot.data,'base64'));
       const hud=await captureHud("6dof-attitude-"+phase,held,true);
       if(Math.abs(angle(banked.playerRoll-before.playerRoll))<60)
         throw Error('Left input did not continuously roll: '+JSON.stringify({before,banked}));
