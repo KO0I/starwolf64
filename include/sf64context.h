@@ -314,7 +314,7 @@ extern s32 gBombCount[4];
 extern s32 gVsPoints[4];
 extern s32 gVsKills[4][10];
 extern s32 gVsMatchWon;
-extern bool gVsMatchStart;
+extern s32 gVsMatchStart; // 0: waiting, 1: start cue pending, 2: playing
 extern bool gChangeTo360;
 extern Vec3f gTeamArrowsViewPos[10];
 extern f32 D_ctx_80177F20[65];

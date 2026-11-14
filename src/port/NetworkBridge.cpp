@@ -15,6 +15,8 @@ extern "C" {
 void Object_SetInfo(ObjectInfo* info, u32 objId);
 extern s32 sVsDrawMode;
 extern s32 sVsWinner;
+extern u8 gAudioSpecId;
+u16 Audio_GetActiveSeqId(u8 seqPlayId);
 }
 namespace {
 constexpr uint32_t CAP = 262144, MAGIC = 0x534e4554, SCENE = 0x53434e31;
@@ -318,8 +320,8 @@ extern "C" void Wasm_NetBeginFrame(void) {
     auto& h = mailbox.h;
     if (h[2].load(std::memory_order_acquire) == 1) {
         h[2].store(2, std::memory_order_release);
-        uint32_t args[16];
-        for (unsigned i = 0; i < 16; i++)
+        uint32_t args[6];
+        for (unsigned i = 0; i < 6; i++)
             args[i] = h[32 + i].load(std::memory_order_relaxed);
         bool ok = false;
         switch (h[4].load(std::memory_order_relaxed)) {
@@ -358,6 +360,8 @@ extern "C" void Wasm_NetEndFrame(void) {
     h[11] = Net_ActiveMask();
     h[21] = gGameState;
     h[22] = gPlayState;
+    h[46] = gVsMatchStart;
+    h[47] = (uint32_t(Net_ActiveBoostSounds()) << 24) | (uint32_t(gAudioSpecId) << 16) | Audio_GetActiveSeqId(0);
     h[23] = gVsMatchOver ? sVsWinner + 1 : 0;
     if (Net_Ready() && gPlayer) {
         for (unsigned i = 0; i < 4; i++) {

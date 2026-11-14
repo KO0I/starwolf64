@@ -363,7 +363,7 @@ s32 gBombCount[4];
 s32 gVsPoints[4];
 s32 gVsKills[4][10];
 s32 gVsMatchWon;
-bool gVsMatchStart;
+s32 gVsMatchStart;
 bool gChangeTo360;
 Vec3f gTeamArrowsViewPos[10];
 // f32 D_ctx_80177F20[65]; // Seem to be an early implementation of RadarMark

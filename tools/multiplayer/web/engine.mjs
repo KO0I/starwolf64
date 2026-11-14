@@ -36,6 +36,10 @@ export class WasmEngine extends EventTarget {
       tick: r(12),
       lastImportedTick: r(18),
       errorCode: this.h ? Atomics.load(this.h, 19) : 0,
+      audioSpec: (r(47) >>> 16) & 255,
+      activeBoostSounds: r(47) >>> 24,
+      matchStartState: r(46),
+      musicSequence: r(47) & 65535,
       winner: r(23),
       headings: this.h ? Array.from(new Float32Array(this.h.buffer, this.h.byteOffset + 24 * 4, 4)) : [],
       controls: [28, 29, 30, 31].map(r),
@@ -145,7 +149,7 @@ export class WasmEngine extends EventTarget {
                        const h = this.h;
                        await this.wait(() => Atomics.load(h, 2) === 0, 'Command slot');
                        const a = typeof args === 'function' ? args() : args, serial = ++this.serial;
-                       for (let i = 0; i < 16; i++) Atomics.store(h, 32 + i, a[i] ?? 0);
+                       for (let i = 0; i < 6; i++) Atomics.store(h, 32 + i, a[i] ?? 0);
                        Atomics.store(h, 3, serial);
                        Atomics.store(h, 4, op);
                        Atomics.store(h, 2, 1);

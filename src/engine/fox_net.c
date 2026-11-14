@@ -1,5 +1,6 @@
 #include "global.h"
 #include "sf64net.h"
+#include "sf64audio_provisional.h"
 extern void Player_Initialize(Player* player);
 extern void Versus_InitMatch(void);
 extern bool Versus_InitViewports(void);
@@ -95,6 +96,7 @@ void Net_OnPlayInit(void) {
     gVsMatchStart = true;
     gNextVsViewScale = 1.5f;
     Versus_InitViewports();
+    AUDIO_PLAY_BGM(gBgmSeqId);
     gFillScreenAlpha = gFillScreenAlphaTarget = 0;
     sNet.ready = 1;
 }
@@ -202,4 +204,14 @@ void Net_ReadController(int slot, OSContPad* pad) {
     }
     if (sNet.role == NET_HOST)
         pad->button &= ~START_BUTTON;
+}
+
+int Net_ActiveBoostSounds(void) {
+    extern SfxBankEntry sSfxBanks[5][20];
+    int count = 0;
+    for (int bank = 0; bank < 5; bank++)
+        for (int i = 0; i < 20; i++)
+            if (sSfxBanks[bank][i].state && sSfxBanks[bank][i].sfxId == NA_SE_ARWING_BOOST)
+                count++;
+    return count;
 }

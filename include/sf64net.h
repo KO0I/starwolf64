@@ -13,6 +13,7 @@ int Net_Enabled(void);
 int Net_IsGuest(void);
 int Net_LocalSlot(void);
 int Net_Ready(void);
+int Net_ActiveBoostSounds(void);
 uint32_t Net_MatchId(void);
 uint32_t Net_StageEpoch(void);
 uint32_t Net_ActiveMask(void);

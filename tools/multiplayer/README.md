@@ -53,6 +53,8 @@ node tools/multiplayer/check-browser.mjs --output build/multiplayer-setup-check
 node tools/multiplayer/check-game-browser.mjs --url http://127.0.0.1:8670/ --output build/multiplayer-game-check
 ```
 
+Check map-entry sound with `node tools/multiplayer/check-audio-browser.mjs --url http://127.0.0.1:8670/ --output build/multiplayer-audio-check`. It checks the native start state, finished startup boost effects, battle music and actual PCM output.
+
 The gameplay check requires a running configured service and Chromium at /usr/bin/chromium.
 It launches actual WASM host/guest workers, sends controls into a distinct native slot, imports live scenes, and records both cameras.
 It also covers interrupted admission, guest departure, slot reuse, stale-incarnation rejection and host departure.
