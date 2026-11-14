@@ -1805,6 +1805,7 @@ void Object_DrawAll(s32 cullDirection) {
     Item* item;
     Scenery* scenery;
 
+    Display_SetAllRangeMapTint(&gMasterDisp, true);
     if ((gLevelMode == LEVELMODE_ALL_RANGE) && (gCurrentLevel != LEVEL_KATINA)) {
         RCP_SetupDL_29(gFogRed, gFogGreen, gFogBlue, gFogAlpha, gFogNear, gFogFar);
 
@@ -1848,6 +1849,8 @@ void Object_DrawAll(s32 cullDirection) {
             }
         }
     }
+
+    Display_SetAllRangeMapTint(&gMasterDisp, false);
 
     for (i = 0, boss = &gBosses[0]; i < ARRAY_COUNT(gBosses); i++, boss++) {
         if ((boss->obj.status >= OBJ_ACTIVE) && (boss->obj.id != OBJ_BOSS_BO_BASE_SHIELD)) {
