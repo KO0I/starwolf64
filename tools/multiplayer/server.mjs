@@ -1,12 +1,14 @@
 import { createServer } from "node:http";
-import { randomBytes } from "node:crypto";
+import { createHash, randomBytes } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import { pathToFileURL } from "node:url";
 import { PILOTS } from "./web/catalog.mjs";
 import { VERSION } from "./web/protocol.mjs";
 
+import { resolve, join } from "node:path";
 const webDir = new URL("./web/", import.meta.url);
 const files = new Map([
+  ...["engine.mjs","game.mjs","world-protocol.mjs"].map(name => ["/"+name,[name,"text/javascript; charset=utf-8"]]),
   ["/", ["index.html", "text/html; charset=utf-8"]],
   ["/index.html", ["index.html", "text/html; charset=utf-8"]],
   ["/app.mjs", ["app.mjs", "text/javascript; charset=utf-8"]],
@@ -61,8 +63,29 @@ function validSignal(data) {
     (c.sdpMLineIndex == null || (Number.isInteger(c.sdpMLineIndex) && c.sdpMLineIndex >= 0)) &&
     (c.usernameFragment == null || typeof c.usernameFragment === "string");
 }
-export function createSignalingServer({ host = "127.0.0.1", port = 8670, iceServers = [], roomLimit = 32, maxPeers = 8, graceMs = 5000, allowedOrigins = [] } = {}) {
+export function createSignalingServer({ host = "127.0.0.1", port = 8670, iceServers = [], roomLimit = 32, maxPeers = 8, graceMs = 5000, allowedOrigins = [], gameDir = null, gameAssets = null } = {}) {
   if (!Number.isInteger(roomLimit) || roomLimit < 1 || !Number.isInteger(maxPeers) || maxPeers < 1 || maxPeers > 8 || !Number.isFinite(graceMs) || graceMs < 0 || !Array.isArray(iceServers) || !Array.isArray(allowedOrigins)) throw new TypeError("invalid signaling configuration");
+
+  const runtimeFiles = new Map();
+  const descriptor = (async () => {
+    if (!gameDir || !gameAssets) return {available:false};
+    const assets = [], fingerprint = createHash('sha256');
+    for (const [name,type] of [['Starship.html','text/html'],['Starship.js','text/javascript'],['Starship.wasm','application/wasm'],['Starship.data','application/octet-stream']]) {
+      const path = join(resolve(gameDir),name), bytes = await readFile(path);
+      fingerprint.update(bytes);
+      runtimeFiles.set('/game/'+name,{bytes,type});
+    }
+    for (const name of ['sf64.o2r','starship.o2r','wolfen.o2r']) {
+      const path = join(resolve(gameAssets),name), bytes = await readFile(path);
+      if (!bytes.length || bytes.length > 64*1024*1024) throw Error('Invalid game archive size');
+      const sha256 = createHash('sha256').update(bytes).digest('hex');
+      fingerprint.update(sha256);
+      assets.push({name,url:'/game-assets/'+name,sha256});
+      runtimeFiles.set('/game-assets/'+name,{bytes,type:'application/octet-stream'});
+    }
+    return {available:true,runtime:'/game/Starship.html',schema:1,capacity:4,fingerprint:fingerprint.digest('hex'),assets};
+  })();
+  descriptor.catch(() => {});
   const rooms = new Map();
   let closing = false;
   const publicPeers = room => [...room.peers.values()].map(({ peer, slot, role, name }) => ({ peer, slot, role, name }));
@@ -130,6 +153,16 @@ export function createSignalingServer({ host = "127.0.0.1", port = 8670, iceServ
   const server = createServer(async (req, res) => {
     try {
       const url = new URL(req.url, "http://localhost");
+
+      if (req.method === 'GET' && url.pathname === '/api/game') return json(res,200,await descriptor);
+      if (req.method === 'GET' && (url.pathname.startsWith('/game/') || url.pathname.startsWith('/game-assets/'))) {
+        await descriptor;
+        const entry = runtimeFiles.get(url.pathname);
+        if (!entry) return json(res,404,{error:'not found'});
+        const body = entry.bytes;
+        res.writeHead(200,{'content-type':entry.type,'content-length':body.length,'cache-control':'no-cache','cross-origin-opener-policy':'same-origin','cross-origin-embedder-policy':'require-corp','cross-origin-resource-policy':'same-origin','x-content-type-options':'nosniff'});
+        return res.end(body);
+      }
       if (req.method === "POST" && !allowedOrigin(req)) return json(res, 403, { error: "origin denied" });
       if (req.method === "GET" && url.pathname === "/api/config") return json(res, 200, { protocol: VERSION, iceServers });
       if (req.method === "GET" && files.has(url.pathname)) {
@@ -230,12 +263,14 @@ export function createSignalingServer({ host = "127.0.0.1", port = 8670, iceServ
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   try {
-    let host = "127.0.0.1", port = 8670, iceServers = [];
+    let host = "127.0.0.1", port = 8670, iceServers = [], gameDir = null, gameAssets = null;
     const allowedOrigins = [];
     for (let i = 2; i < process.argv.length; i++) {
       const arg = process.argv[i];
       if (arg === "--host" && process.argv[i + 1]) host = process.argv[++i];
       else if (arg === "--port" && process.argv[i + 1] !== undefined) port = Number(process.argv[++i]);
+      else if (arg === "--game-dir" && process.argv[i + 1]) gameDir = process.argv[++i];
+      else if (arg === "--game-assets" && process.argv[i + 1]) gameAssets = process.argv[++i];
       else if (arg === "--ice-config" && process.argv[i + 1]) iceServers = JSON.parse(await readFile(process.argv[++i], "utf8"));
       else if (arg === "--origin" && process.argv[i + 1]) {
         const origin = process.argv[++i];
@@ -245,7 +280,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
       else throw new Error(`unknown or incomplete argument: ${arg}`);
     }
     if (!Number.isInteger(port) || port < 0 || port > 65535) throw new Error("invalid port");
-    const { server } = createSignalingServer({ host, port, iceServers, allowedOrigins });
+    const { server } = createSignalingServer({ host, port, iceServers, allowedOrigins, gameDir, gameAssets });
     server.listen(port, host, () => console.log(`READY http://${host.includes(":") ? `[${host}]` : host}:${server.address().port}/`));
   } catch (err) { console.error(err.message); process.exitCode = 1; }
 }

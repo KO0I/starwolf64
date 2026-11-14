@@ -8,7 +8,7 @@ target_link_options(Starship PRIVATE
     # Training already grows to about 370 MiB; retain the existing 512 MiB ceiling.
     -sALLOW_MEMORY_GROWTH=0 -sINITIAL_MEMORY=536870912 -sMAXIMUM_MEMORY=536870912
     -sSTACK_SIZE=8388608 -sEXIT_RUNTIME=0 -sASSERTIONS=2 --profiling-funcs
-    "-sEXPORTED_RUNTIME_METHODS=['FS','callMain']"
+    "-sEXPORTED_RUNTIME_METHODS=['FS','callMain','HEAPU8','HEAP32']"
     "SHELL:--preload-file \"${STARSHIP_WASM_DEPS}/inputs/gamecontrollerdb.txt@/gamecontrollerdb.txt\""
     "--shell-file" "${PROJECT_SOURCE_DIR}/tools/wasm/game-shell.html")
 

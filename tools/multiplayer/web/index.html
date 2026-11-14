@@ -86,9 +86,17 @@
         </div>
         <button id="save-match" type="submit">Save match settings</button>
       </form>
-      <p class="game-readiness">Setup preview: pilot and match choices synchronize now. Starting a shared game is the next integration step.</p>
+      <p class="game-readiness">Playable bridge: Corneria Points, four players, one full-screen view each. Other maps and campaign remain setup choices for future integration. Pilot, aircraft and hue choices are saved; this engine build currently uses the mod aircraft and native slot appearances.</p>
     </section>
-    <section id="proof" class="proof" aria-labelledby="proof-title">
+    <section id="game-panel" aria-labelledby="game-title">
+      <h2 id="game-title" class="panel-title">05 // LAUNCH BAY</h2>
+      <p>Host a room, save Corneria / Points, prepare the game, then start. Guests can prepare and join while the host flies.</p>
+      <p>Arrow keys or WASD steer. Z or Space fires. X drops a bomb. Shift boosts, Ctrl brakes, Q and E roll.</p>
+      <button id="prepare-game">Prepare game</button><button id="launch-game" disabled>Start game</button>
+      <p id="game-status" role="status">Game is not loaded.</p>
+      <div id="game-container"></div>
+    </section>
+    <section id="proof"  class="proof" aria-labelledby="proof-title">
       <h2 id="proof-title" class="panel-title">05 // SUBSPACE LINK TEST</h2>
       <p>A guest sends a control sample to the host. The host sends a world snapshot back to every connected guest.</p>
       <div class="actions">
@@ -110,7 +118,7 @@
         <span>8 PILOTS<br>ONE ROOM</span>
         <span>TAILNET<br>FLIGHT CLUB</span>
       </div>
-      <p>Up to eight people per room. This connection test does not yet run a shared Starwolf match.</p>
+      <p>Up to eight people per room. The first playable engine bridge supports four players on Corneria Points.</p>
     </footer>
   </main>
   <script type="module" src="./app.mjs"></script>

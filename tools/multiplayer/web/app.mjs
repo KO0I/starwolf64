@@ -1,3 +1,4 @@
+import {NetworkGame} from './game.mjs';
 import {ShipPreview} from './ship-preview.mjs';
 import {BrowserSession} from './session.mjs';
 import {PILOTS, VEHICLES, HUES, STAGES, DEFAULT_MATCH, pilotById, vehicleById, hueById, crewName, portraitURL, campaignVehicle} from './catalog.mjs';
@@ -145,8 +146,8 @@ function render() {
     state.role === 'host' ? 'Hosting / ' + live + ' guest connection' + (live === 1 ? '' : 's') + ' open' :
     live ? 'Connected to host' : 'Connecting to host…';
   $('host').disabled = active; $('join').disabled = active; $('leave').disabled = !active;
-  $('send-input').disabled = !active || state.role !== 'guest' || live === 0;
-  $('send-state').disabled = !active || state.role !== 'host' || live === 0;
+  $('send-input').disabled = window.STARWOLF_GAME?.running || !active || state.role !== 'guest' || live === 0;
+  $('send-state').disabled = window.STARWOLF_GAME?.running || !active || state.role !== 'host' || live === 0;
   $('peers').replaceChildren();
   for (const peer of state.peers || []) {
     const item = document.createElement('li'), identity = document.createElement('div'), name = document.createElement('strong'), status = document.createElement('span');
@@ -170,7 +171,15 @@ function render() {
 function newSession() {
   inputSequence = snapshotTick = 0; lastInputs.clear();
   draftSelection = draftMatch = null; selectionBusy = matchBusy = false;
+  window.STARWOLF_GAME?.close();
+  $('prepare-game').disabled=false;
+  $('launch-game').disabled=true;
+  $('game-status').textContent='Game is not loaded.';
+  $('game-container').replaceChildren();
   const created = session = new BrowserSession();
+  const game=window.STARWOLF_GAME=new NetworkGame(created,$('game-container'));
+  game.addEventListener('status',event=>{render();$('game-status').textContent=event.detail.message;$('launch-game').disabled=!game.engine?.state.prepared||game.running||game.closed;$('launch-game').textContent=created.role==='host'?'Start game':'Join host game';});
+  game.addEventListener('error',event=>notice(event.detail.message));
   window.STARWOLF_MP = created;
   created.addEventListener('statechange',() => { if (session === created) render(); });
   created.addEventListener('error',event => {
@@ -240,3 +249,6 @@ $('send-state').addEventListener('click',() => {
   } catch(error) { notice(error.message); }
 });
 newSession();
+
+$('prepare-game').addEventListener('click',async()=>{try{$('prepare-game').disabled=true;await window.STARWOLF_GAME.prepare();}catch(e){notice(e.message);}});
+$('launch-game').addEventListener('click',()=>{try{window.STARWOLF_GAME.launch().catch(e=>notice(e.message));}catch(e){notice(e.message);}});

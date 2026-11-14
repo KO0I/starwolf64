@@ -1,3 +1,4 @@
+#include "sf64net.h"
 #include "prevent_bss_reordering.h"
 #include "global.h"
 #include "fox_option.h"
@@ -596,7 +597,7 @@ s32 Versus_UpdatePlayerStatus(void) {
         }
 
         if (gPlayerInactive[i] || (gVsMatchType == VS_MATCH_BATTLE) ||
-            ((sVsPlayerCount == 1) && (gVsMatchType != VS_MATCH_TIME)) ||
+            (!Net_Enabled() && (sVsPlayerCount == 1) && (gVsMatchType != VS_MATCH_TIME)) ||
             ((gVsMatchType == VS_MATCH_TIME) && VS_TIME_UP(gVsCountdown))) {
             ret = Math_SmoothStepToF(&D_801787D8[i], D_801787E8[i], 0.3f, 100.0f, 1.0f);
             if (ret == 0.0f) {
@@ -744,7 +745,7 @@ bool Versus_CheckForWinner(void) {
                 }
             }
 
-            if ((sVsPlayerCount == 1) && (numDown == 4)) {
+            if (!Net_Enabled() && (sVsPlayerCount == 1) && (numDown == 4)) {
                 gVsMatchWon = true;
                 sVsWinner = VS_TIE;
             } else {
@@ -1651,6 +1652,7 @@ s32 Versus_Main(void) {
 }
 
 void Versus_Draw(void) {
+    if (Net_Enabled()) return;
     s32 var_a1;
 
     sPrevDrawTime = sDrawTime;

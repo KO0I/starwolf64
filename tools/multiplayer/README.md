@@ -1,147 +1,85 @@
-# Browser-hosted multiplayer setup and connection test
+# Play a browser-hosted match
 
-Run in the isolated multiplayer worktree:
+Build the WASM game with the pinned SDK and dependencies described in [the WASM guide](../wasm/README.md).
+Supply your existing local sf64.o2r, starship.o2r and wolfen.o2r archives in one directory.
 
 ```sh
-node tools/multiplayer/server.mjs --port 8670
+python3 tools/wasm/run.py configure
+python3 tools/wasm/run.py build
+node tools/multiplayer/server.mjs --port 8670 --game-dir build/wasm/game --game-assets /absolute/path/to/archives
 ```
 
-Open `http://127.0.0.1:8670/` in two browser windows.
-Create a room in one window and enter its code in the other.
-After hosting or joining, choose a pilot with its radio picture, starting aircraft, and preferred hue.
-Confirm the selection so the host can assign a distinct hue to repeated pilots.
-The host can save an existing VS map/rule combination or main-game crew target.
-New guests receive the current accepted setup. Vitzy is visible but unavailable as "portrait pending".
-The guest can also send a control sample, and the host can send a sample world snapshot.
-The page reports messages received over real WebRTC data channels.
+Open http://127.0.0.1:8670/ in a browser. Create a room, save Corneria / Points, click **Prepare game**, then **Start game**.
+Guests enter the room code, click **Prepare game**, then **Join host game**.
+The host keeps playing while a guest downloads archives and imports the current world.
 
-This implements synchronized setup. It does not yet start a shared Starwolf match or connect to the WASM engine.
-Map/main-game choices are saved configuration targets. Real game launch and joining a running world require the worker and replication work in the [session plan](../../docs/plans/hosted-multiplayer-session.md).
-The single-player WASM preview is unchanged.
+Each participant sees one camera with the single-player HUD for their local pilot.
+Arrow keys or WASD steer, Z or Space fires, X drops a bomb, Shift boosts, Ctrl brakes, and Q/E roll.
+The embedded player also provides touch controls and a fullscreen button.
+Leave and create another room to start a fresh match.
 
-## How the pieces communicate
+The first engine bridge supports four players on Corneria Points.
+Rooms still hold eight people; the remaining slots cannot enter this engine build.
+Other VS maps, campaign, AI, eight-player Venom, vehicle switching and selected pilot/aircraft/hue rendering remain future integration.
+The setup page preserves those choices and previews their actual radio portraits and source-mesh wireframes.
+Vitzy stays visible and unavailable as "portrait pending".
 
-The Node service creates rooms and forwards offers, answers, and ICE candidates.
-HTTP requests and a server-sent event stream provide signaling.
-Control samples and snapshots travel over browser-to-browser WebRTC data channels, not through those signaling routes.
+## Use the existing private tailnet address
 
-Each guest connects to the host. Guests do not connect to each other.
-The room limit is eight people including the host.
-That limit is not proof of eight-player gameplay performance.
-
-The browser session uses a reliable ordered control channel and an unordered snapshot channel with retransmissions disabled.
-Input sequences and snapshot ticks reject stale samples.
-Snapshots in this proof are self-contained.
-The transport bounds buffered data rather than accumulating unlimited stale state.
-
-The version 2 codec sends validated setup and proof messages as binary UTF-8 JSON.
-Refresh all browser clients when changing protocol versions.
-This establishes real message exchange and ownership rules. It does not freeze the future C engine-state encoding.
-The engine bridge still needs complete movement-state, collision, entity-lifetime, and prediction inventories.
-
-## Tests
+Keep the Node service on loopback and configure the allowed page origin:
 
 ```sh
-node --test tools/multiplayer/catalog.test.mjs tools/multiplayer/server.test.mjs tools/multiplayer/protocol.test.mjs
-node tools/multiplayer/check-browser.mjs --output /tmp/starwolf-webrtc-check
-```
-
-The browser check requires Chromium at `/usr/bin/chromium` and Node with a global WebSocket client.
-The development environment uses Node 26. No npm dependencies are required.
-
-The check starts its own local service and browser contexts.
-It verifies one host with two guests, guest-to-host inputs, host-to-guest snapshots,
-stale-message rejection, and continued exchange after one guest leaves.
-It uses the visible pilot/map controls, verifies real radio images, duplicate hues, co-op rules, late setup synchronization, and a replacement peer joining a reused slot.
-It also checks that leaving the host ends the remaining guest session.
-The remaining guest deliberately processes its room-close notice 300 ms late to exercise shutdown ordering.
-The report includes actual data-channel counters and the selected ICE path.
-Signaling traffic is inspected to ensure it carries connection setup rather than game messages.
-
-The browser check writes its report and screenshots to the output directory.
-A local direct connection does not establish TURN fallback, remote-network, Safari, or WASM gameplay support.
-
-
-To check a running service, including a Tailscale HTTPS address:
-
-```sh
-node tools/multiplayer/check-browser.mjs --url https://your-node.your-tailnet.ts.net:8670/ --output /tmp/starwolf-hosted-check
-```
-
-With `--url`, the check uses the supplied service instead of starting another server.
-It runs the same real WebRTC assertions and captures desktop and 390-pixel phone screenshots.
-
-## LAN, Tailscale, and relay setup
-
-For an intentional LAN listener:
-
-```sh
-node tools/multiplayer/server.mjs --host 0.0.0.0 --port 8670
-```
-
-Every participant opens the same reachable service address.
-The default listener remains localhost.
-Use HTTPS for a deployed browser game and its signaling service, including the threaded WASM player's isolation requirements.
-Tailscale can supply connectivity to the service, but browser ICE routing still needs validation on the intended devices.
-Behind an HTTPS reverse proxy, allow its exact public origin with `--origin https://your-game.example`.
-The option can be repeated for additional trusted origins; it does not enable cross-origin CORS.
-
-
-For a private Tailscale HTTPS proxy, start the backend with the exact public origin:
-
-```sh
-node tools/multiplayer/server.mjs --port 8670 --origin https://your-node.your-tailnet.ts.net:8670
+node tools/multiplayer/server.mjs --port 8670 --origin https://your-node.your-tailnet.ts.net:8670 --game-dir build/wasm/game --game-assets /absolute/path/to/archives
 tailscale serve --bg --https=8670 http://127.0.0.1:8670
 ```
 
-Use the address printed by Tailscale Serve while connected to the tailnet.
-The Node process must remain running; a user service can manage it.
-Remove only this proxy with `tailscale serve --https=8670 off`.
-See the [Tailscale Serve documentation](https://tailscale.com/docs/reference/tailscale-cli/serve).
+Open the HTTPS address while connected to the tailnet.
+Cross-origin isolation and shared WASM memory require HTTPS or localhost.
+The server exposes only explicit runtime, archive, page and portrait routes.
+Restart it after rebuilding; each process pins its runtime files and archive fingerprints.
+Game archives remain local deployment inputs and are not committed.
 
-Optional STUN or TURN settings are supplied as a JSON array:
+Signaling forwards only offers, answers and ICE candidates.
+Inputs and complete native world images travel over WebRTC between browsers.
+Optional STUN/TURN settings remain available through `--ice-config /path/to/ice-servers.json`.
+A local direct test does not establish TURN fallback or connectivity across every remote network.
 
-```json
-[
-  {"urls": "stun:your-stun-host.example:3478"},
-  {
-    "urls": "turn:your-turn-host.example:3478",
-    "username": "issued-user",
-    "credential": "issued-credential"
-  }
-]
-```
+## Verify the bridge
 
 ```sh
-node tools/multiplayer/server.mjs --ice-config /path/to/ice-servers.json
+node --test tools/multiplayer/catalog.test.mjs tools/multiplayer/server.test.mjs tools/multiplayer/protocol.test.mjs tools/multiplayer/world-protocol.test.mjs
+python3 tools/multiplayer/generate-scene-schema.py --check
+node tools/multiplayer/check-browser.mjs --output build/multiplayer-setup-check
+node tools/multiplayer/check-game-browser.mjs --url http://127.0.0.1:8670/ --output build/multiplayer-game-check
 ```
 
-The example hosts are placeholders.
-The browser needs the configured ICE credentials to use the service.
-Do not publish permanent TURN credentials as a public static asset.
-For a public deployment, supply appropriate issued credentials through the service.
+The gameplay check requires a running configured service and Chromium at /usr/bin/chromium.
+It launches actual WASM host/guest workers, sends controls into a distinct native slot, imports live scenes, and records both cameras.
+It also covers interrupted admission, guest departure, slot reuse, stale-incarnation rejection and host departure.
+Reports and screenshots are written to the chosen output directory.
+The setup checker continues to verify portraits, ship previews, crew policies and synchronized choices.
 
-The session API accepts `forceRelay: true` for a relay-only check with a real TURN server.
-No TURN server is installed by this proof, and TURN success must not be inferred from direct-connection success.
+For a bounded real-input combat flight:
 
-## Next integration step
+```sh
+node tools/multiplayer/check-combat-browser.mjs --url http://127.0.0.1:8670/ --output build/multiplayer-combat-check
+```
 
-Connect this session to the WASM game worker, which remains the only writer of game state.
-Start with two-browser Corneria movement, authoritative self-state, numbered controls, and verified prediction.
-Then add weapons, damage, deaths, vehicle changes, scoring, and the four-player acceptance checks.
+This flight uses ordinary steering, fire and bomb inputs. It never writes health, scores or player positions.
+A successful flight must observe replicated projectiles, damage, native scoring and a subsequent respawn.
 
-Pilots, crew rules, duplicate appearance hues, and the eight-player Venom mode remain governed by
-[ADR 0001](../../docs/adr/0001-lan-versus-multiplayer.md).
-See the [browser WebRTC plan](../../docs/plans/browser-webrtc-multiplayer.md).
+## Maintain assets and the scene schema
 
-## Ship wireframes
-
-The aircraft selector displays a floating and rotating wireframe using actual source geometry for Arwing, Wolfen, Katt's fighter, and Vitzy's fighter. The preview uses the selected hue, pauses offscreen or in a hidden tab, and stays stationary with reduced motion enabled.
-
-Regenerate geometry from the existing original US v1.1 ROM and sf64.o2r archive:
+Regenerate the selector wireframes from existing local game assets:
 
 ```sh
 python3 tools/multiplayer/export-wireframes.py --source-root /path/to/local/game-assets
 ```
 
-The exporter does not modify the source archives. The browser check verifies each model and reduced-motion behavior.
+Regenerate the numeric field inventory after changing engine declarations:
+
+```sh
+python3 tools/multiplayer/generate-scene-schema.py
+```
+
+Read [the bridge reference](../../docs/multiplayer-wasm-bridge.md) before adding a stage or entity type.

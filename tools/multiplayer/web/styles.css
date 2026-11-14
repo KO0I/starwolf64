@@ -253,3 +253,5 @@ legend { padding:0 6px; color:#ffef92; font:12px "Courier New",monospace; }
 .ship-preview-frame { margin:0 0 16px; border:3px inset #9991bc; background:#020817; padding:8px; }
 #ship-preview { display:block; width:100%; height:210px; background:radial-gradient(ellipse at center,#11232d,#020817 75%); }
 #ship-preview-caption { text-align:center; color:#8cffee; font:11px/1.5 'Courier New',monospace; padding:5px; }
+
+#game-container iframe {width:100%;height:780px;border:1px solid #a58ccf;background:#090815;}

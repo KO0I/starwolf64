@@ -199,3 +199,26 @@ test('only registered radio portraits are served', {timeout:10000},async t => {
     assert.equal((await fetch(f.base+path)).status,404,path);
   }
 });
+test("configured runtime routes pin the manifest and serve only explicit files", async t => {
+  const {mkdtemp,writeFile,rm}=await import("node:fs/promises");
+  const {tmpdir}=await import("node:os");
+  const {join}=await import("node:path");
+  const {createHash}=await import("node:crypto");
+  const directory=await mkdtemp(join(tmpdir(),"starship-runtime-"));
+  t.after(()=>rm(directory,{recursive:true,force:true}));
+  const names=["Starship.html","Starship.js","Starship.wasm","Starship.data","sf64.o2r","starship.o2r","wolfen.o2r"];
+  for(const name of names)await writeFile(join(directory,name),"fixture-"+name);
+  const f=await fixture(t,{gameDir:directory,gameAssets:directory});
+  const manifest=await f.request("/api/game");
+  assert.equal(manifest.body.available,true);assert.equal(manifest.body.capacity,4);
+  assert.match(manifest.body.fingerprint,/^[a-f0-9]{64}$/);
+  const archive=manifest.body.assets.find(a=>a.name==="sf64.o2r");
+  assert.equal(archive.sha256,createHash("sha256").update("fixture-sf64.o2r").digest("hex"));
+  await writeFile(join(directory,"Starship.wasm"),"changed-after-start");
+  const runtime=await fetch(f.base+"/game/Starship.wasm");
+  assert.equal(await runtime.text(),"fixture-Starship.wasm");
+  assert.equal(runtime.headers.get("content-type"),"application/wasm");
+  assert.equal(runtime.headers.get("cross-origin-embedder-policy"),"require-corp");
+  assert.equal((await fetch(f.base+"/game/config.yml")).status,404);
+  assert.equal((await fetch(f.base+"/game-assets/unknown.o2r")).status,404);
+});

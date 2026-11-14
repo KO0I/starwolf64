@@ -1,7 +1,7 @@
 # Hosted pilot setup and joining during play
 
-Date: 2026-11-13
-Status: Networked setup is implemented. Game launch, shared simulation, and joining a running game remain unimplemented.
+Date: 2026-11-14
+Status: Corneria Points launches real WASM host/guest workers with authoritative world replication and joining during play. Four native player slots and the local single-player HUD are implemented. See [the bridge reference](../multiplayer-wasm-bridge.md) for current limits.
 Related decisions: [ADR 0001](../adr/0001-lan-versus-multiplayer.md), [WebRTC plan](browser-webrtc-multiplayer.md).
 
 ## Player flow
@@ -15,7 +15,7 @@ Loading or timing out one guest never pauses the host or other active players.
 This replaces the earlier lobby-only admission rule.
 Each participant fixes their pilot before their first spawn in that match.
 Vehicle switching after death remains allowed.
-A host can start alone once the real engine integration exists.
+The host can start Corneria Points alone.
 
 Vitzy remains visible and unavailable with the label "portrait pending", as the user requested.
 Her existing fighter and voice do not substitute for a radio portrait.
@@ -27,7 +27,7 @@ The existing 1990s page provides synchronized setup over the real reliable WebRT
 
 - [catalog.mjs](../../tools/multiplayer/web/catalog.mjs) defines pilots, actual portrait assets, aircraft, hues, map/rule combinations, and pure selection policies.
 - [session.mjs](../../tools/multiplayer/web/session.mjs) owns accepted choices and match configuration in the playing host's browser.
-- [protocol.mjs](../../tools/multiplayer/web/protocol.mjs) validates version 2 selection requests, confirmations, and complete room setup messages.
+- [protocol.mjs](../../tools/multiplayer/web/protocol.mjs) validates version 3 selection requests, confirmations, and complete room setup messages.
 - [app.mjs](../../tools/multiplayer/web/app.mjs) renders drafts and confirmed choices. A draft never becomes another player's authoritative selection.
 - [server.mjs](../../tools/multiplayer/server.mjs) serves explicit portrait routes and continues to relay connection setup only.
 
@@ -38,14 +38,13 @@ Reconfirming the same preference retains its assigned hue.
 Departures and slot reuse do not recolor remaining players or reuse the old peer's input acknowledgment.
 
 A newly connected guest receives the current complete setup after the channel handshake.
-This proves late setup synchronization, not restoration of a running C game.
+Late setup synchronization is followed by a reliable native baseline and fresh-world acknowledgment before the host activates a guest.
 
 VS choices preserve native combinations: Corneria with Points or Battle; Katina with Time; Sector Z with Points, Battle, or Time.
 Main-game setup selects one crew. Star Fox normally uses Arwings, with Katt using her own fighter. Star Wolf normally uses Wolfens, with Vitzy's separate signature fighter exception when her pilot becomes available.
 Changing the crew during setup clears incompatible unspawned choices and allows players to choose again.
 
-There is no fake Start action or JavaScript-only playing state.
-The page labels its setup-preview scope.
+The Start action launches the actual WASM engine for Corneria Points. Other map and appearance choices remain saved setup targets.
 
 ## Architecture decision
 
@@ -71,7 +70,7 @@ Its diagnostic player-zero coordinates are not a world snapshot.
 `Play_Init` uses `gCamCount` for player allocation, simulation participation, and local view count.
 Campaign controls assume one main controller.
 Drawing changes some gameplay state, versus clocks depend on drawing, and random initialization uses wall-clock time.
-The engine must address these before independent full-screen views can safely share a world.
+The bridge keeps four simulation slots and renders one local view. Guests import complete scenes and skip native gameplay updates. The remaining draw side effects are documented in the bridge reference.
 
 The native transitions in `Versus_StartMatch` and `Map_PlayLevel` supply the launch behavior to reuse.
 Commands must enter a bounded queue and run on the C game worker at simulation boundaries.
@@ -91,7 +90,7 @@ Transport membership and active participation are separate states.
 
 The baseline must cover stage/script progress, players, active entities, AI, projectiles, scores, clock, spawn generations, and relevant timers/random state.
 Serialize fields and entity identities, never C pointers or the entire WASM heap.
-The current sample snapshot codec is insufficient.
+The original sample snapshot codec remains a link test; native gameplay uses the separate complete-scene codec.
 
 Stage changes invalidate transfers. Old acknowledgments cannot activate a participant in a newer match or reused slot.
 A transfer that exceeds bounded catch-up history restarts from a fresh baseline or fails only that guest.

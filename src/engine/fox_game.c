@@ -1,3 +1,4 @@
+#include "sf64net.h"
 #include "prevent_bss_reordering.h"
 #include "global.h"
 #include "sf64dma.h"
@@ -351,6 +352,7 @@ void Game_Update(void) {
     // @port: @event: Call GamePreUpdateEvent
     CALL_EVENT(GamePreUpdateEvent);
 
+    Net_Pump();
     Game_SetGameState();
     if (gGameStandby) {
         Game_InitStandbyDL(&gUnkDisp1);
@@ -363,7 +365,7 @@ void Game_Update(void) {
 
     if (Game_ChangeScene() != true) {
         Lib_InitPerspective(&gUnkDisp1);
-        Game_InitViewport(&gUnkDisp1, gCamCount, 0);
+        Game_InitViewport(&gUnkDisp1, Net_Enabled() ? 1 : gCamCount, 0);
 
         if (gNextGameStateTimer != 0) {
             gNextGameStateTimer--;
@@ -503,7 +505,9 @@ void Game_Update(void) {
                 Versus_StartMatch();
                 break;
             case GSTATE_PLAY:
-                Play_Main();
+                if (!Net_IsGuest() || !Net_Ready()) Play_Main();
+                else gDrawMode = DRAW_PLAY;
+                Net_OnPlayInit();
                 break;
             case GSTATE_GAME_OVER:
                 OvlMenu_CallFunction(OVLCALL_GAME_OVER_UPDATE, NULL);
@@ -516,15 +520,15 @@ void Game_Update(void) {
                 break;
         }
 
-        Game_Draw(0);
+        Game_Draw(Net_Enabled() ? Net_LocalSlot() : 0);
 
-        if (gCamCount == 2) {
+        if (!Net_Enabled() && gCamCount == 2) {
             Game_InitViewport(&gMasterDisp, gCamCount, 1);
             Game_Draw(1);
             gDPPipeSync(gMasterDisp++);
             gDPSetScissor(gMasterDisp++, G_SC_NON_INTERLACE, SCREEN_MARGIN, SCREEN_MARGIN, SCREEN_WIDTH - SCREEN_MARGIN,
                           SCREEN_HEIGHT - SCREEN_MARGIN);
-        } else if ((gCamCount == 4) && (gDrawMode != DRAW_NONE)) {
+        } else if (!Net_Enabled() && (gCamCount == 4) && (gDrawMode != DRAW_NONE)) {
             Game_InitViewport(&gMasterDisp, gCamCount, 3);
             Game_Draw(3);
             Game_InitViewport(&gMasterDisp, gCamCount, 2);
@@ -560,11 +564,12 @@ void Game_Update(void) {
 
         partialFill = false;
 
-        if (gCamCount == 1) {
+        if (gCamCount == 1 || Net_Enabled()) {
+            gPlayerNum = Net_Enabled() ? Net_LocalSlot() : 0;
             Graphics_FillRectangle(&gMasterDisp, OTRGetRectDimensionFromLeftEdge(0), 0,
                                    OTRGetRectDimensionFromRightEdge(SCREEN_WIDTH - 1), SCREEN_HEIGHT - 1,
-                                   gPlayerGlareReds[0], gPlayerGlareGreens[0], gPlayerGlareBlues[0],
-                                   gPlayerGlareAlphas[0]);
+                                   gPlayerGlareReds[gPlayerNum], gPlayerGlareGreens[gPlayerNum], gPlayerGlareBlues[gPlayerNum],
+                                   gPlayerGlareAlphas[gPlayerNum]);
             if ((gDrawMode == DRAW_PLAY) || (gDrawMode == DRAW_ENDING)) {
                 Radio_Draw();
                 if (gShowHud) {

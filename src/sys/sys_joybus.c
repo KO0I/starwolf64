@@ -1,3 +1,4 @@
+#include "sf64net.h"
 #include "sys.h"
 
 #ifdef __EMSCRIPTEN__
@@ -70,7 +71,8 @@ void Controller_UpdateInput(void) {
     s32 i;
 
     for (i = 0; i < 4; i++) {
-        gControllerPlugged[i] = osContGetStatus(i);
+        gControllerPlugged[i] = Net_Enabled() ? ((Net_ActiveMask() >> i) & 1) : osContGetStatus(i);
+        if (Net_Enabled()) Net_ReadController(i, &sNextController[i]);
         if ((gControllerPlugged[i] == 1) && (sNextController[i].err_no == 0)) {
             sPrevController[i] = gControllerHold[i];
             gControllerHold[i] = sNextController[i];

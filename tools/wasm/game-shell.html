@@ -222,7 +222,8 @@ function checkReady() {
 function publishPad() {
   let buttons = 0;
   for (const button of heldButtons.values()) buttons |= Number(button.dataset.button);
-  if (typeof Module._Wasm_SetControllerState === 'function') Module._Wasm_SetControllerState(buttons,stickX,stickY);
+  if (typeof window.STARSHIP_INPUT === 'function') window.STARSHIP_INPUT({buttons,stickX,stickY});
+  else if (typeof Module._Wasm_SetControllerState === 'function') Module._Wasm_SetControllerState(buttons,stickX,stickY);
   for (const button of padButtons) button.classList.toggle('held',[...heldButtons.values()].includes(button));
 }
 function releaseControls() {

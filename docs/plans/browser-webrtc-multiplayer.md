@@ -1,7 +1,7 @@
 # Browser-hosted WebRTC multiplayer
 
-Date: 2026-11-12
-Status: Connection and synchronized pilot/match setup are verified locally. The C/WASM game is not connected yet.
+Date: 2026-11-14
+Status: Real C/WASM Corneria Points host/guest launch, world replication, live joining and the local single-player HUD are implemented. See [the bridge reference](../multiplayer-wasm-bridge.md) for current limits.
 Latest flow: [Hosted setup and joining during play](hosted-multiplayer-session.md).
 Direction: One browser hosts the authoritative match. Other browsers join it.
 This replaces raw TCP as the first browser transport target.
@@ -15,7 +15,7 @@ It provides room creation, room-code joining, one WebRTC peer connection per gue
 and real data channels for numbered inputs and host snapshots.
 It now includes actual radio-portrait selection, starting aircraft, preferred/assigned hues, and host-selected VS or main-game setup.
 Late guests receive the current accepted choices.
-It does not yet drive the C/WASM simulation or admit guests into a running game.
+The connection proof now also launches the WASM bridge and admits guests into a running Corneria Points world.
 
 ```mermaid
 flowchart LR

@@ -1,7 +1,7 @@
 import {validSelection, validSetup} from './catalog.mjs';
 
-// This proof codec is independent of the future C engine-state field inventory.
-export const VERSION = 2;
+// Gameplay control messages. Bulk scenes use world-protocol.mjs.
+export const VERSION = 3;
 export const MAX_FRAME = 65536;
 const encoder = new TextEncoder();
 const decoder = new TextDecoder('utf-8', { fatal: true });
@@ -16,6 +16,7 @@ const validRequest = value => typeof value === 'string' && /^[a-f0-9]{32}$/.test
 
 export function validateMessage(value) {
   if (!value || value.version !== VERSION) return false;
+  if (value.type === 'game') return keys(value,['type','version','op','match','epoch','incarnation','fingerprint','tick','winner']) && ['start','ready','baseline-ack','active','end'].includes(value.op) && u32(value.match) && value.match > 0 && u32(value.epoch) && value.epoch > 0 && u32(value.incarnation) && u32(value.tick) && [0,1,2,3,4,100].includes(value.winner) && typeof value.fingerprint === 'string' && /^[a-f0-9]{64}$/.test(value.fingerprint);
   if (value.type === 'hello') return keys(value, ['type', 'version']);
   if (value.type === 'select-loadout') return keys(value, ['type','version','request','selection']) && validRequest(value.request) && validSelection(value.selection);
   if (value.type === 'selection-result') return keys(value, ['type','version','request','error']) && validRequest(value.request) && (value.error === null || (typeof value.error === 'string' && value.error.length > 0 && value.error.length <= 160));

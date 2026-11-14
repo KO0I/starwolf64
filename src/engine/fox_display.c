@@ -1,3 +1,4 @@
+#include "sf64net.h"
 #include "global.h"
 #include "wolfen.h"
 #include "mods/hit64.c"
@@ -2097,7 +2098,7 @@ void Display_Update(void) {
 
     Background_DrawLensFlare();
 
-    if ((gCamCount != 1) && ((camPlayer->state == PLAYERSTATE_ACTIVE) || (camPlayer->state == PLAYERSTATE_U_TURN))) {
+    if (!Net_Enabled() && (gCamCount != 1) && ((camPlayer->state == PLAYERSTATE_ACTIVE) || (camPlayer->state == PLAYERSTATE_U_TURN))) {
         HUD_Draw();
         HUD_EdgeArrows_Update();
     }

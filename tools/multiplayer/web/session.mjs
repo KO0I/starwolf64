@@ -1,3 +1,4 @@
+import {WORLD_MAGIC,worldFrames,WorldReceiver} from './world-protocol.mjs';
 import {encodeMessage, decodeMessage, VERSION} from './protocol.mjs';
 import {DEFAULT_MATCH, validMatch, selectionProblem, assignSelection} from './catalog.mjs';
 
@@ -207,7 +208,20 @@ export class BrowserSession extends EventTarget {
     channel.onmessage = event => {
       if (link.closed) return;
       try {
+        if (event.data instanceof ArrayBuffer && event.data.byteLength>=4 && new DataView(event.data).getUint32(0,true)===WORLD_MAGIC) {
+          if(this.role!=='guest'||!link.hello)throw Error('Unexpected scene sender');
+          const receiver=channel===link.control?(link.baselineReceiver??=new WorldReceiver()):(link.worldReceiver??=new WorldReceiver());
+          const image=receiver.accept(event.data);
+          if(image)this.emit('world',{peer:link.peer,reliable:channel===link.control,...image});
+          return;
+        }
         const message = decodeMessage(event.data);
+        if(message.type==='game') {
+          if(channel!==link.control||!link.hello)throw Error('Unexpected game control');
+          const allowed=this.role==='host'?['ready','baseline-ack']:['start','active','end'];
+          if(!allowed.includes(message.op))throw Error('Invalid game control sender');
+          this.emit('game',{peer:link.peer,slot:link.slot,message});return;
+        }
         if (channel === link.stateChannel && !link.hello) return;
         if (channel === link.control && message.type === 'hello') {
           link.hello = true;
@@ -343,6 +357,29 @@ export class BrowserSession extends EventTarget {
     return true;
   }
 
+  sendGame(link, data) {return this.sendControl(link,{...data,type:'game',version:VERSION});}
+
+  async sendWorld(link, bytes, reliable=false) {
+    const channel=reliable?link.control:link.stateChannel;
+    if(link.closed||link.state!=='connected'||channel?.readyState!=='open')return false;
+    const frames=worldFrames(bytes), size=frames.reduce((n,a)=>n+a.byteLength,0);
+    if(!reliable) {
+      if(channel.bufferedAmount+size>MAX_BUFFER)return false;
+      for(const frame of frames)channel.send(frame);
+      return true;
+    }
+    const end=Date.now()+this.timeoutMs;
+    for(const frame of frames) {
+      while(channel.bufferedAmount+frame.byteLength>MAX_BUFFER) {
+        if(link.closed||channel.readyState!=='open'||Date.now()>end)throw Error('Scene transfer timed out');
+        await new Promise(resolve=>setTimeout(resolve,20));
+      }
+      if(link.closed)throw Error('Peer left during transfer');
+      channel.send(frame);
+    }
+    return true;
+  }
+
   sendInput(input) {
     if (this.role !== 'guest') throw new Error('Only guests can send input');
     const message = {...input, type: 'input', version: VERSION, slot: this.slot};
@@ -387,6 +424,7 @@ export class BrowserSession extends EventTarget {
     clearTimeout(link.timer);
     link.abort.abort();
     if (this.role === 'guest') this.rejectSelections('Host connection ended before confirming the pilot');
+    this.emit('peer-left',{peer:link.peer,slot:link.slot});
     this.links.delete(link.peer);
     if (closeTransport) this.closeTransport(link);
   }

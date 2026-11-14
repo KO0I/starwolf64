@@ -1,3 +1,4 @@
+#include "sf64net.h"
 #include "sf64math.h"
 #include "fox_hud.h"
 #include "prevent_bss_reordering.h"
@@ -1961,7 +1962,7 @@ void HUD_RadarWindow_Draw(f32 x, f32 y) {
     f32 xScale1;
     f32 yScale1;
 
-    if (gCamCount != 1) { // Versus mode
+    if (gCamCount != 1 && !Net_Enabled()) { // Versus mode
         xPos = sVsRadarWindowXpos[gPlayerNum];
         yPos = sVsRadarWindowYpos[gPlayerNum];
         xScale = 1.21f;
@@ -2070,7 +2071,7 @@ s32 HUD_RadarMarks_Update(void) {
             break;
     }
 
-    if (!gVersusMode) {
+    if (!gVersusMode || Net_Enabled()) {
         if (gLevelMode != LEVELMODE_ALL_RANGE) {
             return 0;
         }
@@ -3046,7 +3047,7 @@ void HUD_BoostGauge_Draw(f32 xPos, f32 yPos) {
     s32 temp_t9;
     s32 playerNum;
 
-    if (gVersusMode) {
+    if (gVersusMode && !Net_Enabled()) {
         temp = 2.0f;
         sp60 = 1.0f;
         playerNum = gPlayerNum;
@@ -3333,7 +3334,7 @@ void HUD_DrawCountdown(s32* countdown, f32 scale) {
 
 // LTODO: Align these
 void HUD_Radar(void) {
-    if (gVersusMode) {
+    if (gVersusMode && !Net_Enabled()) {
         HUD_VS_DrawHUD();
     }
     HUD_RadarMarks_Update();
@@ -3440,6 +3441,14 @@ void HUD_Score_Update(f32 xPos, f32 yPos) {
 }
 
 void HUD_Shield_GoldRings_Score(f32 xPos, f32 yPos) {
+    if (Net_Enabled()) {
+        D_801617A8 = 1.0f;
+        D_801617AC = gPlayer[Net_LocalSlot()].shields / 255.0f;
+        D_800D1EB4 = D_800D1EB8 = D_800D1EBC = 255;
+        HUD_PlayerShieldGauge_Draw(20.0f,18.0f);
+        Graphics_DisplayHUDNumber(xPos,yPos,gVsPoints[Net_LocalSlot()]);
+        return;
+    }
     HUD_Score_Update(xPos, yPos);
     HUD_PlayerShield_GoldRings();
 }
@@ -3655,6 +3664,7 @@ void HUD_VS_Radar(void) {
 }
 
 void HUD_SinglePlayer(void) {
+    if(Net_Enabled()) D_hud_80161708=255;
     CALL_CANCELLABLE_EVENT(DrawRadarHUDEvent) {
         if (gPlayState != PLAY_PAUSE) {
             HUD_Radar();
@@ -3680,7 +3690,7 @@ void HUD_SinglePlayer(void) {
             HUD_Shield_GoldRings_Score(24.0f, 30.0f);
         }
         CALL_CANCELLABLE_EVENT(DrawLivesCounterHUDEvent) {
-            if (gCurrentLevel != LEVEL_TRAINING) {
+            if (gCurrentLevel != LEVEL_TRAINING && !Net_Enabled()) {
                 HUD_LivesCount2_Draw(248.0f, 11.0f, gLifeCount[gPlayerNum]);
             }
         }
@@ -3800,7 +3810,7 @@ void HUD_Draw(void) {
         }
     }
 
-    if (gCamCount != 1) {
+    if (gCamCount != 1 && !Net_Enabled()) {
         HUD_VS_Radar();
     } else {
         HUD_SinglePlayer();

@@ -67,3 +67,9 @@ test('selection requests, confirmations and authoritative setup round trip', () 
     {type:'room-state',version:VERSION,setup:{...setup,members:[]}}
   ]) assert.equal(validateMessage(message),false);
 });
+
+test('game admission binds stage, incarnation, baseline tick and build fingerprint',()=>{
+  const game={type:'game',version:VERSION,op:'baseline-ack',match:42,epoch:1,incarnation:3,tick:120,winner:0,fingerprint:'a'.repeat(64)};
+  assert.deepEqual(decodeMessage(encodeMessage(game)),game);
+  for(const invalid of [{match:0},{epoch:0},{incarnation:-1},{tick:-1},{tick:2**32},{fingerprint:'wrong'},{winner:6},{op:'teleport'}])assert.equal(validateMessage({...game,...invalid}),false);
+});

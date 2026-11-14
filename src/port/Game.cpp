@@ -41,6 +41,8 @@ void Graphics_PushFrame(Gfx* data) {
 extern "C" void Timer_Update();
 
 #ifdef __EMSCRIPTEN__
+extern "C" void Wasm_NetBeginFrame(void);
+extern "C" void Wasm_NetEndFrame(void);
 static std::atomic<uint32_t> browserControllerState{0};
 
 extern "C" EMSCRIPTEN_KEEPALIVE void Wasm_SetControllerState(int buttons, int stickX, int stickY) {
@@ -91,7 +93,13 @@ static void browserStatus(const char* phase) {
 #endif
 
 void push_frame() {
+#ifdef __EMSCRIPTEN__
+    Wasm_NetBeginFrame();
+#endif
     Graphics_ThreadUpdate();
+#ifdef __EMSCRIPTEN__
+    Wasm_NetEndFrame();
+#endif
     GameEngine::StartAudioFrame();
     GameEngine::Instance->StartFrame();
     Timer_Update();
