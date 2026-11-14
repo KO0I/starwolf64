@@ -1838,15 +1838,6 @@ void Display_CsLevelCompleteHandleCamera(Player* player) {
     }
 }
 
-void Display_SetAllRangeMapTint(Gfx** dList, bool enabled) {
-    if (gLevelMode != LEVELMODE_ALL_RANGE) {
-        return;
-    }
-    gDPPipeSync((*dList)++);
-    gDPSetGrayscaleColor((*dList)++, 238, 38, 190, 235);
-    gSPGrayscale((*dList)++, enabled);
-}
-
 void Display_Update(void) {
     s32 i;
     Vec3f tempVec;
@@ -1964,9 +1955,7 @@ void Display_Update(void) {
         Background_DrawStarfield();
     }
 
-    Display_SetAllRangeMapTint(&gMasterDisp, true);
     Background_DrawBackdrop();
-    Display_SetAllRangeMapTint(&gMasterDisp, false);
     Background_DrawSun();
     
     Matrix_Push(&gGfxMatrix);
@@ -1984,9 +1973,7 @@ void Display_Update(void) {
             Matrix_Pop(&gGfxMatrix);
         } else if (gGroundSurface != SURFACE_WATER) {
             D_bg_8015F964 = false;
-            Display_SetAllRangeMapTint(&gMasterDisp, true);
             Background_DrawGround();
-            Display_SetAllRangeMapTint(&gMasterDisp, false);
         }
     }
 
@@ -2055,9 +2042,7 @@ void Display_Update(void) {
     if ((gGroundSurface == SURFACE_WATER) || (gAqDrawMode != 0)) {
         D_bg_8015F964 = true;
         Effect_Draw(1);
-        Display_SetAllRangeMapTint(&gMasterDisp, true);
         Background_DrawGround();
-        Display_SetAllRangeMapTint(&gMasterDisp, false);
     }
 
     if ((gCurrentLevel != LEVEL_AQUAS) &&

@@ -162,12 +162,6 @@ bool Game_ChangeScene(void) {
 #define RIGHT_MARGIN OTRGetRectDimensionFromRightEdge(SCREEN_WIDTH - SCREEN_MARGIN)
 
 void Game_InitMasterDL(Gfx** dList) {
-    u16 background = gBgColor;
-    if (gGameState == GSTATE_PLAY && gLevelMode == LEVELMODE_ALL_RANGE) {
-        s32 brightness = (RGBA16_RED(background) + RGBA16_GRN(background) + RGBA16_BLU(background)) / 3;
-        background = ((brightness * 238 / 255) << 11) | ((brightness * 38 / 255) << 6) |
-                     ((brightness * 190 / 255) << 1) | 1;
-    }
     gSPDisplayList((*dList)++, gRcpInitDL);
     gDPSetScissor((*dList)++, G_SC_NON_INTERLACE, SCREEN_MARGIN, SCREEN_MARGIN, SCREEN_WIDTH - SCREEN_MARGIN,
                   SCREEN_HEIGHT - SCREEN_MARGIN);
@@ -182,10 +176,10 @@ void Game_InitMasterDL(Gfx** dList) {
         gDPSetCycleType((*dList)++, G_CYC_1CYCLE);
         gDPSetCombineMode((*dList)++, G_CC_PRIMITIVE, G_CC_PRIMITIVE);
         gDPSetRenderMode((*dList)++, G_RM_XLU_SURF, G_RM_XLU_SURF2);
-        gDPSetPrimColor((*dList)++, 0x00, 0x00, RGBA16_RED(background) * 8, RGBA16_GRN(background) * 8,
-                        RGBA16_BLU(background) * 8, gBlurAlpha);
+        gDPSetPrimColor((*dList)++, 0x00, 0x00, RGBA16_RED(gBgColor) * 8, RGBA16_GRN(gBgColor) * 8,
+                        RGBA16_BLU(gBgColor) * 8, gBlurAlpha);
     } else {
-        gDPSetFillColor((*dList)++, FILL_COLOR(background | 1));
+        gDPSetFillColor((*dList)++, FILL_COLOR(gBgColor | 1));
     }
     gDPFillWideRectangle((*dList)++, LEFT_MARGIN, SCREEN_MARGIN, RIGHT_MARGIN, SCREEN_HEIGHT - SCREEN_MARGIN);
     gDPPipeSync((*dList)++);

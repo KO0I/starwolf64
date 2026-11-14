@@ -1979,9 +1979,17 @@ void HUD_RadarWindow_Draw(f32 x, f32 y) {
     }
 
     RCP_SetupDL(&gMasterDisp, SETUPDL_78);
-    gDPSetPrimColor(gMasterDisp++, 0, 0, 60, 60, 255, 170);
+    if (gLevelMode == LEVELMODE_ALL_RANGE) {
+        gDPSetPrimColor(gMasterDisp++, 0, 0, 138, 28, 118, 190);
+    } else {
+        gDPSetPrimColor(gMasterDisp++, 0, 0, 60, 60, 255, 170);
+    }
     HUD_MsgWindowBg_Draw(xPos + 1.0f, yPos + 1.0f, xScale, yScale);
-    gDPSetPrimColor(gMasterDisp++, 0, 0, 255, 255, 255, 255);
+    if (gLevelMode == LEVELMODE_ALL_RANGE) {
+        gDPSetPrimColor(gMasterDisp++, 0, 0, 238, 112, 196, 255);
+    } else {
+        gDPSetPrimColor(gMasterDisp++, 0, 0, 255, 255, 255, 255);
+    }
     HUD_RadarWindowFrame_Draw(xPos, yPos, xScale1, yScale1);
 }
 
