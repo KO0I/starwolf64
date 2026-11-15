@@ -3640,13 +3640,66 @@ void Option_CardLightning_Draw(void) {
 
 //! TODO: Enum for Texture types
 
+enum { MULTIPLAYER_CARD_WIDTH = 96, MULTIPLAYER_CARD_HEIGHT = 12 };
+
+static u8* Option_MultiplayerCardTexture(void) {
+    static u8 pixels[MULTIPLAYER_CARD_WIDTH * MULTIPLAYER_CARD_HEIGHT];
+    static bool ready = false;
+    static const struct {
+        const char* texture;
+        u8 stride, height, x, width, yOffset;
+    } letters[] = {
+        { aMainGameCardTex, 72, 12, 0, 10, 0 },      // M
+        { aSoundCardTex, 64, 10, 21, 7, 1 },         // u
+        { aVsTimeTrialCardTex, 96, 10, 65, 3, 1 },   // l
+        { aDataCardTex, 80, 10, 41, 6, 1 },          // t
+        { aMainGameCardTex, 72, 12, 20, 2, 0 },      // i
+        { aExpertCardTex, 80, 12, 27, 8, 1 },        // p
+        { aVsTimeTrialCardTex, 96, 10, 65, 3, 1 },   // l
+        { aMainGameCardTex, 72, 12, 12, 7, 0 },      // a
+        { aVsBattleRoyalCardTex, 96, 11, 68, 7, 1 }, // y
+        { aVsBattleRoyalCardTex, 96, 11, 38, 7, 1 }, // e
+        { aExpertCardTex, 80, 12, 44, 7, 1 },        // r
+    };
+    s32 width = ARRAY_COUNT(letters) - 1;
+    s32 cursor;
+
+    if (ready) {
+        return pixels;
+    }
+    for (s32 i = 0; i < ARRAY_COUNT(letters); i++) {
+        width += letters[i].width;
+    }
+    cursor = (MULTIPLAYER_CARD_WIDTH - width) / 2;
+    for (s32 i = 0; i < ARRAY_COUNT(letters); i++) {
+        const u8* source = ResourceGetDataByName(letters[i].texture);
+        if (source == NULL) {
+            return NULL;
+        }
+        for (s32 y = 0; y < letters[i].height && y + letters[i].yOffset < MULTIPLAYER_CARD_HEIGHT; y++) {
+            for (s32 x = 0; x < letters[i].width; x++) {
+                pixels[(y + letters[i].yOffset) * MULTIPLAYER_CARD_WIDTH + cursor + x] =
+                    source[y * letters[i].stride + letters[i].x + x];
+            }
+        }
+        cursor += letters[i].width + 1;
+    }
+    ready = true;
+    return pixels;
+}
+
 void Option_DrawCardLabel(OptionCardTexture tex) {
     if (!(tex.xScale <= 0.0f) && !(tex.yScale <= 0.0f)) {
         if (tex.texture == aVsCardTex) {
-            RCP_SetupDL(&gMasterDisp, SETUPDL_76_OPTIONAL);
-            gDPSetPrimColor(gMasterDisp++,0,0,tex.red,tex.green,tex.blue,tex.alpha);
-            Graphics_DisplaySmallText(tex.xPos+(32.0f-79.2f)*tex.xScale*0.5f,tex.yPos,
-                                      tex.xScale*0.9f,tex.yScale,"MULTIPLAYER");
+            u8* texture = Option_MultiplayerCardTexture();
+            if (texture != NULL) {
+                RCP_SetupDL(&gMasterDisp, SETUPDL_76_OPTIONAL);
+                gDPSetPrimColor(gMasterDisp++, 0, 0, tex.red, tex.green, tex.blue, tex.alpha);
+                Lib_TextureRect_IA8(&gMasterDisp, texture, MULTIPLAYER_CARD_WIDTH, MULTIPLAYER_CARD_HEIGHT,
+                                   tex.xPos + (tex.width - MULTIPLAYER_CARD_WIDTH) * tex.xScale * 0.5f,
+                                   tex.yPos + (tex.height - MULTIPLAYER_CARD_HEIGHT) * tex.yScale * 0.5f,
+                                   tex.xScale, tex.yScale);
+            }
             return;
         }
         switch (tex.type) {
