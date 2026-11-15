@@ -1,12 +1,12 @@
 {
   "format": "starwolf64-wasm-site-v1",
-  "sourceRevision": "19a64f130b0a09850ad317d43ddc9094243ad7db",
+  "sourceRevision": "b86d3588f701de8c1a79e88cafde77418ece6163",
   "rom": {
     "size": 12582912,
     "sha1": "09f0d105f476b00efa5303a3ebc42e60a7753b7a",
     "sha256": "385bcf1901ed12fb1152f3c227d1968cc54ae41e8566da66695df71af40a573f"
   },
-  "modAssetSetSha256": "2a874f6090b1a37b3cb8118842021366a47e06dbdb92c63164f30f8c582bcd65",
+  "modAssetSetSha256": "36ce130eb75e110644097fdce187b2ecc7f8932e33902a69d216f5947f7c3216",
   "files": {
     "index.html": {
       "size": 28449,
@@ -44,17 +44,21 @@
       "size": 200180,
       "sha256": "35c78660956d6e6980f1d03650eb3c2ba2753cac3ad9cd0ffea97f13f50313fc"
     },
+    "licenses/Arwing.txt": {
+      "size": 256,
+      "sha256": "912fa4d418da6fc5e9db01966171ca13c69e22c4725a2bcbccf48b55072062ea"
+    },
     "runtime/Starship.html": {
-      "size": 46130,
-      "sha256": "0f69af607b8aa8177499952beb9c30f710b15e34b87424f1b9b1f341cb9fa613"
+      "size": 45744,
+      "sha256": "3cb518305d8625bfbc763ea6af8150183386cdf2f243312ab70c3ae342d0d249"
     },
     "runtime/Starship.js": {
       "size": 1114108,
-      "sha256": "d03de38124d43776065f56cc2e51e91b7ad0ac445a16b3f57e57231797c442b6"
+      "sha256": "bb1d8f71b1c77fe2449d78909a94ca2507685b58e33e73c068561ac7a27aa33b"
     },
     "runtime/Starship.wasm": {
-      "size": 8528251,
-      "sha256": "991a6b19d3ece4254bf2189553c49f29c9616c991fc7f8f0408f01415f010c8f"
+      "size": 8540536,
+      "sha256": "cf331a5cb8283ebd25ebcd69f02b61585497194e61fd3c62fd754d5e2d408303"
     },
     "runtime/Starship.data": {
       "size": 610848,
@@ -65,20 +69,20 @@
       "sha256": "ec151f5f50a311984a3a5414b97153af25a46fc4bef312b47051f0e780b33866"
     },
     "extractor/extractor.wasm": {
-      "size": 2939540,
-      "sha256": "52fc67c062666ad52a833e40948331a9002edaa1e82e83d563dafeb122b0b29f"
+      "size": 2939044,
+      "sha256": "5a1be556108799969f3569d2407055a05ff86e0fd8cddb0dccbc52ec66f717d8"
     },
     "extractor/extractor.data": {
       "size": 466320,
       "sha256": "2e0e18efe6d936b7dd0195612415287dc77f8d8fc5e24c8154e19a8fd0c284e0"
     },
     "mod/recipe.json": {
-      "size": 495466,
-      "sha256": "2a3535edc28f57f8e921d37395103344d60ae957d20ccf02b3137702dcb6dfa5"
+      "size": 494457,
+      "sha256": "71055ea4081aece2b46d45bc894ab2a51cd5f2350670d8e9dd823b6b05809db4"
     },
     "mod/literals.dat": {
-      "size": 3577860,
-      "sha256": "a5ded7e775efedd9afbba6dd8a9e8dc89d0bacca8258278d629edd27e3a8bb2b"
+      "size": 3577842,
+      "sha256": "4c885925d2c2984ec780699d8ddd41687a87de275973c53d55f1b63f8adc4a5a"
     },
     "mod/chatter.dat": {
       "size": 4518238,
@@ -127,10 +131,6 @@
     "licenses/characters/Vitzy_README.md": {
       "size": 1432,
       "sha256": "52b2853c79bd9b5847b4495940e12870bb8b33312ed8dec8eed89dca859878d8"
-    },
-    "licenses/Arwing.txt": {
-      "size": 256,
-      "sha256": "912fa4d418da6fc5e9db01966171ca13c69e22c4725a2bcbccf48b55072062ea"
     }
   },
   "download": [
@@ -142,6 +142,7 @@
     "rom-patch.mjs",
     "coi-serviceworker.js",
     "runtime/launch-background.jpg",
+    "licenses/Arwing.txt",
     "runtime/Starship.html",
     "runtime/Starship.js",
     "runtime/Starship.wasm",
@@ -155,7 +156,6 @@
     "README.txt",
     "licenses/characters/CREDITS.md",
     "licenses/characters/README_TheRegressor.txt",
-    "licenses/characters/Vitzy_README.md",
-    "licenses/Arwing.txt"
+    "licenses/characters/Vitzy_README.md"
   ]
 }
