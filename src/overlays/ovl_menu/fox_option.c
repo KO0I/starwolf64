@@ -2299,7 +2299,7 @@ void Option_RankingName_Draw(s32 rankIdx, s32 xPos, s32 yPos) {
     char rankName[4];
 
     RCP_SetupDL(&gMasterDisp, SETUPDL_83_OPTIONAL);
-    gDPSetPrimColor(gMasterDisp++, 0, 0, 255, 0, 255, 255);
+    gDPSetPrimColor(gMasterDisp++, 0, 0, 255, 255, 0, 255);
 
     rankName[0] = gSaveFile.save.data.rankNameEntry[rankIdx][0] & 0xFF;
     rankName[1] = gSaveFile.save.data.rankNameEntry[rankIdx][1] & 0xFF;
@@ -2452,7 +2452,7 @@ void Option_RankingPlanetName_Draw(s32 rankIdx, s32 routeIdx, f32 xPos, f32 yPos
         planetName = D_menu_801AEEAC[planetIdx];
 
         RCP_SetupDL(&gMasterDisp, SETUPDL_83_OPTIONAL);
-        gDPSetPrimColor(gMasterDisp++, 0, 0, 255, 0, 255, 255);
+        gDPSetPrimColor(gMasterDisp++, 0, 0, 255, 255, 0, 255);
         textWidth = Graphics_GetSmallTextWidth(planetName) / 2.0f;
         Graphics_DisplaySmallText(xPos + 12.0f - textWidth, yPos - 8.0f, 1.0f, 1.0f, planetName);
     }

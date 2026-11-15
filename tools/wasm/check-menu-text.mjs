@@ -73,7 +73,9 @@ export async function checkRankingMenu(context) {
   await press(call,sleep,'KeyX','x',88);
   await sleep(2000);
   const ranking=await capture(context,'magenta-ranking-list',[.27,.15,.76,.95]);
-  if(ranking.magenta<100||ranking.yellow>20)throw Error('Ranking labels and names must be magenta: '+JSON.stringify(ranking));
+  if(ranking.magenta<100)throw Error('Ranking labels must be magenta: '+JSON.stringify(ranking));
+  const names=await capture(context,'yellow-ranking-names',[.46,.22,.55,.91]);
+  if(names.yellow<100||names.magenta>20)throw Error('Ranking names must be yellow: '+JSON.stringify(names));
   if((await value('window.STARSHIP_GAME_STATE')).gameState!==3)throw Error('Ranking menu navigation left the menus');
   return ranking;
 }

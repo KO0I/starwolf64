@@ -998,7 +998,7 @@ void HUD_LivesCount2_Draw(f32 x, f32 y, s32 number) {
     Lib_TextureRect_CI4(&gMasterDisp, sLivesCounterTexs[form], sLivesCounterTLUTs[form], 16, 16, x0, y0, 1.0f, 1.0f);
     Lib_TextureRect_CI4(&gMasterDisp, aXTex, aXTLUT, 16, 7, x1, y1, 1.0f, 1.0f);
 
-    gDPSetPrimColor(gMasterDisp++, 0, 0, 255, 0, 255, 255);
+    gDPSetPrimColor(gMasterDisp++, 0, 0, 255, 255, 0, 255);
     Graphics_DisplayHUDNumber(x2, y2, number);
 }
 
@@ -2275,7 +2275,7 @@ s32 ActorMissileSeek_ModeCheck(ActorMissileSeekMode mode) {
 void HUD_RadioCharacterName_Draw(void) {
     if (gGameState == GSTATE_PLAY) {
         RCP_SetupDL(&gMasterDisp, SETUPDL_76_OPTIONAL);
-        gDPSetPrimColor(gMasterDisp++, 0, 0, 255, 0, 255, 255);
+        gDPSetPrimColor(gMasterDisp++, 0, 0, 255, 255, 0, 255);
 
         f32 xPos;
         if (CVarGetInteger("gRadioCommBox.expand", 0) == 1) {

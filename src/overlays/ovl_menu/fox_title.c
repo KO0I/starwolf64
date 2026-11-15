@@ -484,7 +484,7 @@ void Title_RankingData_Draw(void) {
         gDPSetPrimColor(gMasterDisp++, 0, 0, 255, 255, 255, 255);
         Graphics_DisplaySmallNumber(105 - ((HUD_CountDigits(i + 1) - 1) * 8), yPos, i + 1);
 
-        gDPSetPrimColor(gMasterDisp++, 0, 0, 255, 0, 255, 255);
+        gDPSetPrimColor(gMasterDisp++, 0, 0, 255, 255, 0, 255);
         Graphics_DisplaySmallText(150, yPos, 1.0f, 1.0f, &sRankNameEntry[i][0]);
 
         gDPSetPrimColor(gMasterDisp++, 0, 0, 255, 255, 255, 255);

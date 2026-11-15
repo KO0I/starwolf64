@@ -1315,7 +1315,7 @@ void Display_PlayerFeatures(Player* player) {
 
                 src.x = 0;
                 src.y = WOLFEN_HULL_Y;
-                src.z = -40.0f - var_fv0;
+                src.z = WOLFEN_ENGINE_Z - var_fv0;
 
                 Matrix_MultVec3f(gCalcMatrix, &src, &dest);
                 Matrix_Push(&gGfxMatrix);

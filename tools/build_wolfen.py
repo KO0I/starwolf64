@@ -12,6 +12,7 @@ ROOT = Path(__file__).resolve().parents[1]
 FIT_HEADER = (ROOT / 'include/wolfen.h').read_text()
 FIT = {name: float(value) for name, value in re.findall(r'#define WOLFEN_(\w+) \((-?[\d.]+)f\)', FIT_HEADER)}
 HULL_Y = FIT['HULL_Y']
+ENGINE_Z = FIT['ENGINE_Z']
 COCKPIT_DROP = FIT['COCKPIT_DROP']
 HEAD_LIFT = FIT['HEAD_LIFT']
 
@@ -27,8 +28,9 @@ def f32(value):
 FACE_Y = float_bits(f32(f32(6.4) - COCKPIT_DROP) + HEAD_LIFT)
 CANOPY_Y = float_bits(f32(17.2) - COCKPIT_DROP)
 ENGINE_Y = float_bits(HULL_Y)
-if ENGINE_Y & 0xFFFF:
-    raise ValueError('Engine Y must fit the original single-instruction float loads')
+ENGINE_Z_BITS = float_bits(ENGINE_Z)
+if (ENGINE_Y | ENGINE_Z_BITS) & 0xFFFF:
+    raise ValueError('Engine coordinates must fit the original single-instruction float loads')
 
 ROM_NAME = 'Star Fox 64 (U) (V1.1) [!].z64'
 ROM_SHA1 = '09f0d105f476b00efa5303a3ebc42e60a7753b7a'
@@ -50,13 +52,14 @@ COLOR_PATCHES = {
 }
 # Lift pilot heads independently of the recessed canopy. The exhaust vector uses
 # an available delay-slot NOP to load Y, then stores those float bits in src.y.
-# Its X=0 and boost-dependent Z stores remain intact.
+# Its X=0 and boost-dependent Z stores remain intact, with a rearward Z base.
 POSITION_PATCHES = {
     0x543B4: (0x3C0640CC, 0x3C060000 | FACE_Y >> 16),
     0x543C0: (0x34C6CCCD, 0x34C60000 | FACE_Y & 0xFFFF),
     0x54520: (0x3C064189, 0x3C060000 | CANOPY_Y >> 16),
     0x54538: (0x34C6999A, 0x34C60000 | CANOPY_Y & 0xFFFF),
     0x5BA60: (0x44060000, 0x3C060000 | ENGINE_Y >> 16),
+    0x56898: (0x3C01C220, 0x3C010000 | ENGINE_Z_BITS >> 16),
     0x568B0: (0x00000000, 0x3C010000 | ENGINE_Y >> 16),
     0x568DC: (0xE7A20050, 0xAFA10050),
 }
@@ -443,32 +446,6 @@ class Builder:
         self.segments['ast_title'][0x14140:0x147C0] = data
         self.resources[path] = original[:80] + data
 
-    def reverse_wing_mounts(self):
-        # Turn each original wing mount around its local Y axis. Keeping the
-        # original joint animation then reverses its sweep in ship coordinates.
-        # Duplicate shared frame values so other joints retain their old motion.
-        for offset in (0x15AF4, 0x15C28, 0x15D68, 0x163C4):
-            name, _ = self.assets[('ast_arwing', offset)]
-            original = self.base.read(f'ast_arwing/{name}')
-            frame_count, limb_count, key_count = struct.unpack_from('<HHI', original, 64)
-            keys = [list(struct.unpack_from('<6H', original, 72 + 12 * i)) for i in range(key_count)]
-            size_offset = 72 + key_count * 12
-            count = struct.unpack_from('<I', original, size_offset)[0]
-            frames = list(struct.unpack_from(f'<{count}H', original, size_offset + 4))
-            for limb in (14, 16):
-                key = keys[limb + 1]
-                length = max(1, min(key[2], frame_count))
-                values = [(v + 32768) & 65535 for v in frames[key[3]:key[3] + length]]
-                key[3] = len(frames)
-                frames.extend(values)
-            address = self.allocate(struct.pack(f'>{len(frames)}H', *frames))
-            key_pointer = struct.unpack_from('>I', self.output, offset + 8)[0] & 0xFFFFFF
-            struct.pack_into('>I', self.output, offset + 4, address)
-            for i, key in enumerate(keys):
-                struct.pack_into('>6H', self.output, key_pointer + i * 12, *key)
-            self.resources[f'ast_arwing/{name}'] = original[:64] + struct.pack('<HHI', frame_count, limb_count, key_count) + b''.join(struct.pack('<6H', *k) for k in keys) + struct.pack('<I', len(frames)) + struct.pack(f'<{len(frames)}H', *frames)
-        self.matrices, _ = skeleton_matrices(self.output)
-
     def swap_shadows(self):
         slots = (('ast_common', 0x32808), ('ast_star_wolf', 0x14398))
         originals = []
@@ -496,7 +473,6 @@ class Builder:
         self.replace_intro_title()
         self.recolor_lasers()
         self.swap_shadows()
-        self.reverse_wing_mounts()
         hull = [[1, 0, 0, 0], [0, 1, 0, HULL_Y], [0, 0, 1, 0], [0, 0, 0, 1]]
 
         def part(pointer, points, ids):
@@ -704,8 +680,8 @@ class Builder:
             swept, _ = skeleton_matrices(self.output, animation=0x15D68)
             tip = [sign * 63, 14, -13]
             closed_tip = transform(swept[bone], transform(inverse(opened[bone]), tip))
-            if closed_tip[2] >= tip[2]:
-                raise ValueError('Wing joint does not sweep rearward')
+            if closed_tip[2] <= tip[2]:
+                raise ValueError('Wing joint does not sweep forward')
         for offset, (_, replacement) in ROM_PATCHES.items():
             if struct.unpack_from('>I', patched, offset)[0] != replacement:
                 raise ValueError('Browser flight color/position patch missing')

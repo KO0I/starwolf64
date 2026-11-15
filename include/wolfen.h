@@ -2,6 +2,7 @@
 #define WOLFEN_H
 
 #define WOLFEN_HULL_Y (-14.0f)
+#define WOLFEN_ENGINE_Z (-60.0f)
 /* Recess the cockpit floor into the Wolfen roof. */
 #define WOLFEN_COCKPIT_DROP (5.0f)
 

@@ -5690,7 +5690,7 @@ void Map_PathInfo_Draw(s32 missionIdx, f32 x, f32 y, s32 idx) {
     static s32 D_menu_801B6AF4[] = { 255, 67, 255 };
 
     RCP_SetupDL(&gMasterDisp, SETUPDL_83_OPTIONAL);
-    gDPSetPrimColor(gMasterDisp++, 0, 0, 255, 0, 255, 255);
+    gDPSetPrimColor(gMasterDisp++, 0, 0, 255, 255, 0, 255);
 
     Graphics_DisplaySmallText(x + 12.0f - Graphics_GetSmallTextWidth(sPlanetNames[idx]) * 0.5f, y - 8.0f, 1.0f, 1.0f,
                               sPlanetNames[idx]);
@@ -6917,11 +6917,11 @@ void Map_RemainingLives_Draw(s32 xPos, s32 yPos, s32 number) {
     gDPSetPrimColor(gMasterDisp++, 0, 0, 255, 255, 255, 255);
     Lib_TextureRect_CI4(&gMasterDisp, aMapArwingIconTex, aMapArwingIconTLUT, 16, 16, xPos, yPos, 1.0f, 1.0f);
 
-    gDPSetPrimColor(gMasterDisp++, 0, 0, 255, 0, 255, 255);
+    gDPSetPrimColor(gMasterDisp++, 0, 0, 255, 255, 0, 255);
     Lib_TextureRect_CI4(&gMasterDisp, aMapXTex, aMapXTLUT, 16, 7, xPos + 18.0f, yPos + 9.0f, 1.0f, 1.0f);
 
     RCP_SetupDL(&gMasterDisp, SETUPDL_83_OPTIONAL);
-    gDPSetPrimColor(gMasterDisp++, 0, 0, 255, 0, 255, 255);
+    gDPSetPrimColor(gMasterDisp++, 0, 0, 255, 255, 0, 255);
 
     if (number >= 10) {
         Graphics_DisplaySmallNumber(xPos + 33.0f - ((HUD_CountDigits(number) - 1) * 8) + 3, yPos + 8.0f, number);
