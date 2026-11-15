@@ -324,6 +324,13 @@ export class BrowserSession extends EventTarget {
     });
   }
 
+  async setName(name) {
+    if (!this.room || !this.token || !name.trim() || name.length > 32) throw new Error('Enter a name of 1 to 32 characters');
+    this.nameUpdates = (this.nameUpdates || Promise.resolve()).catch(() => {}).then(() =>
+      this.request(`/api/rooms/${encodeURIComponent(this.room)}/name`, {peer:this.peer,token:this.token,name:name.trim()}));
+    return this.nameUpdates;
+  }
+
   async configureMatch(match) {
     if (this.role !== 'host' || !this.setup || !['hosting','connected'].includes(this.phase)) throw new Error('Only the active host can choose the match');
     if (!validMatch(match)) throw new Error('Choose an existing map and its supported match type');

@@ -183,7 +183,7 @@ export function createSignalingServer({ host = "127.0.0.1", port = 8670, iceServ
         rooms.set(code, room);
         return json(res, 200, credentials(room, addPeer(room, body.name, 0)));
       }
-      const match = /^\/api\/rooms\/([A-Z0-9]+)\/(join|events|signal|leave)$/.exec(url.pathname);
+      const match = /^\/api\/rooms\/([A-Z0-9]+)\/(join|events|signal|leave|name)$/.exec(url.pathname);
       if (!match) return json(res, 404, { error: "not found" });
       const room = rooms.get(match[1]);
       if (!room) return json(res, 404, { error: "room not found" });
@@ -229,6 +229,12 @@ export function createSignalingServer({ host = "127.0.0.1", port = 8670, iceServ
       if (action === "leave") {
         remove(room, p, "host left");
         return json(res, 200, { ok: true });
+      }
+      if (action === "name") {
+        if (typeof body.name !== "string" || !body.name.trim() || body.name.length > 32) return json(res,400,{error:"invalid name"});
+        p.name = body.name.trim();
+        roster(room);
+        return json(res,200,{ok:true});
       }
       const target = typeof body.to === "string" ? room.peers.get(body.to) : null;
       if (!target) return json(res, 404, { error: "target not found" });

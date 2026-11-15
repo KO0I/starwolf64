@@ -9,6 +9,23 @@ const lastInputs = new Map();
 const shipPreview = window.STARWOLF_SHIP_PREVIEW = new ShipPreview($('ship-preview'),$('ship-preview-caption'));
 let session, inputSequence = 0, snapshotTick = 0, draftSelection, draftMatch;
 let selectionBusy = false, matchBusy = false;
+let autoName = 'Wolf', customName = false, requestedName = null;
+
+function syncPilotName(pilot) {
+  const field = $('name');
+  if (!customName && field.value.trim() && field.value !== autoName) customName = true;
+  if (!customName) field.value = autoName = pilot.name;
+  const name = field.value.trim() || pilot.name;
+  const current = session;
+  if (!current.room || !current.token || ['closed','error'].includes(current.phase)) return;
+  if (current.peers.find(peer => peer.peer === current.peer)?.name === name || requestedName === name) return;
+  requestedName = name;
+  current.setName(name).catch(error => { if(session === current && !['closed','error'].includes(current.phase)) notice(error.message); });
+}
+$('name').addEventListener('input', () => { customName = Boolean($('name').value.trim()); });
+$('name').addEventListener('change', () => {
+  if (session?.state.setup) syncPilotName(pilotById(draftSelection.pilot));
+});
 
 function record(list,value) { list.push(value); if (list.length > 100) list.shift(); }
 function notice(message) { $('notice').textContent = message; $('notice').hidden = !message; }
@@ -89,6 +106,7 @@ function renderSelection(state,active) {
   if (campaign && pilot.crew !== setup.match.crew) draftSelection = defaultSelection(setup.match);
   if (campaign) draftSelection.vehicle = campaignVehicle(pilotById(draftSelection.pilot));
   const selectedPilot = pilotById(draftSelection.pilot);
+  syncPilotName(selectedPilot);
   for (const pilot of PILOTS) {
     const radio = $('pilot-' + pilot.id), label = radio.parentElement;
     radio.checked = draftSelection.pilot === pilot.id;
@@ -169,6 +187,7 @@ function render() {
   renderSelection(state,active);
 }
 function newSession() {
+  requestedName = null;
   inputSequence = snapshotTick = 0; lastInputs.clear();
   draftSelection = draftMatch = null; selectionBusy = matchBusy = false;
   window.STARWOLF_GAME?.close();
@@ -203,8 +222,8 @@ async function connect(role) {
   notice('');
   try {
     if (session.state.phase !== 'idle') { await session.close(); newSession(); }
-    if (role === 'host') await session.host($('name').value.trim() || 'Pilot');
-    else await session.join($('code').value.trim().toUpperCase(),$('name').value.trim() || 'Pilot');
+    if (role === 'host') await session.host($('name').value.trim() || pilotById(draftSelection?.pilot || 'wolf').name);
+    else await session.join($('code').value.trim().toUpperCase(),$('name').value.trim() || pilotById(draftSelection?.pilot || 'wolf').name);
   } catch(error) { notice(error.message); }
 }
 $('host').addEventListener('click',() => connect('host'));

@@ -222,3 +222,14 @@ test("configured runtime routes pin the manifest and serve only explicit files",
   assert.equal((await fetch(f.base+"/game/config.yml")).status,404);
   assert.equal((await fetch(f.base+"/game-assets/unknown.o2r")).status,404);
 });
+
+test("authenticated name updates reach the roster and validate input",async t=>{
+  const f=await fixture(t);const host=await f.make();const guest=await f.join(host);
+  const events=await f.events(host);t.after(events.close);await events.next();
+  const path=`/api/rooms/${host.room}/name`;
+  assert.equal((await f.request(path,{peer:guest.peer,token:"wrong",name:"Krystal"})).status,403);
+  assert.equal((await f.request(path,{peer:guest.peer,token:guest.token,name:""})).status,400);
+  assert.equal((await f.request(path,{peer:guest.peer,token:guest.token,name:"a".repeat(33)})).status,400);
+  assert.equal((await f.request(path,{peer:guest.peer,token:guest.token,name:"Krystal"})).status,200);
+  assert.equal((await events.next()).data.peers.find(p=>p.peer===guest.peer).name,"Krystal");
+});
