@@ -43,6 +43,14 @@ def export(build, output, *, domain=None):
         sources[name] = ROOT / "tools/wasm/web" / name
     for name in ("rom-file.mjs", "rom-patch.mjs", "coi-serviceworker.js"):
         sources[name] = ROOT / "browser" / name
+    for name in ("index.html","app.mjs","session.mjs","catalog.mjs","styles.css","ship-preview.mjs","ship-wireframes.json","protocol.mjs","world-protocol.mjs","game.mjs","engine.mjs","setup-controls.mjs"):
+        sources["multiplayer/"+name] = ROOT / "tools/multiplayer/web" / name
+    catalog = ROOT / "tools/multiplayer/web/catalog.mjs"
+    pilot_data = subprocess.check_output(["node","--input-type=module","-e",
+        "import("+json.dumps(catalog.as_uri())+").then(({PILOTS})=>process.stdout.write(JSON.stringify(PILOTS)))"],text=True)
+    for pilot in json.loads(pilot_data):
+        if pilot.get("portrait"):
+            sources["portraits/"+pilot["id"]+".png"] = ROOT / "assets" / pilot["portrait"]
     sources["runtime/launch-background.jpg"] = ROOT / "browser/launch-background.jpg"
     sources["licenses/Arwing.txt"] = ROOT / "browser/Arwing-source.txt"
     for suffix in ("html", "js", "wasm", "data"):

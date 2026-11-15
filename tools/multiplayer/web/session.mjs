@@ -24,6 +24,7 @@ export class BrowserSession extends EventTarget {
     this.lastTick = -1;
     this.setup = null;
     this.selectionRequests = new Map();
+    this.lockedLoadouts = new Set();
   }
 
   get state() {
@@ -287,6 +288,7 @@ export class BrowserSession extends EventTarget {
   }
 
   acceptSelection(peer, request) {
+    if(this.lockedLoadouts.has(peer))throw Error("Your loadout is locked for this match.");
     const member = this.setup?.members.find(member => member.peer === peer);
     if (!member) throw new Error('This player is no longer in the room');
     const others = this.setup.members.filter(member => member.peer !== peer).map(member => member.selection);
@@ -332,6 +334,7 @@ export class BrowserSession extends EventTarget {
   }
 
   async configureMatch(match) {
+    if(this.lockedLoadouts.size)throw Error("Match settings are locked while players are flying.");
     if (this.role !== 'host' || !this.setup || !['hosting','connected'].includes(this.phase)) throw new Error('Only the active host can choose the match');
     if (!validMatch(match)) throw new Error('Choose an existing map and its supported match type');
     this.setup = {
@@ -432,6 +435,7 @@ export class BrowserSession extends EventTarget {
     link.abort.abort();
     if (this.role === 'guest') this.rejectSelections('Host connection ended before confirming the pilot');
     this.emit('peer-left',{peer:link.peer,slot:link.slot});
+    this.lockedLoadouts.delete(link.peer);
     this.links.delete(link.peer);
     if (closeTransport) this.closeTransport(link);
   }

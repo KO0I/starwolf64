@@ -86,6 +86,8 @@ void ActorCutscene_Update(Actor*);
 void ActorCutscene_Draw(Actor*);
 void Cutscene_DrawGreatFox(void);
 
+void Game_OpenMultiplayer(void);
+
 // fox_display
 void Display_ArwingWings(ArwingInfo*);
 void Display_DrawEngineGlow(EngineGlowColor);

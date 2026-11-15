@@ -7,6 +7,7 @@ extern bool Versus_InitViewports(void);
 extern s32 sVsPlayerCount;
 typedef struct {
     uint32_t incarnation, sequence, lastFrame;
+    uint32_t loadIncarnation, pilot, ship, rgb;
     int hasSequence;
     uint16_t buttons;
     int8_t stickX, stickY;
@@ -42,10 +43,54 @@ uint32_t Net_Incarnation(int slot) {
     return slot >= 0 && slot < NET_SLOTS ? sNet.slots[slot].incarnation : 0;
 }
 
+int Net_SetLoadout(int slot, uint32_t incarnation, uint32_t pilot, uint32_t ship, uint32_t rgb) {
+    NetSlot* p;
+    if (slot < 0 || slot >= NET_SLOTS || !incarnation || pilot > 255 || ship > 255 || rgb > 0xffffff)
+        return 0;
+    if (sNet.role == NET_OFFLINE) {
+        if (slot != 0 || incarnation != 1)
+            return 0;
+    } else if (sNet.role != NET_HOST || (sNet.activeMask & (1u << slot)) || incarnation <= sNet.slots[slot].incarnation)
+        return 0;
+    p = &sNet.slots[slot];
+    if (p->loadIncarnation && incarnation < p->loadIncarnation)
+        return 0;
+    if (p->loadIncarnation == incarnation && (p->pilot != pilot || p->ship != ship || p->rgb != rgb))
+        return 0;
+    p->loadIncarnation = incarnation;
+    p->pilot = pilot;
+    p->ship = ship;
+    p->rgb = rgb;
+    return 1;
+}
+uint32_t Net_LoadoutPart(int slot, int part) {
+    if (slot < 0 || slot >= NET_SLOTS || !(sNet.activeMask & (1u << slot)))
+        return 0;
+    const NetSlot* p = &sNet.slots[slot];
+    return part == 0 ? p->pilot : part == 1 ? p->ship : part == 2 ? p->rgb : 0;
+}
+int Net_LoadoutColor(int slot, uint32_t* rgb) {
+    if (!Net_Enabled() || slot < 0 || slot >= NET_SLOTS || !rgb || !(sNet.activeMask & (1u << slot)) ||
+        sNet.slots[slot].loadIncarnation != sNet.slots[slot].incarnation)
+        return 0;
+    *rgb = sNet.slots[slot].rgb;
+    return 1;
+}
+void Net_ImportLoadouts(const uint32_t values[12]) {
+    for (int i = 0; i < NET_SLOTS; i++) {
+        NetSlot* p = &sNet.slots[i];
+        p->loadIncarnation = (sNet.activeMask & (1u << i)) ? p->incarnation : 0;
+        p->pilot = values[i * 3];
+        p->ship = values[i * 3 + 1];
+        p->rgb = values[i * 3 + 2];
+    }
+}
+
 int Net_Launch(int role, uint32_t match, uint32_t epoch, int localSlot, int stage, int rules) {
     int i;
     if ((role != NET_HOST && role != NET_GUEST) || !match || !epoch || localSlot < 0 || localSlot >= NET_SLOTS ||
-        (role == NET_HOST && localSlot != 0) || stage != VS_STAGE_CORNERIA || rules != VS_MATCH_POINTS || Net_Enabled())
+        (role == NET_HOST && (localSlot != 0 || sNet.slots[0].loadIncarnation != 1)) || stage != VS_STAGE_CORNERIA ||
+        rules != VS_MATCH_POINTS || Net_Enabled())
         return 0;
     sNet.role = role;
     sNet.match = match;
@@ -55,6 +100,10 @@ int Net_Launch(int role, uint32_t match, uint32_t epoch, int localSlot, int stag
     sNet.ready = 0;
     sNet.activeMask = role == NET_HOST ? 1u : 0u;
     for (i = 0; i < NET_SLOTS; i++) {
+        if (role != NET_HOST || i != 0) {
+            sNet.slots[i].loadIncarnation = 0;
+            sNet.slots[i].pilot = sNet.slots[i].ship = sNet.slots[i].rgb = 0;
+        }
         sNet.slots[i].incarnation = role == NET_HOST && i == 0 ? 1 : 0;
         sNet.slots[i].sequence = 0;
         sNet.slots[i].hasSequence = 0;
@@ -117,7 +166,8 @@ int Net_ImportMembership(uint32_t mask, const uint32_t incarnations[4]) {
 int Net_Activate(int slot, uint32_t incarnation) {
     Player* player;
     if (sNet.role != NET_HOST || !sNet.ready || slot < 0 || slot >= NET_SLOTS || !incarnation ||
-        (sNet.activeMask & (1u << slot)) || incarnation <= sNet.slots[slot].incarnation)
+        (sNet.activeMask & (1u << slot)) || incarnation <= sNet.slots[slot].incarnation ||
+        sNet.slots[slot].loadIncarnation != incarnation)
         return 0;
     gVsPoints[slot] = 0;
     gPlayerScores[slot] = 0;
@@ -154,6 +204,8 @@ int Net_Remove(int slot, uint32_t incarnation) {
         sNet.slots[slot].incarnation != incarnation)
         return 0;
     sNet.activeMask &= ~(1u << slot);
+    sNet.slots[slot].loadIncarnation = 0;
+    sNet.slots[slot].pilot = sNet.slots[slot].ship = sNet.slots[slot].rgb = 0;
     sNet.slots[slot].buttons = 0;
     sNet.slots[slot].stickX = sNet.slots[slot].stickY = 0;
     gPlayerInactive[slot] = true;

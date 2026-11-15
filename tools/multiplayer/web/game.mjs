@@ -1,3 +1,4 @@
+import {nativeLoadout} from './catalog.mjs';
 import {WasmEngine} from './engine.mjs';
 export class NetworkGame extends EventTarget {
   constructor(session, container) {
@@ -14,6 +15,7 @@ export class NetworkGame extends EventTarget {
     this.latest = null;
     this.pending = null;
     this.closed = false;
+    this.abort = new AbortController();
     session.addEventListener(
         'game', e => this.receive(e.detail).catch(error => this.peerFailure(e.detail.peer, error)));
     session.addEventListener('world', e => this.world(e.detail));
@@ -74,9 +76,11 @@ export class NetworkGame extends EventTarget {
     });
   }
   async prepareEngine() {
-    const r = await fetch('/api/game');
+    if (this.closed) throw Error('Game closed');
+    const r = await fetch('/api/game', {signal:this.abort.signal});
     if (!r.ok) throw Error('Game manifest unavailable');
     this.descriptor = await r.json();
+    if (this.closed) throw Error('Game closed');
     this.engine = new WasmEngine(this.container, this.descriptor);
     this.engine.addEventListener('error', e => this.fail(Error(e.detail.message)));
     this.engine.addEventListener('status', () => {
@@ -159,7 +163,17 @@ export class NetworkGame extends EventTarget {
     if (!await this.session.sendWorld(link, this.latest.bytes, true))
       throw Error('Peer left during admission');
   }
+  launchAvailability(setup=this.session.setup) {
+    if(!setup)return {available:false,reason:'Host or join a room first.'};
+    const match=setup.match;
+    if(match.kind==='campaign')return {available:false,reason:'Co-op story is not playable yet. The host will choose missions on the story map, with up to three guests flying along. Campaign player and stage replication are merge blockers.'};
+    if(match.stage!=='corneria'||match.rules!=='points')return {available:false,reason:'This engine build plays Classic VS: Corneria Points. Other battle modes need stage integration.'};
+    if(!setup.members.find(member=>member.peer===this.session.peer)?.selection)return {available:false,reason:'Confirm your pilot, ship and hue before launching.'};
+    return {available:true,reason:'Four-player Classic VS / Corneria Points.'};
+  }
   launch() {
+    const availability=this.launchAvailability();
+    if(!availability.available)throw Error(availability.reason);
     if (!this.engine?.state.prepared) throw Error('Prepare the game first');
     if (this.running) return Promise.resolve();
     if (this.session.role === 'host') {
@@ -169,7 +183,8 @@ export class NetworkGame extends EventTarget {
       this.match = crypto.getRandomValues(new Uint32Array(1))[0] || 1;
       this.epoch = 1;
       this.running = true;
-      const start = this.engine.start({role: 'host', matchId: this.match, epoch: this.epoch, slot: 0});
+      this.session.lockedLoadouts.add(this.session.peer);
+      const start = this.engine.start({role: 'host', matchId: this.match, epoch: this.epoch, slot: 0,loadout:nativeLoadout(this.session.setup.members.find(member=>member.peer===this.session.peer)?.selection)});
       return start
           .then(() => {
             this.active = true;
@@ -234,11 +249,12 @@ export class NetworkGame extends EventTarget {
         member.phase = 'catchup';
         await this.sendBaseline(peer, member, link, true);
       } else if (m.op === 'baseline-ack' && m.tick === member.baselineTick && member.phase === 'catchup') {
+        this.session.lockedLoadouts.add(peer);
         member.phase = 'activating';
         clearTimeout(member.timer);
         await this.queueSlot(member.slot, async () => {
           if (link.closed || this.members.get(peer) !== member) return;
-          await this.engine.activate(member.slot, member.incarnation);
+          await this.engine.activate(member.slot, member.incarnation,nativeLoadout(this.session.setup.members.find(item=>item.peer===peer)?.selection));
           member.active = true;
           if (link.closed || this.members.get(peer) !== member) {
             await this.engine.remove(member.slot, member.incarnation);
@@ -301,6 +317,7 @@ export class NetworkGame extends EventTarget {
   close() {
     if (this.closed) return;
     this.closed = true;
+    this.abort.abort();
     this.active = false;
     for (const member of this.members.values()) clearTimeout(member.timer);
     this.engine?.close();

@@ -247,20 +247,31 @@ size_t capture(uint8_t* bytes) {
                           Net_Incarnation(1),
                           Net_Incarnation(2),
                           Net_Incarnation(3) };
+    uint32_t loadouts[12]{};
+    for (int slot = 0; slot < NET_SLOTS; slot++)
+        for (int part = 0; part < 3; part++)
+            loadouts[slot * 3 + part] = Net_LoadoutPart(slot, part);
+    header[1] = 2;
     codec.field(header);
+    codec.field(loadouts);
     codec.world(scene);
     return codec.ok ? codec.pos : 0;
 }
 bool importWorld(const uint8_t* bytes, size_t size) {
     World scene{};
     Codec codec{ const_cast<uint8_t*>(bytes), size, 0, true };
-    uint32_t header[10]{};
+    uint32_t header[10]{}, loadouts[12]{};
     codec.field(header);
-    if (!codec.ok || header[0] != SCENE || header[1] != 1 || header[2] != Net_MatchId() ||
+    codec.field(loadouts);
+    if (!codec.ok || header[0] != SCENE || header[1] != 2 || header[2] != Net_MatchId() ||
         header[3] != Net_StageEpoch() || header[4] < lastImported || (header[5] & ~15u))
         return false;
     for (unsigned i = 0; i < 4; i++)
         if ((header[5] & (1u << i)) && !header[6 + i])
+            return false;
+    for (unsigned i = 0; i < 4; i++)
+        if (loadouts[i * 3] > 255 || loadouts[i * 3 + 1] > 255 || loadouts[i * 3 + 2] > 0xffffff ||
+            (!(header[5] & (1u << i)) && (loadouts[i * 3] || loadouts[i * 3 + 1] || loadouts[i * 3 + 2])))
             return false;
     codec.world(scene);
     if (!codec.ok || codec.pos != size || scene.globals.gGameState != GSTATE_PLAY ||
@@ -308,6 +319,7 @@ bool importWorld(const uint8_t* bytes, size_t size) {
     copyValue(gRadarMarks, scene.radar);
     copyValue(gBonusText, scene.bonuses);
     Net_ImportMembership(header[5], header + 6);
+    Net_ImportLoadouts(loadouts);
     lastImported = header[4];
     mailbox.h[18].store(lastImported, std::memory_order_release);
     return true;
@@ -334,6 +346,9 @@ extern "C" void Wasm_NetBeginFrame(void) {
             case 3:
                 ok = Net_Remove(args[0], args[1]);
                 break;
+            case 5:
+                ok = Net_SetLoadout(args[0], args[1], args[2], args[3], args[4]);
+                break;
             case 4:
                 if (Net_Incarnation(args[0]) == args[1])
                     ok = Net_SetInput(args[0], args[2], args[3], int32_t(args[4]), int32_t(args[5]));
@@ -345,7 +360,7 @@ extern "C" void Wasm_NetBeginFrame(void) {
     if (Net_IsGuest() && Net_Ready() && h[16].load(std::memory_order_acquire) == 1) {
         h[16].store(2, std::memory_order_release);
         const auto size = h[17].load(std::memory_order_relaxed);
-        const bool ok = size >= 40 && size <= int32_t(CAP) && importWorld(mailbox.incoming, size);
+        const bool ok = size >= 88 && size <= int32_t(CAP) && importWorld(mailbox.incoming, size);
         h[19].store(ok ? 0 : -2, std::memory_order_relaxed);
         h[16].store(3, std::memory_order_release);
     }

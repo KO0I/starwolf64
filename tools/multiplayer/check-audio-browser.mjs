@@ -81,7 +81,8 @@ async function page(label, url) {
 const state = p => value(p, 'window.STARWOLF_MP.state');
 const events = p => value(p, 'window.STARWOLF_MP_PROOF');
 const invoke = (p, method, ...args) => value(p, `window.STARWOLF_MP.${method}(...${JSON.stringify(args)})`);
-const choosePilot = (page,selection) => value(page, `(() => {
+const choosePilot = async (page,selection) => {
+  await value(page, `(() => {
   const choice = ${JSON.stringify(selection)};
   document.getElementById('pilot-' + choice.pilot).click();
   const vehicle = document.getElementById('vehicle');
@@ -90,6 +91,12 @@ const choosePilot = (page,selection) => value(page, `(() => {
   document.getElementById('hue-' + choice.hue).click();
   document.getElementById('save-pilot').click();
 })()`);
+  await wait(page.label+' pilot confirmed',async()=>{
+    const current=await state(page);
+    const accepted=current.setup?.members.find(member=>member.peer===current.peer)?.selection;
+    return accepted?.pilot===selection.pilot && accepted.vehicle===selection.vehicle && accepted.preferredHue===selection.hue;
+  });
+};
 const chooseVersus = (page,stage,rules) => value(page, `(() => {
   const mode = document.getElementById('mode');
   mode.value = 'versus'; mode.dispatchEvent(new Event('change',{bubbles:true}));
@@ -146,6 +153,7 @@ try {
   const host=await page('host',url);
   await value(host,"document.getElementById('host').click()");
   await wait('room',async()=>(await state(host)).room);
+  await choosePilot(host,{pilot:'wolf',vehicle:'wolfen',hue:0});
   await value(host,"window.STARWOLF_GAME.prepare()");
   await value(host,"window.STARWOLF_GAME.launch()");
 

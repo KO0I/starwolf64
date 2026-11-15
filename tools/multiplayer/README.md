@@ -85,3 +85,32 @@ python3 tools/multiplayer/generate-scene-schema.py
 ```
 
 Read [the bridge reference](../../docs/multiplayer-wasm-bridge.md) before adding a stage or entity type.
+
+## Merge preparation
+
+The native main menu now says Multiplayer and opens Sargasso Hideout.
+The selection page uses the main site's sunset gradient, a portrait roster,
+hue controls, and a matching ship wireframe for each confirmed player.
+The accepted hue travels with the native world and colors aircraft lasers and charge effects.
+Pilot and aircraft identities are saved, but their in-game model dispatch remains unfinished.
+
+The optional `--site-dir build/wasm/site` serves an exported main site at `/`
+and Sargasso at `/multiplayer/`, sharing the same signaling service.
+Only files listed by that export's `site.json` are served.
+Exporting the static site alone does not provide signaling or multiplayer game archives.
+
+Main game co-op is reserved for a host and three guests.
+The host will use the in-game story map and own mission progression;
+guests will load that mission and fly along. Their loading must not pause the host.
+Campaign player simulation, stage bootstrap, and audited campaign actors/projectiles
+remain required before this mode can launch.
+See [merge readiness](../../docs/plans/multiplayer-merge-readiness.md).
+
+Verify the native menu handoff with the same game checker:
+
+```sh
+node tools/multiplayer/check-game-browser.mjs --native-menu --url http://127.0.0.1:8670/multiplayer/ --output build/multiplayer-menu-check
+```
+
+This enters the actual native menu, captures the Multiplayer label, and activates it.
+It does not use a browser button as a substitute for the native menu.

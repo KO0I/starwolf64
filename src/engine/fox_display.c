@@ -1086,7 +1086,10 @@ void Display_ArwingLaserCharge(Player* player) {
         RCP_SetupDL(&gMasterDisp, SETUPDL_49);
         gDPSetPrimColor(gMasterDisp++, 0x00, 0x00, 255, 255, 255, 128);
 
-        if (gVersusMode) {
+        uint32_t rgb;
+        if(Net_LoadoutColor(player->num,&rgb)){
+            gDPSetEnvColor(gMasterDisp++,(rgb>>16)&255,(rgb>>8)&255,rgb&255,128);
+        }else if (gVersusMode) {
             switch (player->num) {
                 case 0:
                     gDPSetEnvColor(gMasterDisp++, 255, 255, 32, 128);
@@ -1250,7 +1253,10 @@ void Display_LandmasterLaserCharge(Player* player) {
         RCP_SetupDL(&gMasterDisp, SETUPDL_49);
         gDPSetPrimColor(gMasterDisp++, 0x00, 0x00, 255, 255, 255, 128);
 
-        if (gVersusMode) {
+        uint32_t rgb;
+        if(Net_LoadoutColor(player->num,&rgb)){
+            gDPSetEnvColor(gMasterDisp++,(rgb>>16)&255,(rgb>>8)&255,rgb&255,128);
+        }else if (gVersusMode) {
             switch (player->num) {
                 case 0:
                     gDPSetEnvColor(gMasterDisp++, 255, 255, 32, 128);

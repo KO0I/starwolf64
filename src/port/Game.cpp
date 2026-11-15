@@ -1,4 +1,5 @@
 #include <libultraship.h>
+#include <SDL.h>
 
 #include <Fast3D/interpreter.h>
 #include "Engine.h"
@@ -118,6 +119,17 @@ static void browserStatus(const char* phase) {
     }, phase, state);
 }
 #endif
+
+extern "C" void Game_OpenMultiplayer(void) {
+#ifdef __EMSCRIPTEN__
+    MAIN_THREAD_EM_ASM({
+        if(window.parent!==window)window.parent.postMessage({type:'starwolf-open-multiplayer'},location.origin);
+        else location.assign(new URL('/multiplayer/',location.origin).href);
+    });
+#else
+    SDL_OpenURL(CVarGetString("gMultiplayerUrl","http://localhost:8670/multiplayer/"));
+#endif
+}
 
 void push_frame() {
 #ifdef __EMSCRIPTEN__

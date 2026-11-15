@@ -81,7 +81,8 @@ async function page(label, url) {
 const state = p => value(p, 'window.STARWOLF_MP.state');
 const events = p => value(p, 'window.STARWOLF_MP_PROOF');
 const invoke = (p, method, ...args) => value(p, `window.STARWOLF_MP.${method}(...${JSON.stringify(args)})`);
-const choosePilot = (page,selection) => value(page, `(() => {
+const choosePilot = async (page,selection) => {
+  await value(page, `(() => {
   const choice = ${JSON.stringify(selection)};
   document.getElementById('pilot-' + choice.pilot).click();
   const vehicle = document.getElementById('vehicle');
@@ -90,6 +91,12 @@ const choosePilot = (page,selection) => value(page, `(() => {
   document.getElementById('hue-' + choice.hue).click();
   document.getElementById('save-pilot').click();
 })()`);
+  await wait(page.label+' pilot confirmed',async()=>{
+    const current=await state(page);
+    const accepted=current.setup?.members.find(member=>member.peer===current.peer)?.selection;
+    return accepted?.pilot===selection.pilot && accepted.vehicle===selection.vehicle && accepted.preferredHue===selection.hue;
+  });
+};
 const chooseVersus = (page,stage,rules) => value(page, `(() => {
   const mode = document.getElementById('mode');
   mode.value = 'versus'; mode.dispatchEvent(new Event('change',{bubbles:true}));
@@ -142,9 +149,41 @@ try {
   };
   ws.onclose = () => { for (const entry of pending.values()) entry.reject(Error('CDP disconnected')); pending.clear(); };
 
+  if(process.argv.includes('--native-menu')) {
+  const host=await page('host',url);
+  await value(host,"document.getElementById('host').click()");
+  await wait('room',async()=>(await state(host)).room);
+  await value(host,"window.STARWOLF_GAME.prepare()");
+  await value(host,"window.STARWOLF_MENU_OPENED=false;window.addEventListener('message',e=>{if(e.origin===location.origin && e.data?.type==='starwolf-open-multiplayer')window.STARWOLF_MENU_OPENED=true;});window.STARWOLF_GAME.engine.frame.contentWindow.document.getElementById('launch').click()");
+  const gameState=()=>value(host,"window.STARWOLF_GAME.engine.frame.contentWindow.STARSHIP_GAME_STATE");
+  await wait('native title',async()=>(await gameState())?.gameState===2,60000);
+  const pad=async(buttons)=>value(host,"window.STARWOLF_GAME.engine.frame.contentWindow.Module._Wasm_SetControllerState("+buttons+",0,0)");
+  const press=async(button)=>{await pad(button);await sleep(120);await pad(0);await sleep(400);};
+  await sleep(1700);
+
+  report.menuTransitions=[];
+  for(let attempt=0;attempt<5;attempt++){
+    if((await gameState()).gameState===3)break;
+    await press(0x1000);
+    const until=Date.now()+2200;
+    while(Date.now()<until){const current=await gameState();report.menuTransitions.push(current);if(current.gameState===3)break;await sleep(100);}
+  }
+  await wait('native main menu',async()=>(await gameState()).gameState===3,15000);
+  await value(host,"document.getElementById('game-container').scrollIntoView({block:'center'})");
+  await sleep(2000);
+  const down=async()=>{await value(host,"window.STARWOLF_GAME.engine.frame.contentWindow.Module._Wasm_SetControllerState(0,0,-85)");await sleep(100);await pad(0);await sleep(500);};
+  await down();await down();
+  await value(host,"document.getElementById('game-container').scrollIntoView({block:'center'})");
+  await screenshot('native-multiplayer-menu.png');
+  await press(0x8000);
+  await wait('native Multiplayer opens Sargasso',()=>value(host,"window.STARWOLF_MENU_OPENED"),5000);
+  assert(true,'native Multiplayer menu opens Sargasso');
+  assert(report.errors.length===0,'no uncaught browser errors',report.errors);
+  } else {
   const host=await page('host',url), guest=await page('guest',url);
   await value(host,"document.getElementById('host').click()");
   const room=await wait('room created',async()=>{const s=await state(host);return s.room?s.room:false;});
+  await choosePilot(host,{pilot:'wolf',vehicle:'wolfen',hue:0});
   await value(host,"window.STARWOLF_GAME.prepare()");
   report.prepared=await value(host,"window.STARWOLF_GAME.engine.state");
   await value(host,"window.STARWOLF_GAME.launch()");
@@ -157,6 +196,7 @@ try {
   assert(report.hostFlying.tick>report.hostLaunch.tick,'host simulation advances');
   await value(guest,"document.getElementById('code').value="+JSON.stringify(room)+";document.getElementById('join').click()");
   await wait('RTC connected',async()=>(await state(guest)).phase==='connected',30000);
+  await choosePilot(guest,{pilot:'wolf',vehicle:'arwing',hue:0});
   await wait('game invitation',()=>value(guest,"Boolean(window.STARWOLF_GAME.invitation)"),15000);
   report.hostBeforeGuest=await value(host,"window.STARWOLF_GAME.engine.state");
   await value(guest,"window.STARWOLF_GAME.prepare()");
@@ -192,6 +232,7 @@ try {
   await value(host,"window.STARWOLF_GAME.session.originalSendWorld=window.STARWOLF_GAME.session.sendWorld;window.STARWOLF_GAME.session.sendWorld=async function(link,bytes,reliable){if(reliable){window.STARWOLF_CANCEL_TRANSFER=true;await new Promise(r=>setTimeout(r,700));}return this.originalSendWorld(link,bytes,reliable);}");
   await value(canceled,"document.getElementById('code').value="+JSON.stringify(room)+";document.getElementById('join').click()");
   await wait('canceled guest connected',async()=>(await state(canceled)).phase==='connected');
+  await choosePilot(canceled,{pilot:'wolf',vehicle:'arwing',hue:0});
   await wait('canceled guest invited',()=>value(canceled,"Boolean(window.STARWOLF_GAME.invitation)"));
   await value(canceled,"window.STARWOLF_GAME.prepare()");
   await value(canceled,"window.STARWOLF_GAME.launch()");
@@ -205,6 +246,7 @@ try {
   const replacement=await page('replacement',url);
   await value(replacement,"document.getElementById('code').value="+JSON.stringify(room)+";document.getElementById('join').click()");
   await wait('replacement connected',async()=>(await state(replacement)).phase==='connected');
+  await choosePilot(replacement,{pilot:'wolf',vehicle:'arwing',hue:0});
   await wait('replacement invitation',()=>value(replacement,"Boolean(window.STARWOLF_GAME.invitation)"));
   await value(replacement,"window.STARWOLF_GAME.prepare()");
   await value(replacement,"window.STARWOLF_GAME.launch()");
@@ -219,6 +261,7 @@ try {
     const peer=await page(name,url);
     await value(peer,"document.getElementById('code').value="+JSON.stringify(room)+";document.getElementById('join').click()");
     await wait(name+' connected',async()=>(await state(peer)).phase==='connected');
+    await choosePilot(peer,{pilot:'wolf',vehicle:slot===2?'wolfen':'arwing',hue:0});
     await wait(name+' invitation',()=>value(peer,"Boolean(window.STARWOLF_GAME.invitation)"));
     await value(peer,"window.STARWOLF_GAME.prepare()");
     await value(peer,"window.STARWOLF_GAME.launch()");
@@ -229,11 +272,22 @@ try {
   }
   await wait('four native players active',()=>value(host,"window.STARWOLF_GAME.engine.state.activeMask===15"));
   assert(true,'four actual WASM players share the host world');
+  report.nativeLoadouts=await wait('native loadout scene',()=>value(host,`(()=>{
+    const v=new DataView(window.STARWOLF_GAME.latest.bytes);
+    if(v.getUint32(4,true)!==2 || v.getUint32(20,true)!==15)return null;
+    return Array.from({length:4},(_,slot)=>({pilot:v.getUint32(40+slot*12,true),ship:v.getUint32(44+slot*12,true),rgb:v.getUint32(48+slot*12,true)}));
+  })()`));
+  const expectedLoadouts=[{pilot:5,ship:1,rgb:0xe7e0ff},{pilot:5,ship:0,rgb:0xffcf51},{pilot:5,ship:1,rgb:0x79e98e},{pilot:5,ship:0,rgb:0x7cf4ff}];
+  assert(JSON.stringify(report.nativeLoadouts)===JSON.stringify(expectedLoadouts),'accepted loadouts and duplicate hues reach native world',report.nativeLoadouts);
+  const locked=await value(host,"window.STARWOLF_MP.selectLoadout({pilot:'leon',vehicle:'wolfen',hue:0}).then(()=>false,()=>true)");
+  assert(locked,'host cannot change pilot during play');
+
 
   await value(host,"window.STARWOLF_MP.close()");
   await wait('host close ends guest game',()=>value(replacement,"window.STARWOLF_GAME.closed"),20000);
   assert(true,'host departure closes guest engine');
   assert(report.errors.length===0,'no uncaught browser errors',report.errors);
+  }
   report.ok=true;
 } catch (error) {
   report.failure = String(error?.stack || error);

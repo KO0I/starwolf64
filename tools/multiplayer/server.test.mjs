@@ -1,4 +1,7 @@
 import test from "node:test";
+import {mkdtemp,writeFile,rm,symlink} from "node:fs/promises";
+import {tmpdir} from "node:os";
+import {join} from "node:path";
 import assert from "node:assert/strict";
 import { setTimeout as delay } from "node:timers/promises";
 import { createSignalingServer } from "./server.mjs";
@@ -232,4 +235,34 @@ test("authenticated name updates reach the roster and validate input",async t=>{
   assert.equal((await f.request(path,{peer:guest.peer,token:guest.token,name:"a".repeat(33)})).status,400);
   assert.equal((await f.request(path,{peer:guest.peer,token:guest.token,name:"Krystal"})).status,200);
   assert.equal((await events.next()).data.peers.find(p=>p.peer===guest.peer).name,"Krystal");
+});
+
+test("main site and canonical multiplayer routes share signaling and isolation", async t => {
+  const root=await mkdtemp(join(tmpdir(),'sargasso-site-'));
+  t.after(()=>rm(root,{recursive:true,force:true}));
+  await writeFile(join(root,'index.html'),'<title>Main site</title>');
+  await writeFile(join(root,'site.json'),JSON.stringify({format:'starwolf64-wasm-site-v1',files:{'index.html':{}}}));
+  await writeFile(join(root,'prepared-assets.json'),'{}');
+  await writeFile(join(root,'private.txt'),'must not be served');
+  const f=await fixture(t,{siteDir:root});
+  await f.prepare();
+  assert.equal(await (await fetch(f.base+'/')).text(),'<title>Main site</title>');
+  const lobby=await fetch(f.base+'/multiplayer/');
+  assert.equal(lobby.status,200);
+  assert.match(await lobby.text(),/SARGASSO HIDEOUT/);
+  assert.equal(lobby.headers.get('cross-origin-embedder-policy'),'require-corp');
+  assert.equal((await fetch(f.base+'/multiplayer')).url,f.base+'/multiplayer/');
+  assert.equal((await fetch(f.base+'/multiplayer/setup-controls.mjs')).status,200);
+  assert.equal((await fetch(f.base+'/private.txt')).status,404);
+  assert.equal((await f.request('/api/config')).status,200);
+});
+test("site manifest cannot expose a file outside its directory", async t => {
+  const root=await mkdtemp(join(tmpdir(),'sargasso-containment-'));
+  const outside=await mkdtemp(join(tmpdir(),'sargasso-outside-'));
+  t.after(()=>Promise.all([rm(root,{recursive:true,force:true}),rm(outside,{recursive:true,force:true})]));
+  await writeFile(join(outside,'secret.txt'),'secret');
+  await symlink(join(outside,'secret.txt'),join(root,'index.html'));
+  await writeFile(join(root,'site.json'),JSON.stringify({format:'starwolf64-wasm-site-v1',files:{'index.html':{}}}));
+  const f=await fixture(t,{siteDir:root});
+  await assert.rejects(f.prepare(),/escapes/);
 });

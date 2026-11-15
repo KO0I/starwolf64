@@ -1,20 +1,19 @@
+let meshRequest;
+function loadMeshes(){return meshRequest??=fetch(new URL("./ship-wireframes.json",import.meta.url)).then(response=>{if(!response.ok)throw Error("Ship geometry unavailable");return response.json();}).catch(error=>{meshRequest=null;throw error;});}
 export class ShipPreview {
   constructor(canvas,caption) {
     this.canvas=canvas; this.caption=caption; this.context=canvas.getContext('2d');
     this.meshes=null; this.ship=null; this.frames=0; this.frame=null; this.visible=false;
     this.motion=matchMedia('(prefers-reduced-motion: reduce)');
-    this.motion.addEventListener('change',()=>this.update());
-    document.addEventListener('visibilitychange',()=>this.update());
-    new ResizeObserver(()=>this.draw(performance.now())).observe(canvas);
-    new IntersectionObserver(entries=>{this.visible=entries[0].isIntersecting;this.update();}).observe(canvas);
-    this.loaded=fetch(new URL('./ship-wireframes.json',import.meta.url)).then(response=>{
-      if(!response.ok)throw Error('Ship geometry unavailable');
-      return response.json();
-    }).then(meshes=>{this.meshes=meshes;this.update();}).catch(()=>{
-      this.caption.textContent='Ship preview unavailable. Your selection is still saved.';
-    });
+    this.refresh=()=>this.update();
+    this.motion.addEventListener('change',this.refresh);
+    document.addEventListener('visibilitychange',this.refresh);
+    this.resizeObserver=new ResizeObserver(()=>this.draw(performance.now()));this.resizeObserver.observe(canvas);
+    this.intersectionObserver=new IntersectionObserver(entries=>{if(this.destroyed)return;this.visible=entries[0].isIntersecting;this.update();});this.intersectionObserver.observe(canvas);
+    this.loaded=loadMeshes().then(meshes=>{if(this.destroyed)return;this.meshes=meshes;this.update();}).catch(()=>{if(!this.destroyed)this.caption.textContent='Ship preview unavailable. Your selection is still saved.';});
   }
   select(ship,name,color) {
+    if(this.destroyed || this.ship===ship && this.color===color && this.name===name)return;
     this.ship=ship;this.color=color;this.name=name;
     this.canvas.setAttribute('aria-label',name+' wireframe preview');
     if(this.meshes)this.caption.textContent=name+' / WIREFRAME';
@@ -24,7 +23,9 @@ export class ShipPreview {
     return {ship:this.ship,frames:this.frames,edges:this.meshes?.[this.ship]?.edges.length||0,
       animated:this.frame!==null,ready:Boolean(this.meshes?.[this.ship])};
   }
+  destroy(){if(this.destroyed)return;this.destroyed=true;if(this.frame!==null)cancelAnimationFrame(this.frame);this.frame=null;this.resizeObserver.disconnect();this.intersectionObserver.disconnect();this.motion.removeEventListener("change",this.refresh);document.removeEventListener("visibilitychange",this.refresh);}
   update() {
+    if(this.destroyed)return;
     if(this.frame!==null)cancelAnimationFrame(this.frame);
     this.frame=null;
     this.draw(performance.now());
@@ -37,6 +38,7 @@ export class ShipPreview {
     }
   }
   draw(time) {
+    if(this.destroyed)return;
     const mesh=this.meshes?.[this.ship];
     if(!mesh||!this.context)return;
     const width=this.canvas.clientWidth,height=this.canvas.clientHeight;

@@ -9,7 +9,7 @@ export function checksum(bytes) {
 }
 export function worldFrames(bytes) {
   const a = new Uint8Array(bytes);
-  if (a.length < 40 || a.length > MAX_WORLD) throw Error('Invalid scene size');
+  if (a.length < 88 || a.length > MAX_WORLD) throw Error('Invalid scene size');
   const scene = new DataView(a.buffer, a.byteOffset, a.byteLength), count = Math.ceil(a.length / CHUNK),
         sum = checksum(a);
   return Array.from({length: count}, (_, index) => {
@@ -33,7 +33,7 @@ export class WorldReceiver {
     const v = new DataView(frame),
           [magic, match, epoch, tick, index, count, length, sum] =
               Array.from({length: 8}, (_, i) => v.getUint32(i * 4, true));
-    if (magic !== WORLD_MAGIC || !match || !epoch || !tick || length < 40 || length > MAX_WORLD ||
+    if (magic !== WORLD_MAGIC || !match || !epoch || !tick || length < 88 || length > MAX_WORLD ||
         count !== Math.ceil(length / CHUNK) || index >= count ||
         frame.byteLength !== 32 + Math.min(CHUNK, length - index * CHUNK))
       throw Error('Invalid scene chunk');
@@ -53,7 +53,7 @@ export class WorldReceiver {
     this.pending = null;
     const scene = new DataView(bytes.buffer);
     if (checksum(bytes) !== sum || scene.getUint32(0, true) !== 0x53434e31 ||
-        scene.getUint32(4, true) !== 1 || scene.getUint32(8, true) !== match ||
+        scene.getUint32(4, true) !== 2 || scene.getUint32(8, true) !== match ||
         scene.getUint32(12, true) !== epoch || scene.getUint32(16, true) !== tick)
       throw Error('Corrupt scene image');
     this.lastTick = tick;

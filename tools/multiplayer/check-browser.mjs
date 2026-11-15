@@ -194,6 +194,21 @@ try {
       s.setup.match.rules === 'time' && s.setup.members.filter(member => member.selection?.pilot === 'wolf').length === 2;
   });
   report.assertions['late guest receives current selections and map'] = true;
+  for(const p of [host,guest1,guest2]) {
+    await wait(p.label+' confirmed roster wireframes',()=>value(p,`(()=>{
+      const setup=window.STARWOLF_MP.state.setup;
+      return setup.members.filter(m=>m.selection).every(member=>{
+        const card=[...document.querySelectorAll('#peers .squadron-card')].find(card=>card.dataset.peer===member.peer);
+        const canvas=card?.querySelector('canvas'),image=card?.querySelector('img'),ctx=canvas?.getContext('2d');
+        if(!ctx || !image.complete || !image.naturalWidth || canvas.hidden)return false;
+        const colors=['#e7e0ff','#ffcf51','#79e98e','#7cf4ff','#8da7ff','#ce98ff','#ff94c5','#ffa16a'];
+        if(ctx.strokeStyle!==colors[member.selection.hue])return false;
+        return ctx.getImageData(0,0,canvas.width,canvas.height).data.some((v,i)=>i%4===3&&v>0);
+      });
+    })()`));
+  }
+  assert(true,'all peers see confirmed portraits and hue-colored roster wireframes');
+
   await wait('radio images loaded',async () => value(host, `[...document.querySelectorAll('#pilot-cards img')].every(img => img.complete && img.naturalWidth === 44 && img.naturalHeight === 44)`));
   assert(await value(host, `document.querySelectorAll('#pilot-cards img').length === 11 && document.getElementById('pilot-vitzy').disabled && document.getElementById('pilot-vitzy').parentElement.textContent.includes('portrait pending')`),
     'real radio portraits and unavailable Vitzy card displayed',null);

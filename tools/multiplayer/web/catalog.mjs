@@ -96,3 +96,8 @@ export function validSetup(value) {
   const selected = value.members.map(member => member.selection).filter(Boolean);
   return new Set(selected.map(selection => selection.pilot + ':' + selection.hue)).size === selected.length;
 }
+
+export function nativeLoadout(selection) {
+  if(!validAcceptedSelection(selection))throw Error('Confirm your pilot, ship and hue first.');
+  return {pilot:PILOTS.indexOf(pilotById(selection.pilot)),ship:VEHICLES.indexOf(vehicleById(selection.vehicle)),rgb:parseInt(hueById(selection.hue).color.slice(1),16)};
+}

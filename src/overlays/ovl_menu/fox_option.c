@@ -972,11 +972,11 @@ void Option_MainMenu_Update(void) {
             }
 
             if (gControllerPress[gMainController].button & (A_BUTTON | START_BUTTON)) {
-#if DEBUG_VERSUS == 0
-                if (sMainMenuCursor == 2) {
+                if (sMainMenuCursor == OPTION_VERSUS) {
+                    AUDIO_PLAY_SFX(NA_SE_ARWING_DECIDE, gDefaultSfxSource, 4);
+                    Game_OpenMultiplayer();
                     break;
                 }
-#endif
                 AUDIO_PLAY_SFX(NA_SE_ARWING_DECIDE, gDefaultSfxSource, 4);
                 sLightningYpos = sOptionCardPosY[sMainMenuCursor];
                 sDrawCursor = false;
@@ -3642,6 +3642,13 @@ void Option_CardLightning_Draw(void) {
 
 void Option_DrawCardLabel(OptionCardTexture tex) {
     if (!(tex.xScale <= 0.0f) && !(tex.yScale <= 0.0f)) {
+        if (tex.texture == aVsCardTex) {
+            RCP_SetupDL(&gMasterDisp, SETUPDL_76_OPTIONAL);
+            gDPSetPrimColor(gMasterDisp++,0,0,tex.red,tex.green,tex.blue,tex.alpha);
+            Graphics_DisplaySmallText(tex.xPos+(32.0f-79.2f)*tex.xScale*0.5f,tex.yPos,
+                                      tex.xScale*0.9f,tex.yScale,"MULTIPLAYER");
+            return;
+        }
         switch (tex.type) {
             case 1:
                 RCP_SetupDL(&gMasterDisp, SETUPDL_78_OPTIONAL);

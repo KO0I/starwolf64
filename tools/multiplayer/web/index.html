@@ -9,9 +9,10 @@
   <link rel="stylesheet" href="./styles.css">
 </head>
 <body id="top">
-  <div class="banner"><span>UNDER CONSTRUCTION // MULTIPLAYER CONNECTION TEST</span></div>
+  <div class="banner"><span>SARGASSO HIDEOUT // MULTIPLAYER</span></div>
   <nav class="topnav" aria-label="Site navigation">
-    <a href="#setup">Pilot sign-in</a>
+    <a href="/">A Wolf In Space</a>
+    <a href="#setup">Host / Join</a>
     <a href="#pilot-panel">Pilot select</a>
     <a href="#room">Squadron</a>
     <a href="#proof">Link test</a>
@@ -19,11 +20,11 @@
   <div class="news-strip">*** TRANSMISSION: HOST A ROOM. SHARE THE CODE. CALL YOUR WINGMATES. ***</div>
   <main>
     <header>
-      <h1 class="logo">STARWOLF 64</h1>
-      <span class="badge">SARGASSO HIDEOUT</span>
+      <h1 class="logo">SARGASSO HIDEOUT</h1>
+      <span class="badge">A WOLF IN SPACE // MULTIPLAYER</span>
     </header>
     <h2 class="subtitle">One browser hosts. Friends join the room.</h2>
-    <p class="intro">Welcome to the Lylat underground. Pick a callsign, open a room, and give your wingmates the code. Choose your pilot and match, and check the connection with your wingmates. Shared gameplay is the next integration step.</p>
+    <p class="intro">Choose your crew, tune your fighter, and meet your wingmates. One browser hosts the world; everyone gets their own view.</p>
     <hr class="star-rule">
     <section id="setup" class="setup" aria-labelledby="setup-title">
       <h2 id="setup-title" class="panel-title">01 // PILOT SIGN-IN <small>&lt; JOIN THE PACK &gt;</small></h2>
@@ -38,13 +39,38 @@
         <input id="code" placeholder="Room code" maxlength="16" autocapitalize="characters" autocomplete="off" spellcheck="false">
         <button id="join">Join room</button>
       </div>
+      <p class="connection-steps"><em>Hosting: open a room, share its code, choose a mode and confirm your pilot, ship and hue. Prepare the game, then launch.<br>Joining: enter the host's room code, confirm your pilot, ship and hue, then prepare and join. WebRTC connects your browser to the host; keep this page open. Use the same build and stay on the tailnet.</em></p>
     </section>
-    <p id="notice" role="alert" hidden></p>
+    <p id="notice"  role="alert" hidden></p>
+    <div id="selection-screen">
+    <section id="match-panel" aria-labelledby="match-title" hidden>
+      <h2 id="match-title" class="panel-title">MISSION SELECT</h2>
+      <p id="match-summary" role="status" aria-live="polite"></p>
+      <form id="match-form">
+        <div class="mode-choices" role="group" aria-label="Multiplayer mode">
+          <button id="choose-versus" type="button" aria-pressed="true"><strong>Classic VS</strong><small>Fight your wingmates on the battle maps.</small></button>
+          <button id="choose-campaign" type="button" aria-pressed="false"><strong>Main game co-op</strong><small>Four total pilots. Host chooses the story map; guests fly along. Engine integration pending.</small></button>
+        </div>
+        <label for="mode">Mode</label>
+        <select id="mode"><option value="versus">Classic VS</option><option value="campaign">Main game co-op / host-led story</option></select>
+        <div id="vs-fields" class="match-fields">
+          <div><label for="map">Map</label><select id="map"></select></div>
+          <div><label for="rules">Match type</label><select id="rules"></select></div>
+        </div>
+        <div id="campaign-fields" class="match-fields" hidden>
+          <div><label for="crew">One crew for co-op</label><select id="crew"><option value="star_fox">Star Fox / Arwing + signature ships</option><option value="star_wolf">Star Wolf / Wolfen + signature ships</option></select></div>
+        </div>
+        <button id="save-match" type="submit">Save match settings</button>
+      </form>
+      <p class="game-readiness">Corneria Points is the current playable battle route. Co-op uses one host-led story and at most four pilots; story-stage replication and selected ship models still need engine integration.</p>
+    </section>
     <section id="pilot-panel" aria-labelledby="pilot-title" hidden>
-      <h2 id="pilot-title" class="panel-title">02 // PILOT, VEHICLE &amp; HUE</h2>
+      <h2 id="pilot-title" class="panel-title">02 // SELECT YOUR PILOT</h2>
+      <button id="enter-selection" type="button">Full-screen pilot select</button>
+      <p class="connection-steps"><em>Arrow keys choose a pilot. On a standard controller, use the D-pad to select, A to confirm, shoulder buttons to move between pilot, ship and hue, and B to return to host/join controls.</em></p>
       <p id="crew-rule"></p>
       <form id="loadout-form">
-        <fieldset><legend>Choose a pilot / radio portrait</legend><div id="pilot-cards" class="pilot-grid"></div></fieldset>
+        <fieldset><legend>Crew roster</legend><div id="pilot-cards" class="pilot-grid"></div></fieldset>
         <div class="loadout-editor">
           <div class="pilot-preview-frame">
             <img id="pilot-preview" width="132" height="132" alt="">
@@ -54,7 +80,7 @@
           <div class="loadout-controls">
             <figure class="ship-preview-frame"><canvas id="ship-preview" role="img" aria-label="Selected ship wireframe"></canvas><figcaption id="ship-preview-caption">Loading ship geometry…</figcaption></figure>
             <label for="vehicle">Starting vehicle</label><select id="vehicle"></select>
-            <p class="selection-note">Aircraft first. Tank and on-foot play come later.</p>
+            <p class="selection-note">Aircraft first. These are confirmed loadout previews; the current engine still uses the shared fighter model. Tank and on-foot play come later.</p>
             <fieldset><legend>Preferred hue</legend><div id="hue-options" class="hue-options"></div></fieldset>
             <button id="save-pilot" type="submit" class="primary">Confirm pilot</button>
           </div>
@@ -71,32 +97,17 @@
       <p id="status" role="status" aria-live="polite">Create a room, or enter a friend's code.</p>
       <ul id="peers" aria-label="Players"></ul>
     </section>
-    <section id="match-panel" aria-labelledby="match-title" hidden>
-      <h2 id="match-title" class="panel-title">04 // MAP OR MAIN GAME</h2>
-      <p id="match-summary" role="status" aria-live="polite"></p>
-      <form id="match-form">
-        <label for="mode">Game</label>
-        <select id="mode"><option value="versus">Versus maps</option><option value="campaign">Main game / co-op</option></select>
-        <div id="vs-fields" class="match-fields">
-          <div><label for="map">Map</label><select id="map"></select></div>
-          <div><label for="rules">Match type</label><select id="rules"></select></div>
-        </div>
-        <div id="campaign-fields" class="match-fields" hidden>
-          <div><label for="crew">One crew for co-op</label><select id="crew"><option value="star_fox">Star Fox / Arwing + signature ships</option><option value="star_wolf">Star Wolf / Wolfen + signature ships</option></select></div>
-        </div>
-        <button id="save-match" type="submit">Save match settings</button>
-      </form>
-      <p class="game-readiness">Playable bridge: Corneria Points, four players, one full-screen view each. Other maps and campaign remain setup choices for future integration. Pilot, aircraft and hue choices are saved; this engine build currently uses the mod aircraft and native slot appearances.</p>
-    </section>
+    </div>
     <section id="game-panel" aria-labelledby="game-title">
-      <h2 id="game-title" class="panel-title">05 // LAUNCH BAY</h2>
+      <h2 id="game-title" class="panel-title">04 // LAUNCH BAY</h2>
       <p>Host a room, save Corneria / Points, prepare the game, then start. Guests can prepare and join while the host flies.</p>
       <p>Arrow keys or WASD steer. Z or Space fires. X drops a bomb. Shift boosts, Ctrl brakes, Q and E roll.</p>
       <button id="prepare-game">Prepare game</button><button id="launch-game" disabled>Start game</button>
+      <p id="launch-availability" role="status"></p>
       <p id="game-status" role="status">Game is not loaded.</p>
       <div id="game-container"></div>
     </section>
-    <section id="proof"  class="proof" aria-labelledby="proof-title">
+    <details id="proof" class="proof"><summary>Connection diagnostics</summary>
       <h2 id="proof-title" class="panel-title">05 // SUBSPACE LINK TEST</h2>
       <p>A guest sends a control sample to the host. The host sends a world snapshot back to every connected guest.</p>
       <div class="actions">
@@ -104,12 +115,13 @@
         <button id="send-state" disabled>Send world snapshot</button>
       </div>
       <ol id="events" aria-label="Received messages" aria-live="polite"><li class="empty">Messages will appear here after a connection opens.</li></ol>
-    </section>
+    </details>
     <footer>
       <div class="site-ring">
         <strong>THE LYLAT FLIGHT CLUB</strong>
         <a href="#top">Back to top</a> |
-        <a href="#setup">Pilot sign-in</a> |
+        <a href="/">A Wolf In Space</a>
+    <a href="#setup">Host / Join</a> |
         <a href="#room">Squadron</a> |
         <a href="#proof">Link test</a>
       </div>

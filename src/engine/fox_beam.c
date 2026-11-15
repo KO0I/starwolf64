@@ -1,4 +1,5 @@
 #include "global.h"
+#include "sf64net.h"
 #include "assets/vitzy_fighter.h"
 #include "assets/ast_landmaster.h"
 #include "assets/ast_aquas.h"
@@ -1202,8 +1203,11 @@ void PlayerShot_DrawLaser(PlayerShot* shot) {
             }
         }
     } else {
+        uint32_t rgb;
         RCP_SetupDL_64();
-        switch (shot->sourceId) {
+        if(Net_LoadoutColor(shot->sourceId,&rgb)){
+            gDPSetPrimColor(gMasterDisp++,0,0,(rgb>>16)&255,(rgb>>8)&255,rgb&255,255);
+        }else switch (shot->sourceId) {
             case 0:
                 gDPSetPrimColor(gMasterDisp++, 0x00, 0x00, 255, 255, 32, 255);
                 break;
@@ -1300,7 +1304,10 @@ void PlayerShot_DrawShot(PlayerShot* shot) {
                     }
                     RCP_SetupDL(&gMasterDisp, SETUPDL_49);
                     gDPSetPrimColor(gMasterDisp++, 0x00, 0x00, 255, 255, 255, 255);
-                    if (gVersusMode) {
+                    uint32_t rgb;
+                    if(Net_LoadoutColor(shot->sourceId,&rgb)){
+                        gDPSetEnvColor(gMasterDisp++,(rgb>>16)&255,(rgb>>8)&255,rgb&255,255);
+                    }else if (gVersusMode) {
                         switch (shot->sourceId) {
                             case 0:
                                 gDPSetEnvColor(gMasterDisp++, 255, 255, 32, 128);
@@ -1462,7 +1469,10 @@ void PlayerShot_DrawShot(PlayerShot* shot) {
                     Matrix_Scale(gGfxMatrix, 20.0f, 20.0f, 20.0f, MTXF_APPLY);
                     RCP_SetupDL(&gMasterDisp, SETUPDL_49);
                     gDPSetPrimColor(gMasterDisp++, 0x00, 0x00, 255, 255, 255, 255);
-                    if (gVersusMode) {
+                    uint32_t rgb;
+                    if (Net_LoadoutColor(shot->sourceId, &rgb)) {
+                        gDPSetEnvColor(gMasterDisp++, (rgb >> 16) & 255, (rgb >> 8) & 255, rgb & 255, 255);
+                    } else if (gVersusMode) {
                         switch (shot->sourceId) {
                             case 0:
                                 gDPSetEnvColor(gMasterDisp++, 255, 255, 32, 255);

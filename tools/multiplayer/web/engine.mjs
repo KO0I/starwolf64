@@ -123,7 +123,7 @@ export class WasmEngine extends EventTarget {
     this.poll();
     return this.state;
   }
-  start({role, matchId, epoch, slot}) {
+  start({role, matchId, epoch, slot, loadout}) {
     this.check();
     if (!this.prepared) throw Error('Prepare game first');
     if (this.starting) return this.starting;
@@ -134,7 +134,7 @@ export class WasmEngine extends EventTarget {
     if (!r || r === 1 && slot !== 0) throw Error('Invalid role');
     this.match = {role: r, matchId, epoch, slot};
     this.frame.contentWindow.document.getElementById('launch').click();
-    return this.starting = this.command(1, [r, matchId, epoch, slot, 0, 0]).then(async () => {
+    return this.starting = (r===1?this.setLoadout(slot,1,loadout):Promise.resolve()).then(()=>this.command(1,[r,matchId,epoch,slot,0,0])).then(async () => {
       await this.wait(
           () => this.state.ready && this.state.matchId === matchId, 'Stage initialization', 90000);
       return this.state;
@@ -163,8 +163,9 @@ export class WasmEngine extends EventTarget {
     this.commands = task.catch(() => {});
     return task;
   }
-  activate(slot, incarnation) {
-    return this.command(2, [integer(slot, 1, 3), integer(incarnation, 1, 0xffffffff)]);
+  setLoadout(slot,incarnation,loadout){if(!loadout)return Promise.reject(Error("Confirmed loadout required"));return this.command(5,[integer(slot,0,3),integer(incarnation,1,0xffffffff),integer(loadout.pilot,0,255),integer(loadout.ship,0,255),integer(loadout.rgb,0,0xffffff)]);}
+  activate(slot, incarnation, loadout) {
+    return this.setLoadout(slot,incarnation,loadout).then(()=>this.command(2, [integer(slot, 1, 3), integer(incarnation, 1, 0xffffffff)]));
   }
   remove(slot, incarnation) {
     return this.command(3, [integer(slot, 1, 3), integer(incarnation, 1, 0xffffffff)]);
@@ -174,23 +175,26 @@ export class WasmEngine extends EventTarget {
       integer(v.slot, 0, 3), integer(v.incarnation, 1, 0xffffffff), integer(v.seq, 0, 0xffffffff),
       integer(v.buttons, 0, 65535), integer(v.stickX, -85, 85), integer(v.stickY, -85, 85)
     ];
-    const old = this.pendingInputs.get(v.slot);
+    const key = v.slot + ':' + v.incarnation;
+    const old = this.pendingInputs.get(key);
     if (old) {
       old.args = args;
       return old.promise;
     }
     const item = {args};
-    this.pendingInputs.set(v.slot, item);
+    this.pendingInputs.set(key, item);
     item.promise = this.command(4, () => {
-      this.pendingInputs.delete(v.slot);
+      this.pendingInputs.delete(key);
       return item.args;
+    }).finally(() => {
+      if (this.pendingInputs.get(key) === item) this.pendingInputs.delete(key);
     });
     return item.promise;
   }
   sceneTick(bytes) {
     const v = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
-    if (bytes.length < 40 || bytes.length > CAP || v.getUint32(0, true) !== 0x53434e31 ||
-        v.getUint32(4, true) !== 1 || v.getUint32(8, true) !== this.match?.matchId ||
+    if (bytes.length < 88 || bytes.length > CAP || v.getUint32(0, true) !== 0x53434e31 ||
+        v.getUint32(4, true) !== 2 || v.getUint32(8, true) !== this.match?.matchId ||
         v.getUint32(12, true) !== this.match?.epoch)
       throw Error('Wrong scene identity');
     return v.getUint32(16, true);
@@ -277,7 +281,7 @@ export class WasmEngine extends EventTarget {
       if (this.match?.role === 1 && Atomics.compareExchange(h, 13, 1, 2) === 1) {
         try {
           const n = Atomics.load(h, 14);
-          if (n < 40 || n > CAP) throw Error('Invalid scene export');
+          if (n < 88 || n > CAP) throw Error('Invalid scene export');
           const bytes = this.output.slice(0, n);
           this.emit('scene', {tick: this.sceneTick(bytes), bytes: bytes.buffer});
         } finally {

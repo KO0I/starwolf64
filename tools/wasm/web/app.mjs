@@ -105,3 +105,8 @@ try {
     } else {status('selecting','Choose your ROM to prepare the game.');$('rom').disabled=false;}
   }
 } catch(error) {fail(error);}
+
+window.addEventListener('message',event=>{
+  if(event.origin!==location.origin || event.source!==frame?.contentWindow || event.data?.type!=='starwolf-open-multiplayer')return;
+  location.assign(new URL('multiplayer/',base).href);
+});
