@@ -1,9 +1,9 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Play Starwolf64</title>
+<title>A Wolf In Space</title>
 <meta name="description" content="Play Starwolf64 in your browser. Choose your Star Fox 64 US v1.1 ROM to launch the game.">
 <meta property="og:type" content="website">
-<meta property="og:title" content="Play Starwolf64">
+<meta property="og:title" content="A Wolf In Space">
 <meta property="og:description" content="Play Starwolf64 in your browser. Choose your Star Fox 64 US v1.1 ROM to launch the game.">
 <meta property="og:url" content="https://play.starwolf64.com/">
 <meta property="og:image" content="https://play.starwolf64.com/runtime/launch-background.jpg">
@@ -12,7 +12,7 @@
 <meta property="og:image:height" content="960">
 <meta property="og:image:alt" content="Kami, Krystal, Panther and Wolf at sunset">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Play Starwolf64">
+<meta name="twitter:title" content="A Wolf In Space">
 <meta name="twitter:description" content="Play Starwolf64 in your browser. Choose your Star Fox 64 US v1.1 ROM to launch the game.">
 <meta name="twitter:image" content="https://play.starwolf64.com/runtime/launch-background.jpg">
 <meta name="twitter:image:alt" content="Kami, Krystal, Panther and Wolf at sunset">
@@ -115,9 +115,7 @@ body.club-player { display:flow-root; }
 }
 .club-player #setup > header { display:flex; flex-direction:column; text-align:center; gap:8px; letter-spacing:0; }
 .club-player #setup .club-logo { display:block; margin:5px 0 8px; font-size:clamp(32px,7.8vw,76px); line-height:1.12; letter-spacing:-3px; }
-.club-player #setup header span { display:inline-block; border-radius:0; padding:4px 12px; font-size:11px; letter-spacing:2px; }
-.club-player #headline { color:#fff; font:bold 22px/1.25 Georgia,serif; text-align:center; margin:20px 0 12px; letter-spacing:0; }
-.club-player #intro { color:#f1edff; text-align:center; font-size:16px; }
+.club-player #intro { color:#f1edff; text-align:center; font-size:13px; font-style:italic; }
 .club-player #setup section { border:3px ridge #b6b4d0; border-radius:0; background:#10102f; padding:18px; box-shadow:3px 3px #000; }
 .club-player #setup label { color:#fff5a3; font:bold 14px "Courier New",monospace; }
 .club-player #setup input { padding:10px; max-width:100%; }
@@ -164,7 +162,6 @@ body.club-player { display:flow-root; }
 @media (max-width:550px) {
   .club-player #setup { width:calc(100% - 16px); padding:18px 14px 14px; margin:8px auto; }
   .club-player #setup .club-logo { letter-spacing:-1px; }
-  .club-player #setup header span { font-size:10px; letter-spacing:1px; }
   .club-player #setup section { padding:14px; }
   .club-player #actions { display:grid; grid-template-columns:minmax(0,1fr); }
   .club-player #setup input { font-size:16px; }
@@ -173,8 +170,7 @@ body.club-player { display:flow-root; }
 
 </style>
 </head><body class="flight-club club-player">
-<main id="setup"><header><strong class="club-logo">STARWOLF 64</strong> <span class="club-badge">BROWSER EDITION</span></header>
-<h1 id="headline">Play Starwolf64.</h1>
+<main id="setup"><header><h1 class="club-logo">A Wolf In Space</h1></header>
 <p id="intro">Choose your Star Fox 64 US v1.1 ROM. The game and mod are prepared on this device.</p>
 <img id="splash" src="./runtime/launch-background.jpg" width="1280" height="960" alt="Starwolf crew" draggable="false">
 <section><div id="picker"><label for="rom">Choose ROM</label><input id="rom" type="file" accept=".z64,.v64,.n64,.zip" disabled>
