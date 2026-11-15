@@ -108,10 +108,16 @@ body.club-editor { --bg:#030310; --panel:#10102f; --line:#6c658b; --text:#f1edff
 .club-editor #flight-camera-fields { background:#10102f; border-color:#b6b4d0; box-shadow:4px 4px #000a; }
 .club-editor .notes h3 { color:#f1cdf9; }
 /* ROM preparation page. */
-body.club-player { display:flow-root; }
+body.club-player {
+  display:flow-root;
+  background-color:#000;
+  background-image:var(--club-stars),linear-gradient(to bottom,#000 0%,#230c5c 22%,#8e1e65 42%,#ed8428 62%,#aa2427 80%,#000 100%);
+  background-size:211px 223px,283px 197px,173px 239px,307px 271px,157px 181px,100% 100%;
+  background-repeat:repeat,repeat,repeat,repeat,repeat,no-repeat;
+}
 .club-player #setup {
   width:min(860px,calc(100% - 24px)); max-width:860px; margin:14px auto; padding:22px 28px 16px;
-  background:#030318f0; border:4px ridge #9891ba; box-shadow:5px 5px #000;
+  background:#03031899; border:4px ridge #9891ba; box-shadow:5px 5px #000;
 }
 .club-player #setup > header { display:flex; flex-direction:column; text-align:center; gap:8px; letter-spacing:0; }
 .club-player #setup .club-logo { display:block; margin:5px 0 8px; font-size:clamp(32px,7.8vw,76px); line-height:1.12; letter-spacing:-3px; }
