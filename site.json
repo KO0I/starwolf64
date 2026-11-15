@@ -9,8 +9,8 @@
   "modAssetSetSha256": "2a874f6090b1a37b3cb8118842021366a47e06dbdb92c63164f30f8c582bcd65",
   "files": {
     "index.html": {
-      "size": 16496,
-      "sha256": "855a5a7e893d07450278aec62854fee3f4953391eccad4e90bb84f9fbb3b6e51"
+      "size": 28143,
+      "sha256": "f11d149004b011554ce3eacb19889280e427aa19ebc4d1713be0f57272e0c631"
     },
     "app.mjs": {
       "size": 6108,
@@ -45,8 +45,8 @@
       "sha256": "35c78660956d6e6980f1d03650eb3c2ba2753cac3ad9cd0ffea97f13f50313fc"
     },
     "runtime/Starship.html": {
-      "size": 33352,
-      "sha256": "a875919e34402b96a86301ec4a7b2c0a557716d54494d3225765213d07ec4c56"
+      "size": 45087,
+      "sha256": "1325b6f2d8682fade65d99a594b57416bdc9b837ca484d6caedc9ffa4ffdaaed"
     },
     "runtime/Starship.js": {
       "size": 1114108,
@@ -127,6 +127,10 @@
     "licenses/characters/Vitzy_README.md": {
       "size": 1432,
       "sha256": "52b2853c79bd9b5847b4495940e12870bb8b33312ed8dec8eed89dca859878d8"
+    },
+    "licenses/Arwing.txt": {
+      "size": 256,
+      "sha256": "912fa4d418da6fc5e9db01966171ca13c69e22c4725a2bcbccf48b55072062ea"
     }
   },
   "download": [
@@ -151,6 +155,7 @@
     "README.txt",
     "licenses/characters/CREDITS.md",
     "licenses/characters/README_TheRegressor.txt",
-    "licenses/characters/Vitzy_README.md"
+    "licenses/characters/Vitzy_README.md",
+    "licenses/Arwing.txt"
   ]
 }
