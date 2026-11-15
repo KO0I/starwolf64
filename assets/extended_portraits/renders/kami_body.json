@@ -1,0 +1,13 @@
+{
+  "source": "kami_body.glb",
+  "source_sha256": "41f32bc0d530304ac50978624457a16b7befcf809fae50ffe57d784e77fe1c78",
+  "yaw": 0,
+  "pitch": 0,
+  "bones": [],
+  "size": [
+    360,
+    420
+  ],
+  "crop": null,
+  "sha256_png": "0fcdd5e53fd68ad10ded21b54e3b9478f9928787dc0a69e2269898749954f4db"
+}

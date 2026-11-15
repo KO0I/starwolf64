@@ -1,4 +1,5 @@
 #include "Engine.h"
+#include <algorithm>
 #include "ui/ImguiUI.h"
 #include "StringHelper.h"
 
@@ -105,6 +106,7 @@ GameEngine::GameEngine() {
         archiveFiles.push_back(assets_path);
     }
 
+    std::vector<std::string> patchArchives;
     if (const std::string patches_path = Ship::Context::GetPathRelativeToAppDirectory("mods");
         !patches_path.empty()) {
         if (!std::filesystem::exists(patches_path)) {
@@ -115,16 +117,19 @@ GameEngine::GameEngine() {
             for (const auto& p : std::filesystem::recursive_directory_iterator(patches_path)) {
                 const auto ext = p.path().extension().string();
                 if (StringHelper::IEquals(ext, ".otr") || StringHelper::IEquals(ext, ".o2r")) {
-                    archiveFiles.push_back(p.path().generic_string());
+                    patchArchives.push_back(p.path().generic_string());
                 }
 
                 if (StringHelper::IEquals(ext, ".zip")) {
                     SPDLOG_WARN("Zip files should be only used for development purposes, not for distribution");
-                    archiveFiles.push_back(p.path().generic_string());
+                    patchArchives.push_back(p.path().generic_string());
                 }
             }
         }
     }
+
+    std::sort(patchArchives.begin(), patchArchives.end());
+    archiveFiles.insert(archiveFiles.end(), patchArchives.begin(), patchArchives.end());
 
     this->context->InitConfiguration();    // without this line InitConsoleVariables fails at Config::Reload()
     this->context->InitConsoleVariables(); // without this line the controldeck constructor failes in

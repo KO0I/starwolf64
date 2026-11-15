@@ -911,6 +911,10 @@ void ItemGoldRing_Draw(ItemGoldRing* this) {
 }
 
 void ItemBomb_Draw(ItemBomb* this) {
+    if (this->isMultilock) {
+        Multilock_DrawItem(this);
+        return;
+    }
     if (gCurrentLevel == LEVEL_AQUAS) {
         Graphics_SetScaleMtx(this->width);
         gSPDisplayList(gMasterDisp++, D_blue_marine_3005980);
@@ -1177,6 +1181,7 @@ void Actor_DrawOnRails(Actor* this) {
             if ((this->lockOnTimers[TEAM_ID_FOX] != 0) && (gReflectY > 0)) {
                 sp34.y += this->info.targetOffset;
                 Matrix_MultVec3f(gGfxMatrix, &sp34, &gLockOnTargetViewPos[TEAM_ID_FOX]);
+                this->lockOnViewPos = gLockOnTargetViewPos[TEAM_ID_FOX];
                 if (gLockOnTargetViewPos[TEAM_ID_FOX].z > -200.0f) {
                     this->lockOnTimers[TEAM_ID_FOX] = 0;
                 }
@@ -1290,6 +1295,7 @@ void Actor_DrawAllRange(Actor* this) {
         if (this->lockOnTimers[playerNum] != 0) {
             gLockOnTargetViewPos[playerNum] = sViewPos;
             gLockOnTargetViewPos[playerNum].y += this->info.targetOffset;
+            this->lockOnViewPos = gLockOnTargetViewPos[playerNum];
             if ((playerNum == gPlayerNum) && (gLockOnTargetViewPos[playerNum].z > -300.0f)) {
                 this->lockOnTimers[playerNum] = 0;
             }

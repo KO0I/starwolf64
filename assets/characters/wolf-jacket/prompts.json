@@ -1,0 +1,25 @@
+{
+  "tool": "Built-in image_gen.imagegen",
+  "style": "Low-detail N64 hand-painted textures",
+  "leather": {
+    "prompt": "Repaint this black-violet leather material as a VERY SIMPLE NINTENDO 64 ERA GAME TEXTURE. Keep the dark black-purple color family, but completely remove the photographic pebbled grain and fine noise. Design a seamless 32 by 32 pixel texture tile, shown enlarged with crisp nearest-neighbor square pixels. Use only four flat colors: almost-black violet, dark aubergine, muted dark violet, and a small amount of dull lavender-gray highlight. Mostly broad quiet dark areas with just a few chunky two-to-four-pixel angular creases and highlights that hint at leather. No tiny speckles, no fine grain, no realism, no gradients inside pixels, no woven pattern, no soft airbrushing, no text, no garment parts, no border. A simple hand-painted low-poly game material, not a checkerboard and not a photo. Fill the whole square with the tile.",
+    "source": "texture-sources/black-violet-leather.png",
+    "asset": "textures/black-violet-leather.png",
+    "refinement": "Simplify ONLY the leather pattern in this low-poly texture. Keep a seamless enlarged 32-by-32-pixel game tile in dark black-violet, but remove the large zigzag veins and camouflage-like patches. Make at least 90 percent of the tile quiet, nearly uniform midnight aubergine. Use only four LOW-CONTRAST flat colors: RGB about 25,15,30; 32,20,37; 40,27,45; and a very sparse muted highlight of 51,37,56. Only two or three tiny short angular crease highlights, each just one to three pixels, hint at worn leather. No broad crack network, no stripes, no large patches, no fine grain, no noise, no photographic detail, no text or borders. Subtle and understated low-resolution N64 leather. Large crisp square pixel cells, flat color inside each cell."
+  },
+  "wool": {
+    "prompt": "Repaint this eggshell-white wool material as a VERY SIMPLE NINTENDO 64 ERA GAME TEXTURE. Remove all photographic hair, fine fiber detail, shading noise and soft fuzzy edges. Make a seamless 32 by 32 pixel tile shown enlarged with crisp nearest-neighbor square pixels, using only six flat ivory, eggshell-white and pale warm-gray colors. Suggest short sheep-wool curls with simple small two-to-four-pixel rounded clusters or C-shaped highlights. Mostly pale eggshell white, just a few blocky soft-gray recesses, no yellow-brown color cast. No realistic fibers, no texture noise, no woven or knitted checker pattern, no smooth gradients inside the pixels, no deep shadows, no text, borders, or objects. Clean hand-painted low-poly retro game material, not a photograph. Fill the whole square edge to edge.",
+    "source": "texture-sources/eggshell-sheepswool.png",
+    "asset": "textures/eggshell-sheepswool.png"
+  },
+  "encoding": {
+    "size": [
+      32,
+      32
+    ],
+    "leather_colors": 4,
+    "wool_colors": 6,
+    "dithering": false,
+    "filter": "nearest"
+  }
+}

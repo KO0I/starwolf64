@@ -55,6 +55,7 @@ s32 sLevelSceneIds[] = {
 };
 
 void Game_Initialize(void) {
+    Multilock_Reset();
     Memory_FreeAll();
     Rand_Init();
     Rand_SetSeed(1, 29000, 9876);
@@ -416,6 +417,7 @@ void Game_Update(void) {
                 break;
 
             case GSTATE_INIT:
+                Multilock_Reset();
                 gGameState = GSTATE_TITLE;
                 gTitleState = 1;
                 gClearPlayerInfo = true;

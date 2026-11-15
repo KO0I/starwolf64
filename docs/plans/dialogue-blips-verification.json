@@ -1,0 +1,481 @@
+{
+  "branch": "mods/dialogue-blips",
+  "date": "2026-11-12",
+  "delta_round_trips_identical": true,
+  "format": "dialogue-blips-verification-v1",
+  "hardware_verified": false,
+  "narrator_payload_and_program_unchanged_after_expert_fix": true,
+  "native": {
+    "starfox64": {
+      "audio": {
+        "expert": {
+          "frames": 171648,
+          "late_rms": 2106.0946807754453
+        },
+        "normal": {
+          "frames": 171712,
+          "late_rms": 2419.505511534072
+        },
+        "silent": {
+          "frames": 171776,
+          "late_rms": 3.1356643036205263
+        }
+      },
+      "channels": 2,
+      "legacy_mixer_unchanged": true,
+      "lookup_2050": 2050,
+      "narration_cleared": true,
+      "narration_interruption_preserved": true,
+      "narration_started": true,
+      "path": "build/dialogue-blips/run/native-starfox-composed/proof.json",
+      "pause_retains_voice": true,
+      "pending_narration_cleared": true,
+      "routes": {
+        "expert": [
+          2050,
+          2050
+        ],
+        "normal": [
+          2050,
+          2050
+        ],
+        "silent": [
+          2050,
+          2050
+        ]
+      }
+    },
+    "starwolf64": {
+      "audio": {
+        "expert": {
+          "frames": 171648,
+          "late_rms": 2436.552915150444
+        },
+        "normal": {
+          "frames": 171584,
+          "late_rms": 4030.3077554558413
+        },
+        "silent": {
+          "frames": 171648,
+          "late_rms": 0.8945494676092541
+        }
+      },
+      "channels": 2,
+      "legacy_mixer_unchanged": true,
+      "lookup_2050": 2050,
+      "narration_cleared": true,
+      "narration_interruption_preserved": true,
+      "narration_started": true,
+      "path": "build/dialogue-blips/run/native-starwolf-final-composed/proof.json",
+      "pause_retains_voice": true,
+      "pending_narration_cleared": true,
+      "routes": {
+        "expert": [
+          2050,
+          24040
+        ],
+        "normal": [
+          2050,
+          2050
+        ],
+        "silent": [
+          2050,
+          24040
+        ]
+      }
+    }
+  },
+  "original_archive_and_prepared_inputs_unchanged": true,
+  "releases": {
+    "starfox64": {
+      "artifacts": {
+        "catalog.json": {
+          "bytes": 1800890,
+          "sha256": "e7c8c3447d5cae654b5c3569bb194bec3949fca4997792ca77e7eab35557e01f"
+        },
+        "expert-mapping.json": {
+          "bytes": 3,
+          "sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356"
+        },
+        "starfox64-blips.patch.json": {
+          "bytes": 8306817,
+          "sha256": "7a62cf985407eab511ea3a1d2c776617839994076f90dee18ce8782b69e7bcb9"
+        },
+        "starfox64-blips.z64": {
+          "bytes": 16777216,
+          "sha256": "5cd1d6cecc60994f191efefcde3882fee8f116c4634686cad189604764aa5045"
+        },
+        "zz-voice-blips-starfox64.o2r": {
+          "bytes": 1314091,
+          "sha256": "ec790dfb76f941923dd574aee6296bc7b97fb2ad63de42f44041f1e2c35860f1"
+        }
+      },
+      "coverage_counts": {
+        "control": 4,
+        "narration": 7,
+        "silent": 54,
+        "voiced": 725
+      },
+      "directory": "build/dialogue-blips/starfox64/starfox64-867675f56118f94e",
+      "free_voice_bank_bytes": 2768560,
+      "minimum_clip_snr_db": 22.214,
+      "native_verification": {
+        "complete_resource_graph_verified": true,
+        "protected_audio_resources_unchanged": true,
+        "replacement_instruments": 725
+      },
+      "profiles": 55,
+      "rom_verification": {
+        "crc_verified": true,
+        "protected_audio_bytes_identical": true,
+        "replacement_regions": 1009,
+        "retained_regions": 72,
+        "sequence_verified": true
+      },
+      "source_only_ids": [
+        2080,
+        5080,
+        15254,
+        18130,
+        18140,
+        19467,
+        20020,
+        20256,
+        20264,
+        20265,
+        20268,
+        20270,
+        20279,
+        20284,
+        20285,
+        20286,
+        20287,
+        20288,
+        20289,
+        20291,
+        20292,
+        21070,
+        21071,
+        21072,
+        21073,
+        21080,
+        21082,
+        21083,
+        21090,
+        21091,
+        21092,
+        21093
+      ]
+    },
+    "starwolf64": {
+      "artifacts": {
+        "catalog.json": {
+          "bytes": 1800890,
+          "sha256": "e7c8c3447d5cae654b5c3569bb194bec3949fca4997792ca77e7eab35557e01f"
+        },
+        "expert-mapping.json": {
+          "bytes": 1467,
+          "sha256": "bb7a0f84e4f7ffa2b19d6e52cc23e509e2f5d8886ff815afda367ca306d16b15"
+        },
+        "starwolf64-blips.patch.json": {
+          "bytes": 10731816,
+          "sha256": "be713134e7c7a68da78a08b0aeff0e5280bdee7e6053bdcb2636d0a49fcba56c"
+        },
+        "starwolf64-blips.z64": {
+          "bytes": 16777216,
+          "sha256": "c726f03d7d7ffb155993102459301496750e9ebf354cb09b80dfec0859ab0f5f"
+        },
+        "zz-voice-blips-starwolf64.o2r": {
+          "bytes": 2019870,
+          "sha256": "750f1f33f4639aaf406fc25d71f74361ed621097973dba5dee46f8a991ad61d3"
+        }
+      },
+      "coverage_counts": {
+        "control": 4,
+        "narration": 7,
+        "silent": 54,
+        "voiced": 725
+      },
+      "directory": "build/dialogue-blips/starwolf64/starwolf64-5e105a7db7562d86",
+      "free_voice_bank_bytes": 1674752,
+      "minimum_clip_snr_db": 22.214,
+      "native_verification": {
+        "complete_resource_graph_verified": true,
+        "protected_audio_resources_unchanged": true,
+        "replacement_instruments": 727
+      },
+      "profiles": 55,
+      "rom_verification": {
+        "crc_verified": true,
+        "protected_audio_bytes_identical": true,
+        "replacement_regions": 1012,
+        "retained_regions": 71,
+        "sequence_verified": true
+      },
+      "source_only_ids": [
+        2080,
+        5080,
+        15254,
+        18130,
+        18140,
+        19467,
+        20020,
+        20256,
+        20264,
+        20265,
+        20268,
+        20270,
+        20279,
+        20284,
+        20285,
+        20286,
+        20287,
+        20288,
+        20289,
+        20291,
+        20292,
+        21070,
+        21071,
+        21072,
+        21073,
+        21080,
+        21082,
+        21083,
+        21090,
+        21091,
+        21092,
+        21093
+      ]
+    }
+  },
+  "repeated_builds_identical": true,
+  "runtime_binary_sha256": "47580e7f7ea6abab966338d48bfbfb05e1c58e30db6e1bd502cca61f6620b0f7",
+  "runtime_source_sha256": {
+    "src/audio/audio_general.c": "211c26d11c4306e893996d008bfd949dd305c803e7d30556a3997efb60eb0920",
+    "src/engine/fox_message.c": "5672cd5b711b2cdaae7b6408ef5d47de634c51d36f91be66883841899d031d4f",
+    "src/port/Engine.cpp": "f1fc35ceee56b73dd44bf90a5b91b6d0b0e34af0fe7bcff3d3545d97a8fd617b",
+    "src/port/audio/CrewChatter.cpp": "6bc57e47f9fb01d7f7cf108de12333587c4095f916e667def2d1d3592cd2ab5e",
+    "src/port/audio/VoiceBlips.cpp": "4e96c5c98de83e67d05ae7d5011c4809493ea5a50e1749f899e08618a8d5ebd4",
+    "src/port/audio/VoiceBlips.h": "f901308e8fd402f5ce0bf9163bab75a1313a2a11014ec1f331e0136eacadf8c9",
+    "src/port/ui/ImguiUI.cpp": "9d5846552dccc5c5b9fd78312beb6d1c605883e1205b044c3ed015c086cfa377"
+  },
+  "source_readme_seed_retained_in_this_worktree": true,
+  "source_worktree_seed_differences": [
+    "browser/README.md",
+    "tools/build_wolfen.py"
+  ],
+  "standalone_playback": {
+    "expert-boss": {
+      "core": "mupen64plus_next",
+      "path": "build/dialogue-blips/run/expert-boss/proof.json",
+      "voices": [
+        {
+          "completed_at_ms": 3789.635000001639,
+          "id": 2220,
+          "late_audible_samples": 45,
+          "logical_stop_ms": null
+        }
+      ]
+    },
+    "expert-briefing": {
+      "core": "parallel_n64",
+      "path": "build/dialogue-blips/run/expert-briefing/proof.json",
+      "voices": [
+        {
+          "completed_at_ms": 2607.540000002831,
+          "id": 1230,
+          "late_audible_samples": 19,
+          "logical_stop_ms": null
+        }
+      ]
+    },
+    "expert-final-11241": {
+      "core": "parallel_n64",
+      "path": "build/dialogue-blips/run/expert-final-11241/proof.json",
+      "voices": [
+        {
+          "completed_at_ms": 5285.815000005066,
+          "id": 11241,
+          "late_audible_samples": 73,
+          "logical_stop_ms": null
+        }
+      ]
+    },
+    "expert-final-18006": {
+      "core": "mupen64plus_next",
+      "path": "build/dialogue-blips/run/expert-final-18006/proof.json",
+      "voices": [
+        {
+          "completed_at_ms": 5746.994999997318,
+          "id": 18006,
+          "late_audible_samples": 79,
+          "logical_stop_ms": null
+        }
+      ]
+    },
+    "expert-final-bitmap-tail": {
+      "core": "mupen64plus_next",
+      "path": "build/dialogue-blips/run/expert-final-bitmap-tail/proof.json",
+      "voices": [
+        {
+          "completed_at_ms": 2756.780000001192,
+          "id": 21060,
+          "late_audible_samples": 24,
+          "logical_stop_ms": null
+        }
+      ]
+    },
+    "retrigger-control": {
+      "core": "mupen64plus_next",
+      "path": "build/dialogue-blips/run/retrigger-control/proof.json",
+      "voices": [
+        {
+          "completed_at_ms": null,
+          "id": 2050,
+          "late_audible_samples": 93,
+          "logical_stop_ms": null
+        }
+      ]
+    },
+    "starfox-parallel-n64": {
+      "core": "parallel_n64",
+      "path": "build/dialogue-blips/run/starfox-parallel-n64/proof.json",
+      "voices": [
+        {
+          "completed_at_ms": 3780.815000001341,
+          "id": 2050,
+          "late_audible_samples": 53,
+          "logical_stop_ms": null
+        },
+        {
+          "completed_at_ms": 2651.625,
+          "id": 2030,
+          "late_audible_samples": 33,
+          "logical_stop_ms": null
+        }
+      ]
+    },
+    "starfox-roster-final": {
+      "core": "mupen64plus_next",
+      "path": "build/dialogue-blips/run/starfox-roster-final/proof.json",
+      "voices": [
+        {
+          "completed_at_ms": 3737.114999998361,
+          "id": 2050,
+          "late_audible_samples": 52,
+          "logical_stop_ms": null
+        },
+        {
+          "completed_at_ms": 2455.490000002086,
+          "id": 2020,
+          "late_audible_samples": 28,
+          "logical_stop_ms": null
+        },
+        {
+          "completed_at_ms": 2625.460000000894,
+          "id": 2030,
+          "late_audible_samples": 32,
+          "logical_stop_ms": null
+        },
+        {
+          "completed_at_ms": 2639.019999999553,
+          "id": 2040,
+          "late_audible_samples": 32,
+          "logical_stop_ms": null
+        },
+        {
+          "completed_at_ms": 2903.114999998361,
+          "id": 2220,
+          "late_audible_samples": 36,
+          "logical_stop_ms": null
+        },
+        {
+          "completed_at_ms": 4311.405000001192,
+          "id": 20256,
+          "late_audible_samples": 61,
+          "logical_stop_ms": null
+        }
+      ]
+    },
+    "starwolf-narrator": {
+      "core": "mupen64plus_next",
+      "path": "build/dialogue-blips/run/starwolf-narrator/proof.json",
+      "voices": [
+        {
+          "completed_at_ms": 61904.31500000134,
+          "id": 1000,
+          "late_audible_samples": 505,
+          "logical_stop_ms": null
+        }
+      ]
+    },
+    "starwolf-roster": {
+      "core": "mupen64plus_next",
+      "path": "build/dialogue-blips/run/starwolf-roster/proof.json",
+      "voices": [
+        {
+          "completed_at_ms": 3727.435000002384,
+          "id": 2050,
+          "late_audible_samples": 51,
+          "logical_stop_ms": null
+        },
+        {
+          "completed_at_ms": 2430.460000000894,
+          "id": 2020,
+          "late_audible_samples": 28,
+          "logical_stop_ms": null
+        },
+        {
+          "completed_at_ms": 2606.855000000447,
+          "id": 2030,
+          "late_audible_samples": 31,
+          "logical_stop_ms": null
+        },
+        {
+          "completed_at_ms": 2644.820000000298,
+          "id": 2040,
+          "late_audible_samples": 32,
+          "logical_stop_ms": null
+        },
+        {
+          "completed_at_ms": 2882.865000002086,
+          "id": 2220,
+          "late_audible_samples": 36,
+          "logical_stop_ms": null
+        },
+        {
+          "completed_at_ms": 4400.420000001788,
+          "id": 20256,
+          "late_audible_samples": 63,
+          "logical_stop_ms": null
+        }
+      ]
+    },
+    "voice-interrupt": {
+      "core": "mupen64plus_next",
+      "path": "build/dialogue-blips/run/voice-interrupt/proof.json",
+      "voices": [
+        {
+          "completed_at_ms": 3432.480000000447,
+          "id": 2050,
+          "late_audible_samples": 46,
+          "logical_stop_ms": null
+        }
+      ]
+    },
+    "voice-stop-final": {
+      "core": "mupen64plus_next",
+      "path": "build/dialogue-blips/run/voice-stop-final/proof.json",
+      "voices": [
+        {
+          "completed_at_ms": 2191.800000000745,
+          "id": 2050,
+          "late_audible_samples": 24,
+          "logical_stop_ms": 1631.199999999255
+        }
+      ]
+    }
+  },
+  "unit_tests_passed": 16,
+  "worktree": "/home/amber/proj/Starship-dialogue-blips"
+}

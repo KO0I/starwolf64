@@ -49,7 +49,8 @@ try{
    samples.push(current);
    const bucket=Math.floor(current.csFrame/200);if(bucket!==lastFrameBucket){console.log('Cutscene progress',JSON.stringify(current));lastFrameBucket=bucket}
    if(current.speaker===20&&current.radio===4&&!sawKami){sawKami=true;firstKami=current;afterKami=Date.now();console.log('Kami check-in',JSON.stringify(current));await shot('kami-check-in')}
-   if(sawKami&&Date.now()-afterKami>20000&&current.csFrame>=firstKami.csFrame+500&&current.speaker!==20){
+   // The cutscene counter stops when gameplay begins; game frames continue.
+   if(sawKami&&Date.now()-afterKami>20000&&current.frame>=firstKami.frame+500&&current.csFrame>=firstKami.csFrame&&current.speaker!==20){
     const first=samples.find(s=>s.speaker===20&&s.radio===4);
     assert(current.speaker!==20||current.radio!==4,'Kami check-in remained stuck');
     assert(new Set(samples.slice(-5).map(sample=>sample.frame)).size>1,'Game frames stopped after Kami check-in');

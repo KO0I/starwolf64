@@ -1316,7 +1316,7 @@ void Display_PlayerFeatures(Player* player) {
 
                 src.x = 0;
                 src.y = WOLFEN_HULL_Y;
-                src.z = -40.0f - var_fv0;
+                src.z = WOLFEN_ENGINE_Z - var_fv0;
 
                 Matrix_MultVec3f(gCalcMatrix, &src, &dest);
                 Matrix_Push(&gGfxMatrix);
@@ -1601,8 +1601,9 @@ void Display_Player_Update(Player* player, s32 reflectY) {
 f32 D_display_800CA334[] = {
     0.02f, 0.06f, 0.08f, 0.05f, 0.04f, 0.03f, 0.06f, 0.04f,
 };
+static const ALIGN_ASSET(2) char aWolfMarkDL[] = "__OTR__crew_hud/aWolfMarkDL";
 Gfx* sTeammateMarkDLs[] = {
-    aFalcoMarkDL, aFalcoMarkDL, aSlippyMarkDL, aPeppyMarkDL, aPeppyMarkDL, aPeppyMarkDL,
+    aWolfMarkDL, aFalcoMarkDL, aSlippyMarkDL, aPeppyMarkDL, aPeppyMarkDL, aPeppyMarkDL,
     aPeppyMarkDL, aPeppyMarkDL, aKattMarkDL,   aBillMarkDL,  aJamesMarkDL,
 };
 f32 D_display_800CA380 = 0.0f;
@@ -1719,6 +1720,15 @@ void Display_LockOnIndicator(void) {
     s32 i;
     s32 j;
     f32 var_fs0;
+
+    if (Multilock_IsEnabled(0)) {
+        Multilock_DrawIndicators();
+        for (j = 0; j < gCamCount; j++) {
+            gLockOnTargetViewPos[j].x = gLockOnTargetViewPos[j].y = 0.0f;
+            gLockOnTargetViewPos[j].z = 100.0f;
+        }
+        return;
+    }
 
     for (i = 0; i < gCamCount; i++) {
         if (gLockOnTargetViewPos[i].z < 0.0f) {

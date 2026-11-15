@@ -13,4 +13,8 @@
 #define MEDUSA_ENGINE_Y (138.768426f)
 #define MEDUSA_ENGINE_Z (-1393.201225f)
 
+/* Title-scene offset with the mothership rendered at 0.1 scale. */
+#define MEDUSA_LAUNCH_OFFSET_X (55.0f)
+#define MEDUSA_LAUNCH_OFFSET_Y (90.0f)
+
 #endif

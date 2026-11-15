@@ -29,6 +29,29 @@ class PublicExportTests(unittest.TestCase):
                 export_site.export(build, root / "build/wasm/site")
             self.assertFalse((root / "build/wasm/site").exists())
 
+    def test_unrelated_output_is_preserved(self):
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            output = root / "site"
+            output.mkdir()
+            note = output / "keep.txt"
+            note.write_text("unrelated work")
+            with patch.object(export_site, "ROOT", root), self.assertRaisesRegex(ValueError, "unrelated"):
+                export_site.export(root / "build/wasm/public", output)
+            self.assertEqual(note.read_text(), "unrelated work")
+
+    def test_existing_site_cannot_hide_unrelated_files(self):
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            output = root / "site"
+            output.mkdir()
+            (output / "site.json").write_text('{"format":"starwolf64-wasm-site-v1","files":{}}')
+            note = output / "keep.txt"
+            note.write_text("unrelated work")
+            with patch.object(export_site, "ROOT", root), self.assertRaisesRegex(ValueError, "unrelated"):
+                export_site.export(root / "build/wasm/public", output)
+            self.assertEqual(note.read_text(), "unrelated work")
+
 
 if __name__ == "__main__":
     unittest.main()

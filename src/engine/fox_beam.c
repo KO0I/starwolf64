@@ -143,8 +143,10 @@ void PlayerShot_Impact(PlayerShot* shot) {
     } else if (shot->obj.id == PLAYERSHOT_LOCK_ON) {
         shot->scale = 7.5f;
 
-        for (i = 0; i < ARRAY_COUNT(gActors); i++) {
-            gActors[i].lockOnTimers[shot->sourceId] = 0;
+        if (!shot->isMultilockShot) {
+            for (i = 0; i < ARRAY_COUNT(gActors); i++) {
+                gActors[i].lockOnTimers[shot->sourceId] = 0;
+            }
         }
 
         shot->vel.x = shot->vel.y = shot->vel.z = 0.0f;
@@ -691,7 +693,9 @@ void PlayerShot_ApplyDamageToActor(PlayerShot* shot, Actor* actor, s32 hitIndex)
         } else {
             actor->dmgType = DMG_EXPLOSION;
             actor->damage = 30;
-            actor->lockOnTimers[shot->sourceId] = 0;
+            if (!shot->isMultilockShot) {
+                actor->lockOnTimers[shot->sourceId] = 0;
+            }
         }
     }
     actor->dmgSource = shot->sourceId + 1;
@@ -1739,6 +1743,9 @@ bool PlayerShot_FindLockTarget(PlayerShot* shot) {
     Actor* actor;
     Player* player;
 
+    if (Multilock_IsEnabled(shot->sourceId) && !Multilock_CanLockOn()) {
+        return false;
+    }
     if (gLevelMode == LEVELMODE_ON_RAILS) {
         lockRange = 300.0f;
     } else {
@@ -1749,8 +1756,15 @@ bool PlayerShot_FindLockTarget(PlayerShot* shot) {
             ((actor->lockOnTimers[shot->sourceId] == 0) && (fabsf(shot->obj.pos.x - actor->obj.pos.x) <= lockRange) &&
              (fabsf(shot->obj.pos.y - (actor->obj.pos.y + actor->info.targetOffset)) <= lockRange) &&
              (fabsf(shot->obj.pos.z - actor->obj.pos.z) <= lockRange))) {
+            if (Multilock_IsEnabled(shot->sourceId) && !Multilock_TryLock(actor)) {
+                continue;
+            }
             actor->lockOnTimers[shot->sourceId] = 20;
-            Object_PlayerSfx(gPlayer[shot->sourceId].sfxSource, NA_SE_LOCK_ON, shot->sourceId);
+            if (Multilock_IsEnabled(shot->sourceId)) {
+                Multilock_PlayLockSfx();
+            } else {
+                Object_PlayerSfx(gPlayer[shot->sourceId].sfxSource, NA_SE_LOCK_ON, shot->sourceId);
+            }
             for (j = 0; j < ARRAY_COUNT(gPlayerShots); j++) {
                 if (gPlayerShots[j].obj.id == PLAYERSHOT_LOCK_SEARCH) {
                     Object_Kill(&gPlayerShots[j].obj, gPlayerShots[j].sfxSource);
@@ -2155,28 +2169,37 @@ void PlayerShot_UpdateLockOnShot(PlayerShot* shot) {
     } else {
         var_a3 = 0;
         if (shot->unk_60 == 0) {
-            for (i = 0, actor = &gActors[0]; i < ARRAY_COUNT(gActors); i++, actor++) {
-                if ((actor->obj.status == OBJ_ACTIVE) && (actor->info.targetOffset != 0.0f) &&
-                    (actor->lockOnTimers[shot->sourceId] != 0)) {
+            if (shot->isMultilockShot) {
+                actor = Multilock_GetShotTarget(shot);
+                if (actor != NULL) {
                     var_a3 = 1;
-                    actor->lockOnTimers[shot->sourceId] = 2;
                     sLockOnPos = actor->obj.pos;
                     sLockOnPos.y += actor->info.targetOffset;
                 }
-            }
-
-            for (i = 0, player = &gPlayer[0]; i < gCamCount; i++, player++) {
-                if (((player->state == PLAYERSTATE_ACTIVE) || (player->state == PLAYERSTATE_U_TURN)) &&
-                    (gVsLockOnTimers[i][shot->sourceId] != 0)) {
-                    var_a3 = 1;
-                    gVsLockOnTimers[i][shot->sourceId] = 2;
-                    sLockOnPos.x = player->pos.x;
-                    if (player->form == FORM_ARWING) {
-                        sLockOnPos.y = player->pos.y;
-                    } else {
-                        sLockOnPos.y = player->pos.y + 30.0f;
+            } else {
+                for (i = 0, actor = &gActors[0]; i < ARRAY_COUNT(gActors); i++, actor++) {
+                    if ((actor->obj.status == OBJ_ACTIVE) && (actor->info.targetOffset != 0.0f) &&
+                        (actor->lockOnTimers[shot->sourceId] != 0)) {
+                        var_a3 = 1;
+                        actor->lockOnTimers[shot->sourceId] = 2;
+                        sLockOnPos = actor->obj.pos;
+                        sLockOnPos.y += actor->info.targetOffset;
                     }
-                    sLockOnPos.z = player->trueZpos;
+                }
+
+                for (i = 0, player = &gPlayer[0]; i < gCamCount; i++, player++) {
+                    if (((player->state == PLAYERSTATE_ACTIVE) || (player->state == PLAYERSTATE_U_TURN)) &&
+                        (gVsLockOnTimers[i][shot->sourceId] != 0)) {
+                        var_a3 = 1;
+                        gVsLockOnTimers[i][shot->sourceId] = 2;
+                        sLockOnPos.x = player->pos.x;
+                        if (player->form == FORM_ARWING) {
+                            sLockOnPos.y = player->pos.y;
+                        } else {
+                            sLockOnPos.y = player->pos.y + 30.0f;
+                        }
+                        sLockOnPos.z = player->trueZpos;
+                    }
                 }
             }
 

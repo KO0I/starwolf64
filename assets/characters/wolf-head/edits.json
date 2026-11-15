@@ -1,0 +1,23 @@
+{
+  "source_triangles": 225,
+  "triangles": 440,
+  "source_primitives_preserved": 9,
+  "ear_height_scale": 1.45,
+  "head_width_scale": 1.1,
+  "metal_crown_removed": true,
+  "whisker_back_shift": 14.0,
+  "whisker_depth": 18.0,
+  "crown_triangles_changed_to_fur": 28,
+  "moved_ear_vertex_entries": 46,
+  "added_triangles": 215,
+  "detail_triangles": {
+    "whiskers_left": 28,
+    "whiskers_right": 28,
+    "eyepatch": 48,
+    "forehead_strap": 37,
+    "side_strap": 60,
+    "rear_strap": 14
+  },
+  "preserved": "Existing face under the requested width scale, original textures, rig nodes and animation clips",
+  "strap_route": "Up the forehead over the fur crown, and around the right cheek and back, following the user markup"
+}

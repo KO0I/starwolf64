@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "sampleRate": 32000,
   "characters": [
     {
@@ -40,13 +40,46 @@
         {
           "start": 23744,
           "frames": 3392
+        },
+        {
+          "start": 27136,
+          "frames": 3392
+        },
+        {
+          "start": 30528,
+          "frames": 3392
+        },
+        {
+          "start": 33920,
+          "frames": 3392
+        },
+        {
+          "start": 37312,
+          "frames": 3392
+        },
+        {
+          "start": 40704,
+          "frames": 3392
+        },
+        {
+          "start": 44096,
+          "frames": 3392
+        },
+        {
+          "start": 47488,
+          "frames": 3392
+        },
+        {
+          "start": 50880,
+          "frames": 3392
         }
       ],
       "gapSeconds": 0.0575,
+      "playback": "syllables",
       "pitchSemitones": -3,
       "bassShelfDb": 5,
       "tempo": 1,
-      "sha256": "ec59acf43e863f906ad9c628f23d0adfade8f534416e56c51a3b4e503d260513"
+      "sha256": "3da43ac1137cda220e7d300d0953a66676e10402846e3c80f17ec2134fa8ce6e"
     },
     {
       "name": "panther",
@@ -86,13 +119,46 @@
         {
           "start": 23744,
           "frames": 3392
+        },
+        {
+          "start": 27136,
+          "frames": 3392
+        },
+        {
+          "start": 30528,
+          "frames": 3392
+        },
+        {
+          "start": 33920,
+          "frames": 3392
+        },
+        {
+          "start": 37312,
+          "frames": 3392
+        },
+        {
+          "start": 40704,
+          "frames": 3392
+        },
+        {
+          "start": 44096,
+          "frames": 3392
+        },
+        {
+          "start": 47488,
+          "frames": 3392
+        },
+        {
+          "start": 50880,
+          "frames": 3392
         }
       ],
       "gapSeconds": 0.0575,
+      "playback": "syllables",
       "pitchSemitones": -10,
       "bassShelfDb": 5,
       "tempo": 1,
-      "sha256": "53d7a089ec76208982dd077e5d26cf08afb13c00fb73ac8864660c426fe908cd"
+      "sha256": "ded74808cf5c87861fac77c8ec0aa01cef9502792c71cb9a4781b9cbe87f8fd0"
     },
     {
       "name": "kami",
@@ -132,13 +198,46 @@
         {
           "start": 23800,
           "frames": 3400
+        },
+        {
+          "start": 27200,
+          "frames": 3400
+        },
+        {
+          "start": 30600,
+          "frames": 3400
+        },
+        {
+          "start": 34000,
+          "frames": 3400
+        },
+        {
+          "start": 37400,
+          "frames": 3400
+        },
+        {
+          "start": 40800,
+          "frames": 3400
+        },
+        {
+          "start": 44200,
+          "frames": 3400
+        },
+        {
+          "start": 47600,
+          "frames": 3400
+        },
+        {
+          "start": 51000,
+          "frames": 3400
         }
       ],
       "gapSeconds": 0.059375,
+      "playback": "syllables",
       "pitchSemitones": -3,
       "bassShelfDb": 0,
       "tempo": 0.8,
-      "sha256": "599ba18d9028d9828e74c123ce99b1ab6e6a38ebad73221841642bb2b8429601"
+      "sha256": "fade8d719d580b979f316f99d7a46596df549afe55a3cdbabd0c22333c9614c2"
     },
     {
       "name": "krystal",
@@ -178,13 +277,46 @@
         {
           "start": 25088,
           "frames": 3584
+        },
+        {
+          "start": 28672,
+          "frames": 3584
+        },
+        {
+          "start": 32256,
+          "frames": 3584
+        },
+        {
+          "start": 35840,
+          "frames": 3584
+        },
+        {
+          "start": 39424,
+          "frames": 3584
+        },
+        {
+          "start": 43008,
+          "frames": 3584
+        },
+        {
+          "start": 46592,
+          "frames": 3584
+        },
+        {
+          "start": 50176,
+          "frames": 3584
+        },
+        {
+          "start": 53760,
+          "frames": 3584
         }
       ],
       "gapSeconds": 0.0545,
+      "playback": "syllables",
       "pitchSemitones": 0,
       "bassShelfDb": 0,
       "tempo": 1,
-      "sha256": "8ca22538df13a035e5dd0c1d8d1fa7022307a544f3d8eac9fba103f00e9e61bc"
+      "sha256": "bb9cd81e456f10860c626e01748a5d553624a759a9379c6099ff45a0e57390cc"
     },
     {
       "name": "vitzy",
@@ -223,13 +355,46 @@
         {
           "start": 23520,
           "frames": 3360
+        },
+        {
+          "start": 26880,
+          "frames": 3360
+        },
+        {
+          "start": 30240,
+          "frames": 3360
+        },
+        {
+          "start": 33600,
+          "frames": 3360
+        },
+        {
+          "start": 36960,
+          "frames": 3360
+        },
+        {
+          "start": 40320,
+          "frames": 3360
+        },
+        {
+          "start": 43680,
+          "frames": 3360
+        },
+        {
+          "start": 47040,
+          "frames": 3360
+        },
+        {
+          "start": 50400,
+          "frames": 3360
         }
       ],
       "gapSeconds": 0.0525,
+      "playback": "syllables",
       "pitchSemitones": 0,
       "bassShelfDb": 0,
       "tempo": 1,
-      "sha256": "e65c89883a3c627a6de696b645d3b2a8700ce9af5fc9149d4b81b49dedec790b"
+      "sha256": "0c44ec73b266fa1c5b3fc75316b0ae3165c81326f758a22045f1fa58251a3bd6"
     },
     {
       "name": "narrator",
@@ -239,42 +404,75 @@
       "grains": [
         {
           "start": 0,
-          "frames": 3840
+          "frames": 1984667
         },
         {
-          "start": 3840,
-          "frames": 3840
+          "start": 0,
+          "frames": 1984667
         },
         {
-          "start": 7680,
-          "frames": 3840
+          "start": 0,
+          "frames": 1984667
         },
         {
-          "start": 11520,
-          "frames": 3840
+          "start": 0,
+          "frames": 1984667
         },
         {
-          "start": 15360,
-          "frames": 3840
+          "start": 0,
+          "frames": 1984667
         },
         {
-          "start": 19200,
-          "frames": 3840
+          "start": 0,
+          "frames": 1984667
         },
         {
-          "start": 23040,
-          "frames": 3840
+          "start": 0,
+          "frames": 1984667
         },
         {
-          "start": 26880,
-          "frames": 3840
+          "start": 0,
+          "frames": 1984667
+        },
+        {
+          "start": 0,
+          "frames": 1984667
+        },
+        {
+          "start": 0,
+          "frames": 1984667
+        },
+        {
+          "start": 0,
+          "frames": 1984667
+        },
+        {
+          "start": 0,
+          "frames": 1984667
+        },
+        {
+          "start": 0,
+          "frames": 1984667
+        },
+        {
+          "start": 0,
+          "frames": 1984667
+        },
+        {
+          "start": 0,
+          "frames": 1984667
+        },
+        {
+          "start": 0,
+          "frames": 1984667
         }
       ],
-      "gapSeconds": 0.07,
+      "gapSeconds": 0,
+      "playback": "continuous",
       "pitchSemitones": 0,
       "bassShelfDb": 0,
       "tempo": 1,
-      "sha256": "23fcb79d48cddd2a851527e4b7de67c96a6fab4cdb68e0e88a3cf6264212012d"
+      "sha256": "6143a41b178f4fbf5a4cc3a2019fc25d3f90cf45687452d4f0dff181aac1745f"
     }
   ],
   "sources": {
@@ -349,7 +547,13 @@
       "tool": "edge-tts",
       "text": "All right, team. Keep your eyes on the stars, and stay close. I am ready when you are. Let us move.",
       "pitch_shift_semitones": 0,
-      "source_mp3_sha256": "82fbf7f68b540a2448f9b36c5b696f14f8e7d2ada61c10da0ae75de2503f6604"
+      "source_mp3_sha256": "82fbf7f68b540a2448f9b36c5b696f14f8e7d2ada61c10da0ae75de2503f6604",
+      "processing": {
+        "codec": "adpcm_ima_wav",
+        "bits_per_sample": 4,
+        "sample_rate": 7000,
+        "playback_sample_rate": 32000
+      }
     },
     "vitzy": {
       "source": "User-supplied recording",
@@ -372,17 +576,149 @@
     "narrator": {
       "message_id": 1000,
       "source": "Original prologue narrator",
-      "resource": "ast_audio/ast_audio_v1_sample_3100",
-      "wav_sha256": "0b7809048d509e4058a9cce8ed693c55f8fabde8a056d966f1f34e1eec95a246",
       "sequence": "sequences/01_voice.m64",
+      "sequence_sha256": "55d5bdc76b568467bf818cfe225fbaf5168153857f698eab85e445c5e915e98e",
       "bank_offset": "0x673",
       "layer_offset": "0x69c",
       "soundfont": 1,
-      "instrument": 0,
-      "note": 39,
-      "tuning": 0.46875,
-      "source_sample_rate": 15000,
-      "pitch_shift_semitones": 0
+      "tempo_bpm": 120,
+      "ticks_per_beat": 48,
+      "segments": [
+        {
+          "instrument": 0,
+          "note": 39,
+          "region": "normal",
+          "resource": "ast_audio/ast_audio_v1_sample_3100",
+          "wav_sha256": "0b7809048d509e4058a9cce8ed693c55f8fabde8a056d966f1f34e1eec95a246",
+          "start_tick": 0,
+          "ticks": 792,
+          "source_sample_rate": 15000,
+          "playback_sample_rate": 15000
+        },
+        {
+          "instrument": 1,
+          "note": 39,
+          "region": "normal",
+          "resource": "ast_audio/ast_audio_v1_sample_31B0",
+          "wav_sha256": "390fbec5f04ff24150b3e8b9ef14933b1ea841095bfe7254d2505dbf61775b63",
+          "start_tick": 792,
+          "ticks": 287,
+          "source_sample_rate": 15000,
+          "playback_sample_rate": 15000
+        },
+        {
+          "instrument": 1,
+          "note": 51,
+          "region": "high",
+          "resource": "ast_audio/ast_audio_v1_sample_31D0",
+          "wav_sha256": "43aa155542063e78fd96742cc3d5258e632f8e3cd625f4004ed5436080f19416",
+          "start_tick": 1079,
+          "ticks": 920,
+          "source_sample_rate": 7500,
+          "playback_sample_rate": 15000
+        },
+        {
+          "instrument": 2,
+          "note": 39,
+          "region": "normal",
+          "resource": "ast_audio/ast_audio_v1_sample_31F0",
+          "wav_sha256": "eaf57dc71c67705872974d3206a5ffc569153ce14eb93c66b6baa9077bb17d66",
+          "start_tick": 1999,
+          "ticks": 1146,
+          "source_sample_rate": 15000,
+          "playback_sample_rate": 15000
+        },
+        {
+          "instrument": 3,
+          "note": 39,
+          "region": "normal",
+          "resource": "ast_audio/ast_audio_v1_sample_3210",
+          "wav_sha256": "977875d78e17102e87eb53fc6aa31768bda7c2c050f8c707be42f5c4252414fb",
+          "start_tick": 3145,
+          "ticks": 678,
+          "source_sample_rate": 15000,
+          "playback_sample_rate": 15000
+        },
+        {
+          "instrument": 3,
+          "note": 51,
+          "region": "high",
+          "resource": "ast_audio/ast_audio_v1_sample_3230",
+          "wav_sha256": "fc7c4ce1cc45a1aae11ae81ca574a13ccdd82c0e18c8f25cad2750eefad005d2",
+          "start_tick": 3823,
+          "ticks": 208,
+          "source_sample_rate": 7500,
+          "playback_sample_rate": 15000
+        },
+        {
+          "instrument": 4,
+          "note": 27,
+          "region": "low",
+          "resource": "ast_audio/ast_audio_v1_sample_3250",
+          "wav_sha256": "a215f85501e4ccdaecb5ec9487d1f7d17361db6351024c2299dc94bc2889264e",
+          "start_tick": 4031,
+          "ticks": 504,
+          "source_sample_rate": 30000,
+          "playback_sample_rate": 15000
+        },
+        {
+          "instrument": 4,
+          "note": 39,
+          "region": "normal",
+          "resource": "ast_audio/ast_audio_v1_sample_3270",
+          "wav_sha256": "c84c94a2415ee2dacfc01e6d30df61ccf1160c23be1aa5ec2a844e239f6061dd",
+          "start_tick": 4535,
+          "ticks": 180,
+          "source_sample_rate": 15000,
+          "playback_sample_rate": 15000
+        },
+        {
+          "instrument": 4,
+          "note": 51,
+          "region": "high",
+          "resource": "ast_audio/ast_audio_v1_sample_3290",
+          "wav_sha256": "fc17cb6c61d7243037554e4e6c50123032b3b2adb60e4ec9a453c8c5a5b7c4fa",
+          "start_tick": 4715,
+          "ticks": 323,
+          "source_sample_rate": 7500,
+          "playback_sample_rate": 15000
+        },
+        {
+          "instrument": 5,
+          "note": 27,
+          "region": "low",
+          "resource": "ast_audio/ast_audio_v1_sample_32B0",
+          "wav_sha256": "bce540e402c70bfe922ea9da7b44f4f782c6fd39794ac8cbaee2fd5439fd0688",
+          "start_tick": 5038,
+          "ticks": 623,
+          "source_sample_rate": 30000,
+          "playback_sample_rate": 15000
+        },
+        {
+          "instrument": 5,
+          "note": 39,
+          "region": "normal",
+          "resource": "ast_audio/ast_audio_v1_sample_32D0",
+          "wav_sha256": "7a818c39858efe73d4cd4bd9d2c627fbd279e6a96e22881ced179bdde088ed89",
+          "start_tick": 5661,
+          "ticks": 210,
+          "source_sample_rate": 15000,
+          "playback_sample_rate": 15000
+        },
+        {
+          "instrument": 5,
+          "note": 51,
+          "region": "high",
+          "resource": "ast_audio/ast_audio_v1_sample_32F0",
+          "wav_sha256": "7c0b6b8921e75cfc7323b180adbcd544a54c72702a42dbfbe63792302d363b85",
+          "start_tick": 5871,
+          "ticks": 83,
+          "source_sample_rate": 7500,
+          "playback_sample_rate": 15000
+        }
+      ],
+      "pitch_shift_semitones": 0,
+      "processing": "Full recording reversed after resampling to 32000 Hz"
     }
   },
   "approvedPreviewHashes": {

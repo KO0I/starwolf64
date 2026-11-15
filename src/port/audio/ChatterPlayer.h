@@ -20,9 +20,11 @@ inline int Profile(int speaker) {
 
 class Player {
     static constexpr size_t VoiceCount = 6;
-    static constexpr size_t HeaderBytes = 16 + VoiceCount * 68;
+    static constexpr size_t GrainCount = 16;
+    static constexpr size_t VoiceSize = 4 + GrainCount * 8;
+    static constexpr size_t HeaderBytes = 16 + VoiceCount * VoiceSize;
     struct Span { uint32_t start = 0, frames = 0; };
-    struct Voice { uint32_t gap = 0; std::array<Span, 8> grains; };
+    struct Voice { uint32_t gap = 0; std::array<Span, GrainCount> grains; };
     std::array<Voice, VoiceCount> voices;
     std::vector<int16_t> pcm;
     uintptr_t message = 0;
@@ -33,19 +35,19 @@ class Player {
 
   public:
     bool Load(const uint8_t* data, size_t size) {
-        if (!data || size < HeaderBytes || data[0] != 'C' || data[1] != 'H' || data[2] != 'T' || data[3] != '1') return false;
+        if (!data || size < HeaderBytes || data[0] != 'C' || data[1] != 'H' || data[2] != 'T' || data[3] != '2') return false;
         auto word = [&](size_t offset) {
             return uint32_t(data[offset]) | uint32_t(data[offset+1]) << 8 |
                 uint32_t(data[offset+2]) << 16 | uint32_t(data[offset+3]) << 24;
         };
         uint32_t count = word(12);
-        if (word(4) != 32000 || word(8) != VoiceCount || count > VoiceCount * 64000 || size != HeaderBytes + size_t(count) * 2) return false;
+        if (word(4) != 32000 || word(8) != VoiceCount || count > 32000 * 120 || size != HeaderBytes + size_t(count) * 2) return false;
         std::array<Voice, VoiceCount> parsed;
         for (size_t v = 0; v < VoiceCount; ++v) {
-            parsed[v].gap = word(16 + v * 68);
+            parsed[v].gap = word(16 + v * VoiceSize);
             if (parsed[v].gap > 32000) return false;
-            for (size_t g = 0; g < 8; ++g) {
-                Span span{ word(20 + v * 68 + g * 8), word(24 + v * 68 + g * 8) };
+            for (size_t g = 0; g < GrainCount; ++g) {
+                Span span{ word(20 + v * VoiceSize + g * 8), word(24 + v * VoiceSize + g * 8) };
                 if (!span.frames || span.start >= count || span.frames > count - span.start) return false;
                 parsed[v].grains[g] = span;
             }
@@ -71,8 +73,16 @@ class Player {
         int previous = index;
         index = revealed;
         bool letter = (glyph >= 24 && glyph <= 75) || (glyph >= 81 && glyph <= 90) || glyph >= 95;
-        if (revealed <= previous || !letter || cooldown) return false;
         const Voice& voice = voices[profile];
+        if (profile == 5) {
+            if (syllable) return false;
+            const Span& span = voice.grains[0];
+            position = span.start;
+            remaining = span.frames;
+            syllable = 1;
+            return true;
+        }
+        if (revealed <= previous || !letter || cooldown) return false;
         const Span& span = voice.grains[syllable++ % voice.grains.size()];
         position = span.start;
         remaining = span.frames;

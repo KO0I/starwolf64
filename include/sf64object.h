@@ -208,6 +208,7 @@ typedef struct Item {
     /* 0x58 */ f32 unk_58;
     /* 0x5C */ f32 sfxSource[3];
     /* 0x68 */ f32 width;
+    bool isMultilock;
 } Item; // size 0x6C
 
 typedef struct Effect {
@@ -312,6 +313,8 @@ typedef struct Actor {
     /* 0x110 */ f32 scale;
     /* 0x114 */ f32 fwork[30];
     /* 0x18C */ Vec3f vwork[30];
+    u32 lockOnGeneration;
+    Vec3f lockOnViewPos;
 } Actor; // size = 0x2F4
 
 typedef enum ObjectId {

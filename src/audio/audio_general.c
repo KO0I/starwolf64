@@ -4,6 +4,8 @@
 #include "audiothread_cmd.h"
 #include "audioseq_cmd.h"
 #include "port/Engine.h"
+#include "port/audio/VoiceBlips.h"
+
 
 void Audio_SetModulationAndPlaySfx(f32* sfxSource, u32 sfxId, f32 freqMod);
 s32 Audio_GetCurrentVoice(void);
@@ -1848,7 +1850,11 @@ void Audio_ResetSfx(void) {
 }
 
 void Audio_PlayVoice(s32 msgId) {
-    sCurrentVoiceId = sNextVoiceId = msgId;
+    sCurrentVoiceId = msgId;
+    sNextVoiceId = msgId;
+    if (msgId >= 4 && msgId < 24000 && VoiceBlips_IsActive()) {
+        sNextVoiceId = VoiceBlips_ResolveVoice((u16) msgId, gExpertMode);
+    }
     sSetNextVoiceId = true;
 }
 
@@ -1885,6 +1891,12 @@ void Audio_ClearVoice(void) {
     sCurrentVoiceId = 0;
     sNextVoiceId = 1;
     sSetNextVoiceId = true;
+}
+
+void VoiceBlips_ClearNarration(void) {
+    if (sCurrentVoiceId == 1000) {
+        Audio_ClearVoice();
+    }
 }
 
 s32 Audio_GetCurrentVoice(void) {

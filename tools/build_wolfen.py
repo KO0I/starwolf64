@@ -12,6 +12,7 @@ ROOT = Path(__file__).resolve().parents[1]
 FIT_HEADER = (ROOT / 'include/wolfen.h').read_text()
 FIT = {name: float(value) for name, value in re.findall(r'#define WOLFEN_(\w+) \((-?[\d.]+)f\)', FIT_HEADER)}
 HULL_Y = FIT['HULL_Y']
+ENGINE_Z = FIT['ENGINE_Z']
 COCKPIT_DROP = FIT['COCKPIT_DROP']
 HEAD_LIFT = FIT['HEAD_LIFT']
 
@@ -27,8 +28,9 @@ def f32(value):
 FACE_Y = float_bits(f32(f32(6.4) - COCKPIT_DROP) + HEAD_LIFT)
 CANOPY_Y = float_bits(f32(17.2) - COCKPIT_DROP)
 ENGINE_Y = float_bits(HULL_Y)
-if ENGINE_Y & 0xFFFF:
-    raise ValueError('Engine Y must fit the original single-instruction float loads')
+ENGINE_Z_BITS = float_bits(ENGINE_Z)
+if (ENGINE_Y | ENGINE_Z_BITS) & 0xFFFF:
+    raise ValueError('Engine coordinates must fit the original single-instruction float loads')
 
 ROM_NAME = 'Star Fox 64 (U) (V1.1) [!].z64'
 ROM_SHA1 = '09f0d105f476b00efa5303a3ebc42e60a7753b7a'
@@ -50,13 +52,14 @@ COLOR_PATCHES = {
 }
 # Lift pilot heads independently of the recessed canopy. The exhaust vector uses
 # an available delay-slot NOP to load Y, then stores those float bits in src.y.
-# Its X=0 and boost-dependent Z stores remain intact.
+# Its X=0 and boost-dependent Z stores remain intact, with a rearward Z base.
 POSITION_PATCHES = {
     0x543B4: (0x3C0640CC, 0x3C060000 | FACE_Y >> 16),
     0x543C0: (0x34C6CCCD, 0x34C60000 | FACE_Y & 0xFFFF),
     0x54520: (0x3C064189, 0x3C060000 | CANOPY_Y >> 16),
     0x54538: (0x34C6999A, 0x34C60000 | CANOPY_Y & 0xFFFF),
     0x5BA60: (0x44060000, 0x3C060000 | ENGINE_Y >> 16),
+    0x56898: (0x3C01C220, 0x3C010000 | ENGINE_Z_BITS >> 16),
     0x568B0: (0x00000000, 0x3C010000 | ENGINE_Y >> 16),
     0x568DC: (0xE7A20050, 0xAFA10050),
 }
@@ -368,7 +371,7 @@ class Builder:
     def recolor_menu(self):
         menu = self.segments['ovl_menu']
         patches = [(0x27140 + index * 0x60, struct.pack('>4I', 20, 0, 75, 255),
-                    struct.pack('>4I', 75, 0, 0, 255)) for index in range(9)]
+                    struct.pack('>4I', 75, 0, 75, 255)) for index in range(9)]
         # Expert-mode selection arrows use immediate RGB arguments.
         patches.extend((offset, struct.pack('>I', original), struct.pack('>I', replacement))
                        for offset, original, replacement in (
@@ -382,6 +385,8 @@ class Builder:
                 raise ValueError(f'Unexpected original menu color at {offset:#x}')
             menu[offset:offset + len(replacement)] = replacement
         self.menu_color_changes = patches
+        from wolf_menu_text import apply_menu
+        apply_menu(self)
 
     def replace_intro_title(self):
         # Keep the original intro glyphs; W/L use a matching bold sans font.
@@ -441,38 +446,33 @@ class Builder:
         self.segments['ast_title'][0x14140:0x147C0] = data
         self.resources[path] = original[:80] + data
 
-    def reverse_wing_mounts(self):
-        # Turn each original wing mount around its local Y axis. Keeping the
-        # original joint animation then reverses its sweep in ship coordinates.
-        # Duplicate shared frame values so other joints retain their old motion.
-        for offset in (0x15AF4, 0x15C28, 0x15D68, 0x163C4):
-            name, _ = self.assets[('ast_arwing', offset)]
-            original = self.base.read(f'ast_arwing/{name}')
-            frame_count, limb_count, key_count = struct.unpack_from('<HHI', original, 64)
-            keys = [list(struct.unpack_from('<6H', original, 72 + 12 * i)) for i in range(key_count)]
-            size_offset = 72 + key_count * 12
-            count = struct.unpack_from('<I', original, size_offset)[0]
-            frames = list(struct.unpack_from(f'<{count}H', original, size_offset + 4))
-            for limb in (14, 16):
-                key = keys[limb + 1]
-                length = max(1, min(key[2], frame_count))
-                values = [(v + 32768) & 65535 for v in frames[key[3]:key[3] + length]]
-                key[3] = len(frames)
-                frames.extend(values)
-            address = self.allocate(struct.pack(f'>{len(frames)}H', *frames))
-            key_pointer = struct.unpack_from('>I', self.output, offset + 8)[0] & 0xFFFFFF
-            struct.pack_into('>I', self.output, offset + 4, address)
-            for i, key in enumerate(keys):
-                struct.pack_into('>6H', self.output, key_pointer + i * 12, *key)
-            self.resources[f'ast_arwing/{name}'] = original[:64] + struct.pack('<HHI', frame_count, limb_count, key_count) + b''.join(struct.pack('<6H', *k) for k in keys) + struct.pack('<I', len(frames)) + struct.pack(f'<{len(frames)}H', *frames)
-        self.matrices, _ = skeleton_matrices(self.output)
+    def swap_shadows(self):
+        slots = (('ast_common', 0x32808), ('ast_star_wolf', 0x14398))
+        originals = []
+        for stem, offset in slots:
+            name, fields = self.assets[stem, offset]
+            path = f'{stem}/{name}'
+            original = self.base.read(path)
+            if (fields['format'], int(fields['width']), int(fields['height'])) != ('IA8', 32, 32):
+                raise ValueError('Unexpected ship shadow format: ' + path)
+            if struct.unpack_from('<4I', original, 64) != (8, 32, 32, 1024) or len(original) != 1104:
+                raise ValueError('Unexpected ship shadow allocation: ' + path)
+            if self.segments[stem][offset:offset + 1024] != original[80:]:
+                raise ValueError('Ship shadow differs from the base asset: ' + path)
+            originals.append((path, original))
+        self.shadow_changes = []
+        for (stem, offset), (path, original), (_, source) in zip(slots, originals, reversed(originals)):
+            payload = source[80:]
+            self.resources[path] = original[:80] + payload
+            self.segments[stem][offset:offset + len(payload)] = payload
+            self.shadow_changes.append((stem, path, offset, original[80:], payload))
 
     def build(self):
         from wolf_logo import replace_title_logo
         replace_title_logo(self)
         self.replace_intro_title()
         self.recolor_lasers()
-        self.reverse_wing_mounts()
+        self.swap_shadows()
         hull = [[1, 0, 0, 0], [0, 1, 0, HULL_Y], [0, 0, 1, 0], [0, 0, 0, 1]]
 
         def part(pointer, points, ids):
@@ -535,6 +535,8 @@ class Builder:
         replace_icons(self)
         from medusa import install_medusa
         install_medusa(self, crc64)
+        from crew_hud import install as install_crew_hud
+        install_crew_hud(self)
         from wolf_portraits import replace_portraits
         replace_portraits(self)
         from wolf_identity import replace_name_cards
@@ -546,6 +548,7 @@ class Builder:
         self.recolor_menu()
         replace_identity(self)
         mute_changed_dialogue(self)
+        self.medusa.relocate_launch()
         from vitzy_fighter import build_fighter
         build_fighter(self)
         return wing_parts
@@ -557,23 +560,27 @@ class Builder:
                 raise ValueError(f'Unexpected color instruction at {offset:x}')
             struct.pack_into('>I', out, offset, replacement)
         for stem, data in self.segments.items():
-            if stem == 'ast_star_wolf':
-                continue
             start = (len(out) + 15) & ~15
             out.extend(b'\0' * (start - len(out)))
             out.extend(data)
             entry = TABLE + 16 * self.table_indices[stem]
             virtual = struct.unpack_from('>I', out, entry)[0]
             struct.pack_into('>IIII', out, entry, virtual, start, len(out), 0)
+        from crew_hud import patch_rom as patch_crew_hud
+        patch_crew_hud(self, out)
         self.character.patch_rom(out)
         self.medusa.patch_rom(out)
         from wolf_dialogue import patch_dialogue_voice
         patch_dialogue_voice(self, out)
+        from wolf_menu_text import patch_rom as patch_text
+        patch_text(self, out)
         out.extend(b'\0' * (0x1000000 - len(out)))
         struct.pack_into('>II', out, 0x10, *cartridge_crc(out))
         return out
 
     def verify(self, patched):
+        from wolf_menu_text import verify as verify_menu_text
+        verify_menu_text(self, patched)
         from vitzy_fighter import verify_fighter
         verify_fighter(self)
         title = self.segments['ast_title']
@@ -673,11 +680,13 @@ class Builder:
             swept, _ = skeleton_matrices(self.output, animation=0x15D68)
             tip = [sign * 63, 14, -13]
             closed_tip = transform(swept[bone], transform(inverse(opened[bone]), tip))
-            if closed_tip[2] >= tip[2]:
-                raise ValueError('Wing joint does not sweep rearward')
+            if closed_tip[2] <= tip[2]:
+                raise ValueError('Wing joint does not sweep forward')
         for offset, (_, replacement) in ROM_PATCHES.items():
             if struct.unpack_from('>I', patched, offset)[0] != replacement:
                 raise ValueError('Browser flight color/position patch missing')
+        from crew_hud import verify as verify_crew_hud, restore_common
+        verify_crew_hud(self, patched)
         from wolf_portraits import verify_portraits
         common = bytearray(verify_portraits(self))
         from wolfen_icons import verify_icons
@@ -685,6 +694,15 @@ class Builder:
         for stem, _, offset, old, _ in self.small_icon_changes:
             if stem == 'ast_common':
                 common[offset:offset + len(old)] = old
+        restore_common(self, common)
+        for stem, path, offset, original, expected in self.shadow_changes:
+            if self.resources[path][80:] != expected or self.segments[stem][offset:offset + len(expected)] != expected:
+                raise ValueError('Native/browser ship shadow mismatch: ' + path)
+            _, start, end, compressed = struct.unpack_from('>IIII', patched, TABLE + 16 * self.table_indices[stem])
+            if compressed or offset + len(expected) > end - start or patched[start + offset:start + offset + len(expected)] != expected:
+                raise ValueError('Ship shadow missing from browser ROM: ' + path)
+            if stem == 'ast_common':
+                common[offset:offset + len(original)] = original
         if common[:0x1AF98] != self.original_common[:0x1AF98] or common[0x1B198:] != self.original_common[0x1B198:]:
             raise ValueError('An unrelated common asset, including hyper lasers, changed')
         pixels = struct.unpack_from('>256H', common, 0x1AF98)
@@ -714,7 +732,7 @@ def main():
         sides = builder.build()
         chatter = ROOT / "assets/audio/chatter/bank.bin"
         data = chatter.read_bytes()
-        if data[:4] != b"CHT1":
+        if data[:4] != b"CHT2":
             raise ValueError("Missing or invalid crew chatter bank")
         header = base.read("ast_audio/ast_audio_v1_sequence_DEA20")[:64]
         builder.resources["audio/crew_chatter"] = header + struct.pack("<I", len(data)) + data

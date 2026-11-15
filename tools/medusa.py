@@ -25,6 +25,7 @@ ENDING_SCALE_OFFSET = 0xB914
 ENDING_SCALE_VALUES = (4, 1, 10, 4.4, 1, 11, 5.1, 1, 15, 5.6, 1, 16.5)
 LAYOUT = (SOURCE.parents[2] / 'include/medusa.h').read_text()
 ENGINE = {name: float(value) for name, value in re.findall(r'#define MEDUSA_ENGINE_(\w+) \((-?[\d.]+)f\)', LAYOUT)}
+LAUNCH = {name: float(value) for name, value in re.findall(r'#define MEDUSA_LAUNCH_OFFSET_(\w+) \((-?[\d.]+)f\)', LAYOUT)}
 ENGINE_ALPHA = int(re.search(r'#define MEDUSA_ENGINE_GLOW_ALPHA (\d+)', LAYOUT)[1])
 ENGINE_CORE_BLUE = int(re.search(r'#define MEDUSA_ENGINE_CORE_B (\d+)', LAYOUT)[1])
 ENGINE_RGB = tuple(int(re.search(r'#define MEDUSA_ENGINE_GLOW_' + channel + r' (\d+)', LAYOUT)[1]) for channel in 'RGB')
@@ -439,6 +440,39 @@ class Medusa:
                 quads.append((points, (255, 255, 255, 255), uv))
             self.quads(raw, native, quads, path)
 
+    def relocate_launch(self):
+        """Move the US 1.1 exterior launch, destinations and camera together."""
+        from build_wolfen import float_bits
+        menu = self.builder.segments['ovl_menu']
+        # Reuse the redundant LUI before the fighter loop to load X into t6.
+        loads = (LAUNCH['X'], -40 + LAUNCH['Y'], -8 + LAUNCH['X'], -37 + LAUNCH['Y'])
+        if any(float_bits(value) & 0xFFFF for value in loads):
+            raise ValueError('Medusa launch coordinates must fit single-instruction float loads')
+        words = (
+            (0x4F80, 0x3C01801B, 0x3C0E0000 | float_bits(loads[0]) >> 16),
+            (0x4F88, 0x3C01C220, 0x3C010000 | float_bits(loads[1]) >> 16),
+            (0x4FA8, 0xE454FFA4, 0xAC4EFFA4),
+            (0x4FF4, 0x3C01C100, 0x3C010000 | float_bits(loads[2]) >> 16),
+            (0x4FFC, 0x3C01C214, 0x3C010000 | float_bits(loads[3]) >> 16),
+        )
+        self.launch_changes = [(offset, struct.pack('>I', old), struct.pack('>I', new))
+                               for offset, old, new in words]
+        targets = (-15, -5, 5, 10, -50, -45, -55, -60)
+        moved = tuple(value + LAUNCH['X' if i < 4 else 'Y'] for i, value in enumerate(targets))
+        self.launch_changes.append((0x26F14, struct.pack('>8f', *targets), struct.pack('>8f', *moved)))
+        camera = bytes(menu[0x26A64:0x26A64 + 9 * 24])
+        if hashlib.sha256(camera).hexdigest() != '0502880adadd23224c5a3f9ee7c5a3c85e010539b48b5f7595d5eddf6d759860':
+            raise ValueError('Unexpected original exterior launch camera')
+        points = list(struct.unpack('>54f', camera))
+        for i in range(len(points)):
+            if i % 3 < 2:
+                points[i] += LAUNCH['X' if i % 3 == 0 else 'Y']
+        self.launch_changes.append((0x26A64, camera, struct.pack('>54f', *points)))
+        for offset, old, new in self.launch_changes:
+            if menu[offset:offset + len(old)] != old:
+                raise ValueError(f'Unexpected original Medusa launch data at {offset:#x}')
+            menu[offset:offset + len(new)] = new
+
     def patch_rom(self, rom):
         expected = struct.pack('>17f', *GLOW_VALUES)
         if rom[GLOW_OFFSET:GLOW_OFFSET + len(expected)] != expected:
@@ -458,6 +492,10 @@ class Medusa:
     def verify(self, rom):
         from build_wolfen import TABLE
         data = self.builder.segments[STEM]
+        menu = self.builder.segments['ovl_menu']
+        for offset, _, expected in self.launch_changes:
+            if menu[offset:offset + len(expected)] != expected:
+                raise ValueError(f'Browser Medusa launch mismatch at {offset:#x}')
         if len(data) != len(self.original):
             raise ValueError('Medusa changed Great Fox DMA allocation size')
         for start, end in ((0xDFB0, 0xE100), (0x11D80, len(data))):

@@ -65,12 +65,14 @@ function readPrologue(data) {
 
 export function createCrewChatter(getEmulator, isRunning, environment = globalThis) {
   let context, gain, manifest, loading, base = null, heapBuffer, nextScan = 0;
+  let narrationStarted = false;
   let node, identity = '', lastIndex = 0, syllable = 0, nextAt = 0, enabled = true;
   const banks = new Map();
   const stats = {ramBase: null, voices: {}, ready: false, error: null, playing: false};
   function stop() {
     if (node) {try {node.stop();} catch {} node = undefined;}
     stats.playing = false;
+    narrationStarted = false;
   }
   function resume() {
     try {
@@ -84,7 +86,7 @@ export function createCrewChatter(getEmulator, isRunning, environment = globalTh
         const response = await fetch(new URL('./audio/chatter/bank.json', import.meta.url));
         if (!response.ok) throw Error('Crew chatter bank could not be loaded');
         manifest = await response.json();
-        if (manifest.version !== 1 || manifest.sampleRate !== 32000) throw Error('Unsupported crew chatter bank');
+        if (manifest.version !== 2 || manifest.sampleRate !== 32000) throw Error('Unsupported crew chatter bank');
         await Promise.all(manifest.characters.map(async profile => {
           const response = await fetch(new URL('./audio/chatter/' + profile.name + '.wav', import.meta.url));
           if (!response.ok) throw Error('Missing chatter voice: ' + profile.name);
@@ -122,10 +124,13 @@ export function createCrewChatter(getEmulator, isRunning, environment = globalTh
     lastIndex = radio.index;
     const letter = (radio.glyph >= 24 && radio.glyph <= 75) ||
       (radio.glyph >= 81 && radio.glyph <= 90) || radio.glyph >= 95;
-    if (!advanced || !letter || context.currentTime < nextAt || context.state !== 'running') return;
-    stop();
-    const grain = profile.grains[syllable++ % profile.grains.length];
+    const continuous = profile.playback === 'continuous';
     gain.gain.value = .7 * Math.max(0, Math.min(1, emulator.volume ?? .7)) * radio.voiceVolume;
+    if (context.state !== 'running' || (continuous ? narrationStarted :
+        !advanced || !letter || context.currentTime < nextAt)) return;
+    stop();
+    const grain = profile.grains[continuous ? 0 : syllable++ % profile.grains.length];
+    narrationStarted = continuous;
     node = context.createBufferSource();
     node.buffer = banks.get(profile.name);
     node.connect(gain);

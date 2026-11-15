@@ -1,0 +1,33 @@
+{
+  "tool": "built-in image_gen",
+  "reference": "reference.jpg",
+  "edit_target": "original-face-preview.png",
+  "master": "face.png",
+  "prompt": "Use case: precise-object-edit. Asset type: flat UV face texture for Kami's low-polygon 3D game head. Image 1 is the EDIT TARGET, a 944x808 rectangular enlargement of the exact existing face UV tile. Image 2 is ONLY the desired design reference for the eyes and mouth. Edit the FLAT TEXTURE, preserving its rectangular aspect ratio, UV layout, feature centers, face silhouette, hair shapes, turquoise forehead triangle, diamond pink nose, cheek markings, neck and all unrelated texture content. Change only eyes/lower lashes and mouth. EYES: make both eye globes visibly rounder and more oval/circular like the reference, with relaxed half-closed rounded purple upper eyelids and pale lower eye whites, small purple pupils near the existing positions. Replace the sharply angled angry eye shape with a gentler curved upper lid and round U-shaped lower edge. Keep the eyes in their current footprint, do not move them or alter the head anatomy. LOWER LASHES: restrained thin dark lower eyeliner and THREE SHORT fine pointed lower lashes per eye, roughly half the weight of the recent thick portrait lashes. Delicate separated points, not broad black triangles or black under-eye bands. No tear streaks or smeared mascara. MOUTH: replace the straight smiling line with the reference's small reptilian sideways-curly-brace seam, like a closing curly brace '}' rotated 90 degrees, a wide shallow double curve with a tiny central upward notch and gently lifted corners. Keep the TWO SMALL WHITE FANGS visible below the mouth in their original positions; retain the calm closed-mouth expression. Match the reference's simple slightly mischievous reptile mouth, no thick lips, no large open mouth. Preserve original pixel-art/soft low-resolution texture shading and palette. Do not add a border, text, cockpit, ears, new head, or a rendered 3D scene. Output only the revised flat rectangular UV tile with the same composition as image 1.",
+  "atlas_face_rect": [
+    72,
+    317,
+    190,
+    418
+  ],
+  "registered_regions_uv": [
+    [
+      0.075,
+      0.415,
+      0.385,
+      0.685
+    ],
+    [
+      0.585,
+      0.415,
+      0.895,
+      0.685
+    ],
+    [
+      0.285,
+      0.7,
+      0.7,
+      0.84
+    ]
+  ]
+}

@@ -179,6 +179,7 @@ void Actor_Initialize(Actor* this) {
         *ptr = 0;
     }
     this->scale = 1.0f;
+    Multilock_ActorInitialized(this);
 }
 
 void Boss_Initialize(Boss* this) {
@@ -1728,6 +1729,7 @@ void func_enmy_800660F0(Actor* this) {
             item->timer_4A = 8;
 
             CALL_CANCELLABLE_EVENT(ItemDropEvent, item) {
+                Multilock_ConvertDrop(item);
                 Object_SetInfo(&item->info, item->obj.id);
                 if ((item->obj.id == OBJ_ITEM_SILVER_RING) || (item->obj.id == OBJ_ITEM_BOMB) ||
                     (item->obj.id == OBJ_ITEM_LASERS)) {
@@ -2243,7 +2245,11 @@ void ItemPickup_Update(Item* this) {
                     this->state = 1;
                     this->timer_48 = 20;
                     this->unk_50 = 60.0f;
-                    gBombCount[this->playerNum]++;
+                    if (this->isMultilock) {
+                        Multilock_Upgrade();
+                    } else {
+                        gBombCount[this->playerNum]++;
+                    }
                     Object_PlayerSfx(gPlayer[this->playerNum].sfxSource, NA_SE_BOMB_GET, this->playerNum);
                     Object_PlayerSfx(gPlayer[this->playerNum].sfxSource, NA_SE_BOMB_GAUGE_UP, this->playerNum);
                 }
@@ -2851,7 +2857,9 @@ void Actor_Update(Actor* this) {
             (rapidFire && (gControllerHold[gMainController].button & A_BUTTON))) {
             this->lockOnTimers[TEAM_ID_FOX]--;
         }
-        gChargeTimers[0] = 0;
+        if (!Multilock_IsEnabled(0)) {
+            gChargeTimers[0] = 0;
+        }
     }
 
     if (this->timer_0C4 != 0) {

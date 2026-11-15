@@ -1,5 +1,7 @@
 # Threaded runtime: HTML5 WebGL owns the browser-main canvas; SDL handles events.
 set_target_properties(Starship PROPERTIES SUFFIX ".html")
+configure_file("${PROJECT_SOURCE_DIR}/browser/launch-background.jpg"
+    "${CMAKE_CURRENT_BINARY_DIR}/launch-background.jpg" COPYONLY)
 target_link_options(Starship PRIVATE
     -sMIN_WEBGL_VERSION=2 -sMAX_WEBGL_VERSION=2
     -sPROXY_TO_PTHREAD=1 -sOFFSCREEN_FRAMEBUFFER=1 -sPTHREAD_POOL_SIZE=4

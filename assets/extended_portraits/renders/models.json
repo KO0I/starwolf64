@@ -1,0 +1,46 @@
+{
+  "source_archive_sha256": "141bce52b13994844c7089f8e711bcdb2d16bf0e59cdf2cf59aa511033d546dd",
+  "technique": "Exact GLBs captured from production Compiler.emit; native idle pose captured from Bodies.animation.",
+  "models": {
+    "wolf_body": {
+      "sha256": "dc9500711565de33ff4b9c39d6c6496ba4716ee031ca91e838f22461626ff988",
+      "production_path": "characters/wolf/title",
+      "pose": "production standing idle frame0"
+    },
+    "panther_body": {
+      "sha256": "c465b51cfdb3d6b2f865aa5c6896fadcaba009a74e3f729f30fb0584a7efb6e6",
+      "production_path": "characters/panther/title",
+      "pose": "production standing idle frame0"
+    },
+    "krystal_body": {
+      "sha256": "2ebf8d62efd13eca233d8e228907d8acd4c62a50c1a43c1ad3f73f4402aff560",
+      "production_path": "characters/krystal/title",
+      "pose": "production standing idle frame0"
+    },
+    "kami_body": {
+      "sha256": "41f32bc0d530304ac50978624457a16b7befcf809fae50ffe57d784e77fe1c78",
+      "production_path": "characters/kami/title",
+      "pose": "production standing idle frame0"
+    },
+    "wolf_head": {
+      "sha256": "f564a44dc761b666db4325a603e0382ca71addfbfba318b939ff193f03cb71a9",
+      "production_path": "ast_arwing/aAwFoxHeadDL",
+      "pose": "production rest geometry"
+    },
+    "krystal_head": {
+      "sha256": "83be2feace75392371d7cca8f50ba41c39124abcfb2239dc794cb4d4f48e7abc",
+      "production_path": "ast_arwing/aAwPeppyHeadDL",
+      "pose": "production rest geometry"
+    },
+    "kami_head": {
+      "sha256": "3ef6e5ef9339f24946b11892b1b8b5b5148c0efb5bd5a6fd93c35310b113ffb3",
+      "production_path": "ast_arwing/aAwSlippyHeadDL",
+      "pose": "production rest geometry"
+    },
+    "panther_head": {
+      "sha256": "63d7beb0d00f671730d9b9ced79f120416649ca43f9814a240f0d821e0b78bac",
+      "production_path": "ast_arwing/aAwFalcoHeadDL",
+      "pose": "production rest geometry"
+    }
+  }
+}

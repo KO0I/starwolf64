@@ -134,7 +134,7 @@ def verify_dialogue(builder, patched):
     if struct.unpack_from('>II', menu, PROLOGUE_VOICE_OFFSET) != (0, 0x240403E8):
         raise ValueError('Browser prologue still plays the original narration')
     restored = bytearray(menu)
-    for offset, original, expected in builder.menu_color_changes + builder.level_title_changes:
+    for offset, original, expected in builder.menu_color_changes + builder.level_title_changes + builder.medusa.launch_changes:
         if menu[offset:offset + len(expected)] != expected:
             raise ValueError(f'Browser menu mismatch at {offset:#x}')
         restored[offset:offset + len(original)] = original

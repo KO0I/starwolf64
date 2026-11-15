@@ -1,8 +1,10 @@
 # Starwolf64
 
-A playable Star Wolf mod built on HarbourMasters/Starship. The browser edition runs a delta patch against a visitor-selected Star Fox 64 US v1.1 ROM. The base ROM stays on the visitor's device.
+A playable Star Wolf mod built on HarbourMasters/Starship. The default browser edition runs the native Starship engine in WebAssembly, with the current character assets and dialogue-blip audio mod. It prepares game assets from a visitor-selected Star Fox 64 US v1.1 ROM. The base ROM stays on the visitor's device.
 
 [Play on GitHub Pages](https://ko0i.github.io/starwolf64/) and [build or host your own copy](browser/README.md). The game domain is play.starwolf64.com. Squarespace can forward starwolf64.com there.
+
+Create layouts with the [local level editor](docs/level-editor.md). One JSON file exports to a native mod archive and a browser ROM patch. The first supported stage is Corneria on rails.
 
 The original Starship instructions and credits follow.
 

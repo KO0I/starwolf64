@@ -49,4 +49,6 @@ typedef enum OverlayCalls {
 
 
 
+#include "multilock.h"
+
 #endif // GLOBAL_H

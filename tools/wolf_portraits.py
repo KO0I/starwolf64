@@ -70,9 +70,13 @@ def replace_portraits(builder):
         builder.segments[stem][target:target + len(payload)] = payload
         builder.resources[path] = original[:80] + payload
 
+    from extended_portraits import install
+    install(builder)
 
 def verify_portraits(builder):
     restored = {stem: bytearray(builder.segments[stem]) for stem in builder.portrait_originals}
+    from extended_portraits import verify
+    restored['ast_map'] = verify(builder)
     for stem, path, offset, old, expected in builder.crew_portrait_changes:
         if builder.resources[path][80:] != expected or builder.segments[stem][offset:offset + len(expected)] != expected:
             raise ValueError('Crew portrait replacement missing: ' + path)

@@ -1,0 +1,13 @@
+{
+  "source": "wolf_head.glb",
+  "source_sha256": "f564a44dc761b666db4325a603e0382ca71addfbfba318b939ff193f03cb71a9",
+  "yaw": 0,
+  "pitch": 0,
+  "bones": [],
+  "size": [
+    360,
+    420
+  ],
+  "crop": null,
+  "sha256_png": "c4d5a5ade3e059e4ac109974af138a87d4902c911999a27a3d08ef3fa1796c28"
+}

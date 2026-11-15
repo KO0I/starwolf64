@@ -17,7 +17,6 @@ CARDS = (
     ('ast_text', 0x6B30, 48, 8, 'IA8', ('PANTHER',)),
     ('ast_vs_menu', 0x5020, 48, 8, 'CI8', ('PANTHER',)),
     ('ast_vs_menu', 0x49C0, 56, 8, 'CI8', ('WOLF',)),
-    ('ast_option', 0xE170, 188, 60, 'RGBA16', ('MERCENARY UNIT', 'STAR WOLF', "WOLF O'DONNELL")),
 )
 
 

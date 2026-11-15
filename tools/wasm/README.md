@@ -1,6 +1,6 @@
 # Build the WASM dependencies
 
-Run in the Starship WASM worktree. Host prerequisites are Python 3.12+, Git,
+Run in the Starship project. Host prerequisites are Python 3.12+, Git,
 CMake 3.24+, Ninja, Bash and GNU patch. The recorded build used CMake 4.4.5.
 Downloads, source caches, SDK and build outputs stay under ignored `build/wasm`.
 No system installation or shell profile change is required.
@@ -109,8 +109,7 @@ python3 tools/wasm/serve.py --port 8664
 ```
 
 Open http://127.0.0.1:8664/Starship.html. Select sf64.o2r and starship.o2r from a
-native installation; optionally select mod archives. The browser builder below handles ROM input locally. Remembered assets and
-save persistence remain pending. Existing keyboard mappings work in this preview.
+native installation; optionally select mod archives. The browser builder below handles ROM input locally. Game saves persist in browser storage. ROM assets must be selected again after reload. Existing keyboard mappings work in this preview.
 
 ```sh
 node tools/wasm/check-webgl.mjs --game --training --base /path/sf64.o2r --port /path/starship.o2r --mod /path/wolfen.o2r
@@ -285,7 +284,7 @@ device confirmation.
 
 ## Public browser builder
 
-A separate experimental player accepts the original Star Fox 64 US v1.1 ROM
+The default browser player accepts the original Star Fox 64 US v1.1 ROM
 entirely on the user's device. The runtime is compiled once. A disposable worker
 uses the same pinned Torch extractor to build the base archive, packs the shipped
 port resources, then applies the frozen native-mod recipe. Every mod resource is
@@ -318,10 +317,11 @@ opens the prepared game with the required isolation headers. No extraction tools
 or ROM selection are needed for that downloaded copy. A direct file:// launch is
 not supported. Downloaded prepared assets remain personal local output.
 
-The exact preview mod is frozen in `assets/wasm/mod/`; see
-[its notes](../../assets/wasm/README.md). The authoring scripts can continue evolving
-independently of this tested snapshot. Regenerate the recipe intentionally when
-shipping a new mod snapshot.
+The current character and dialogue-blip mods are frozen in `assets/wasm/mod/`.
+Run `python3 tools/wasm/refresh_mod.py` after source changes, then repeat with
+`--check` to compare every resource. Public export verifies the recorded source
+hashes and rejects a stale snapshot. See [the browser guide](../../browser/README.md)
+for the default export, preview, custom-domain, and asset refresh commands.
 
 ### Verification
 

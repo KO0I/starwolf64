@@ -36,7 +36,7 @@ def display_list(archive, path, names):
 
 def main():
     report = json.loads((ROOT / 'build-cmake/character-assets.json').read_text())
-    expected = {'krystal': (761, 583, 520), 'kami': (762, 752, 323)}
+    expected = {'krystal': (761, 583, 360), 'kami': (762, 752, 323)}
     with zipfile.ZipFile(ROOT / 'build-cmake/mods/wolfen.o2r') as archive:
         names = {crc64(name): name for name in archive.namelist()}
         for char, (title, foot, head) in expected.items():
@@ -46,10 +46,11 @@ def main():
                 actual = sum(display_list(archive, path, names)[0] for path in paths)
                 assert actual == count and actual <= 768, (char, variant, actual)
             actual = display_list(archive, report['pilot_heads'][char]['path'], names)[0]
-            assert actual == head and actual <= (512 if char == 'kami' else 520), (char, 'pilot', actual)
+            assert actual == head and actual <= (512 if char == 'kami' else 360), (char, 'pilot', actual)
             if char == 'krystal':
                 assert report['pilot_heads'][char]['source'] == 'heads/krystal/head.glb'
-                assert report['pilot_heads'][char]['triangle_reduction'] is None
+                assert report['pilot_heads'][char]['triangle_reduction'] == {
+                    'source_triangles': 520, 'triangles': 360, 'budget': 360, 'removed_triangles': 160}
         # Read the actual compiled textures used by all four exposed limbs in each pose.
         teal = ((89 >> 3) << 11) | ((201 >> 3) << 6) | ((219 >> 3) << 1) | 1
         limbs = {'title': (3, 6, 9, 12), 'on_foot': (3, 11, 5, 8)}

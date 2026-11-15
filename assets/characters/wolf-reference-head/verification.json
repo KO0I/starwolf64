@@ -1,0 +1,21 @@
+{
+  "glb_triangles": 477,
+  "obj_triangles": 477,
+  "finite_positions": true,
+  "unit_normals": true,
+  "valid_indices": true,
+  "nondegenerate_triangles": true,
+  "embedded_materials": true,
+  "glb_bounds_min": [
+    -0.10938628017902374,
+    0.0,
+    -0.06530685722827911
+  ],
+  "glb_bounds_max": [
+    0.10938628017902374,
+    0.30000001192092896,
+    0.14945848286151886
+  ],
+  "height_m": 0.30000001192092896,
+  "glb_bytes": 58472
+}

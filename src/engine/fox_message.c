@@ -1,6 +1,7 @@
 #include "global.h"
 #include "mods.h"
 #include "port/audio/CrewChatter.h"
+#include "port/audio/VoiceBlips.h"
 
 extern u8 sVolumeSettings[3];
 
@@ -18,6 +19,9 @@ u16* Message_PtrFromId(u16 msgId) {
 }
 
 static u16 Message_VoiceId(u16 msgId) {
+    if (VoiceBlips_IsActive()) {
+        return msgId;
+    }
     switch ((s32) gRadioMsgRadioId) {
         case RCID_FOX:
         case RCID_FOX_RED:

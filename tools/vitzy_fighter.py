@@ -45,9 +45,6 @@ class Fighter(Builder):
             if 'offset' in fields:
                 self.assets['ast_allies', int(fields['offset'], 16) & 0xFFFFFF] = name, fields
         self.original_allies = bytes(self.segments['ast_allies'])
-        # Match the installed Wolfen wing joints without installing more animation overrides.
-        self.reverse_wing_mounts()
-        self.resources.clear()
         self.output = bytearray()
         self.cursor = 0
         self.material_roles = {}

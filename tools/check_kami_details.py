@@ -48,7 +48,9 @@ def inspect(resources, path):
                 data = resources[matrix.get('Path')]
                 assert struct.unpack_from('<I', data, 4)[0] == 0x4F4D5458
                 transform = np.array(struct.unpack_from('<16f', data, 64)).reshape(4, 4)
-                assert np.array_equal(transform, np.diag([.125, .125, .125, 1.]))
+                detail_scale = transform[0, 0]
+                assert detail_scale in (.125, .0625)
+                assert np.array_equal(transform, np.diag([detail_scale, detail_scale, detail_scale, 1.]))
                 stack.append(scale)
                 scale *= transform[0, 0]
             else:

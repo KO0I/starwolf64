@@ -133,6 +133,9 @@ typedef struct PlayerShot {
     /* 0x64 */ s32 timer;
     /* 0x68 */ s32 sourceId;
     /* 0x6C */ u8 bonus;
+    bool isMultilockShot;
+    s32 multilockActorIndex;
+    u32 multilockGeneration;
 } PlayerShot; // size = 0x70
 
 typedef struct ArwingInfo {
