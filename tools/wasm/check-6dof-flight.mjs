@@ -19,8 +19,17 @@ export async function checkSixDofFlight({value, sleep, call, output}) {
     return wait(current=>current.frames>=start.frames+count);
   };
   const angle = degrees => ((degrees+540)%360)-180;
+  const checkAssistIndicator=async active=>{
+    const button=await value(`(()=>{const b=document.querySelector('[data-button="0x0001"]');return {title:b.title,label:b.getAttribute('aria-label'),pressed:b.getAttribute('aria-pressed'),background:getComputedStyle(b).backgroundImage}})()`);
+    if(button.pressed!==String(active)||button.title!==(active?'flight assist off':'')||
+       button.background.includes('rgb(146, 255, 255)')!==active||
+       (active&&!button.label.includes('flight assist off')))
+      throw Error('C-right flight-assist indicator is incorrect: '+JSON.stringify({active,button}));
+    return button;
+  };
   const initial=await state();
   if(initial.sixDof) throw Error('6DOF must be off by default');
+  await checkAssistIndicator(false);
   if(initial.levelMode!==0) throw Error('Expected on-rails Training for the browser control check');
   if(!await value(`document.getElementById('six-dof')===null&&typeof Module._Wasm_SetSixDof==='undefined'`))
     throw Error('The external 6DOF toggle is still exposed');
@@ -30,11 +39,13 @@ export async function checkSixDofFlight({value, sleep, call, output}) {
   await pad(0,0,1);await frames(20);
   const busy=await state();
   if(busy.sixDof) throw Error('C-right toggled while a message was playing');
+  await checkAssistIndicator(false);
   await wait(idle);await frames(20);
   if((await state()).sixDof) throw Error('Holding C-right toggled when a message finished');
   await pad();await frames(20);await wait(idle);
   await pad(0,0,1);await wait(current=>current.sixDof);await frames(40);
   if(!(await state()).sixDof) throw Error('Holding C-right repeatedly toggled 6DOF');
+  const assistIndicator=await checkAssistIndicator(true);
   await pad();await frames(60);
   const captureHud=async(name,current,visible)=>{
     const box=await value(`(()=>{const r=document.getElementById('canvas').getBoundingClientRect(),frame=window.frameElement?.getBoundingClientRect();return{x:r.x+(frame?.x??0)+window.top.scrollX+(160-24)*r.width/320,y:r.y+(frame?.y??0)+window.top.scrollY+(66-25)*r.height/240,width:48*r.width/320,height:55*r.height/240,scale:1};})()`);
@@ -114,11 +125,11 @@ export async function checkSixDofFlight({value, sleep, call, output}) {
       const pitchAxis=[Math.cos(radians),Math.sin(radians)];
       const along=current=>current.playerPitch*pitchAxis[0]+current.playerYaw*pitchAxis[1];
       const across=current=>current.playerPitch*pitchAxis[1]-current.playerYaw*pitchAxis[0];
-      if(along(up)<4||Math.abs(across(up))>1)
-        throw Error('Pitch did not follow roll: '+JSON.stringify({held,up,pitchAxis}));
+      if(along(up)>-4||Math.abs(across(up))>1)
+        throw Error('Forward stick did not pitch down in the craft frame: '+JSON.stringify({held,up,pitchAxis}));
       await pad(0,-35);const down=await frames(40);await pad();
-      if(along(down)>-4||Math.abs(across(down))>1)
-        throw Error('Down did not reverse local pitch: '+JSON.stringify({down,pitchAxis}));
+      if(along(down)<4||Math.abs(across(down))>1)
+        throw Error('Back stick did not pitch up in the craft frame: '+JSON.stringify({down,pitchAxis}));
       samples.push({banked,held,up,down,hud});
       await frames(60);
     }
@@ -129,9 +140,10 @@ export async function checkSixDofFlight({value, sleep, call, output}) {
     if(!await value(`localStorage.getItem('starship-six-dof')==='1'`)) throw Error('6DOF preference was not saved');
     await wait(idle);await pad(0,0,1);await wait(current=>!current.sixDof);
     await pad();await frames(100);
+    await checkAssistIndicator(false);
     const hiddenHud=await captureHud('6dof-attitude-off',await state(),false);
     await pad(85);const standard=await frames(60);await pad();
     if(standard.playerYaw>=-10) throw Error('Standard yaw controls were not restored');
-    return {busy,samples,right,standard,hiddenHud,persisted:true};
+    return {busy,samples,right,standard,hiddenHud,assistIndicator,persisted:true};
   } finally {await pad();}
 }

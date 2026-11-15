@@ -3788,13 +3788,15 @@ static void Player_Update6DOFToggle(Player* player) {
         return;
     }
 
-    CVarSetInteger("gSixDofFlight", !CVarGetInteger("gSixDofFlight", 0));
+    bool enabled = !CVarGetInteger("gSixDofFlight", 0);
+    CVarSetInteger("gSixDofFlight", enabled);
+    AUDIO_PLAY_SFX(enabled ? NA_SE_MAP_WINDOW_OPEN : NA_SE_MAP_WINDOW_CLOSE, gDefaultSfxSource, 4);
     CVarSave();
     gInputPress->button &= ~R_CBUTTONS;
 }
 
 static void Player_Steer6DOF(Player* player, bool allRange) {
-    f32 pitchInput = gInputPress->stick_y * (CVarGetInteger("gInvertYAxis", 0) ? -1.0f : 1.0f);
+    f32 pitchInput = gInputPress->stick_y * (CVarGetInteger("gInvertYAxis", 0) ? 1.0f : -1.0f);
     f32 rollStep = -gInputPress->stick_x * (3.0f / 85.0f);
     f32 extraRoll = player->zRotBank + player->zRotBarrelRoll;
     f32 roll = Flight6DOF_Wrap(player->rot.z + extraRoll);

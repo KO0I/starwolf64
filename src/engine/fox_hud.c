@@ -3779,8 +3779,6 @@ static void HUD_AttitudeIndicator_Draw(void) {
     HUD_AttitudeSpan(centerX - 1, centerX + 2, centerY + 3);
     HUD_AttitudeSpan(centerX - 1, centerX + 2, centerY - radius - 4);
     RCP_SetupDL(&gMasterDisp, SETUPDL_76_OPTIONAL);
-    gDPSetPrimColor(gMasterDisp++, 0, 0, 66, 255, 82, alpha);
-    Graphics_DisplaySmallText(centerX - 13.0f, centerY + radius + 5.0f, 0.7f, 0.7f, "6DOF");
 }
 
 void HUD_Draw(void) {
