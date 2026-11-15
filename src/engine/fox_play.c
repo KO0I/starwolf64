@@ -768,6 +768,8 @@ void Play_ClearObjectData(void) {
     s16 i;
     s16 j;
 
+    Multilock_ClearLocks();
+
     for (i = 0; i < ARRAY_COUNT(gBonusText); i++) {
         BonusText_Initialize(&gBonusText[i]);
     }
@@ -3311,6 +3313,10 @@ bool Player_CanLockOn(s32 playerNum) {
     Actor* actor;
     s32 i;
 
+    if (Multilock_IsEnabled(playerNum)) {
+        return Multilock_CanLockOn();
+    }
+
     for (i = 0, actor = &gActors[0]; i < ARRAY_COUNT(gActors); i++, actor++) {
         if ((actor->obj.status == OBJ_ACTIVE) && (actor->lockOnTimers[playerNum] != 0)) {
             return false;
@@ -3344,6 +3350,17 @@ bool Player_UpdateLockOn(Player* player) {
     } else {
         charging = (gInputHold->button & A_BUTTON);
     }
+    if (Multilock_IsEnabled(player->num) && (gInputPress->button & B_BUTTON) &&
+        (Multilock_GetTargets(NULL) != 0)) {
+        bool fired = false;
+        CALL_CANCELLABLE_EVENT(PlayerActionPreBombEvent, player) {
+            fired = Multilock_FireBomb(player);
+        }
+        if (fired) {
+            CALL_EVENT(PlayerActionPostBombEvent, player);
+        }
+        return true;
+    }
     if (charging) {
         gChargeTimers[player->num]++;
         if (gChargeTimers[player->num] > 21) {
@@ -3355,7 +3372,9 @@ bool Player_UpdateLockOn(Player* player) {
         if (!((gInputHold->button & R_TRIG) && (gInputHold->button & Z_TRIG) && (player->form == FORM_ARWING) &&
               (player->state == PLAYERSTATE_ACTIVE)) &&
             ((gGameFrameCount % 4) == 0) && Player_CanLockOn(player->num)) {
-            if (gChargeTimers[player->num] > 20) {
+            if ((gChargeTimers[player->num] > 20) ||
+                (Multilock_IsEnabled(player->num) && (Multilock_GetTargets(NULL) != 0) &&
+                 !(gInputPress->button & (CVarGetInteger("gLtoCharge", 0) == 1 ? L_TRIG : A_BUTTON)))) {
                 for (i = 0; i < 13; i++) { // bug? should be 11
                     if (gPlayerShots[i].obj.status == SHOT_FREE) {
                         if (player->form == FORM_ARWING) {
@@ -3376,6 +3395,16 @@ bool Player_UpdateLockOn(Player* player) {
     }
 
     if (gInputPress->button & (CVarGetInteger("gLtoCharge", 0) == 1 ? L_TRIG : A_BUTTON)) {
+        if (Multilock_IsEnabled(player->num) && (Multilock_GetTargets(NULL) != 0)) {
+            bool fired = false;
+            CALL_CANCELLABLE_EVENT(PlayerActionPreShootChargedEvent, player) {
+                fired = Multilock_FireVolley(player);
+            }
+            if (fired) {
+                CALL_EVENT(PlayerActionPostShootChargedEvent, player);
+            }
+            return true;
+        }
         for (i = 0; i < ARRAY_COUNT(gActors); i++) {
             if ((gActors[i].obj.status == OBJ_ACTIVE) && (gActors[i].lockOnTimers[player->num] != 0)) {
                 if ((gPlayerShots[14 - player->num].obj.status == SHOT_FREE) ||
@@ -3410,6 +3439,9 @@ bool Player_UpdateLockOn(Player* player) {
                                                70.0f);
                     } else {
                         Player_SetupTankShot(player, &gPlayerShots[14 - player->num], PLAYERSHOT_LOCK_ON, 70.0f);
+                    }
+                    if (Multilock_IsEnabled(player->num)) {
+                        Multilock_AssignShot(&gPlayerShots[14 - player->num], NULL);
                     }
                     Object_PlayerSfx(player->sfxSource, NA_SE_LOCK_ON_LASER, player->num);
                     gChargeTimers[player->num] = 0;
@@ -5736,6 +5768,9 @@ void Play_dummy_800B41E0(Player* player) {
 }
 
 void Player_Down(Player* player) {
+    if (player->num == 0) {
+        Multilock_Reset();
+    }
     player->state = PLAYERSTATE_DOWN;
 
     if (!gVersusMode) {
@@ -6076,6 +6111,9 @@ void Player_Update(Player* player) {
             break;
 
         case PLAYERSTATE_DOWN:
+            if (player->num == 0) {
+                Multilock_Reset();
+            }
             Cutscene_PlayerDown(player);
             break;
 

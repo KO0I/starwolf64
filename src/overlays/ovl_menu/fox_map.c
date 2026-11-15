@@ -1622,6 +1622,7 @@ void Map_Setup_Menu(void) {
         sPaths[i].alpha = 255;
     }
 
+    Multilock_Reset();
     gMissionNumber = 0;
     gCurrentLevel = LEVEL_CORNERIA;
 

@@ -1720,6 +1720,15 @@ void Display_LockOnIndicator(void) {
     s32 j;
     f32 var_fs0;
 
+    if (Multilock_IsEnabled(0)) {
+        Multilock_DrawIndicators();
+        for (j = 0; j < gCamCount; j++) {
+            gLockOnTargetViewPos[j].x = gLockOnTargetViewPos[j].y = 0.0f;
+            gLockOnTargetViewPos[j].z = 100.0f;
+        }
+        return;
+    }
+
     for (i = 0; i < gCamCount; i++) {
         if (gLockOnTargetViewPos[i].z < 0.0f) {
             var_fs0 = VEC3F_MAG(&gLockOnTargetViewPos[i]);
