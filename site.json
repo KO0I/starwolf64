@@ -1,6 +1,6 @@
 {
   "format": "starwolf64-wasm-site-v1",
-  "sourceRevision": "b86d3588f701de8c1a79e88cafde77418ece6163",
+  "sourceRevision": "d279d7b46de4f09fed6ad3e9feda3e2b7bbea67e",
   "rom": {
     "size": 12582912,
     "sha1": "09f0d105f476b00efa5303a3ebc42e60a7753b7a",
@@ -57,8 +57,8 @@
       "sha256": "bb1d8f71b1c77fe2449d78909a94ca2507685b58e33e73c068561ac7a27aa33b"
     },
     "runtime/Starship.wasm": {
-      "size": 8540536,
-      "sha256": "cf331a5cb8283ebd25ebcd69f02b61585497194e61fd3c62fd754d5e2d408303"
+      "size": 8540473,
+      "sha256": "7f267ff1930a263885bd84be20d7e97559e26f9de63111c245b59636f192f541"
     },
     "runtime/Starship.data": {
       "size": 610848,
