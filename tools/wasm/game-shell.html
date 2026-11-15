@@ -197,6 +197,8 @@ body.club-player {
 .club-player #toolbar { background:var(--club-title); color:#fff5a3; }
 .club-player #toolbar button { font-size:12px; }
 .club-player #play-status { color:#bff7ff; font-family:"Courier New",monospace; }
+.club-runtime .c-buttons .pad-button.flight-assist-off { background:linear-gradient(145deg,#92ffff,#2ec8dc); color:#052029; border-color:#baffff; box-shadow:0 4px 0 #126577,0 0 12px #75ffff99; }
+.club-runtime .c-buttons .pad-button.flight-assist-off.held { box-shadow:0 1px 0 #126577,0 0 12px #75ffff99; }
 /* Controller typography and the central Start control. */
 .club-runtime .pad-button { font-family:Arwing,Arial,sans-serif; font-weight:400; }
 .club-runtime .playfield > .start-row { grid-column:2; grid-row:2; margin:0; justify-self:center; align-self:center; }
@@ -566,6 +568,21 @@ launch.addEventListener('click',async()=>{
     document.getElementById('diagnostics').open=true;
   }
 });
+</script>
+<script id="flight-assist-indicator">
+const flightAssistButton=document.querySelector('[data-button="0x0001"]');
+let previousFlightAssistState;
+function updateFlightAssistIndicator() {
+  const active=!!window.STARSHIP_GAME_STATE?.sixDof;
+  if(active===previousFlightAssistState)return;
+  previousFlightAssistState=active;
+  flightAssistButton.classList.toggle('flight-assist-off',active);
+  flightAssistButton.title=active?'flight assist off':'';
+  flightAssistButton.setAttribute('aria-label',active?'C right, flight assist off':'C right');
+  flightAssistButton.setAttribute('aria-pressed',String(active));
+}
+updateFlightAssistIndicator();
+setInterval(updateFlightAssistIndicator,100);
 </script>
 {{{ SCRIPT }}}
 </body></html>
