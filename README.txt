@@ -9,4 +9,4 @@ You can choose a different port with: python3 start.py --port 8666
 The player needs HTTP hosting; opening index.html as a file will not run it.
 
 A prepared download contains assets extracted from your ROM. Keep it for your own use.
-Source: https://github.com/KO0I/starwolf64/tree/starwolf/wasm-port-exploration
+Source: https://github.com/KO0I/starwolf64/tree/starwolf/dev
