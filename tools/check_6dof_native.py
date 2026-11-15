@@ -14,7 +14,15 @@ HARNESS = r'''
 #include <stdio.h>
 static OSContPad pad;
 OSContPad* gInputPress = &pad;
-static int enabled, inverted, currentVoice, saves;
+static int enabled, inverted, currentVoice, saves, sfxCalls;
+static u32 playedSfx;
+static f32* playedSource;
+static u8 playedToken;
+f32 gDefaultSfxSource[3], gDefaultMod = 1.0f;
+s8 gDefaultReverb;
+void Audio_PlaySfx(u32 id, f32* source, u8 token, f32* frequency, f32* volume, s8* reverb) {
+    playedSfx = id; playedSource = source; playedToken = token; sfxCalls++;
+}
 s32 gPlayState, gRadioState, gCallTimer;
 LevelMode gLevelMode;
 u8 gLevelType;
@@ -47,11 +55,13 @@ int main(void) {
     pad.button = R_CBUTTONS | A_BUTTON;
     Player_Update6DOFToggle(&player);
     CHECK(enabled && saves == 1 && pad.button == A_BUTTON);
+    CHECK(sfxCalls == 1 && playedSfx == NA_SE_MAP_WINDOW_OPEN && playedSource == gDefaultSfxSource && playedToken == 4);
     Player_Update6DOFToggle(&player);
-    CHECK(enabled && saves == 1);
+    CHECK(enabled && saves == 1 && sfxCalls == 1);
     pad.button = R_CBUTTONS;
     Player_Update6DOFToggle(&player);
     CHECK(!enabled && saves == 2 && pad.button == 0);
+    CHECK(sfxCalls == 2 && playedSfx == NA_SE_MAP_WINDOW_CLOSE);
     const int radioStates[] = {1, 4, 6, 100};
     for (int i = 0; i < 4; i++) {
         gRadioState = radioStates[i];
@@ -104,6 +114,7 @@ int main(void) {
     player.num = 0;
     pad.button = 0;
     CHECK(!Player_Uses6DOF(&player));
+    CHECK(sfxCalls == 2);
     enabled = 1;
     CHECK(Player_Uses6DOF(&player));
     for (int form = FORM_LANDMASTER; form <= FORM_ON_FOOT; form++) {
@@ -117,8 +128,8 @@ int main(void) {
         player.rot.z = banks[i];
         pad.stick_y = 60;
         for (int frame = 0; frame < 120; frame++) Player_Steer6DOF(&player, false);
-        CHECK(fabsf(player.rot.x - COS_DEG(banks[i]) * 40.8f) < 0.1f);
-        CHECK(fabsf(player.rot.y - SIN_DEG(banks[i]) * 40.8f) < 0.1f);
+        CHECK(fabsf(player.rot.x + COS_DEG(banks[i]) * 40.8f) < 0.1f);
+        CHECK(fabsf(player.rot.y + SIN_DEG(banks[i]) * 40.8f) < 0.1f);
         CHECK(fabsf(Flight6DOF_Wrap(player.rot.z - banks[i])) < 0.001f);
         pad.stick_y = 0;
         for (int frame = 0; frame < 120; frame++) Player_Steer6DOF(&player, false);
@@ -141,18 +152,30 @@ int main(void) {
         pad.stick_y = 60;
         Player_Steer6DOF(&player, true);
         float pitch = player.rot.x * M_DTOR, yaw = player.yRot_114 * M_DTOR;
-        CHECK(fabsf(sinf(pitch) - COS_DEG(banks[i]) * sinf((60 * 1.8f / 85) * M_DTOR)) < 0.0001f);
-        CHECK(fabsf(-sinf(yaw)*cosf(pitch) + SIN_DEG(banks[i]) * sinf((60 * 1.8f / 85) * M_DTOR)) < 0.0001f);
+        CHECK(fabsf(sinf(pitch) + COS_DEG(banks[i]) * sinf((60 * 1.8f / 85) * M_DTOR)) < 0.0001f);
+        CHECK(fabsf(-sinf(yaw)*cosf(pitch) - SIN_DEG(banks[i]) * sinf((60 * 1.8f / 85) * M_DTOR)) < 0.0001f);
     }
     memset(&player, 0, sizeof(player));
     inverted = 1;
     Player_Steer6DOF(&player, true);
-    CHECK(player.rot.x < 0);
+    CHECK(player.rot.x > 0);
     inverted = 0;
     memset(&player, 0, sizeof(player));
     player.zRotBank = 90;
     Player_Steer6DOF(&player, true);
-    CHECK(player.yRot_114 > 0 && fabsf(player.rot.x) < 0.0001f);
+    CHECK(player.yRot_114 < 0 && fabsf(player.rot.x) < 0.0001f);
+    for (int allRange = 0; allRange < 2; allRange++) {
+        for (int setting = 0; setting < 2; setting++) {
+            inverted = setting;
+            for (int direction = -1; direction <= 1; direction += 2) {
+                memset(&player, 0, sizeof(player));
+                pad.stick_y = direction * 60;
+                Player_Steer6DOF(&player, allRange);
+                CHECK(player.rot.x * direction * (inverted ? 1 : -1) > 0);
+            }
+        }
+    }
+    inverted = 0;
     pad.stick_x = pad.stick_y = 0;
     enabled = 1;
     const float cameraBanks[] = {90, 180, -90, 179, -179, 450};
@@ -195,7 +218,7 @@ int main(void) {
     gLevelType = LEVELTYPE_PLANET;
     Camera_UpdateArwingOnRails(&player);
     CHECK(fabsf(player.camRoll + 1.5f) < 0.001f);
-    puts("PASS: flight steering, radio gating, full camera roll on rails and all-range, rolled chase offset, and standard camera behavior");
+    puts("PASS: classic pitch controls, toggle sound IDs and edge/radio gating, full camera roll on rails and all-range, rolled chase offset, and standard camera behavior");
     return 0;
 }
 '''

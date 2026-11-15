@@ -125,11 +125,11 @@ export async function checkSixDofFlight({value, sleep, call, output}) {
       const pitchAxis=[Math.cos(radians),Math.sin(radians)];
       const along=current=>current.playerPitch*pitchAxis[0]+current.playerYaw*pitchAxis[1];
       const across=current=>current.playerPitch*pitchAxis[1]-current.playerYaw*pitchAxis[0];
-      if(along(up)<4||Math.abs(across(up))>1)
-        throw Error('Pitch did not follow roll: '+JSON.stringify({held,up,pitchAxis}));
+      if(along(up)>-4||Math.abs(across(up))>1)
+        throw Error('Forward stick did not pitch down in the craft frame: '+JSON.stringify({held,up,pitchAxis}));
       await pad(0,-35);const down=await frames(40);await pad();
-      if(along(down)>-4||Math.abs(across(down))>1)
-        throw Error('Down did not reverse local pitch: '+JSON.stringify({down,pitchAxis}));
+      if(along(down)<4||Math.abs(across(down))>1)
+        throw Error('Back stick did not pitch up in the craft frame: '+JSON.stringify({down,pitchAxis}));
       samples.push({banked,held,up,down,hud});
       await frames(60);
     }
