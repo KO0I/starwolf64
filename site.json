@@ -9,8 +9,8 @@
   "modAssetSetSha256": "2a874f6090b1a37b3cb8118842021366a47e06dbdb92c63164f30f8c582bcd65",
   "files": {
     "index.html": {
-      "size": 16590,
-      "sha256": "3664d37020a8db480103b2bb1b88048ae15ea752597a2db9c3ab590e1f3cf0d6"
+      "size": 16183,
+      "sha256": "4c5025d3c9a7b18f858b9e5a32085ba71a3ff3c53a27ec89aa848b4b0d9d9060"
     },
     "app.mjs": {
       "size": 6108,
