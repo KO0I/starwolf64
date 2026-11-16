@@ -179,9 +179,9 @@ class SiteCharacters:
             raise ValueError('Missing reviewed Bill cockpit module')
         private = SimpleNamespace(base=b.base, resources=b.resources, gfx=b.gfx, segments={'ast_arwing': bytearray()})
         self.cockpit_compiler = Compiler(private, 'ast_arwing', 'characters/vitzy/cockpit')
-        _, cockpit, triangles = self.cockpit_compiler.emit(glb, module, 'characters/vitzy/CockpitDL')
-        _, hull = fighter.emit([fighter.hull(body_inverse.tolist(), 'body')], 'reviewed_hull')
-        # Both component streams restore their own material state.
+        _, cockpit, triangles = self.cockpit_compiler.emit(glb, module, 'characters/vitzy/CockpitDL', vertex_limit=fighter.wing_roots.start)
+        _, hull = fighter.emit([fighter.hull(body_inverse.tolist(), 'body')], 'reviewed_hull', preload=fighter.wing_roots)
+        # The cockpit keeps the upper vertex slots reserved for body-space wing roots.
         b.gfx('ships/vitzy_fighter/BodyDL', hull[:-1] + cockpit)
         b.gfx('ships/vitzy_fighter/CanopyDL', [END])
         full_module = [(i, mount @ fit @ world[i]) for i, n in enumerate(glb.doc['nodes'])

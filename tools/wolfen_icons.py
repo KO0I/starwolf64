@@ -1,15 +1,26 @@
-"""Install the supplied life/menu icon and project the Wolfen radar marker."""
+"""Build crisp native life/menu pixels and matching Wolfen radar silhouettes."""
 import math
 import struct
-from pathlib import Path
 
-from PIL import Image, ImageOps
-
-LIFE_ICON = Path(__file__).resolve().parents[1] / "assets/wolfen/life-indicator.png"
-LIFE_PALETTE = (
-    (0, 0, 0, 0), (255, 255, 255, 255), (183, 255, 242, 255),
-    (88, 244, 217, 255), (29, 219, 193, 255),
-    (255, 193, 209, 255), (255, 115, 149, 255), (247, 49, 100, 255),
+# Native CI4 pixels keep the original icon's black outline, white hull and
+# gray engine details. The outer wings sweep forward of their rear roots.
+LIFE_ROWS = (
+    "0000000000000000",
+    "0000000000000000",
+    "0000000000000000",
+    "0000000000000000",
+    "0000000100000000",
+    "0000001210000000",
+    "0000001210000000",
+    "0100011211000100",
+    "1210131213101210",
+    "1431131313113410",
+    "0143131313134100",
+    "0016421512461000",
+    "0001671217610000",
+    "0000111211100000",
+    "0000001210000000",
+    "0000000100000000",
 )
 
 
@@ -22,6 +33,7 @@ ICON_SLOTS = (
     ('ast_arwing', 0x00000, 'CI4'), ('ast_arwing', 0x00080, 'TLUT'),
     ('ast_map', 0x1DC10, 'CI4'), ('ast_map', 0x1DC90, 'TLUT'),
     ('ast_common', 0x15598, 'IA8'),
+    ('ast_star_wolf', 0x14208, 'IA8'),
 )
 
 
@@ -78,26 +90,21 @@ def render_icon(triangles, tilt):
     return bytes(indices[i] << 4 | indices[i + 1] for i in range(0, len(indices), 2)), bytes(silhouette)
 
 
-def load_life_icon():
-    """Pack the reference into the existing 16x16 CI4/eight-color slots."""
-    with Image.open(LIFE_ICON) as source:
-        image = ImageOps.contain(source.convert('RGBA'), (16, 16), Image.Resampling.LANCZOS)
-    canvas = Image.new('RGBA', (16, 16))
-    canvas.paste(image, ((16 - image.width) // 2, (16 - image.height) // 2))
-    indices = [0 if a < 96 else min(range(1, len(LIFE_PALETTE)),
-               key=lambda c: sum((LIFE_PALETTE[c][i] - rgb) ** 2
-                                 for i, rgb in enumerate((r, g, b))))
-               for r, g, b, a in canvas.getdata()]
-    if not all(any(index == c for index in indices) for c in (0, 3, 7)):
-        raise ValueError('Life icon must retain transparency, mint wings and pink engines')
+def load_life_icon(original_palette):
+    """Retain the original CI4 contrast, changing blue accents to red."""
+    indices = [int(pixel) for row in LIFE_ROWS for pixel in row]
     icon = bytes(indices[i] << 4 | indices[i + 1] for i in range(0, len(indices), 2))
-    palette = struct.pack('>8H', *((r >> 3) << 11 | (g >> 3) << 6 | (b >> 3) << 1 | bool(a)
-                                   for r, g, b, a in LIFE_PALETTE))
-    return icon, palette
+    colors = list(struct.unpack('>8H', original_palette))
+    colors[0] = 0
+    for index in (3, 4, 5, 7):
+        word = colors[index]
+        colors[index] = ((word & 0x7C1) | ((word & 0x3E) << 10) |
+                         ((word >> 10) & 0x3E))
+    return icon, struct.pack('>8H', *colors)
 
 
 def replace_icons(builder):
-    icon, palette = load_life_icon()
+    icon, palette = load_life_icon(builder.original_arwing[0x80:0x90])
     _, radar = render_icon(builder.geometry['full'], 0)
     builder.small_icon_changes = []
     for stem, offset, fmt in ICON_SLOTS:

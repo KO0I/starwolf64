@@ -15,6 +15,7 @@ HULL_Y = FIT['HULL_Y']
 ENGINE_Z = FIT['ENGINE_Z']
 COCKPIT_DROP = FIT['COCKPIT_DROP']
 HEAD_LIFT = FIT['HEAD_LIFT']
+WING_SWEEP_SCALE = 0.25
 
 
 def float_bits(value):
@@ -225,6 +226,68 @@ class Builder:
         self.output[offset:self.cursor] = data
         return 0x03000000 | offset
 
+    def soften_wing_sweep(self):
+        reference = self.base.read('ast_arwing/' + self.assets['ast_arwing', 0x15C28][0])
+        _, _, reference_count = struct.unpack_from('<HHI', reference, 64)
+        reference_size = 72 + reference_count * 12
+        reference_frames = struct.unpack_from('<' + str(struct.unpack_from('<I', reference, reference_size)[0]) + 'H', reference, reference_size + 4)
+        for offset in (0x15AF4, 0x15C28, 0x15D68, 0x163C4):
+            name, _ = self.assets['ast_arwing', offset]
+            original = self.base.read('ast_arwing/' + name)
+            frame_count, limb_count, key_count = struct.unpack_from('<HHI', original, 64)
+            keys = [list(struct.unpack_from('<6H', original, 72 + 12 * i)) for i in range(key_count)]
+            size_offset = 72 + key_count * 12
+            frames = list(struct.unpack_from('<' + str(struct.unpack_from('<I', original, size_offset)[0]) + 'H', original, size_offset + 4))
+            for limb in (12, 13):
+                key = keys[limb + 1]
+                base_key = struct.unpack_from('<6H', reference, 72 + 12 * (limb + 1))
+                for axis in (3, 5):
+                    base = reference_frames[base_key[axis]]
+                    length = max(1, min(key[axis - 1], frame_count))
+                    values = [(base + round((((value - base + 32768) & 65535) - 32768) * WING_SWEEP_SCALE)) & 65535 for value in frames[key[axis]:key[axis] + length]]
+                    key[axis] = len(frames)
+                    frames.extend(values)
+            address = self.allocate(struct.pack('>' + str(len(frames)) + 'H', *frames))
+            key_pointer = struct.unpack_from('>I', self.output, offset + 8)[0] & 0xFFFFFF
+            struct.pack_into('>I', self.output, offset + 4, address)
+            for index, key in enumerate(keys):
+                struct.pack_into('>6H', self.output, key_pointer + index * 12, *key)
+            self.resources['ast_arwing/' + name] = original[:64] + struct.pack('<HHI', frame_count, limb_count, key_count) + b''.join(struct.pack('<6H', *key) for key in keys) + struct.pack('<I', len(frames)) + struct.pack('<' + str(len(frames)) + 'H', *frames)
+
+    def rear_cockpit_cap(self, matrix):
+        # Join the Wolfen roof pole to the retained cockpit fairing's upper edge.
+        points = [(0, 23 + HULL_Y, -32)]
+        shift = [row[:] for row in IDENTITY]
+        shift[1][3] = -COCKPIT_DROP
+        for point in ((36, 4, 18), (36, -4, 18)):
+            points.append(transform(multiply(shift, self.matrices[0x9B60]), point))
+        points[1:] = sorted(points[1:], key=lambda point: point[0])
+        uv = [(512, 0), (0, 512), (1024, 512)]
+        normal = transform(matrix, [0, 106, -70], False)
+        values = [(*[round(v) for v in transform(matrix, point)], 0, *texel, *[round(v) & 255 for v in normal], 255) for point, texel in zip(points, uv)]
+        address = self.allocate(b''.join(struct.pack('>hhhHhhBBBB', *v) for v in values))
+        path = f'wolfen_player/cockpit_cap_{len(self.vertices)}'
+        self.resources[path] = self.base.read('ast_star_wolf/ast_star_wolf_seg15_vtx_F590')[:64] + struct.pack('<I', 3) + b''.join(struct.pack('<hhhHhhBBBB', *v) for v in values)
+        source = commands(self.original_arwing, 0x9B60)
+        texture_index = next(i for i, (w0, w1) in enumerate(source) if w0 >> 24 == 0xFD and w1 & 0xFFFFFF == 0x10448)
+        start = max(i + 1 for i, (w0, _) in enumerate(source[:texture_index]) if w0 >> 24 in (0xBF, 0xB1))
+        end = next(i for i in range(texture_index + 1, len(source)) if source[i][0] >> 24 in (0xBF, 0xB1))
+        raw, native = [], []
+        for w0, w1 in source[start:end]:
+            opcode = w0 >> 24
+            if opcode == 4:
+                continue
+            if opcode == 0xFD:
+                texture, texture_path = self.texture('ast_arwing', w1)
+                raw.append((w0, texture))
+                native.extend((((w0 & 0xFFFFFF) | 0x20000000, texture), (crc64(texture_path) >> 32, crc64(texture_path) & 0xFFFFFFFF)))
+            else:
+                raw.append((w0, w1))
+                native.append((w0, w1))
+        raw.extend(((0x04000C2F, address), (0xBF000000, 0x00000204)))
+        native.extend(((0x32003006, 0), (crc64(path) >> 32, crc64(path) & 0xFFFFFFFF), (0xBF000000, 0x00000204)))
+        return raw, native, [transform(matrix, point) for point in points]
+
     def texture(self, stem, pointer):
         key = (stem, pointer & 0xFFFFFF)
         if key not in self.textures:
@@ -269,13 +332,14 @@ class Builder:
             self.vertices[key] = address, path
         return self.vertices[key]
 
-    def emit(self, sources, name):
+    def emit(self, sources, name, roots=None, preload=None, cap_matrix=None):
         raw, native, triangles = [], [], []
         for stem, offset, matrix, keep in sources:
             source = self.original_arwing if stem == 'ast_arwing' else self.segments[stem]
             stream = commands(source, offset)
             cache, vertex_pointer = {}, None
             owners, required_loads = {}, set()
+            vertex_addresses, selected_addresses = {}, {}
             selected = {}
             active = None
             for index, (w0, w1) in enumerate(stream):
@@ -285,12 +349,14 @@ class Builder:
                     for i in range(w0 >> 10 & 63):
                         cache[(w0 >> 17 & 127) + i] = self.source_position(stem, struct.unpack_from('>hhh', source, vertex_pointer + i * 16))
                         owners[(w0 >> 17 & 127) + i] = index
+                        vertex_addresses[(w0 >> 17 & 127) + i] = vertex_pointer + i * 16
                 elif opcode in (0xB1, 0xBF):
                     for packed in ((w0 & 0xFFFFFF, w1) if opcode == 0xB1 else (w1,)):
                         ids = [(packed >> shift & 255) // 2 for shift in (16, 8, 0)]
                         points = [cache[i] for i in ids]
                         if keep(vertex_pointer, points, ids):
                             selected.setdefault(active, []).append((index, packed))
+                            selected_addresses[index, packed] = [vertex_addresses[i] for i in ids]
                             required_loads.update(owners[i] for i in ids)
                             triangles.append([transform(matrix, v) for v in points])
             # Keep complete texture setup sequences only for materials with
@@ -322,7 +388,7 @@ class Builder:
                 if opcode == 0xB8:
                     continue
                 if opcode == 4:
-                    if index not in required_loads:
+                    if roots is not None or index not in required_loads:
                         continue
                     count, start = w0 >> 10 & 63, w0 >> 17 & 127
                     address, path = self.vertex(stem, w1, count, matrix)
@@ -330,6 +396,18 @@ class Builder:
                     native.extend(((0x32000000 | count << 12 | (start + count) << 1, 0), (crc64(path) >> 32, crc64(path) & 0xFFFFFFFF)))
                 elif opcode in (0xB1, 0xBF):
                     for packed in selected_triangles.get(index, []):
+                        if roots is not None:
+                            slots = []
+                            for scratch, pointer in enumerate(selected_addresses[index, packed]):
+                                slot = roots.lookup.get((stem, pointer))
+                                if slot is None:
+                                    slot = scratch
+                                    address, path = self.vertex(stem, pointer, 1, matrix)
+                                    raw.append((0x0400040F | slot << 17, address))
+                                    native.extend(((0x32001000 | (slot + 1) << 1, 0),
+                                                   (crc64(path) >> 32, crc64(path) & 0xFFFFFFFF)))
+                                slots.append(slot)
+                            packed = sum(slot * 2 << shift for slot, shift in zip(slots, (16, 8, 0)))
                         raw.append((0xBF000000, packed))
                         native.append((0xBF000000, packed))
                 elif opcode == 0xFD:
@@ -341,6 +419,15 @@ class Builder:
                 else:
                     raw.append((w0, w1))
                     native.append((w0, w1))
+        if cap_matrix is not None:
+            cap_raw, cap_native, cap = self.rear_cockpit_cap(cap_matrix)
+            raw.extend(cap_raw)
+            native.extend(cap_native)
+            triangles.append(cap)
+        if preload is not None:
+            root_raw, root_native = preload.preload(multiply(inverse(preload.body_matrix), preload.fit))
+            raw.extend(root_raw)
+            native.extend(root_native)
         raw.append(END)
         native.append(END)
         self.geometry[name] = triangles
@@ -473,6 +560,7 @@ class Builder:
         self.replace_intro_title()
         self.recolor_lasers()
         self.swap_shadows()
+        self.soften_wing_sweep()
         hull = [[1, 0, 0, 0], [0, 1, 0, HULL_Y], [0, 0, 1, 0], [0, 0, 0, 1]]
 
         def part(pointer, points, ids):
@@ -491,12 +579,14 @@ class Builder:
         def cockpit(pointer, points, ids):
             return pointer in (0xA8E8, 0xAAD8) or pointer == 0xAB38 and max(ids) < 4
 
+        from wing_skinning import WingRoots
+        self.wing_roots = WingRoots(self, 'ast_star_wolf', 0xF200, part, hull)
         body_matrix = self.matrices[0x9B60]
         cockpit_shift = [row[:] for row in IDENTITY]
         cockpit_shift[1][3] = -COCKPIT_DROP
         body_sources = wolf_sources(multiply(inverse(body_matrix), hull), {'body'})
         body_sources.append(('ast_arwing', 0x9B60, multiply(inverse(body_matrix), multiply(cockpit_shift, body_matrix)), cockpit))
-        address, stream = self.emit(body_sources, 'body')
+        address, stream = self.emit(body_sources, 'body', preload=self.wing_roots, cap_matrix=inverse(body_matrix))
         self.redirect('ast_arwing', 0x9B60, address, stream)
         wing_parts = {}
         for offset in (0x15D80, 0x16660):
@@ -504,13 +594,14 @@ class Builder:
             side = 'right' if matrix[0][3] > 0 else 'left'
             wing_parts[offset] = side
             sources = wolf_sources(multiply(inverse(matrix), hull), {side})
-            address, stream = self.emit(sources, side)
-            self.redirect('ast_arwing', offset, address, stream)
+            address, stream = self.emit(sources, side, roots=self.wing_roots)
+            self.wing_roots.install_wolfen(offset, side, address, stream)
             # Broken variants retain the engine pod and lose the outer fins.
             broken_sources = [(s, o, m, lambda p, v, ids, side=side: part(p, v, ids) == side and max(abs(x[0]) for x in v) < 45) for s, o, m, _ in sources]
-            broken_address, broken_stream = self.emit(broken_sources, side + '_broken')
+            broken_address, broken_stream = self.emit(broken_sources, side + '_broken', roots=self.wing_roots)
             broken_offset = 0x14BF0 if offset == 0x15D80 else 0x15120
             self.redirect('ast_arwing', broken_offset, broken_address, broken_stream)
+            self.wing_roots.paths.add('ast_arwing/' + self.assets['ast_arwing', broken_offset][0])
         for pointer in self.limbs:
             offset = pointer & 0xFFFFFF
             old_dl = struct.unpack_from('>I', self.original_arwing, offset)[0] & 0xFFFFFF
@@ -528,7 +619,7 @@ class Builder:
         self.redirect('ast_arwing', 0x11720, debris_address, debris_stream)
         full_sources = wolf_sources(hull, {'body', 'left', 'right'})
         full_sources.append(('ast_arwing', 0x9B60, multiply(cockpit_shift, body_matrix), cockpit))
-        full_address, full_stream = self.emit(full_sources, 'full')
+        full_address, full_stream = self.emit(full_sources, 'full', cap_matrix=IDENTITY)
         from wolfen_lod import build_lod
         build_lod(self, crc64)
         from wolfen_icons import replace_icons
@@ -638,12 +729,13 @@ class Builder:
             if data[4:8] != b'TLDO':
                 continue
             offset = 88
-            loaded = set()
+            roots = self.vitzy_fighter.wing_roots if name.startswith('ships/vitzy_fighter/') else self.wing_roots
+            loaded = set(roots.slots) if name in roots.paths else set()
             while offset < len(data):
                 w0, w1 = struct.unpack_from('<II', data, offset)
                 opcode = w0 >> 24
                 offset += 8
-                if opcode in (0x20, 0x32):
+                if opcode in (0x20, 0x31, 0x32):
                     hi, lo = struct.unpack_from('<II', data, offset)
                     if hi << 32 | lo not in hashes:
                         raise ValueError(f'Unresolved resource in {name}')
@@ -660,7 +752,7 @@ class Builder:
             command, pointer = struct.unpack_from('>II', data, target)
             if command != 0x06010000 or pointer >> 24 != segment:
                 raise ValueError(f'Invalid {stem} mesh redirect')
-            loaded = set()
+            loaded = set(self.wing_roots.slots) if stem == 'ast_arwing' and target in (0x14BF0, 0x15120) else set()
             for w0, w1 in commands(data, pointer & 0xFFFFFF):
                 opcode = w0 >> 24
                 if opcode in (4, 0xFD):
@@ -679,7 +771,8 @@ class Builder:
             opened, _ = skeleton_matrices(self.output)
             swept, _ = skeleton_matrices(self.output, animation=0x15D68)
             tip = [sign * 63, 14, -13]
-            closed_tip = transform(swept[bone], transform(inverse(opened[bone]), tip))
+            key = self.wing_roots.addresses[bone]
+            closed_tip = transform(swept[key], transform(inverse(opened[key]), tip))
             if closed_tip[2] <= tip[2]:
                 raise ValueError('Wing joint does not sweep forward')
         for offset, (_, replacement) in ROM_PATCHES.items():
