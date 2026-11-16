@@ -1,5 +1,6 @@
 #include "prevent_bss_reordering.h"
 #include "global.h"
+#include "sf64net.h"
 #include "fox_map.h"
 #include "assets/ast_corneria.h"
 #include "assets/ast_training.h"
@@ -1662,6 +1663,13 @@ void Player_CheckItemCollect(Player* player) {
     s32 sp6C;
 
     for (i = 0, item = gItems; i < ARRAY_COUNT(gItems); i++, item++) {
+        if (Net_IsCampaign() && item->collected) continue;
+        if (Player_IsCampaignCompanion(player)) {
+            if (item->obj.id != OBJ_ITEM_LASERS && item->obj.id != OBJ_ITEM_SILVER_RING &&
+                item->obj.id != OBJ_ITEM_SILVER_STAR &&
+                !(item->obj.id == OBJ_ITEM_BOMB && !item->isMultilock)) continue;
+        }
+
         if ((item->obj.status == OBJ_ACTIVE) &&
             ((player->state == PLAYERSTATE_ACTIVE) || (player->state == PLAYERSTATE_U_TURN)) && (item->timer_4A == 0) &&
             Player_CheckHitboxCollision(player, item->info.hitbox, &sp6C, item->obj.pos.x, item->obj.pos.y,
@@ -1998,10 +2006,12 @@ void Player_CollisionCheck(Player* player) {
                         if (temp_v0 != 0) {
                             if (temp_v0 < 0) {
                                 if (temp_v0 == -1) {
-                                    gLight2colorStep = 40;
-                                    gLight2RTarget = 20;
-                                    gLight2GTarget = 20;
-                                    gLight2BTarget = 20;
+                                    if (!Player_IsCampaignCompanion(player)) {
+                                        gLight2colorStep = 40;
+                                        gLight2RTarget = 20;
+                                        gLight2GTarget = 20;
+                                        gLight2BTarget = 20;
+                                    }
                                     player->shadowing = 80;
                                 }
                                 if (player->whooshTimer == 0) {
@@ -2606,10 +2616,11 @@ void Player_FloorCheck(Player* player) {
 }
 
 void Player_InitializeAll(void) {
+    Net_OnPlayerPoolReset();
     u8* ptr = (u8*) gPlayer;
     u32 i;
 
-    for (i = 0; i < gCamCount * sizeof(Player); i++, ptr++) {
+    for (i = 0; i < Play_PlayerSlotCount() * sizeof(Player); i++, ptr++) {
         *ptr = 0;
     }
 }
@@ -2948,10 +2959,11 @@ void Play_Init(void) {
         gTeamShields[3] = 0;
     }
 
-    MEM_ARRAY_ALLOCATE(gPlayer, gCamCount);
+    MEM_ARRAY_ALLOCATE(gPlayer, Play_PlayerSlotCount());
     Player_InitializeAll();
-    for (i = 0; i < gCamCount; i++) {
-        gPlayer[i].state = PLAYERSTATE_INIT;
+    for (i = 0; i < Play_PlayerSlotCount(); i++) {
+        gPlayer[i].num = i;
+        gPlayer[i].state = Net_IsCampaign() && i > 0 ? PLAYERSTATE_STANDBY : PLAYERSTATE_INIT;
         gPlayerGlareAlphas[i] = D_ctx_801783C0[i] = 0;
         gControllerRumbleTimers[i] = 0;
         gPlayerScores[i] = 0;
@@ -3666,6 +3678,14 @@ void Player_UpdatePath(Player* player) {
     f32 temp_fv0_2;
     s32 temp_v0;
 
+    if (Player_IsCampaignCompanion(player)) {
+        player->zPath = gPlayer[0].zPath;
+        player->zPathVel = gPlayer[0].zPathVel;
+        player->pos.z = CLAMP(player->pos.z, gPlayer[0].pos.z - 600.0f, gPlayer[0].pos.z + 600.0f);
+        player->trueZpos = player->pos.z + player->camDist;
+        player->bankAngle = player->rot.z + player->zRotBank + player->zRotBarrelRoll;
+        return;
+    }
     player->zPathVel = -player->vel.z;
     player->zPath += -player->vel.z;
 
@@ -5387,7 +5407,7 @@ void Player_ArwingBrake(Player* player) {
         player->unk_004 = 0.0f;
         player->unk_194 = 5.0f;
         player->unk_190 = 5.0f;
-        if (gCurrentLevel == LEVEL_CORNERIA) {
+        if (gCurrentLevel == LEVEL_CORNERIA && !Player_IsCampaignCompanion(player)) {
             gCoUturnCount++;
         }
     }
@@ -5649,10 +5669,10 @@ void Player_UpdateEffects(Player* player) {
 
     player->dmgEffect = player->dmgEffectTimer & 1;
 
-    if (player->dmgEffectTimer != 0) {
+    if (player->dmgEffectTimer != 0 && !Player_IsCampaignCompanion(player)) {
         gFillScreenAlphaStep = 8;
     }
-    if (player->dmgEffectTimer == 19) {
+    if (player->dmgEffectTimer == 19 && !Player_IsCampaignCompanion(player)) {
         gFillScreenAlpha = 128;
         gFillScreenRed = 255;
         gFillScreenGreen = gFillScreenBlue = 0;
@@ -5770,6 +5790,7 @@ void Play_dummy_800B41E0(Player* player) {
 }
 
 void Player_Down(Player* player) {
+    if (Player_IsCampaignCompanion(player)) { Player_DownCompanion(player); return; }
     if (player->num == 0) {
         Multilock_Reset();
     }
@@ -5978,7 +5999,7 @@ void Player_Update(Player* player) {
     Vec3f sp58[30];
     s32 pad;
     CALL_EVENT(PlayerPreUpdateEvent, player);
-    if (gVersusMode) {
+    if (gVersusMode || Net_Enabled()) {
         gInputHold = &gControllerHold[player->num];
         gInputPress = &gControllerPress[player->num];
         gControllerRumble = &gControllerRumbleFlags[player->num];
@@ -6360,6 +6381,7 @@ void Camera_UpdateArwingOnRails(Player* player) {
     gCsCamEyeY += player->yPath + sOverheadCamDist;
     gCsCamAtZ = player->trueZpos + gPathProgress - 1.0f;
     gCsCamEyeZ = 400.0f + sOverheadCamDist;
+    if (Player_IsCampaignCompanion(player)) gCsCamEyeZ += player->trueZpos + gPathProgress;
     if (gFovYMode == 2) {
         gCsCamEyeZ -= 50.0f;
     }
@@ -6582,6 +6604,10 @@ void Camera_UpdateArwing360(Player* player, bool arg1) {
     var_fv0 = (player->somersault) ? 1.0f : 0.79f;
     atY = (player->pos.y * (var_fv0)) + player->damageShake + (player->xRock * 5.0f);
     atY += (player->unk_02C * 0.5f);
+    if (Net_Enabled()) {
+        eyeY = player->pos.y + 50.0f - player->unk_02C * 1.5f;
+        atY = player->pos.y + 40.0f + player->damageShake + player->xRock * 5.0f + player->unk_02C * 0.5f;
+    }
     if (player->state == PLAYERSTATE_U_TURN) {
         atY = player->pos.y;
     }
@@ -7173,6 +7199,13 @@ void Play_Update(void) {
         Player_Update(&gPlayer[i]);
     }
 
+    if (Net_IsCampaign()) {
+        for (i = 1; i < NET_SLOTS; i++) { gPlayer[i].num = i; Player_UpdateCompanion(&gPlayer[i]); }
+        gPlayerNum = 0;
+        gInputHold = &gControllerHold[0]; gInputPress = &gControllerPress[0];
+        gControllerRumble = &gControllerRumbleFlags[0];
+    }
+
     Object_Update();
     PlayerShot_UpdateAll();
     BonusText_Update();
@@ -7182,6 +7215,11 @@ void Play_Update(void) {
         Camera_Update(&gPlayer[i]);
     }
 
+    if (Net_IsCampaign()) {
+        for (i = 1; i < NET_SLOTS; i++)
+            if (Net_ActiveMask() & (1u << i)) Player_UpdateCompanionCamera(&gPlayer[i]);
+        gPlayerNum = 0;
+    }
     gCameraShakeY = 0.0f;
     if (gCameraShake != 0) {
         f32 var_fv1;

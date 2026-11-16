@@ -735,6 +735,27 @@ void Display_CockpitGlass(void) {
     FrameInterpolation_RecordCloseChild();
 }
 
+
+static const ALIGN_ASSET(2) char sNetArwingIntact[] = "__OTR__net/original/ast_versus/D_versus_300EE80";
+static const ALIGN_ASSET(2) char sNetArwingRightBroken[] = "__OTR__net/original/ast_versus/D_versus_3010A90";
+static const ALIGN_ASSET(2) char sNetArwingLeftBroken[] = "__OTR__net/original/ast_versus/D_versus_3011470";
+static const ALIGN_ASSET(2) char sNetArwingBothBroken[] = "__OTR__net/original/ast_versus/D_versus_300D550";
+static void Display_NetFighter(Player* player) {
+    uint32_t rgb;
+    uint32_t ship = Net_LoadoutColor(player->num, &rgb) ? Net_LoadoutPart(player->num, 1) : 1;
+    const char* model;
+    if (ship == 2) { gSPDisplayList(gMasterDisp++, aKattShipDL); return; }
+    if (ship == 3) { gSPDisplayList(gMasterDisp++, gVitzyHullDL); return; }
+    if (player->arwing.rightWingState == WINGSTATE_INTACT && player->arwing.leftWingState == WINGSTATE_INTACT)
+        model = ship == 0 ? sNetArwingIntact : D_versus_300EE80;
+    else if (player->arwing.rightWingState <= WINGSTATE_BROKEN && player->arwing.leftWingState == WINGSTATE_INTACT)
+        model = ship == 0 ? sNetArwingRightBroken : D_versus_3010A90;
+    else if (player->arwing.rightWingState == WINGSTATE_INTACT && player->arwing.leftWingState <= WINGSTATE_BROKEN)
+        model = ship == 0 ? sNetArwingLeftBroken : D_versus_3011470;
+    else model = ship == 0 ? sNetArwingBothBroken : D_versus_300D550;
+    gSPDisplayList(gMasterDisp++, model);
+}
+
 void Display_Arwing(Player* player, s32 reflectY) {
     Vec3f sp4C;
     f32 sp48;
@@ -764,7 +785,9 @@ void Display_Arwing(Player* player, s32 reflectY) {
             Matrix_Pop(&gGfxMatrix);
         }
     } else {
-        if (gVersusMode) {
+        if (Net_Enabled()) {
+            Display_NetFighter(player);
+        } else if (gVersusMode) {
             if ((player->arwing.rightWingState == WINGSTATE_INTACT) &&
                 (player->arwing.leftWingState == WINGSTATE_INTACT)) {
                 gSPDisplayList(gMasterDisp++, D_versus_300EE80);
@@ -956,8 +979,16 @@ void Display_LandmasterEngineGlow_Draw(Player* player) {
         Matrix_Scale(gGfxMatrix, 0.9f * 0.9f, 0.9f * 0.63f, 1.0f, MTXF_APPLY);
     }
     Matrix_SetGfxMtx(&gMasterDisp);
-    Display_DrawEngineGlow((player->form == FORM_ARWING) &&
-                           (Player_IsVitzy(player->num) || (gLevelType == LEVELTYPE_SPACE)) ? EG_PINK : EG_GREEN);
+    uint32_t rgb;
+    if (Net_LoadoutColor(player->num, &rgb)) {
+        RCP_SetupDL(&gMasterDisp, SETUPDL_67);
+        gDPSetPrimColor(gMasterDisp++, 0, 0, 255, 255, 255, 255);
+        gDPSetEnvColor(gMasterDisp++, (rgb >> 16) & 255, (rgb >> 8) & 255, rgb & 255, 255);
+        gSPDisplayList(gMasterDisp++, aOrbDL);
+    } else {
+        Display_DrawEngineGlow((player->form == FORM_ARWING) &&
+                              (Player_IsVitzy(player->num) || (gLevelType == LEVELTYPE_SPACE)) ? EG_PINK : EG_GREEN);
+    }
     Matrix_Pop(&gGfxMatrix);
 
     FrameInterpolation_RecordCloseChild();
@@ -1486,7 +1517,7 @@ void Display_Player_Update(Player* player, s32 reflectY) {
             Matrix_Translate(gGfxMatrix, player->pos.x, player->pos.y + player->unk_18C + 30.0f,
                              player->trueZpos + player->zPath, MTXF_APPLY);
             if (gVersusMode) {
-                for (i = 0; i < gCamCount; i++) {
+                for (i = 0; i < Play_PlayerSlotCount(); i++) {
                     if (gVsLockOnTimers[player->num][i] != 0) {
                         Matrix_MultVec3f(gGfxMatrix, &sp50, &gLockOnTargetViewPos[i]);
                         if ((i == gPlayerNum) &&
@@ -1539,7 +1570,7 @@ void Display_Player_Update(Player* player, s32 reflectY) {
         } else {
             Matrix_Translate(gGfxMatrix, player->pos.x, player->pos.y, player->trueZpos + player->zPath, MTXF_APPLY);
             if (gVersusMode) {
-                for (i = 0; i < gCamCount; i++) {
+                for (i = 0; i < Play_PlayerSlotCount(); i++) {
                     if (gVsLockOnTimers[player->num][i] != 0) {
                         Matrix_MultVec3f(gGfxMatrix, &sp50, &gLockOnTargetViewPos[i]);
                         if ((i == gPlayerNum) &&
@@ -1736,7 +1767,7 @@ void Display_LockOnIndicator(void) {
         return;
     }
 
-    for (i = 0; i < gCamCount; i++) {
+    for (i = 0; i < Play_PlayerSlotCount(); i++) {
         if (gLockOnTargetViewPos[i].z < 0.0f) {
             var_fs0 = VEC3F_MAG(&gLockOnTargetViewPos[i]);
             if (var_fs0 < 20000.0f) {
@@ -1996,7 +2027,7 @@ void Display_Update(void) {
     Lights_SetOneLight(&gMasterDisp, gLight2x, gLight2y, gLight2z, gLight2R, gLight2G, gLight2B, gAmbientR, gAmbientG,
                        gAmbientB);
 
-    for (i = 0, player = &gPlayer[0]; i < gCamCount; i++, player++) {
+    for (i = 0, player = &gPlayer[0]; i < Play_PlayerSlotCount(); i++, player++) {
         playerPos.x = player->pos.x;
         playerPos.y = player->pos.y;
         playerPos.z = player->trueZpos;
@@ -2012,7 +2043,7 @@ void Display_Update(void) {
                            gAmbientG, gAmbientB);
         Matrix_Push(&gGfxMatrix);
         Matrix_Scale(gGfxMatrix, 1.0f, -1.0f, 1.0f, MTXF_APPLY);
-        for (i = 0, player = &gPlayer[0]; i < gCamCount; i++, player++) {
+        for (i = 0, player = &gPlayer[0]; i < Play_PlayerSlotCount(); i++, player++) {
             playerPos.x = player->pos.x;
             playerPos.y = player->pos.y;
             playerPos.z = player->trueZpos;
@@ -2043,13 +2074,13 @@ void Display_Update(void) {
     if ((gGroundSurface == SURFACE_WATER) && (gPlayer[0].state != PLAYERSTATE_LEVEL_INTRO)) {
         Matrix_Push(&gGfxMatrix);
         Matrix_Scale(gGfxMatrix, 1.0f, -1.0f, 1.0f, MTXF_APPLY);
-        for (i = 0, player = &gPlayer[0]; i < gCamCount; i++, player++) {
+        for (i = 0, player = &gPlayer[0]; i < Play_PlayerSlotCount(); i++, player++) {
             if (sPlayersVisible[i]) {
                 Display_PlayerFeatures(player);
                 Display_ArwingWingTrail_Update(player);
             }
-            Matrix_Pop(&gGfxMatrix);
         }
+        Matrix_Pop(&gGfxMatrix);
     }
 
     if (gCurrentLevel == LEVEL_AQUAS) {
@@ -2069,7 +2100,7 @@ void Display_Update(void) {
 
     gReflectY = 1;
 
-    for (i = 0, player = &gPlayer[0]; i < gCamCount; i++, player++) {
+    for (i = 0, player = &gPlayer[0]; i < Play_PlayerSlotCount(); i++, player++) {
         if (sPlayersVisible[i]) {
             Display_PlayerShadow_Update(player);
             Display_PlayerFeatures(player);
@@ -2095,7 +2126,7 @@ void Display_Update(void) {
         Display_CockpitGlass();
     }
 
-    for (i = 0, player = &gPlayer[0]; i < gCamCount; i++, player++) {
+    for (i = 0, player = &gPlayer[0]; i < Play_PlayerSlotCount(); i++, player++) {
         if (sPlayersVisible[i]) {
             if (gShowReticles[i]) {
                 Display_Reticle(player);

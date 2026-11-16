@@ -73,3 +73,13 @@ test('game admission binds stage, incarnation, baseline tick and build fingerpri
   assert.deepEqual(decodeMessage(encodeMessage(game)),game);
   for(const invalid of [{match:0},{epoch:0},{incarnation:-1},{tick:-1},{tick:2**32},{fingerprint:'wrong'},{winner:6},{op:'teleport'}])assert.equal(validateMessage({...game,...invalid}),false);
 });
+
+test('stage descriptors bound mission identity and supported flight topology',()=>{
+  const stage={type:'stage',version:VERSION,match:42,epoch:7,status:3,level:1,phase:0,topology:1,incarnation:9,fingerprint:'a'.repeat(64)};
+  assert.deepEqual(decodeMessage(encodeMessage(stage)),stage);
+  for(const fields of [{match:0},{match:2**32},{epoch:0},{epoch:2**32},{status:0},{status:4},{level:0},{level:2},{level:79},{phase:-1},{phase:2**32},{topology:0},{topology:3},{incarnation:0},{incarnation:2**32},{fingerprint:'bad'},{extra:1},{version:VERSION+1}])
+    assert.equal(validateMessage({...stage,...fields}),false,JSON.stringify(fields));
+  const waiting={...stage,status:1,level:0,topology:0,incarnation:0};
+  assert.deepEqual(decodeMessage(encodeMessage(waiting)),waiting);
+  assert.deepEqual(decodeMessage(encodeMessage({...waiting,status:2,level:13})),{...waiting,status:2,level:13});
+});

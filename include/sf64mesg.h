@@ -955,4 +955,6 @@ typedef enum MsgMojiCode {
     /* 735 */ MSGMOJI_735,
 } MsgMojiCode;
 
+u16 Message_ResourceIdFromPtr(u16* msgPtr);
+
 #endif

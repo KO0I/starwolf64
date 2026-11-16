@@ -507,7 +507,7 @@ void Game_Update(void) {
                 Versus_StartMatch();
                 break;
             case GSTATE_PLAY:
-                if (!Net_IsGuest() || !Net_Ready()) Play_Main();
+                if (Net_ShouldRunPlay()) Play_Main();
                 else gDrawMode = DRAW_PLAY;
                 Net_OnPlayInit();
                 break;

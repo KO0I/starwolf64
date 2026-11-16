@@ -5,6 +5,7 @@
 
 #include "prevent_bss_reordering.h"
 #include "global.h"
+#include "sf64net.h"
 #include "wolfen.h"
 #include "assets/vitzy_fighter.h"
 #include "sf64object.h"
@@ -1285,18 +1286,18 @@ void Actor_DrawAllRange(Actor* this) {
     }
 
     if (!sDrewActor) {
-        this->lockOnTimers[gPlayerNum] = 0;
+        if (!Net_IsGuest()) this->lockOnTimers[gPlayerNum] = 0;
         if ((this->obj.id == OBJ_ACTOR_DEBRIS) || (this->obj.id == OBJ_ACTOR_AND_BRAIN_WASTE)) {
             Object_Kill(&this->obj, this->sfxSource);
         }
     }
 
-    for (playerNum = 0; playerNum < gCamCount; playerNum++) {
+    for (playerNum = 0; playerNum < Play_PlayerSlotCount(); playerNum++) {
         if (this->lockOnTimers[playerNum] != 0) {
             gLockOnTargetViewPos[playerNum] = sViewPos;
             gLockOnTargetViewPos[playerNum].y += this->info.targetOffset;
             this->lockOnViewPos = gLockOnTargetViewPos[playerNum];
-            if ((playerNum == gPlayerNum) && (gLockOnTargetViewPos[playerNum].z > -300.0f)) {
+            if (!Net_IsGuest() && (playerNum == gPlayerNum) && (gLockOnTargetViewPos[playerNum].z > -300.0f)) {
                 this->lockOnTimers[playerNum] = 0;
             }
         }

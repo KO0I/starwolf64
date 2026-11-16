@@ -6,6 +6,7 @@
 
 #include "prevent_bss_reordering.h"
 #include "global.h"
+#include "sf64net.h"
 #include "assets/ast_allies.h"
 #include "assets/ast_corneria.h"
 #include "assets/ast_meteo.h"
@@ -541,185 +542,188 @@ void Radio_Draw(void) {
         return;
     }
 
-    if (gRadioStateTimer > 0) {
-        gRadioStateTimer--;
-    }
+    if (!(Net_IsCampaign() && Net_IsGuest())) {
+        if (gRadioStateTimer > 0) {
+            gRadioStateTimer--;
+        }
 
-    if (gRadioMouthTimer > 0) {
-        gRadioMouthTimer--;
-    }
+        if (gRadioMouthTimer > 0) {
+            gRadioMouthTimer--;
+        }
 
-    switch (gRadioState) {
-        case 100:
-            D_radio_80178748 = 1;
-            gCurrentRadioPortrait = RCID_1000;
-            gRadioState = 1;
-            gRadioMsgCharIndex = 0;
-            gRadioPortraitScaleY = 0.0f;
-            gRadioTextBoxScaleY = 0.0f;
-            sRadioCheckMouthFlag = 0;
-            if (gCamCount != 1) {
-                gRadioState = 0;
-            }
-            break;
-
-        case 1:
-            gRadioPortraitScaleY += 0.25f;
-            if (gRadioPortraitScaleY == 1.0f) {
-                gRadioState++;
-                gRadioStateTimer = 10;
-            }
-            gCurrentRadioPortrait = RCID_STATIC;
-            if ((gGameFrameCount % 2) != 0) {
-                gCurrentRadioPortrait = RCID_STATIC + 1;
-            }
-            break;
-
-        case 2:
-            if (gRadioStateTimer == 0) {
-                gRadioState++;
-                gRadioStateTimer = 10;
-            }
-            gCurrentRadioPortrait = RCID_STATIC;
-            if ((gGameFrameCount % 2) != 0) {
-                gCurrentRadioPortrait = RCID_STATIC + 1;
-            }
-            break;
-
-        case 3:
-            if (gRadioStateTimer == 0) {
-                gRadioState++;
-                ret = Message_GetWidth(gRadioMsg);
-                if (gVIsPerFrame == 3) {
-                    gRadioStateTimer = ret + 16;
-                } else {
-                    gRadioStateTimer = (2 * ret) + 16;
-                }
-                if ((gGameState == GSTATE_TITLE) || (gGameState == GSTATE_ENDING)) {
-                    gRadioStateTimer = ret * 2;
-                }
-            }
-            gCurrentRadioPortrait = (s32) gRadioMsgRadioId;
-            gRadioTextBoxScaleY += 0.26f;
-            if (gRadioTextBoxScaleY > 1.3f) {
-                gRadioTextBoxScaleY = 1.3f;
-            }
-            break;
-
-        case 31:
-            gRadioState++;
-            gRadioStateTimer = 80 - gRadioStateTimer;
-            break;
-
-        case 32:
-            if (Audio_GetCurrentVoice() == 0) {
-                gRadioMsgListIndex++;
-                gRadioMsg = SEGMENTED_TO_VIRTUAL(gRadioMsgList[gRadioMsgListIndex]);
-                Audio_PlayVoice(Message_IdFromPtr(gRadioMsg));
+        switch (gRadioState) {
+            case 100:
+                D_radio_80178748 = 1;
+                gCurrentRadioPortrait = RCID_1000;
+                gRadioState = 1;
                 gRadioMsgCharIndex = 0;
-                sRadioCheckMouthFlag = 0;
-                gRadioStateTimer = 80;
-                gRadioStateTimer = Message_GetWidth(gRadioMsg) * 2;
-                gRadioState = 4;
-            }
-            break;
-
-        case 4:
-            if ((Audio_GetCurrentVoice() == 0) && (gRadioStateTimer == 0)) {
-                gRadioStateTimer = 10;
-                gCurrentRadioPortrait = (s32) gRadioMsgRadioId;
-                gRadioState = 6;
-            }
-            gCurrentRadioPortrait = (s32) gRadioMsgRadioId;
-            if (gRadioMouthTimer > 0) {
-                gCurrentRadioPortrait = (s32) gRadioMsgRadioId + 1;
-            }
-
-            if (!gVIsPerFrame) {}
-
-            if (1) {
-                fakeTemp = 0;
-            }
-
-            if (!(fakeTemp)) {
-                ret = Audio_GetCurrentVoiceStatus();
-
-                if (gRadioMsgCharIndex < 60 && gRadioMsg[gRadioMsgCharIndex + 1] != MSGCHAR_END) {
-                    if (gRadioMsg[gRadioMsgCharIndex + 1] == MSGCHAR_NXT) {
-                        if (ret == 0) {
-                            gRadioState = 31;
-                        }
-                    } else {
-                        gRadioMsgCharIndex++;
-                    }
-                } else if (gRadioMsgCharIndex < 60) {
-                    gRadioMsgCharIndex = 60;
-                }
-
-                if (sRadioCheckMouthFlag) {
-                    if ((gRadioMsgId >= 23000) && (gRadioMsgId < 23033)) {
-                        if (gMsgCharIsPrinting) {
-                            gRadioMouthTimer = 2;
-                            AUDIO_PLAY_SFX(NA_SE_MESSAGE_MOVE, gDefaultSfxSource, 4);
-                        }
-                    } else if (ret == 1) {
-                        gRadioMouthTimer = 2;
-                    } else {
-                        gRadioMouthTimer = 0;
-                    }
-                }
-            }
-            sRadioCheckMouthFlag ^= 1;
-            break;
-
-        case 5:
-            if (gRadioStateTimer == 0) {
-                gRadioState++;
-                gRadioStateTimer = 10;
-            }
-            gCurrentRadioPortrait = (s32) gRadioMsgRadioId;
-            break;
-
-        case 6:
-            if (gRadioStateTimer == 0) {
-                if (gGameState == GSTATE_ENDING) {
-                    Audio_ClearVoice();
-                } else {
-                    Audio_PlayVoice(0);
-                }
-                gRadioState++;
-            }
-            gCurrentRadioPortrait = RCID_STATIC;
-            if ((gGameFrameCount % 2) != 0) {
-                gCurrentRadioPortrait = RCID_STATIC + 1;
-            }
-            gRadioTextBoxScaleY -= 0.26f;
-            if (gRadioTextBoxScaleY < 0.0f) {
+                gRadioPortraitScaleY = 0.0f;
                 gRadioTextBoxScaleY = 0.0f;
-            }
-            break;
+                sRadioCheckMouthFlag = 0;
+                if (gCamCount != 1) {
+                    gRadioState = 0;
+                }
+                break;
 
-        case 7:
-            gRadioPortraitScaleY -= 0.25f;
-            if (gRadioPortraitScaleY == 0) {
-                gHideRadio = false;
-                gRadioMsgPri = 0;
-                gRadioState = 0;
-            }
-            gCurrentRadioPortrait = RCID_STATIC;
-            if ((gGameFrameCount % 2) != 0) {
-                gCurrentRadioPortrait = RCID_STATIC + 1;
-            }
-            break;
+            case 1:
+                gRadioPortraitScaleY += 0.25f;
+                if (gRadioPortraitScaleY == 1.0f) {
+                    gRadioState++;
+                    gRadioStateTimer = 10;
+                }
+                gCurrentRadioPortrait = RCID_STATIC;
+                if ((gGameFrameCount % 2) != 0) {
+                    gCurrentRadioPortrait = RCID_STATIC + 1;
+                }
+                break;
 
-        case 8:
-            gCurrentRadioPortrait = (s32) gRadioMsgRadioId;
-            gRadioTextBoxScaleY = 1.3f;
-            gRadioPortraitScaleY = 1.0f;
-            break;
+            case 2:
+                if (gRadioStateTimer == 0) {
+                    gRadioState++;
+                    gRadioStateTimer = 10;
+                }
+                gCurrentRadioPortrait = RCID_STATIC;
+                if ((gGameFrameCount % 2) != 0) {
+                    gCurrentRadioPortrait = RCID_STATIC + 1;
+                }
+                break;
 
-        case 0:
-            break;
+            case 3:
+                if (gRadioStateTimer == 0) {
+                    gRadioState++;
+                    ret = Message_GetWidth(gRadioMsg);
+                    if (gVIsPerFrame == 3) {
+                        gRadioStateTimer = ret + 16;
+                    } else {
+                        gRadioStateTimer = (2 * ret) + 16;
+                    }
+                    if ((gGameState == GSTATE_TITLE) || (gGameState == GSTATE_ENDING)) {
+                        gRadioStateTimer = ret * 2;
+                    }
+                }
+                gCurrentRadioPortrait = (s32) gRadioMsgRadioId;
+                gRadioTextBoxScaleY += 0.26f;
+                if (gRadioTextBoxScaleY > 1.3f) {
+                    gRadioTextBoxScaleY = 1.3f;
+                }
+                break;
+
+            case 31:
+                gRadioState++;
+                gRadioStateTimer = 80 - gRadioStateTimer;
+                break;
+
+            case 32:
+                if (Audio_GetCurrentVoice() == 0) {
+                    gRadioMsgListIndex++;
+                    gRadioMsg = SEGMENTED_TO_VIRTUAL(gRadioMsgList[gRadioMsgListIndex]);
+                    Audio_PlayVoice(Message_IdFromPtr(gRadioMsg));
+                    gRadioMsgCharIndex = 0;
+                    sRadioCheckMouthFlag = 0;
+                    gRadioStateTimer = 80;
+                    gRadioStateTimer = Message_GetWidth(gRadioMsg) * 2;
+                    gRadioState = 4;
+                }
+                break;
+
+            case 4:
+                if ((Audio_GetCurrentVoice() == 0) && (gRadioStateTimer == 0)) {
+                    gRadioStateTimer = 10;
+                    gCurrentRadioPortrait = (s32) gRadioMsgRadioId;
+                    gRadioState = 6;
+                }
+                gCurrentRadioPortrait = (s32) gRadioMsgRadioId;
+                if (gRadioMouthTimer > 0) {
+                    gCurrentRadioPortrait = (s32) gRadioMsgRadioId + 1;
+                }
+
+                if (!gVIsPerFrame) {}
+
+                if (1) {
+                    fakeTemp = 0;
+                }
+
+                if (!(fakeTemp)) {
+                    ret = Audio_GetCurrentVoiceStatus();
+
+                    if (gRadioMsgCharIndex < 60 && gRadioMsg[gRadioMsgCharIndex + 1] != MSGCHAR_END) {
+                        if (gRadioMsg[gRadioMsgCharIndex + 1] == MSGCHAR_NXT) {
+                            if (ret == 0) {
+                                gRadioState = 31;
+                            }
+                        } else {
+                            gRadioMsgCharIndex++;
+                        }
+                    } else if (gRadioMsgCharIndex < 60) {
+                        gRadioMsgCharIndex = 60;
+                    }
+
+                    if (sRadioCheckMouthFlag) {
+                        if ((gRadioMsgId >= 23000) && (gRadioMsgId < 23033)) {
+                            if (gMsgCharIsPrinting) {
+                                gRadioMouthTimer = 2;
+                                AUDIO_PLAY_SFX(NA_SE_MESSAGE_MOVE, gDefaultSfxSource, 4);
+                            }
+                        } else if (ret == 1) {
+                            gRadioMouthTimer = 2;
+                        } else {
+                            gRadioMouthTimer = 0;
+                        }
+                    }
+                }
+                sRadioCheckMouthFlag ^= 1;
+                break;
+
+            case 5:
+                if (gRadioStateTimer == 0) {
+                    gRadioState++;
+                    gRadioStateTimer = 10;
+                }
+                gCurrentRadioPortrait = (s32) gRadioMsgRadioId;
+                break;
+
+            case 6:
+                if (gRadioStateTimer == 0) {
+                    if (gGameState == GSTATE_ENDING) {
+                        Audio_ClearVoice();
+                    } else {
+                        Audio_PlayVoice(0);
+                    }
+                    gRadioState++;
+                }
+                gCurrentRadioPortrait = RCID_STATIC;
+                if ((gGameFrameCount % 2) != 0) {
+                    gCurrentRadioPortrait = RCID_STATIC + 1;
+                }
+                gRadioTextBoxScaleY -= 0.26f;
+                if (gRadioTextBoxScaleY < 0.0f) {
+                    gRadioTextBoxScaleY = 0.0f;
+                }
+                break;
+
+            case 7:
+                gRadioPortraitScaleY -= 0.25f;
+                if (gRadioPortraitScaleY == 0) {
+                    gHideRadio = false;
+                    gRadioMsgPri = 0;
+                    gRadioState = 0;
+                }
+                gCurrentRadioPortrait = RCID_STATIC;
+                if ((gGameFrameCount % 2) != 0) {
+                    gCurrentRadioPortrait = RCID_STATIC + 1;
+                }
+                break;
+
+            case 8:
+                gCurrentRadioPortrait = (s32) gRadioMsgRadioId;
+                gRadioTextBoxScaleY = 1.3f;
+                gRadioPortraitScaleY = 1.0f;
+                break;
+
+            case 0:
+                break;
+        }
+
     }
 
     if (((gRadioState > 0) && (gRadioState != 100)) && !gHideRadio) {

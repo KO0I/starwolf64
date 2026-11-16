@@ -49,7 +49,7 @@
       <form id="match-form">
         <div class="mode-choices" role="group" aria-label="Multiplayer mode">
           <button id="choose-versus" type="button" aria-pressed="true"><strong>Classic VS</strong><small>Fight your wingmates on the battle maps.</small></button>
-          <button id="choose-campaign" type="button" aria-pressed="false"><strong>Main game co-op</strong><small>Four total pilots. Host chooses the story map; guests fly along. Engine integration pending.</small></button>
+          <button id="choose-campaign" type="button" aria-pressed="false"><strong>Main game co-op</strong><small>Four total pilots. The host chooses the story mission. Corneria is the first networked mission.</small></button>
         </div>
         <label for="mode">Mode</label>
         <select id="mode"><option value="versus">Classic VS</option><option value="campaign">Main game co-op / host-led story</option></select>
@@ -62,7 +62,7 @@
         </div>
         <button id="save-match" type="submit">Save match settings</button>
       </form>
-      <p class="game-readiness">Corneria Points is the current playable battle route. Co-op uses one host-led story and at most four pilots; story-stage replication and selected ship models still need engine integration.</p>
+      <p class="game-readiness">Play Corneria Points, or fly Corneria together in host-led story co-op with up to four pilots. Other story missions keep guests waiting.</p>
     </section>
     <section id="pilot-panel" aria-labelledby="pilot-title" hidden>
       <h2 id="pilot-title" class="panel-title">02 // SELECT YOUR PILOT</h2>
@@ -80,7 +80,7 @@
           <div class="loadout-controls">
             <figure class="ship-preview-frame"><canvas id="ship-preview" role="img" aria-label="Selected ship wireframe"></canvas><figcaption id="ship-preview-caption">Loading ship geometry…</figcaption></figure>
             <label for="vehicle">Starting vehicle</label><select id="vehicle"></select>
-            <p class="selection-note">Aircraft first. These are confirmed loadout previews; the current engine still uses the shared fighter model. Tank and on-foot play come later.</p>
+            <p class="selection-note">Your confirmed aircraft appears in flight. Arwing, Wolfen, Katt’s fighter and Vitzy’s fighter have distinct models. Tank and on-foot play come later.</p>
             <fieldset><legend>Preferred hue</legend><div id="hue-options" class="hue-options"></div></fieldset>
             <button id="save-pilot" type="submit" class="primary">Confirm pilot</button>
           </div>

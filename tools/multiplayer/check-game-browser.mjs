@@ -11,12 +11,13 @@ const urlIndex = process.argv.indexOf('--url');
 if (urlIndex !== -1 && !process.argv[urlIndex + 1]) throw Error('--url requires a URL');
 const hostedURL = urlIndex < 0 ? null : new URL(process.argv[urlIndex + 1]);
 if (hostedURL && !['http:', 'https:'].includes(hostedURL.protocol)) throw Error('--url must use HTTP or HTTPS');
+const shipModels = process.argv.includes('--ship-models');
 const sleep = ms => new Promise(done => setTimeout(done, ms));
 const report = {ok:false, assertions:{}, signalKinds:[], diagnostics:{}, errors:[]};
 const requests = [], pending = new Map(), pages = [];
 let server, chrome, ws, profile, id = 0, interrupted = false;
 process.once('SIGINT', () => { interrupted = true; });
-const deadline = Date.now() + 240000;
+const deadline = Date.now() + (process.argv.includes('--campaign') ? 600000 : 240000);
 function assert(value, name, detail) {
   if (!value) throw Error(`${name}: ${JSON.stringify(detail)}`);
   report.assertions[name] = true;
@@ -179,6 +180,140 @@ try {
   await wait('native Multiplayer opens Sargasso',()=>value(host,"window.STARWOLF_MENU_OPENED"),5000);
   assert(true,'native Multiplayer menu opens Sargasso');
   assert(report.errors.length===0,'no uncaught browser errors',report.errors);
+  } else if(process.argv.includes('--campaign')) {
+  const host=await page('host',url),guest=await page('guest',url);
+  await value(host,"document.getElementById('host').click()");
+  const room=await wait('room created',async()=>(await state(host)).room);
+  await value(host,`(()=>{
+    const mode=document.getElementById('mode');mode.value='campaign';mode.dispatchEvent(new Event('change',{bubbles:true}));
+    const crew=document.getElementById('crew');crew.value='star_fox';crew.dispatchEvent(new Event('change',{bubbles:true}));
+    document.getElementById('save-match').click();
+  })()`);
+  await choosePilot(host,{pilot:'fox_original',vehicle:'arwing',hue:0});
+  await value(host,"window.STARWOLF_GAME.prepare()");
+  if(process.argv.includes('--campaign-checkpoint')){report.checkpoint=160000;await value(host,"window.STARWOLF_ROUTE_CHECKPOINT=true");}
+  if(process.argv.includes('--campaign-route'))await value(host,`(()=>{
+    const fs=window.STARWOLF_GAME.engine.frame.contentWindow.Module.FS,write=fs.writeFile;
+    fs.writeFile=function(path,bytes,...rest){
+      if(path==='/starship.cfg.json'){
+        const cfg=JSON.parse(bytes);Object.assign(cfg.CVars,{gInvincible:1,gInfiniteBombs:1,gRapidFire:1,gDebugLevelComplete:1});
+        if(window.parent.STARWOLF_ROUTE_CHECKPOINT)Object.assign(cfg.CVars,{'gCheckpoint.0.Set':1,'gCheckpoint.0.gSavedGroundSurface':0,'gCheckpoint.0.gSavedPathProgress':160000.5,'gCheckpoint.0.gSavedObjectLoadIndex':619});
+        bytes=JSON.stringify(cfg);
+      }
+      return write.call(this,path,bytes,...rest);
+    };
+  })()`);
+  await value(host,"window.STARWOLF_GAME.launch()");
+  await wait('host native story map',()=>value(host,"window.STARWOLF_GAME.engine.state.status===1"),60000);
+  report.hostMap=await value(host,"window.STARWOLF_GAME.engine.state");
+  assert(report.hostMap.mode===1,'host launches native story map',report.hostMap);
+  await joinViaUI(guest,room,'Falco');
+  await wait('guest connected',async()=>(await state(guest)).phase==='connected',30000);
+  await choosePilot(guest,{pilot:'falco_original',vehicle:'arwing',hue:2});
+  await wait('campaign invitation',()=>value(guest,"Boolean(window.STARWOLF_GAME.invitation)"));
+  await value(guest,"window.STARWOLF_GAME.prepare()");
+  await value(guest,"window.STARWOLF_GAME.launch()");
+  await wait('guest waits for map',()=>value(guest,"window.STARWOLF_GAME.stage?.status===1"));
+  assert(await value(guest,"!window.STARWOLF_GAME.active && window.STARWOLF_GAME.engine.frame.hidden"),'guest waits outside host map');
+  const wingmates=[guest];
+  if(process.argv.includes('--campaign-four')){
+    for(const [label,pilot,vehicle]of [['slippy','slippy_original','arwing'],['katt','katt','katt_fighter']]){
+      const peer=await page(label,url);wingmates.push(peer);
+      await joinViaUI(peer,room,label);
+      await wait(label+' connected',async()=>(await state(peer)).phase==='connected');
+      await choosePilot(peer,{pilot,vehicle,hue:0});
+      await wait(label+' campaign invitation',()=>value(peer,"Boolean(window.STARWOLF_GAME.invitation)"));
+      await value(peer,"window.STARWOLF_GAME.prepare()");
+      await value(peer,"window.STARWOLF_GAME.launch()");
+      await wait(label+' waiting for map',()=>value(peer,"window.STARWOLF_GAME.stage?.status===1"));
+    }
+  }
+  const expectedMask=process.argv.includes('--campaign-four')?15:3;
+  const press=async(button)=>{
+    await value(host,"window.STARWOLF_GAME.engine.pad={buttons:"+button+",stickX:0,stickY:0}");
+    await sleep(180);
+    await value(host,"window.STARWOLF_GAME.engine.pad={buttons:0,stickX:0,stickY:0}");
+    await sleep(900);
+  };
+  report.story=[];
+  for(let attempt=0;attempt<65;attempt++){
+    const current=await value(host,"window.STARWOLF_GAME.engine.state");
+    report.story.push(current);console.log('story',current.gameState,current.status,current.epoch,current.frame);
+    if(current.gameState===7)break;
+    await press(attempt%3===0?0x1000:0x8000);
+  }
+  await wait('native story flight',()=>value(host,"window.STARWOLF_GAME.stage?.status===3"),120000);
+  await wait('guest admitted to rails mission',()=>value(guest,"window.STARWOLF_GAME.active"),90000);
+  await wait('all companions admitted',()=>value(host,'window.STARWOLF_GAME.engine.state.activeMask==='+expectedMask),90000);
+  report.flight=await value(host,"window.STARWOLF_GAME.engine.state");
+  report.guestFlight=await value(guest,"window.STARWOLF_GAME.engine.state");
+  assert(report.flight.activeMask===expectedMask&&report.flight.topology===1,'all selected players in native rails story',report.flight);
+  assert(report.guestFlight.lastImportedTick>0,'guest imports story world',report.guestFlight);
+  const before=report.flight;
+  await value(guest,"window.STARWOLF_GAME.engine.pad={buttons:0x8000,stickX:65,stickY:25}");
+  await sleep(3000);
+  report.afterInput=await value(host,"window.STARWOLF_GAME.engine.state");
+  assert(report.afterInput.positions.slice(3,6).some((v,i)=>Math.abs(v-before.positions[3+i])>10),'companion movement reaches host simulation',report.afterInput);
+  assert(report.afterInput.tick>before.tick,'host continues throughout guest handoff');
+  for(const p of [host,guest]){
+    await value(p,"document.getElementById('game-container').scrollIntoView({block:'center'})");
+    const shot=await call('Page.captureScreenshot',{format:'png'},p.sessionId);
+    await writeFile(resolve(output,p.label+'-campaign.png'),Buffer.from(shot.data,'base64'));
+  }
+  if(process.argv.includes('--campaign-route')){
+    await value(host,"window.STARWOLF_GAME.engine.pad={buttons:0x8000,stickX:0,stickY:0}");
+    await value(guest,"window.STARWOLF_GAME.engine.pad={buttons:0x8000,stickX:0,stickY:0}");
+    report.route=[];
+    const routeEnd=Date.now()+360000;
+    while(Date.now()<routeEnd){
+      const current=await value(host,"({native:window.STARWOLF_GAME.engine.frame.contentWindow?.STARSHIP_GAME_STATE,engine:window.STARWOLF_GAME.engine.state,error:window.STARWOLF_GAME.error})");
+      current.guest=await value(guest,"({engine:window.STARWOLF_GAME.engine.state,error:window.STARWOLF_GAME.error})");
+      report.route.push(current);
+      await writeFile(resolve(output,'route-live.json'),JSON.stringify(report.route,null,2));
+      console.log('route',current.engine.epoch,current.engine.topology,current.engine.status,current.engine.tick,current.guest.engine.lastImportedTick,current.guest.error??'');
+      if(current.guest.error)throw Error('Guest: '+current.guest.error);
+      if(current.error)throw Error(current.error);
+      if(current.engine.topology===2&&current.engine.status===3)break;
+      await sleep(10000);
+    }
+    await wait('all-range companion re-admission',()=>value(guest,"window.STARWOLF_GAME.active && window.STARWOLF_GAME.engine.state.topology===2"),90000);
+    report.allrange=await value(host,"window.STARWOLF_GAME.engine.state");
+    report.guestAllrange=await value(guest,"window.STARWOLF_GAME.engine.state");
+    const imported=report.guestAllrange.lastImportedTick;
+    await wait('all-range live imports continue',async()=>{
+      const state=await value(guest,"window.STARWOLF_GAME.engine.state");
+      if(await value(guest,"window.STARWOLF_GAME.error"))throw Error('Guest stopped');
+      if(state.errorCode)throw Error('Current all-range scene rejected '+state.errorCode);
+      return state.lastImportedTick>imported+100;
+    },20000);
+    await wait('all companions re-admitted',()=>value(host,'window.STARWOLF_GAME.engine.state.activeMask==='+expectedMask),90000);
+    report.allrange=await value(host,"window.STARWOLF_GAME.engine.state");
+    assert(report.allrange.activeMask===expectedMask,'companions follow rails to all-range',report.allrange);
+    assert(report.guestAllrange.epoch>report.guestFlight.epoch,'new topology has a fresh epoch',report.guestAllrange);
+    for(const p of [host,guest]){
+      const shot=await call('Page.captureScreenshot',{format:'png'},p.sessionId);
+      await writeFile(resolve(output,p.label+'-allrange.png'),Buffer.from(shot.data,'base64'));
+    }
+  }
+  if(process.argv.includes('--campaign-return-map')){
+    report.debugCompletion=true;
+    await press(0x20);
+    await wait('host completion revokes guest flight',()=>value(host,"window.STARWOLF_GAME.stage?.status===2"),10000);
+    for(const peer of wingmates)assert(await value(peer,"!window.STARWOLF_GAME.active"),peer.label+' waits during host completion');
+    for(let attempt=0;attempt<160;attempt++){
+      const current=await value(host,"window.STARWOLF_GAME.engine.state");
+      if(current.gameState===4&&current.status===1)break;
+      await press(0x8000);
+    }
+    await wait('native story map after completion',()=>value(host,"window.STARWOLF_GAME.engine.state.gameState===4 && window.STARWOLF_GAME.engine.state.status===1"),20000);
+    report.returnedMap=await value(host,"window.STARWOLF_GAME.engine.state");
+    assert(true,'native completion returns to host story map');
+    for(const peer of wingmates){
+      await wait(peer.label+' follows host back to waiting map',()=>value(peer,"window.STARWOLF_GAME.stage?.status===1 && !window.STARWOLF_GAME.active"));
+      assert(await value(peer,"window.STARWOLF_GAME.engine.frame.hidden"),peer.label+' waits outside completed mission');
+    }
+  }
+  assert(report.errors.length===0,'no uncaught browser errors',report.errors);
   } else {
   const host=await page('host',url), guest=await page('guest',url);
   await value(host,"document.getElementById('host').click()");
@@ -261,7 +396,7 @@ try {
     const peer=await page(name,url);
     await value(peer,"document.getElementById('code').value="+JSON.stringify(room)+";document.getElementById('join').click()");
     await wait(name+' connected',async()=>(await state(peer)).phase==='connected');
-    await choosePilot(peer,{pilot:'wolf',vehicle:slot===2?'wolfen':'arwing',hue:0});
+    await choosePilot(peer,{pilot:'wolf',vehicle:shipModels?(slot===2?'katt_fighter':'vitzy_fighter'):(slot===2?'wolfen':'arwing'),hue:0});
     await wait(name+' invitation',()=>value(peer,"Boolean(window.STARWOLF_GAME.invitation)"));
     await value(peer,"window.STARWOLF_GAME.prepare()");
     await value(peer,"window.STARWOLF_GAME.launch()");
@@ -269,15 +404,22 @@ try {
     const observed=await value(peer,"window.STARWOLF_GAME.engine.state");
     assert(observed.slot===slot&&observed.lastImportedTick>0,name+' renders its own native player slot',observed);
     report.fourPlayers.push(observed);
+    if(shipModels){
+      await value(peer,"document.getElementById('game-container').scrollIntoView({block:'center'})");
+      await sleep(2500);
+      const shot=await call('Page.captureScreenshot',{format:'png'},peer.sessionId);
+      await writeFile(resolve(output,name+'-ship.png'),Buffer.from(shot.data,'base64'));
+    }
+
   }
   await wait('four native players active',()=>value(host,"window.STARWOLF_GAME.engine.state.activeMask===15"));
   assert(true,'four actual WASM players share the host world');
   report.nativeLoadouts=await wait('native loadout scene',()=>value(host,`(()=>{
     const v=new DataView(window.STARWOLF_GAME.latest.bytes);
-    if(v.getUint32(4,true)!==2 || v.getUint32(20,true)!==15)return null;
+    if(v.getUint32(4,true)!==3 || v.getUint32(20,true)!==15)return null;
     return Array.from({length:4},(_,slot)=>({pilot:v.getUint32(40+slot*12,true),ship:v.getUint32(44+slot*12,true),rgb:v.getUint32(48+slot*12,true)}));
   })()`));
-  const expectedLoadouts=[{pilot:5,ship:1,rgb:0xe7e0ff},{pilot:5,ship:0,rgb:0xffcf51},{pilot:5,ship:1,rgb:0x79e98e},{pilot:5,ship:0,rgb:0x7cf4ff}];
+  const expectedLoadouts=[{pilot:5,ship:1,rgb:0xe7e0ff},{pilot:5,ship:0,rgb:0xffcf51},{pilot:5,ship:shipModels?2:1,rgb:0x79e98e},{pilot:5,ship:shipModels?3:0,rgb:0x7cf4ff}];
   assert(JSON.stringify(report.nativeLoadouts)===JSON.stringify(expectedLoadouts),'accepted loadouts and duplicate hues reach native world',report.nativeLoadouts);
   const locked=await value(host,"window.STARWOLF_MP.selectLoadout({pilot:'leon',vehicle:'wolfen',hue:0}).then(()=>false,()=>true)");
   assert(locked,'host cannot change pilot during play');
@@ -293,7 +435,7 @@ try {
   report.failure = String(error?.stack || error);
   report.finalStates = {};
   for (const page of pages) {
-    try { report.finalStates[page.label] = {state:await state(page), events:await events(page)}; }
+    try { report.finalStates[page.label] = {state:await state(page), events:await events(page), runtime:await value(page,`(()=>{const game=window.STARWOLF_GAME,w=game?.engine?.frame?.contentWindow;return {last:game?.engine?.lastRuntime,engine:game?.engine?.state,error:w?.STARSHIP_GAME_ERROR,crash:w?.STARSHIP_CRASH_REPORT,logs:w?.document.getElementById('status')?.textContent?.slice(-6000)}})()`)}; }
     catch { /* A crashed target may not be inspectable. */ }
   }
   process.exitCode = interrupted ? 130 : 1;

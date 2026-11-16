@@ -1,4 +1,5 @@
 #include "sys.h"
+#include "sf64net.h"
 #include "sf64audio_provisional.h"
 #include "sf64context.h"
 #include "audiothread_cmd.h"
@@ -2145,7 +2146,7 @@ void Audio_UpdatePlayerFreqMod(void) {
     u8 playerId;
 
 #ifdef AVOID_UB
-    for (playerId = 0; playerId < gCamCount; playerId++) {
+    for (playerId = 0; playerId < (Net_Enabled() ? NET_SLOTS : gCamCount); playerId++) {
 #else
     for (playerId = 0; playerId < 4; playerId++) {
 #endif

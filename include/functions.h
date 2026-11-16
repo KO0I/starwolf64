@@ -464,6 +464,19 @@ void Player_CollisionCheck(Player* player);
 void Player_FloorCheck(Player* player);
 void Player_SetupOnFootShot(Player*, PlayerShot*, PlayerShotId );
 void Player_Setup(Player*);
+s32 Play_PlayerSlotCount(void);
+bool Player_IsCampaignCompanion(const Player*);
+void Player_SetupCompanion(Player*, const Player*);
+void Player_ResumeCompanion(Player* player, const Player* leader);
+void Player_UpdateCompanion(Player*);
+void Player_UpdateCompanionCamera(Player*);
+void Player_DownCompanion(Player*);
+void Player_UpdateEffects(Player*);
+void Player_UpdateOnRails(Player*);
+void Player_UpdateShields(Player*);
+void Camera_Update(Player*);
+
+
 void Player_Update360(Player*);
 void Play_InitLevel(void);
 void Player_InitVersus(void);

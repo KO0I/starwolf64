@@ -38,22 +38,29 @@ static u16 Message_VoiceId(u16 msgId) {
     }
 }
 
-u16 Message_IdFromPtr(u16* msgPtr) {
+u16 Message_ResourceIdFromPtr(u16* msgPtr) {
+    if (msgPtr == NULL) return (u16)-1;
     MsgLookup* lookup = (MsgLookup*) LOAD_ASSET(gMsgLookup);
-
-    while (lookup->msgPtr != NULL) {
-        if (GameEngine_OTRSigCheck(msgPtr)) {
-            if (strcmp(((char*) msgPtr) + 7, lookup->path) == 0) {
-                return Message_VoiceId(lookup->msgId);
-            }
-        } else {
-            if (lookup->msgPtr == msgPtr) {
-                return Message_VoiceId(lookup->msgId);
-            }
-        }
+    const char* path = GameEngine_OTRSigCheck(msgPtr) ? ((const char*)msgPtr) + 7 : NULL;
+    while (lookup->msgId != -1) {
+        if (lookup->msgId >= 0 && lookup->msgId < 65535 &&
+            (lookup->msgPtr == msgPtr || (path != NULL && strcmp(path, lookup->path) == 0)))
+            return (u16)lookup->msgId;
         lookup++;
     }
-    return -1;
+    return (u16)-1;
+}
+
+u16 Message_IdFromPtr(u16* msgPtr) {
+    if (msgPtr == NULL) return (u16)-1;
+    MsgLookup* lookup = (MsgLookup*)LOAD_ASSET(gMsgLookup);
+    const char* path = GameEngine_OTRSigCheck(msgPtr) ? ((const char*)msgPtr) + 7 : NULL;
+    while (lookup->msgId != -1) {
+        if (lookup->msgPtr == msgPtr || (path != NULL && strcmp(path, lookup->path) == 0))
+            return Message_VoiceId((u16)lookup->msgId);
+        lookup++;
+    }
+    return (u16)-1;
 }
 
 s32 Message_GetWidth(u16* msgPtr) {

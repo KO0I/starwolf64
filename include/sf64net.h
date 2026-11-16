@@ -10,6 +10,20 @@ int Net_Launch(int role, uint32_t match, uint32_t epoch, int localSlot, int stag
 void Net_Pump(void);
 void Net_OnPlayInit(void);
 int Net_Enabled(void);
+int Net_IsCampaign(void);
+int Net_ShouldRunPlay(void);
+int Net_StageStatus(void);
+int Net_StageLevel(void);
+int Net_StagePhase(void);
+int Net_StageTopology(void);
+int Net_CanCapture(void);
+int Net_CaptureBlocked(void);
+void Net_SuspendStage(void);
+void Net_ObserveStage(void);
+void Net_OnStoryStageSelected(void);
+int Net_BootstrapStage(uint32_t epoch, int level, int phase, int topology);
+int Net_WaitStage(uint32_t epoch);
+
 int Net_IsGuest(void);
 int Net_LocalSlot(void);
 int Net_Ready(void);
@@ -23,7 +37,8 @@ int Net_SetLoadout(int slot,uint32_t incarnation,uint32_t pilot,uint32_t ship,ui
 uint32_t Net_LoadoutPart(int slot,int part);
 int Net_LoadoutColor(int slot,uint32_t* rgb);
 void Net_ImportLoadouts(const uint32_t values[12]);
-int Net_Activate(int slot, uint32_t incarnation);
+int Net_Activate(int slot, uint32_t incarnation, uint32_t previousIncarnation);
+void Net_OnPlayerPoolReset(void);
 int Net_Remove(int slot, uint32_t incarnation);
 int Net_SetInput(int slot, uint32_t sequence, uint16_t buttons, int stickX, int stickY);
 void Net_ReadController(int slot, OSContPad* pad);

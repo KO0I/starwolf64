@@ -9,6 +9,23 @@
 
 Vec3f sShotViewPos;
 
+static bool PlayerShot_CampaignAllyActor(const Actor* actor) {
+    if (actor->obj.id == OBJ_ACTOR_TEAM_BOSS) return true;
+    if (actor->obj.id == OBJ_ACTOR_ALLRANGE)
+        return (actor->aiType >= AI360_FALCO && actor->aiType <= AI360_PEPPY) ||
+               actor->aiType == AI360_KATT || actor->aiType == AI360_BILL;
+    return actor->obj.id == OBJ_ACTOR_EVENT && actor->iwork[12] >= TEAM_ID_FALCO &&
+           actor->iwork[12] <= TEAM_ID_BILL;
+}
+static bool PlayerShot_CampaignAllyShot(const PlayerShot* shot) {
+    if (shot->sourceId >= 0 && shot->sourceId < NET_SLOTS) return true;
+    s32 index = shot->sourceId - NPC_SHOT_ID;
+    return index >= 0 && index < ARRAY_COUNT(gActors) && PlayerShot_CampaignAllyActor(&gActors[index]);
+}
+static bool PlayerShot_CampaignFriendlyHit(const PlayerShot* shot, const Actor* actor) {
+    return Net_IsCampaign() && PlayerShot_CampaignAllyShot(shot) && PlayerShot_CampaignAllyActor(actor);
+}
+
 void PlayerShot_SetupEffect351(Effect* effect, f32 xPos, f32 yPos, f32 zPos) {
     Effect_Initialize(effect);
     effect->obj.status = OBJ_INIT;
@@ -667,6 +684,7 @@ void PlayerShot_ApplyDamageToActor(PlayerShot* shot, Actor* actor, s32 hitIndex)
     Vec3f sp44 = { 0.0f, 0.0f, -100.0f };
     Vec3f sp38;
 
+    if (PlayerShot_CampaignFriendlyHit(shot, actor)) return;
     actor->dmgType = DMG_BEAM;
     actor->dmgPart = hitIndex - 1;
     actor->timer_0C2 = 2;
@@ -774,6 +792,7 @@ void PlayerShot_CollisionCheck(PlayerShot* shot) {
             }
         }
         for (i = 0, actor = &gActors[0]; i < ARRAY_COUNT(gActors); i++, actor++) {
+            if (PlayerShot_CampaignFriendlyHit(shot, actor)) continue;
             if ((actor->obj.status >= OBJ_ACTIVE) && (actor->timer_0C2 == 0)) {
                 switch (actor->obj.id) {
                     case OBJ_ACTOR_ME_MOLAR_ROCK:
@@ -839,8 +858,10 @@ void PlayerShot_CollisionCheck(PlayerShot* shot) {
                 }
             }
         }
-        if (gLevelMode == LEVELMODE_ALL_RANGE) {
-            for (i = 0, player = gPlayer; i < gCamCount; i++, player++) {
+        if (gLevelMode == LEVELMODE_ALL_RANGE && !(Net_IsCampaign() && PlayerShot_CampaignAllyShot(shot))) {
+            for (i = 0, player = gPlayer; i < Play_PlayerSlotCount(); i++, player++) {
+                if (Net_IsCampaign() && (!(Net_ActiveMask() & (1u << i)) || !player->draw ||
+                    (player->state != PLAYERSTATE_ACTIVE && player->state != PLAYERSTATE_U_TURN))) continue;
                 test.x = 50.0f;
                 if (gVersusMode && (shot->sourceId < 4) &&
                     ((gLaserStrength[shot->sourceId] != LASERS_SINGLE) || (shot->obj.id == PLAYERSHOT_LOCK_ON))) {
@@ -859,7 +880,8 @@ void PlayerShot_CollisionCheck(PlayerShot* shot) {
                 }
                 test.z = test.x;
                 if ((i != shot->sourceId) &&
-                    ((player->state == PLAYERSTATE_ACTIVE) || (player->state == PLAYERSTATE_DOWN)) &&
+                    ((player->state == PLAYERSTATE_ACTIVE) ||
+                     (player->state == (Net_IsCampaign() ? PLAYERSTATE_U_TURN : PLAYERSTATE_DOWN))) &&
                     (fabsf(player->trueZpos - shot->obj.pos.z) < test.z) &&
                     (fabsf(player->pos.x - shot->obj.pos.x) < test.x) &&
                     (fabsf(player->pos.y - shot->obj.pos.y) < test.y)) {
@@ -882,7 +904,7 @@ void PlayerShot_CollisionCheck(PlayerShot* shot) {
                         Effect_Effect393_Spawn(player->pos.x, player->pos.y, player->trueZpos, 8.0f);
                     } else {
                         PlayerShot_Impact(shot);
-                        if (player->hitTimer == 0) {
+                        if (player->hitTimer == 0 && (!Net_IsCampaign() || player->mercyTimer == 0)) {
                             if (gPlayer[0].form == FORM_ON_FOOT) {
                                 Player_ApplyDamage(player, 0, 60);
                             } else {
@@ -900,6 +922,7 @@ void PlayerShot_CollisionCheck(PlayerShot* shot) {
                             }
                         }
                     }
+                    if (Net_IsCampaign()) return;
                 }
             }
         }
@@ -1109,7 +1132,7 @@ void PlayerShot_DrawLaser(PlayerShot* shot) {
     Gfx* dList;
 
     dList = (Player_IsVitzy(shot->sourceId) && (shot->unk_58 == 0)) ? (Gfx*) gVitzyLaserDL : D_101AED0;
-    if (gCamCount < 4) {
+    if (gCamCount < 4 && (!Net_Enabled() || shot->sourceId >= NET_SLOTS)) {
         RCP_SetupDL_21();
         twinLaserSeparation = 9.0f;
         if ((shot->unk_58 == 0) || ((gCurrentLevel == LEVEL_METEO) && (gPlayer[0].state == PLAYERSTATE_LEVEL_INTRO))) {
@@ -1762,6 +1785,7 @@ bool PlayerShot_FindLockTarget(PlayerShot* shot) {
         lockRange = 200.0f;
     }
     for (i = 0, actor = &gActors[0]; i < ARRAY_COUNT(gActors); i++, actor++) {
+        if (PlayerShot_CampaignFriendlyHit(shot, actor)) continue;
         if ((actor->obj.status == OBJ_ACTIVE) && (actor->info.targetOffset != 0.0f) &&
             ((actor->lockOnTimers[shot->sourceId] == 0) && (fabsf(shot->obj.pos.x - actor->obj.pos.x) <= lockRange) &&
              (fabsf(shot->obj.pos.y - (actor->obj.pos.y + actor->info.targetOffset)) <= lockRange) &&
@@ -1776,7 +1800,8 @@ bool PlayerShot_FindLockTarget(PlayerShot* shot) {
                 Object_PlayerSfx(gPlayer[shot->sourceId].sfxSource, NA_SE_LOCK_ON, shot->sourceId);
             }
             for (j = 0; j < ARRAY_COUNT(gPlayerShots); j++) {
-                if (gPlayerShots[j].obj.id == PLAYERSHOT_LOCK_SEARCH) {
+                if (gPlayerShots[j].obj.id == PLAYERSHOT_LOCK_SEARCH &&
+                    (!Net_IsCampaign() || gPlayerShots[j].sourceId == shot->sourceId)) {
                     Object_Kill(&gPlayerShots[j].obj, gPlayerShots[j].sfxSource);
                 }
             }
@@ -1797,7 +1822,8 @@ bool PlayerShot_FindLockTarget(PlayerShot* shot) {
                 gVsLockOnTimers[i][shot->sourceId] = 20;
                 Object_PlayerSfx(gPlayer[shot->sourceId].sfxSource, NA_SE_LOCK_ON, shot->sourceId);
                 for (j = 0; j < ARRAY_COUNT(gPlayerShots); j++) {
-                    if (gPlayerShots[j].obj.id == PLAYERSHOT_LOCK_SEARCH) {
+                    if (gPlayerShots[j].obj.id == PLAYERSHOT_LOCK_SEARCH &&
+                    (!Net_IsCampaign() || gPlayerShots[j].sourceId == shot->sourceId)) {
                         Object_Kill(&gPlayerShots[j].obj, gPlayerShots[j].sfxSource);
                     }
                 }
@@ -1818,8 +1844,9 @@ void PlayerShot_SearchLockOnTarget(PlayerShot* shot) {
         }
     } else {
         bool rapidFire = CVarGetInteger("gRapidFire", 0) == 1;
+        s32 controller = Net_IsCampaign() ? shot->sourceId : gMainController;
         if ((shot->obj.pos.y < gGroundHeight) || PlayerShot_FindLockTarget(shot) ||
-            (!(gControllerHold[gMainController].button & A_BUTTON) ^ rapidFire) || (shot->timer == 0)) {
+            (!(gControllerHold[controller].button & A_BUTTON) ^ rapidFire) || (shot->timer == 0)) {
             Object_Kill(&shot->obj, shot->sfxSource);
         }
     }
@@ -1955,6 +1982,7 @@ void PlayerShot_ApplyExplosionDamage(PlayerShot* shot, s32 damage) {
 
     actor = &gActors[0];
     for (i = 0; i < ARRAY_COUNT(gActors); i++, actor++) {
+        if (PlayerShot_CampaignFriendlyHit(shot, actor)) continue;
         if ((actor->obj.status == OBJ_ACTIVE) && (actor->timer_0C2 == 0) &&
             !((gCurrentLevel == LEVEL_MACBETH) && (OBJ_ACTOR_MA_LOCOMOTIVE <= actor->obj.id) &&
               (actor->obj.id < OBJ_ACTOR_MA_RAILROAD_SWITCH)) &&
@@ -2096,7 +2124,7 @@ void PlayerShot_UpdateBomb(PlayerShot* shot) {
             }
 
             if (shot->timer < 25) {
-                if (gVersusMode) {
+                if (gVersusMode || Net_IsCampaign()) {
                     if (gControllerPress[shot->sourceId].button & gBombButton[shot->sourceId]) {
                         PlayerShot_ExplodeBomb(shot);
                         break;

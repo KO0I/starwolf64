@@ -11,11 +11,17 @@
 extern "C" {
 #include "sf64context.h"
 #include "sf64net.h"
+#include "sf64event.h"
+#include "sf64audio_provisional.h"
+#include "assets/ast_corneria.h"
 #include "variables.h"
 void Object_SetInfo(ObjectInfo* info, u32 objId);
 extern s32 sVsDrawMode;
 extern s32 sVsWinner;
 extern u8 gAudioSpecId;
+extern u8 sFightCarrier;
+extern f32 sCoGrangaWork[68];
+u16* Message_PtrFromId(u16 id);
 u16 Audio_GetActiveSeqId(u8 seqPlayId);
 }
 namespace {
@@ -29,7 +35,7 @@ struct Mailbox {
         h[20] = CAP;
     }
 } mailbox;
-uint32_t tick = 0, lastImported = 0;
+uint32_t tick = 0, lastImported = 0, sceneEpoch = 0, invalidObject = 0;
 struct Globals {
 #include "net_globals.inc"
 };
@@ -47,6 +53,9 @@ struct World {
     TexturedLine lines[100]{};
     RadarMark radar[65]{};
     BonusText bonuses[10]{};
+    float corneriaWork[68]{};
+    uint8_t fightCarrier{};
+    uint16_t radioResource = 65535, music = 65535;
 };
 template <class T> void copyValue(T& dst, const T& src) {
     dst = src;
@@ -143,8 +152,21 @@ struct Codec {
             if (active) {
                 field(value);
                 if constexpr (std::is_same_v<T, Actor>) {
-                    // Only numeric debris work is audited for the first Corneria schema.
-                    if (value.obj.id != OBJ_ACTOR_DEBRIS) {
+                    bool numeric = value.obj.id == OBJ_ACTOR_DEBRIS;
+                    if (Net_IsCampaign()) {
+                        switch (value.obj.id) {
+                            case OBJ_ACTOR_CO_GARUDA_1: case OBJ_ACTOR_CO_GARUDA_2:
+                            case OBJ_ACTOR_CO_GARUDA_3: case OBJ_ACTOR_CO_GARUDA_DESTROY:
+                            case OBJ_ACTOR_MISSILE_SEEK_TEAM: case OBJ_ACTOR_MISSILE_SEEK_PLAYER:
+                            case OBJ_ACTOR_CO_SKIBOT: case OBJ_ACTOR_CO_RADAR:
+                            case OBJ_ACTOR_CUTSCENE: case OBJ_ACTOR_CO_MOLE_MISSILE:
+                            case OBJ_ACTOR_ALLRANGE: case OBJ_ACTOR_TEAM_BOSS: case OBJ_ACTOR_EVENT:
+                                numeric = true; break;
+                            default: break;
+                        }
+                    }
+                    if (!numeric) {
+                        invalidObject = value.obj.id;
                         ok = false;
                         return;
                     }
@@ -158,6 +180,22 @@ struct Codec {
                         if (reading)
                             raw = static_cast<uintptr_t>(static_cast<intptr_t>(number));
                     }
+                }
+                if constexpr (std::is_same_v<T, Actor>) {
+                    if (Net_IsCampaign() && value.obj.id == OBJ_ACTOR_EVENT &&
+                        (value.eventType < 0 || (value.eventType >= 108 && value.eventType != EVID_FFF))) {
+                        invalidObject = 10000u + uint32_t(value.eventType); ok = false; return;
+                    }
+                    if (Net_IsCampaign() && value.obj.id == OBJ_ACTOR_EVENT) {
+                        for (int index : {1, 9})
+                            if (static_cast<intptr_t>(value.iwork[index]) < 0 || value.iwork[index] >= 60) {
+                                invalidObject = 20000u + index; ok = false; return;
+                            }
+                        if (value.iwork[8] >= 100) { invalidObject = 20008; ok = false; return; }
+                    }
+                    if (Net_IsCampaign() && (value.obj.id == OBJ_ACTOR_CO_GARUDA_1 ||
+                        value.obj.id == OBJ_ACTOR_CO_GARUDA_2 || value.obj.id == OBJ_ACTOR_CO_GARUDA_3) &&
+                        value.iwork[0] >= 50) { invalidObject = 20100; ok = false; return; }
                 }
                 if constexpr (std::is_same_v<T, Effect>) {
                     if (!reading && value.unk_74 != nullptr) {
@@ -204,6 +242,9 @@ struct Codec {
         field(value.lines);
         field(value.radar);
         field(value.bonuses);
+        field(value.corneriaWork);
+        field(value.fightCarrier);
+        field(value.radioResource); field(value.music);
     }
 };
 template <class T, size_t N> void bindInfo(T (&values)[N]) {
@@ -225,7 +266,8 @@ size_t capture(uint8_t* bytes) {
     World scene{};
 #include "net_capture.inc"
     copyValue(scene.players, *reinterpret_cast<Player(*)[4]>(gPlayer));
-    copyValue(scene.allrange, *reinterpret_cast<Scenery360(*)[200]>(gScenery360));
+    if (gLevelMode == LEVELMODE_ALL_RANGE && gScenery360)
+        copyValue(scene.allrange, *reinterpret_cast<Scenery360(*)[200]>(gScenery360));
     copyValue(scene.scenery, gScenery);
     copyValue(scene.sprites, gSprites);
     copyValue(scene.actors, gActors);
@@ -236,6 +278,11 @@ size_t capture(uint8_t* bytes) {
     copyValue(scene.lines, gTexturedLines);
     copyValue(scene.radar, gRadarMarks);
     copyValue(scene.bonuses, gBonusText);
+    if (Net_IsCampaign() && gCurrentLevel == LEVEL_CORNERIA) {
+        copyValue(scene.corneriaWork, sCoGrangaWork); scene.fightCarrier = sFightCarrier;
+        scene.radioResource = Message_ResourceIdFromPtr(gRadioMsg);
+        scene.music = Audio_GetActiveSeqId(SEQ_PLAYER_BGM);
+    }
     Codec codec{ bytes, CAP, 0, false };
     uint32_t header[] = { SCENE,
                           1,
@@ -251,7 +298,7 @@ size_t capture(uint8_t* bytes) {
     for (int slot = 0; slot < NET_SLOTS; slot++)
         for (int part = 0; part < 3; part++)
             loadouts[slot * 3 + part] = Net_LoadoutPart(slot, part);
-    header[1] = 2;
+    header[1] = 3;
     codec.field(header);
     codec.field(loadouts);
     codec.world(scene);
@@ -263,7 +310,7 @@ bool importWorld(const uint8_t* bytes, size_t size) {
     uint32_t header[10]{}, loadouts[12]{};
     codec.field(header);
     codec.field(loadouts);
-    if (!codec.ok || header[0] != SCENE || header[1] != 2 || header[2] != Net_MatchId() ||
+    if (!codec.ok || header[0] != SCENE || header[1] != 3 || header[2] != Net_MatchId() ||
         header[3] != Net_StageEpoch() || header[4] < lastImported || (header[5] & ~15u))
         return false;
     for (unsigned i = 0; i < 4; i++)
@@ -275,26 +322,41 @@ bool importWorld(const uint8_t* bytes, size_t size) {
             return false;
     codec.world(scene);
     if (!codec.ok || codec.pos != size || scene.globals.gGameState != GSTATE_PLAY ||
-        scene.globals.gPlayState != PLAY_UPDATE || scene.globals.gCurrentLevel != LEVEL_VERSUS ||
-        scene.globals.gVersusStage != VS_STAGE_CORNERIA || scene.globals.gVsMatchType != VS_MATCH_POINTS ||
-        scene.globals.gCamCount != 4 || !gPlayer || !gScenery360)
+        scene.globals.gPlayState != PLAY_UPDATE || !gPlayer)
         return false;
+    if (Net_IsCampaign()) {
+        if (scene.globals.gCurrentLevel != LEVEL_CORNERIA || scene.globals.gLevelPhase != 0 ||
+            scene.globals.gCamCount != 1 || scene.globals.gVersusMode ||
+            scene.globals.gLevelMode != Net_StageTopology()) return false;
+    } else if (scene.globals.gCurrentLevel != LEVEL_VERSUS || scene.globals.gVersusStage != VS_STAGE_CORNERIA ||
+               scene.globals.gVsMatchType != VS_MATCH_POINTS || scene.globals.gCamCount != 4) return false;
+    if (scene.globals.gLevelMode == LEVELMODE_ALL_RANGE && !gScenery360) return false;
     for (unsigned i = 0; i < 4; i++) {
         if (scene.players[i].num != int(i) || scene.players[i].form != FORM_ARWING ||
             scene.players[i].state >= PLAYERSTATE_MAX)
             return false;
     }
     for (const auto& shot : scene.shots)
-        if (shot.obj.status && (shot.sourceId < 0 || shot.sourceId > 3))
+        if (shot.obj.status && (shot.sourceId < 0 ||
+            (shot.sourceId >= NET_SLOTS && (!Net_IsCampaign() ||
+             shot.sourceId < NPC_SHOT_ID || shot.sourceId >= NPC_SHOT_ID + 60))))
             return false;
-    for (unsigned i = 0; i < 4; i++) {
+    for (unsigned i = 0; !Net_IsCampaign() && i < 4; i++) {
         if (scene.globals.gVsPoints[i] < 0 || scene.globals.gVsPoints[i] > 10)
             return false;
         for (unsigned j = 0; j < 10; j++)
             if (scene.globals.gVsKills[i][j] < 0 || scene.globals.gVsKills[i][j] > 3)
                 return false;
     }
+    u16* radioText = nullptr;
+    if (Net_IsCampaign()) {
+        if (scene.radioResource != 65535) radioText = Message_PtrFromId(scene.radioResource);
+        if (scene.globals.gRadioState > 0 && !radioText) return false;
+    }
     bindInfo(scene.allrange);
+    if (Net_IsCampaign() && scene.globals.gLevelMode == LEVELMODE_ALL_RANGE)
+        for (auto& scenery : scene.allrange)
+            if (scenery.obj.status && scenery.obj.id == OBJ_SCENERY_CO_BUMP_1) scenery.info.dList = (Gfx*)D_CO_6020760;
     bindInfo(scene.scenery);
     bindInfo(scene.sprites);
     bindInfo(scene.actors);
@@ -307,7 +369,8 @@ bool importWorld(const uint8_t* bytes, size_t size) {
         gPlayer[i].sfx.srcPos = gPlayer[i].sfxSource;
         gPlayer[i].sfx.srcVel = gPlayer[i].sfxVel;
     }
-    copyValue(*reinterpret_cast<Scenery360(*)[200]>(gScenery360), scene.allrange);
+    if (gLevelMode == LEVELMODE_ALL_RANGE)
+        copyValue(*reinterpret_cast<Scenery360(*)[200]>(gScenery360), scene.allrange);
     copyValue(gScenery, scene.scenery);
     copyValue(gSprites, scene.sprites);
     copyValue(gActors, scene.actors);
@@ -318,6 +381,14 @@ bool importWorld(const uint8_t* bytes, size_t size) {
     copyValue(gTexturedLines, scene.lines);
     copyValue(gRadarMarks, scene.radar);
     copyValue(gBonusText, scene.bonuses);
+    if (Net_IsCampaign()) {
+        copyValue(sCoGrangaWork, scene.corneriaWork); sFightCarrier = scene.fightCarrier;
+        gRadioMsg = radioText;
+        if (scene.music != Audio_GetActiveSeqId(SEQ_PLAYER_BGM)) {
+            if (scene.music == SEQ_ID_NONE) SEQCMD_STOP_SEQUENCE(SEQ_PLAYER_BGM, 1);
+            else AUDIO_PLAY_BGM(scene.music);
+        }
+    }
     Net_ImportMembership(header[5], header + 6);
     Net_ImportLoadouts(loadouts);
     lastImported = header[4];
@@ -330,18 +401,38 @@ extern "C" EMSCRIPTEN_KEEPALIVE uint32_t Wasm_NetMailboxAddress(void) {
 }
 extern "C" void Wasm_NetBeginFrame(void) {
     auto& h = mailbox.h;
+    Net_ObserveStage();
+    if (sceneEpoch != Net_StageEpoch()) {
+        sceneEpoch = Net_StageEpoch(); tick = lastImported = 0;
+        h[12] = h[18] = h[19] = 0;
+        if (h[13].load(std::memory_order_acquire) != 2) h[13].store(0, std::memory_order_release);
+    }
     if (h[2].load(std::memory_order_acquire) == 1) {
         h[2].store(2, std::memory_order_release);
         uint32_t args[6];
         for (unsigned i = 0; i < 6; i++)
             args[i] = h[32 + i].load(std::memory_order_relaxed);
         bool ok = false;
-        switch (h[4].load(std::memory_order_relaxed)) {
+        const auto command = h[4].load(std::memory_order_relaxed);
+        const bool fenced = Net_IsCampaign() && command >= 2 && command <= 5;
+        const bool stale = fenced && (uint32_t(h[43]) != Net_StageEpoch() ||
+                           ((command == 2 || command == 5) && !Net_CanCapture()));
+        if (!stale) switch (command) {
+            case 6:
+                ok = Net_BootstrapStage(args[0], args[1], args[2], args[3]);
+                if (ok) h[7].store(0, std::memory_order_release);
+                lastImported = tick = 0;
+                h[18] = 0;
+                break;
+            case 7:
+                ok = Net_WaitStage(args[0]);
+                if (ok) h[7].store(0, std::memory_order_release);
+                break;
             case 1:
                 ok = Net_Launch(args[0], args[1], args[2], args[3], args[4], args[5]);
                 break;
             case 2:
-                ok = Net_Activate(args[0], args[1]);
+                ok = Net_Activate(args[0], args[1], args[2]);
                 break;
             case 3:
                 ok = Net_Remove(args[0], args[1]);
@@ -354,14 +445,18 @@ extern "C" void Wasm_NetBeginFrame(void) {
                     ok = Net_SetInput(args[0], args[2], args[3], int32_t(args[4]), int32_t(args[5]));
                 break;
         }
-        h[5].store(ok ? 0 : -1, std::memory_order_relaxed);
+        h[5].store(stale ? -4 : ok ? 0 : -1, std::memory_order_relaxed);
         h[2].store(3, std::memory_order_release);
     }
-    if (Net_IsGuest() && Net_Ready() && h[16].load(std::memory_order_acquire) == 1) {
+    if (Net_IsGuest() && h[16].load(std::memory_order_acquire) == 1) {
         h[16].store(2, std::memory_order_release);
         const auto size = h[17].load(std::memory_order_relaxed);
-        const bool ok = size >= 88 && size <= int32_t(CAP) && importWorld(mailbox.incoming, size);
-        h[19].store(ok ? 0 : -2, std::memory_order_relaxed);
+        const uint32_t epoch = uint32_t(mailbox.incoming[12]) | (uint32_t(mailbox.incoming[13]) << 8) |
+                               (uint32_t(mailbox.incoming[14]) << 16) | (uint32_t(mailbox.incoming[15]) << 24);
+        const bool stale = Net_IsCampaign() &&
+                           (!Net_Ready() || Net_StageStatus() != 3 || (size >= 16 && epoch != Net_StageEpoch()));
+        const bool ok = !stale && Net_Ready() && size >= 88 && size <= int32_t(CAP) && importWorld(mailbox.incoming, size);
+        h[19].store(ok ? 0 : stale ? -4 : -2, std::memory_order_relaxed);
         h[16].store(3, std::memory_order_release);
     }
 }
@@ -370,12 +465,19 @@ extern "C" void Wasm_NetEndFrame(void) {
     h[6] = Net_IsGuest() ? 2 : Net_Enabled() ? 1 : 0;
     h[7] = Net_Ready();
     h[8] = Net_MatchId();
+    Net_ObserveStage();
+    h[44].fetch_add(1, std::memory_order_acq_rel);
     h[9] = Net_StageEpoch();
+    h[38] = Net_IsCampaign();
+    h[39] = Net_StageLevel() + 1; h[40] = Net_StagePhase();
+    h[41] = Net_StageTopology() + 1; h[42] = Net_StageStatus();
+    h[44].fetch_add(1, std::memory_order_release);
+    h[45] = invalidObject;
     h[10] = Net_LocalSlot();
     h[11] = Net_ActiveMask();
     h[21] = gGameState;
     h[22] = gPlayState;
-    h[46] = gVsMatchStart;
+    h[46] = Net_IsCampaign() ? Net_CaptureBlocked() : gVsMatchStart;
     h[47] = (uint32_t(Net_ActiveBoostSounds()) << 24) | (uint32_t(gAudioSpecId) << 16) | Audio_GetActiveSeqId(0);
     h[23] = gVsMatchOver ? sVsWinner + 1 : 0;
     if (Net_Ready() && gPlayer) {
@@ -405,7 +507,7 @@ extern "C" void Wasm_NetEndFrame(void) {
         h[62] = gVsPoints[Net_LocalSlot()];
         h[63] = gGameFrameCount;
     }
-    if (Net_Ready() && !Net_IsGuest() && gPlayer && gScenery360) {
+    if (Net_CanCapture() && !Net_IsGuest() && gPlayer && (gLevelMode != LEVELMODE_ALL_RANGE || gScenery360)) {
         ++tick;
         h[12] = tick;
         if ((tick % 2) == 0 && h[13].load(std::memory_order_acquire) == 0) {
@@ -415,8 +517,10 @@ extern "C" void Wasm_NetEndFrame(void) {
                 h[14] = size;
                 h[15] = tick;
                 h[13].store(1, std::memory_order_release);
-            } else
+            } else {
                 h[19] = -3;
+                Net_SuspendStage();
+            }
         }
     }
 }

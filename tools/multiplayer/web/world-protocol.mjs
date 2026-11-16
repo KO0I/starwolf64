@@ -23,9 +23,11 @@ export function worldFrames(bytes) {
   });
 }
 export class WorldReceiver {
-  constructor() {
+  constructor(match = null, epoch = null) {
     this.pending = null;
     this.lastTick = 0;
+    this.match = match;
+    this.epoch = epoch;
   }
   accept(frame) {
     if (!(frame instanceof ArrayBuffer) || frame.byteLength < 33 || frame.byteLength > CHUNK + 32)
@@ -37,6 +39,7 @@ export class WorldReceiver {
         count !== Math.ceil(length / CHUNK) || index >= count ||
         frame.byteLength !== 32 + Math.min(CHUNK, length - index * CHUNK))
       throw Error('Invalid scene chunk');
+    if ((this.match !== null && match !== this.match) || (this.epoch !== null && epoch !== this.epoch)) return null;
     if (tick <= this.lastTick) return null;
     let p = this.pending;
     if (p && Date.now() - p.at > 3000) p = this.pending = null;
@@ -53,7 +56,7 @@ export class WorldReceiver {
     this.pending = null;
     const scene = new DataView(bytes.buffer);
     if (checksum(bytes) !== sum || scene.getUint32(0, true) !== 0x53434e31 ||
-        scene.getUint32(4, true) !== 2 || scene.getUint32(8, true) !== match ||
+        scene.getUint32(4, true) !== 3 || scene.getUint32(8, true) !== match ||
         scene.getUint32(12, true) !== epoch || scene.getUint32(16, true) !== tick)
       throw Error('Corrupt scene image');
     this.lastTick = tick;

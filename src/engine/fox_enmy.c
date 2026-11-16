@@ -1,4 +1,5 @@
 #include "global.h"
+#include "sf64net.h"
 #include "assets/ast_corneria.h"
 #include "assets/ast_sector_x.h"
 #include "assets/ast_sector_y.h"
@@ -1760,7 +1761,9 @@ void Actor_Despawn(Actor* this) {
             gPlayerScores[this->dmgSource - 1] += this->info.bonus;
         }
     } else if (!((this->obj.id == OBJ_ACTOR_ALLRANGE) && (this->animFrame == 1))) {
-        if ((this->dmgSource == AI360_FOX + 1) && (this->info.bonus != 0)) {
+        if (((this->dmgSource == AI360_FOX + 1) ||
+             (Net_IsCampaign() && this->dmgSource >= 1 && this->dmgSource <= NET_SLOTS)) &&
+            (this->info.bonus != 0)) {
             gHitCount += this->info.bonus;
             D_ctx_80177850 = 15;
 
@@ -3092,7 +3095,26 @@ void TexturedLine_Update(TexturedLine* this) {
     }
 
     if (gGameState == GSTATE_PLAY) {
-        if (((this->mode == 1) || (this->mode == 101) || (this->mode == 50)) &&
+        if (Net_IsCampaign()) {
+            if (this->mode == 1 || this->mode == 101 || this->mode == 50) {
+                for (s32 slot = 0; slot < NET_SLOTS; slot++) {
+                    Player* player = &gPlayer[slot];
+                    if (!(Net_ActiveMask() & (1u << slot)) || !player->draw ||
+                        (player->state != PLAYERSTATE_ACTIVE && player->state != PLAYERSTATE_U_TURN) ||
+                        player->hitTimer || player->mercyTimer) continue;
+                    Matrix_RotateX(gCalcMatrix, -this->xRot, MTXF_NEW);
+                    Matrix_RotateY(gCalcMatrix, -this->yRot, MTXF_APPLY);
+                    sp44.x = player->pos.x - this->posAA.x;
+                    sp44.y = player->pos.y - this->posAA.y;
+                    sp44.z = player->trueZpos - this->posAA.z;
+                    Matrix_MultVec3fNoTranslate(gCalcMatrix, &sp44, &sp38);
+                    if (fabsf(sp38.x) < 30 && fabsf(sp38.y) < 30 && sp38.z < 0 && sp38.z > -this->zScale) {
+                        Player_ApplyDamage(player, 0, gCurrentLevel == LEVEL_AQUAS ? 30 : 20);
+                        if (this->mode < 100) { this->mode = 0; break; }
+                    }
+                }
+            }
+        } else if (((this->mode == 1) || (this->mode == 101) || (this->mode == 50)) &&
             (gPlayer[0].state == PLAYERSTATE_ACTIVE) && (gPlayer[0].hitTimer == 0)) {
             Matrix_RotateX(gCalcMatrix, -this->xRot, MTXF_NEW);
             Matrix_RotateY(gCalcMatrix, -this->yRot, MTXF_APPLY);

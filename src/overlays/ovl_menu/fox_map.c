@@ -6,6 +6,7 @@
 
 #include "mods.h"
 #include "global.h"
+#include "sf64net.h"
 #include "fox_map.h"
 #include "fox_option.h"
 #include "sf64save.h"
@@ -4295,6 +4296,7 @@ void Map_SetState_ZoomPlanet(void) {
 }
 
 void Map_PlayLevel(void) {
+    Net_OnStoryStageSelected();
     gGameState = GSTATE_PLAY;
     gNextGameStateTimer = 2;
     gPlayState = PLAY_STANDBY;

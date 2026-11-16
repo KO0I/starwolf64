@@ -7,7 +7,7 @@ function image(length = 20000, tick = 12) {
   const bytes = new Uint8Array(length);
   for (let i = 40; i < length; i++) bytes[i] = i % 251;
   const v = new DataView(bytes.buffer);
-  [0x53434e31, 2, 42, 1, tick, 3, 1, 1, 0, 0].forEach((n, i) => v.setUint32(i * 4, n, true));
+  [0x53434e31, 3, 42, 1, tick, 3, 1, 1, 0, 0].forEach((n, i) => v.setUint32(i * 4, n, true));
   return bytes.buffer;
 }
 test('complete native images reassemble out of order and reject late ticks', () => {

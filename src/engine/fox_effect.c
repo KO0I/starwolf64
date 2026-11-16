@@ -5,6 +5,7 @@
  */
 
 #include "global.h"
+#include "sf64net.h"
 #include "assets/ast_blue_marine.h"
 #include "assets/ast_arwing.h"
 #include "assets/ast_bg_space.h"
@@ -1018,7 +1019,12 @@ void Effect_TimedSfx_Update(TimedSfx* this) {
     }
 }
 
-bool func_effect_8007A774(Player* player, Effect* this, f32 arg2) {
+static bool Effect_CampaignPlayerIsTarget(s32 slot) {
+    const Player* player = &gPlayer[slot];
+    return (Net_ActiveMask() & (1u << slot)) && player->draw &&
+           (player->state == PLAYERSTATE_ACTIVE || player->state == PLAYERSTATE_U_TURN);
+}
+static bool Effect_DamageOnePlayer(Player* player, Effect* this, f32 arg2) {
     if ((fabsf(player->trueZpos - this->obj.pos.z) < arg2) && (fabsf(player->pos.x - this->obj.pos.x) < arg2) &&
         (fabsf(player->pos.y - this->obj.pos.y) < arg2) && (player->mercyTimer == 0)) {
         Player_ApplyDamage(player, 0, this->info.damage);
@@ -1026,6 +1032,16 @@ bool func_effect_8007A774(Player* player, Effect* this, f32 arg2) {
     } else {
         return false;
     }
+}
+
+bool func_effect_8007A774(Player* player, Effect* effect, f32 radius) {
+    if (!Net_IsCampaign() || player != gPlayer) return Effect_DamageOnePlayer(player, effect, radius);
+    bool damaged = false;
+    if (effect->obj.status == OBJ_FREE) return false;
+    for (s32 slot = 0; slot < NET_SLOTS; slot++)
+        if (Effect_CampaignPlayerIsTarget(slot) && Effect_DamageOnePlayer(&gPlayer[slot], effect, radius))
+            damaged = true;
+    return damaged;
 }
 
 void Effect_Effect359_Setup(Effect359* this, f32 xPos, f32 yPos, f32 zPos, f32 scale1, u8 arg5, u8 arg6, u16 arg7) {
@@ -2903,6 +2919,35 @@ bool func_effect_8007FD84(Effect* this) {
     return false;
 }
 
+static bool Effect_CampaignProjectileHit(Effect* effect) {
+    for (s32 slot = 0; slot < NET_SLOTS; slot++) {
+        if (!Effect_CampaignPlayerIsTarget(slot)) continue;
+        Player* player = &gPlayer[slot];
+        f32 margin = player->barrelRollAlpha != 0 ? 100.0f : 0.0f;
+        if (fabsf(player->trueZpos - effect->obj.pos.z) >= 50.0f + margin ||
+            fabsf(player->pos.x - effect->obj.pos.x) >= 30.0f + margin ||
+            fabsf(player->pos.y - effect->obj.pos.y) >= 30.0f + margin) continue;
+        if (player->barrelRollAlpha != 0 || player->meteoWarpTimer != 0) {
+            Vec3f source = {0, 0, 100};
+            effect->obj.rot.y = 90; effect->obj.rot.x = RAND_FLOAT(360);
+            Matrix_RotateY(gCalcMatrix, effect->obj.rot.y * M_DTOR, MTXF_NEW);
+            Matrix_RotateX(gCalcMatrix, effect->obj.rot.x * M_DTOR, MTXF_APPLY);
+            Matrix_MultVec3f(gCalcMatrix, &source, &effect->vel);
+            player->deflectCount++;
+            AUDIO_PLAY_SFX(NA_SE_ROLLING_REFLECT, effect->sfxSource, 0);
+            return true;
+        }
+        if (player->mercyTimer == 0) {
+            Player_ApplyDamage(player, 0, effect->info.damage);
+            player->knockback.x = effect->vel.x < 0 ? -20 : 20;
+            if (gCurrentLevel != LEVEL_MACBETH) player->knockback.y = effect->vel.y < 0 ? -20 : 20;
+            Object_Kill(&effect->obj, effect->sfxSource);
+            return true;
+        }
+    }
+    return false;
+}
+
 void Effect_Effect353_354_Update(Effect* this) {
     Vec3f srcVelocity;
     Vec3f destVelocity;
@@ -2919,11 +2964,12 @@ void Effect_Effect353_354_Update(Effect* this) {
         return;
     }
 
-    if (gPlayer[0].barrelRollAlpha != 0) {
+    if (Net_IsCampaign() && Effect_CampaignProjectileHit(this)) return;
+    if (!Net_IsCampaign() && gPlayer[0].barrelRollAlpha != 0) {
         var_fa0 = 100.0f;
     }
 
-    if (fabsf(gPlayer[0].trueZpos - this->obj.pos.z) < (50.0f + var_fa0)) {
+    if (!Net_IsCampaign() && fabsf(gPlayer[0].trueZpos - this->obj.pos.z) < (50.0f + var_fa0)) {
         if ((fabsf(gPlayer[0].pos.x - this->obj.pos.x) < (30.0f + var_fa0)) &&
             (fabsf(gPlayer[0].pos.y - this->obj.pos.y) < (30.0f + var_fa0))) {
             if ((gPlayer[0].barrelRollAlpha != 0) || (gPlayer[0].meteoWarpTimer != 0)) {
@@ -3053,12 +3099,13 @@ void Effect_Effect398_Update(Effect398* this) {
                 return;
             }
 
-            if (gPlayer[0].barrelRollAlpha != 0) {
+            if (Net_IsCampaign() && Effect_CampaignProjectileHit(this)) return;
+            if (!Net_IsCampaign() && gPlayer[0].barrelRollAlpha != 0) {
                 var_fa0 = 100.0f;
             }
 
-            if (fabsf(gPlayer[0].trueZpos - this->obj.pos.z) < (50.0f + var_fa0)) {
-                if ((fabsf(gPlayer[0].pos.x - this->obj.pos.x) < (30.0f + var_fa0)) &&
+            if (Net_IsCampaign() || fabsf(gPlayer[0].trueZpos - this->obj.pos.z) < (50.0f + var_fa0)) {
+                if (!Net_IsCampaign() && (fabsf(gPlayer[0].pos.x - this->obj.pos.x) < (30.0f + var_fa0)) &&
                     (fabsf(gPlayer[0].pos.y - this->obj.pos.y) < (30.0f + var_fa0))) {
                     if ((gPlayer[0].barrelRollAlpha != 0) || (gPlayer[0].meteoWarpTimer != 0)) {
                         this->obj.rot.y = 90.0f;

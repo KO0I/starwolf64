@@ -24,6 +24,7 @@ std::shared_ptr<Ship::IResource> ResourceFactoryBinaryMessageLookupV0::ReadResou
         table->mLookupTable.push_back({ id, ptr, strdup(name) });
     }
 
+    table->mLookupTable.push_back({ -1, nullptr, nullptr });
     return table;
 }
 } // namespace LUS

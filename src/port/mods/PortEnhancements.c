@@ -105,6 +105,8 @@ void OnDisplayUpdatePost(IEvent* event) {
                 gAllRangeEventTimer = 9200;
                 return;
             }
+            gCsFrameCount = 0;
+            pl->csState = pl->csTimer = 0;
             pl->state = PLAYERSTATE_LEVEL_COMPLETE;
         }
     }

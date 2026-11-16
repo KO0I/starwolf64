@@ -13,14 +13,97 @@ typedef struct {
     int8_t stickX, stickY;
 } NetSlot;
 static struct {
-    int role, localSlot, pending, ready;
-    uint32_t match, epoch, activeMask;
+    int role, localSlot, pending, ready, mode, loading, status, level, phase, topology, blocked;
+    uint32_t match, epoch, activeMask, resumeMask, noiseMask;
     NetSlot slots[NET_SLOTS];
 } sNet;
 
 int Net_Enabled(void) {
     return sNet.role != NET_OFFLINE;
 }
+
+int Net_IsCampaign(void) { return sNet.mode == 1 && Net_Enabled(); }
+int Net_ShouldRunPlay(void) {
+    return !Net_IsGuest() || (Net_IsCampaign() ? sNet.loading : !sNet.ready);
+}
+int Net_StageStatus(void) { return Net_IsCampaign() ? sNet.status : 0; }
+int Net_StageLevel(void) { return sNet.level; }
+int Net_StagePhase(void) { return sNet.phase; }
+int Net_StageTopology(void) { return sNet.topology; }
+int Net_CanCapture(void) { return Net_Ready() && (!Net_IsCampaign() || sNet.status == 3); }
+void Net_OnPlayerPoolReset(void) { sNet.resumeMask = sNet.noiseMask = 0; }
+static void Net_RevokeFlight(void) {
+    if (Net_IsGuest()) {
+        for (int i = 0; i < NET_SLOTS; i++) if (sNet.noiseMask & (1u << i)) Audio_StopPlayerNoise(i);
+        sNet.noiseMask = 0;
+    }
+    if (sNet.ready && gGameState == GSTATE_PLAY && gPlayer) {
+        sNet.resumeMask |= sNet.activeMask & 14u;
+        for (int i = 1; i < NET_SLOTS; i++) if (sNet.activeMask & (1u << i)) {
+            gPlayer[i].draw = false; Audio_StopPlayerNoise(i);
+        }
+    }
+    sNet.activeMask = sNet.role == NET_HOST ? 1u : 0u;
+    for (int i = 1; i < NET_SLOTS; i++) {
+        sNet.slots[i].buttons = 0;
+        sNet.slots[i].stickX = sNet.slots[i].stickY = 0;
+    }
+}
+int Net_CaptureBlocked(void) { return sNet.blocked; }
+void Net_SuspendStage(void) {
+    if (Net_IsCampaign() && !Net_IsGuest()) { sNet.blocked = 1; Net_ObserveStage(); }
+}
+void Net_OnStoryStageSelected(void) {
+    if (!Net_IsCampaign() || Net_IsGuest()) return;
+    ++sNet.epoch;
+    Net_RevokeFlight();
+    sNet.resumeMask = 0; sNet.blocked = 0;
+    sNet.ready = 0;
+    sNet.level = gCurrentLevel; sNet.phase = gLevelPhase;
+    sNet.topology = gCurrentLevel >= LEVEL_FORTUNA ? LEVELMODE_ALL_RANGE : LEVELMODE_ON_RAILS;
+    sNet.status = 2;
+}
+void Net_ObserveStage(void) {
+    if (!Net_IsCampaign() || Net_IsGuest()) return;
+    int status = 1, level = -1, phase = 0, topology = sNet.topology;
+    if (gGameState == GSTATE_PLAY) {
+        level = gCurrentLevel; phase = gLevelPhase; status = 2;
+        if (sNet.ready && gPlayer) {
+            topology = gLevelMode;
+            if (!sNet.blocked && level == LEVEL_CORNERIA && phase == 0 &&
+                (gPlayer[0].state == PLAYERSTATE_ACTIVE || gPlayer[0].state == PLAYERSTATE_U_TURN))
+                status = 3;
+        }
+    }
+    if ((sNet.status == 3 && status != 3) ||
+        (sNet.ready && level >= 0 && (level != sNet.level || phase != sNet.phase || topology != sNet.topology))) {
+        ++sNet.epoch;
+        Net_RevokeFlight();
+    }
+    if (gGameState != GSTATE_PLAY) sNet.ready = 0;
+    sNet.status = status; sNet.level = level; sNet.phase = phase; sNet.topology = topology;
+}
+int Net_BootstrapStage(uint32_t epoch, int level, int phase, int topology) {
+    if (!Net_IsCampaign() || !Net_IsGuest() || epoch < sNet.epoch ||
+        level != LEVEL_CORNERIA || phase != 0 ||
+        (topology != LEVELMODE_ON_RAILS && topology != LEVELMODE_ALL_RANGE)) return 0;
+    sNet.epoch = epoch; sNet.level = level; sNet.phase = phase; sNet.topology = topology;
+    AUDIO_SET_SPEC(SFXCHAN_0, AUDIOSPEC_CO);
+    sNet.ready = 0; sNet.loading = 1; sNet.status = 2;
+    Net_RevokeFlight();
+    gLastGameState = GSTATE_NONE;
+    gSavedObjectLoadIndex = 0; gSavedPathProgress = 0;
+    D_ctx_8017782C = true;
+    gNextLevel = level; gNextLevelPhase = phase; gNextGameState = GSTATE_PLAY;
+    return 1;
+}
+int Net_WaitStage(uint32_t epoch) {
+    if (!Net_IsCampaign() || !Net_IsGuest() || epoch < sNet.epoch) return 0;
+    sNet.epoch = epoch; sNet.ready = 0; sNet.loading = 0; sNet.status = 1; sNet.level = -1;
+    Net_RevokeFlight();
+    return 1;
+}
+
 int Net_IsGuest(void) {
     return sNet.role == NET_GUEST;
 }
@@ -90,13 +173,15 @@ int Net_Launch(int role, uint32_t match, uint32_t epoch, int localSlot, int stag
     int i;
     if ((role != NET_HOST && role != NET_GUEST) || !match || !epoch || localSlot < 0 || localSlot >= NET_SLOTS ||
         (role == NET_HOST && (localSlot != 0 || sNet.slots[0].loadIncarnation != 1)) || stage != VS_STAGE_CORNERIA ||
-        rules != VS_MATCH_POINTS || Net_Enabled())
+        (rules != 0 && rules != 1) || Net_Enabled())
         return 0;
+    sNet.mode = rules; sNet.loading = 0; sNet.status = rules == 1 ? 1 : 0;
+    sNet.level = -1; sNet.phase = 0; sNet.topology = LEVELMODE_ON_RAILS;
     sNet.role = role;
     sNet.match = match;
     sNet.epoch = epoch;
     sNet.localSlot = localSlot;
-    sNet.pending = 1;
+    sNet.pending = rules == 1 && role == NET_GUEST ? 0 : 1;
     sNet.ready = 0;
     sNet.activeMask = role == NET_HOST ? 1u : 0u;
     for (i = 0; i < NET_SLOTS; i++) {
@@ -114,9 +199,17 @@ int Net_Launch(int role, uint32_t match, uint32_t epoch, int localSlot, int stag
 }
 void Net_Pump(void) {
     int i;
+    Net_ObserveStage();
     if (!sNet.pending || gGameState != GSTATE_TITLE || gNextGameState != GSTATE_NONE)
         return;
     sNet.pending = 0;
+    if (Net_IsCampaign()) {
+        gMainController = 0;
+        gLastGameState = GSTATE_NONE;
+        gClearPlayerInfo = true;
+        gNextGameState = GSTATE_MAP;
+        return;
+    }
     gVersusStage = VS_STAGE_CORNERIA;
     gVsMatchType = VS_MATCH_POINTS;
     gVsPointsToWin = 3;
@@ -129,8 +222,28 @@ void Net_Pump(void) {
 }
 void Net_OnPlayInit(void) {
     int i;
-    if (!Net_Enabled() || sNet.ready || gPlayState != PLAY_UPDATE || gCurrentLevel != LEVEL_VERSUS || !gPlayer)
+    if (!Net_Enabled() || sNet.ready || gPlayState != PLAY_UPDATE || (Net_IsCampaign() ? gCurrentLevel != sNet.level : gCurrentLevel != LEVEL_VERSUS) || !gPlayer)
         return;
+    if (Net_IsCampaign()) {
+        if (Net_IsGuest()) {
+            if (!sNet.loading) return;
+            if (gPlayer[0].state == PLAYERSTATE_INIT) { gPlayerNum = 0; Player_Setup(&gPlayer[0]); }
+            if (sNet.topology == LEVELMODE_ALL_RANGE && gLevelMode != LEVELMODE_ALL_RANGE) {
+                gChangeTo360 = true;
+                return;
+            }
+        }
+        if (gPlayer[0].state == PLAYERSTATE_INIT) return;
+        for (i = 0; i < NET_SLOTS; i++) {
+            gPlayer[i].num = i;
+            gPlayerInactive[i] = !(sNet.activeMask & (1u << i));
+            if (i && gPlayerInactive[i]) { gPlayer[i].state = PLAYERSTATE_STANDBY; gPlayer[i].draw = false; }
+        }
+        sNet.ready = 1; sNet.loading = 0;
+        if (Net_IsGuest()) { sNet.status = 3; AUDIO_PLAY_BGM(gBgmSeqId); }
+        Net_ObserveStage();
+        return;
+    }
     Player_InitVersus();
     for (i = 0; i < NET_SLOTS; i++) {
         gPlayer[i].num = i;
@@ -156,6 +269,17 @@ int Net_ImportMembership(uint32_t mask, const uint32_t incarnations[4]) {
     for (i = 0; i < NET_SLOTS; i++)
         if ((mask & (1u << i)) && !incarnations[i])
             return 0;
+    if (Net_IsCampaign() && Net_IsGuest()) {
+        uint32_t noise = 0;
+        for (i = 0; i < NET_SLOTS; i++)
+            if ((mask & (1u << i)) && gPlayer[i].draw &&
+                (gPlayer[i].state == PLAYERSTATE_ACTIVE || gPlayer[i].state == PLAYERSTATE_U_TURN)) noise |= 1u << i;
+        for (i = 0; i < NET_SLOTS; i++) {
+            if ((noise & ~sNet.noiseMask) & (1u << i)) Audio_StartPlayerNoise(i);
+            if ((sNet.noiseMask & ~noise) & (1u << i)) Audio_StopPlayerNoise(i);
+        }
+        sNet.noiseMask = noise;
+    }
     sNet.activeMask = mask;
     for (i = 0; i < NET_SLOTS; i++) {
         sNet.slots[i].incarnation = incarnations[i];
@@ -163,12 +287,30 @@ int Net_ImportMembership(uint32_t mask, const uint32_t incarnations[4]) {
     }
     return 1;
 }
-int Net_Activate(int slot, uint32_t incarnation) {
+int Net_Activate(int slot, uint32_t incarnation, uint32_t previousIncarnation) {
     Player* player;
     if (sNet.role != NET_HOST || !sNet.ready || slot < 0 || slot >= NET_SLOTS || !incarnation ||
         (sNet.activeMask & (1u << slot)) || incarnation <= sNet.slots[slot].incarnation ||
         sNet.slots[slot].loadIncarnation != incarnation)
         return 0;
+    if (Net_IsCampaign()) {
+        if (!Net_CanCapture()) return 0;
+        bool resume = previousIncarnation && previousIncarnation == sNet.slots[slot].incarnation &&
+                      (sNet.resumeMask & (1u << slot));
+        sNet.resumeMask &= ~(1u << slot);
+        sNet.slots[slot].incarnation = incarnation;
+        sNet.slots[slot].hasSequence = 0;
+        sNet.slots[slot].buttons = 0;
+        sNet.slots[slot].stickX = sNet.slots[slot].stickY = 0;
+        sNet.activeMask |= 1u << slot;
+        gPlayerInactive[slot] = false;
+        int previous = gPlayerNum;
+        gPlayerNum = slot;
+        if (resume) Player_ResumeCompanion(&gPlayer[slot], &gPlayer[0]);
+        else Player_SetupCompanion(&gPlayer[slot], &gPlayer[0]);
+        gPlayerNum = previous;
+        return 1;
+    }
     gVsPoints[slot] = 0;
     gPlayerScores[slot] = 0;
     gBombCount[slot] = 1;
@@ -209,13 +351,14 @@ int Net_Remove(int slot, uint32_t incarnation) {
     sNet.slots[slot].buttons = 0;
     sNet.slots[slot].stickX = sNet.slots[slot].stickY = 0;
     gPlayerInactive[slot] = true;
-    gPlayer[slot].state = PLAYERSTATE_VS_STANDBY;
+    gPlayer[slot].state = Net_IsCampaign() ? PLAYERSTATE_STANDBY : PLAYERSTATE_VS_STANDBY;
     gPlayer[slot].draw = false;
     gPlayer[slot].attacker = 1;
     for (int j = 0; j < ARRAY_COUNT(gPlayerShots); j++)
         if (gPlayerShots[j].sourceId == slot)
             gPlayerShots[j].obj.status = SHOT_FREE;
-    sVsPlayerCount--;
+    if (!Net_IsCampaign()) sVsPlayerCount--;
+    else { Audio_KillSfxBySource(gPlayer[slot].sfxSource); Audio_StopPlayerNoise(slot); }
     return 1;
 }
 int Net_SetInput(int slot, uint32_t sequence, uint16_t buttons, int stickX, int stickY) {
@@ -254,7 +397,7 @@ void Net_ReadController(int slot, OSContPad* pad) {
         pad->button = pad->stick_x = pad->stick_y = 0;
         pad->err_no = 0;
     }
-    if (sNet.role == NET_HOST)
+    if (sNet.role == NET_HOST && (!Net_IsCampaign() || gGameState == GSTATE_PLAY))
         pad->button &= ~START_BUTTON;
 }
 

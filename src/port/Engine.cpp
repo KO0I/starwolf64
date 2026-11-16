@@ -1,5 +1,7 @@
 #include "Engine.h"
+#include "NetBaseArchive.h"
 #include <algorithm>
+#include <cstdio>
 #include "ui/ImguiUI.h"
 #include "StringHelper.h"
 
@@ -180,6 +182,16 @@ GameEngine::GameEngine() {
 
     auto audioChannelsSetting = Ship::Context::GetInstance()->GetConfig()->GetCurrentAudioChannelsSetting();
     this->context->Init(archiveFiles, {}, resourceThreadReservation, { 32000, 1024, 1680, audioChannelsSetting }, window, controlDeck);
+    std::string netBaseError;
+    if (!InstallNetBaseArchive(context->GetResourceManager(), main_path, netBaseError)) {
+        std::fprintf(stderr, "Original fighter assets: %s\n", netBaseError.c_str());
+        SPDLOG_ERROR("Original fighter assets: {}", netBaseError);
+#ifndef __EMSCRIPTEN__
+        ShowMessage("Original fighter assets", netBaseError.c_str());
+#endif
+        exit(1);
+    }
+
 
 #ifndef __SWITCH__
     Ship::Context::GetInstance()->GetLogger()->set_level(

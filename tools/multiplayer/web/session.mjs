@@ -217,6 +217,11 @@ export class BrowserSession extends EventTarget {
           return;
         }
         const message = decodeMessage(event.data);
+        if (message.type === 'stage') {
+          if (this.role !== 'guest' || channel !== link.control || !link.hello) throw Error('Unexpected stage sender');
+          this.emit('stage', {peer:link.peer, slot:link.slot, message});
+          return;
+        }
         if(message.type==='game') {
           if(channel!==link.control||!link.hello)throw Error('Unexpected game control');
           const allowed=this.role==='host'?['ready','baseline-ack']:['start','active','end'];
@@ -368,10 +373,15 @@ export class BrowserSession extends EventTarget {
   }
 
   sendGame(link, data) {return this.sendControl(link,{...data,type:'game',version:VERSION});}
+  sendStage(link, data) {return this.sendControl(link,{...data,type:'stage',version:VERSION});}
+  expectWorld(link, match, epoch) {
+    link.baselineReceiver = new WorldReceiver(match, epoch);
+    link.worldReceiver = new WorldReceiver(match, epoch);
+  }
 
-  async sendWorld(link, bytes, reliable=false) {
+  async sendWorld(link, bytes, reliable=false, current=()=>true) {
     const channel=reliable?link.control:link.stateChannel;
-    if(link.closed||link.state!=='connected'||channel?.readyState!=='open')return false;
+    if(!current()||link.closed||link.state!=='connected'||channel?.readyState!=='open')return false;
     const frames=worldFrames(bytes), size=frames.reduce((n,a)=>n+a.byteLength,0);
     if(!reliable) {
       if(channel.bufferedAmount+size>MAX_BUFFER)return false;
@@ -381,9 +391,11 @@ export class BrowserSession extends EventTarget {
     const end=Date.now()+this.timeoutMs;
     for(const frame of frames) {
       while(channel.bufferedAmount+frame.byteLength>MAX_BUFFER) {
+        if(!current())return false;
         if(link.closed||channel.readyState!=='open'||Date.now()>end)throw Error('Scene transfer timed out');
         await new Promise(resolve=>setTimeout(resolve,20));
       }
+      if(!current())return false;
       if(link.closed)throw Error('Peer left during transfer');
       channel.send(frame);
     }
