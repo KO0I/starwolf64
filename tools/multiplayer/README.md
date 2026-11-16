@@ -21,7 +21,9 @@ Leave and create another room to start a fresh match.
 The engine supports four players on Corneria Points and Corneria story co-op.
 Rooms hold eight people, but only the first four slots can enter this build.
 Confirmed aircraft render as the original Arwing, Wolfen, Katt's fighter, or Vitzy's fighter.
-Lasers and engine glow use the accepted hue. Katt and Vitzy have intact hull models only.
+Lasers use the accepted hue. Arwing engines retain Star Fox's red planet glow and blue space glow.
+Other aircraft engines use the accepted hue. Arwing radar uses the original blue window and white frame; other all-range radar stays purple.
+Katt and Vitzy have intact hull models only.
 Vitzy stays visible and unavailable as "portrait pending".
 
 To host story co-op, select **Main game co-op**, choose one crew, and confirm each pilot's aircraft and hue.

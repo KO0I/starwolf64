@@ -254,19 +254,15 @@ class Character:
         # Scene tables carry virtual start/end pairs independently of the DMA
         # table. Extend both the copy size and subsequent segment placement.
         self.scene_loads = []
-        scene_entries = {
-            'ast_title': (0xCB12C, 0xCB1C4, 0xCB25C, 0xCB2F4, 0xCB424),
-            'ast_versus': (0xCBD90, 0xCC83C, 0xCC8D4),
-        }
-        for stem, entries in scene_entries.items():
+        from n64_scenes import resize_asset
+        for stem, expected in (('ast_title', 5), ('ast_versus', 2)):
             virtual = manifest(stem)[0]
             old_end = virtual + len(self.original[stem])
             new_end = virtual + len(self.builder.segments[stem])
-            for offset in entries:
-                if struct.unpack_from('>II', self.builder.rom, offset) != (virtual, old_end):
-                    raise ValueError(f'Unexpected scene load range at {offset:X}')
-                struct.pack_into('>I', rom, offset + 4, new_end)
-                self.scene_loads.append((offset, virtual, new_end))
+            entries = resize_asset(rom, virtual, old_end, new_end)
+            if len(entries) != expected:
+                raise ValueError(f'Unexpected {stem} scene table references')
+            self.scene_loads.extend(entries)
 
     def verify(self, rom):
         b = self.builder

@@ -9,7 +9,9 @@ Sargasso owns pilot, aircraft, hue, room membership, and WebRTC signaling.
 The native Multiplayer menu opens that browser selection screen.
 Confirmed loadouts select the original Arwing, Wolfen, Katt's fighter, or Vitzy's fighter.
 Original Arwing display lists and their dependencies use the separate net/original resource namespace.
-Lasers and engine glow use the accepted hue. Katt and Vitzy have intact hull models only.
+Lasers use the accepted hue. Arwing engines retain Star Fox's red planet glow and blue space glow.
+Other aircraft engines use the accepted hue. Arwing radar uses the original blue window and white frame; other all-range radar stays purple.
+Katt and Vitzy have intact hull models only.
 Vitzy remains unavailable as a pilot while her radio portrait is pending.
 
 Corneria story co-op has one host and up to three human companions.
@@ -61,6 +63,12 @@ The final run passed 43 unit tests, 38 setup-browser assertions, 20 four-ship VS
 16 four-player campaign assertions, and six audio assertions.
 The campaign report records all four active slots in rails and all-range, followed by native map state 4.
 That return-map check uses debug completion. The full earlier two-browser rails flight used the ordinary story route.
+
+The ROM exporters now resize only complete scene asset descriptors. This ports the ROM branch's
+Landmaster entry fix for Macbeth and Titania and the adjacent Aquas asset fix.
+Nine regression tests pass. A dry run against the original US 1.1 ROM validates all 44 scenes
+and preserves the tank and Aquas descriptors during asset growth.
+These checks cover ROM export data, not native or WASM Landmaster gameplay.
 
 ## Gates before a full campaign merge
 

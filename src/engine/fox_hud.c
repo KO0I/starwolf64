@@ -1963,6 +1963,9 @@ void HUD_RadarWindow_Draw(f32 x, f32 y) {
     f32 yScale;
     f32 xScale1;
     f32 yScale1;
+    uint32_t rgb;
+    bool purple = gLevelMode == LEVELMODE_ALL_RANGE &&
+                  !(Net_LoadoutColor(gPlayerNum, &rgb) && Net_LoadoutPart(gPlayerNum, 1) == 0);
 
     if (gCamCount != 1 && !Net_Enabled()) { // Versus mode
         xPos = sVsRadarWindowXpos[gPlayerNum];
@@ -1981,13 +1984,13 @@ void HUD_RadarWindow_Draw(f32 x, f32 y) {
     }
 
     RCP_SetupDL(&gMasterDisp, SETUPDL_78);
-    if (gLevelMode == LEVELMODE_ALL_RANGE) {
+    if (purple) {
         gDPSetPrimColor(gMasterDisp++, 0, 0, 138, 28, 118, 190);
     } else {
         gDPSetPrimColor(gMasterDisp++, 0, 0, 60, 60, 255, 170);
     }
     HUD_MsgWindowBg_Draw(xPos + 1.0f, yPos + 1.0f, xScale, yScale);
-    if (gLevelMode == LEVELMODE_ALL_RANGE) {
+    if (purple) {
         gDPSetPrimColor(gMasterDisp++, 0, 0, 238, 112, 196, 255);
     } else {
         gDPSetPrimColor(gMasterDisp++, 0, 0, 255, 255, 255, 255);

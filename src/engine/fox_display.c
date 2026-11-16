@@ -980,7 +980,10 @@ void Display_LandmasterEngineGlow_Draw(Player* player) {
     }
     Matrix_SetGfxMtx(&gMasterDisp);
     uint32_t rgb;
-    if (Net_LoadoutColor(player->num, &rgb)) {
+    bool hasLoadout = Net_LoadoutColor(player->num, &rgb);
+    if (hasLoadout && player->form == FORM_ARWING && Net_LoadoutPart(player->num, 1) == 0) {
+        Display_DrawEngineGlow(gLevelType);
+    } else if (hasLoadout) {
         RCP_SetupDL(&gMasterDisp, SETUPDL_67);
         gDPSetPrimColor(gMasterDisp++, 0, 0, 255, 255, 255, 255);
         gDPSetEnvColor(gMasterDisp++, (rgb >> 16) & 255, (rgb >> 8) & 255, rgb & 255, 255);
