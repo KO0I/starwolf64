@@ -1,9 +1,52 @@
-"""Self-contained Wolfen meshes for slots where the Arwing segment is absent."""
+"""Wolfen ROM fallbacks and textured native models for versus and map slots."""
 import math
 import struct
 
 
-def build_lod(builder, crc64):
+def detailed_native(builder, crc64, stream, broken=(), map_model=False):
+    """Preserve full materials and place map vertices and normals in map coordinates."""
+    sources = {crc64(path): path for _, path in
+               list(builder.vertices.values()) + list(builder.textures.values())}
+    cache, result = {}, []
+    commands = iter(stream)
+    for w0, w1 in commands:
+        opcode = w0 >> 24
+        if opcode in (0x20, 0x32):
+            hi, lo = next(commands)
+            source = sources[hi << 32 | lo]
+            data = builder.resources.get(source)
+            if data is None:
+                data = builder.base.read(source)
+            map_vertex = map_model and opcode == 0x32
+            path = 'wolfen_player/detail/' + ('map/' if map_vertex else '') + source
+            if opcode == 0x32:
+                values = [list(v) for v in struct.iter_unpack('<hhhHhhBBBB', data[68:])]
+                count, end = w0 >> 12 & 255, w0 >> 1 & 127
+                cache.update((end - count + i, v[0]) for i, v in enumerate(values[:count]))
+            if path not in builder.resources:
+                if map_vertex:
+                    for v in values:
+                        x, y, z = v[:3]
+                        v[:3] = [round(-x * .9), round(z * .9), round((y + 22) * .9)]
+                        nx, ny, nz = [n if n < 128 else n - 256 for n in v[6:9]]
+                        v[6:9] = [-nx & 255, nz & 255, ny & 255]
+                    data = data[:68] + b''.join(struct.pack('<hhhHhhBBBB', *v) for v in values)
+                builder.resources[path] = data
+            hashed = crc64(path)
+            result.extend(((w0, w1), (hashed >> 32, hashed & 0xFFFFFFFF)))
+        elif opcode in (0xBF, 0xB1):
+            triangles = (w0 & 0xFFFFFF, w1) if opcode == 0xB1 else (w1,)
+            for packed in triangles:
+                xs = [cache[(packed >> shift & 255) // 2] for shift in (16, 8, 0)]
+                side = 'right' if min(xs) >= 10 else 'left' if max(xs) <= -10 else None
+                if side not in broken or max(map(abs, xs)) < 45:
+                    result.append((0xBF000000, packed))
+        else:
+            result.append((w0, w1))
+    return result
+
+
+def build_lod(builder, crc64, full_stream):
     triangles = [[tuple(round(x) for x in point) for point in tri] for tri in builder.geometry['full']]
     normals = {}
     for a, b, c in triangles:
@@ -122,3 +165,8 @@ def build_lod(builder, crc64):
             builder.gfx(f'{stem}/{name}', native)
             builder.lod_targets.append((stem, segment, target))
         builder.lod_usage[stem] = used
+        if stem in ('ast_map', 'ast_versus'):
+            for target, broken in targets:
+                name, _ = builder.assets[(stem, target)]
+                builder.gfx(f'{stem}/{name}', detailed_native(
+                    builder, crc64, full_stream, broken, stem == 'ast_map'))

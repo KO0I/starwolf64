@@ -181,15 +181,16 @@ try {
   assert(true,'native Multiplayer menu opens Sargasso');
   assert(report.errors.length===0,'no uncaught browser errors',report.errors);
   } else if(process.argv.includes('--campaign')) {
+  const wolfenCampaign=process.argv.includes('--wolfen-campaign');
   const host=await page('host',url),guest=await page('guest',url);
   await value(host,"document.getElementById('host').click()");
   const room=await wait('room created',async()=>(await state(host)).room);
   await value(host,`(()=>{
     const mode=document.getElementById('mode');mode.value='campaign';mode.dispatchEvent(new Event('change',{bubbles:true}));
-    const crew=document.getElementById('crew');crew.value='star_fox';crew.dispatchEvent(new Event('change',{bubbles:true}));
+    const crew=document.getElementById('crew');crew.value=${JSON.stringify(wolfenCampaign?'star_wolf':'star_fox')};crew.dispatchEvent(new Event('change',{bubbles:true}));
     document.getElementById('save-match').click();
   })()`);
-  await choosePilot(host,{pilot:'fox_original',vehicle:'arwing',hue:0});
+  await choosePilot(host,{pilot:wolfenCampaign?'wolf':'fox_original',vehicle:wolfenCampaign?'wolfen':'arwing',hue:0});
   await value(host,"window.STARWOLF_GAME.prepare()");
   if(process.argv.includes('--campaign-checkpoint')){report.checkpoint=160000;await value(host,"window.STARWOLF_ROUTE_CHECKPOINT=true");}
   if(process.argv.includes('--campaign-route'))await value(host,`(()=>{
@@ -209,7 +210,7 @@ try {
   assert(report.hostMap.mode===1,'host launches native story map',report.hostMap);
   await joinViaUI(guest,room,'Falco');
   await wait('guest connected',async()=>(await state(guest)).phase==='connected',30000);
-  await choosePilot(guest,{pilot:'falco_original',vehicle:'arwing',hue:2});
+  await choosePilot(guest,{pilot:wolfenCampaign?'leon':'falco_original',vehicle:wolfenCampaign?'wolfen':'arwing',hue:2});
   await wait('campaign invitation',()=>value(guest,"Boolean(window.STARWOLF_GAME.invitation)"));
   await value(guest,"window.STARWOLF_GAME.prepare()");
   await value(guest,"window.STARWOLF_GAME.launch()");
@@ -239,6 +240,10 @@ try {
   for(let attempt=0;attempt<65;attempt++){
     const current=await value(host,"window.STARWOLF_GAME.engine.state");
     report.story.push(current);console.log('story',current.gameState,current.status,current.epoch,current.frame);
+    if(wolfenCampaign && current.gameState===4 && [8,16,20].includes(attempt)){
+      await value(host,"document.getElementById('game-container').scrollIntoView({block:'center'})");
+      await screenshot('host-map-'+attempt+'.png');
+    }
     if(current.gameState===7)break;
     await press(attempt%3===0?0x1000:0x8000);
   }
@@ -311,6 +316,14 @@ try {
     for(const peer of wingmates){
       await wait(peer.label+' follows host back to waiting map',()=>value(peer,"window.STARWOLF_GAME.stage?.status===1 && !window.STARWOLF_GAME.active"));
       assert(await value(peer,"window.STARWOLF_GAME.engine.frame.hidden"),peer.label+' waits outside completed mission');
+    }
+    if(wolfenCampaign){
+      for(let step=0;step<12;step++){
+        await value(host,"document.getElementById('game-container').scrollIntoView({block:'center'})");
+        await screenshot('host-map-return-'+step+'.png');
+        await press(step===0?0x1000:0x8000);
+        if((await value(host,"window.STARWOLF_GAME.engine.state")).gameState!==4)break;
+      }
     }
   }
   assert(report.errors.length===0,'no uncaught browser errors',report.errors);

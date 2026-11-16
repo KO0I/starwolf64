@@ -95,6 +95,20 @@ Regenerate the numeric field inventory after changing engine declarations:
 python3 tools/multiplayer/generate-scene-schema.py
 ```
 
+The native and WASM archives use the textured Wolfen hull for multiplayer and the campaign-map ship.
+The intact and three damaged-wing variants keep their detailed materials. Map vertices preserve UVs and rotate their surface normals into the map's coordinates.
+The separate ROM retains its segment-local fallback geometry.
+
+To update only these native models in an existing mod archive:
+
+```sh
+python3 -B tools/multiplayer/export-wolfen-detail.py --rom "/path/to/Star Fox 64 (U) (V1.1) [!].z64" --assets /path/to/sf64.o2r --source-mod /path/to/wolfen.o2r --output build/wolfen-detail/wolfen.o2r
+python3 -B tools/test_wolfen_lod.py
+```
+
+The exporter preserves unrelated resources and writes a model verification report beside the output archive.
+The regular Wolfen asset build generates the same detailed native models.
+
 Read [the bridge reference](../../docs/multiplayer-wasm-bridge.md) before adding a stage or entity type.
 
 ## Merge preparation

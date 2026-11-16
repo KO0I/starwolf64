@@ -54,6 +54,8 @@ Each additional stage needs a resource/work-field inventory and a real runtime c
 Corneria Points uses the native four-slot simulation with a single camera per browser.
 The setup catalog has more pilots, aircraft, maps and room slots than this initial engine bridge can render or simulate.
 The selected aircraft and hue render natively. Original Arwing assets and their dependencies are isolated under net/original.
+Wolfen's native multiplayer and map resources retain the full hull, textures, UVs, and normals.
+Its intact and three damaged-wing variants share isolated material dependencies under wolfen_player/detail.
 Katt and Vitzy use their own hull resources. Their damaged wing variants are not authored.
 Other maps, distinct pilot heads, vehicle changes, and eight-player capacity need further integration.
 

@@ -467,12 +467,7 @@ class Builder:
             self.segments[stem][offset:offset + len(payload)] = payload
             self.shadow_changes.append((stem, path, offset, original[80:], payload))
 
-    def build(self):
-        from wolf_logo import replace_title_logo
-        replace_title_logo(self)
-        self.replace_intro_title()
-        self.recolor_lasers()
-        self.swap_shadows()
+    def build_fighter_meshes(self):
         hull = [[1, 0, 0, 0], [0, 1, 0, HULL_Y], [0, 0, 1, 0], [0, 0, 0, 1]]
 
         def part(pointer, points, ids):
@@ -530,9 +525,18 @@ class Builder:
         full_sources.append(('ast_arwing', 0x9B60, multiply(cockpit_shift, body_matrix), cockpit))
         full_address, full_stream = self.emit(full_sources, 'full')
         from wolfen_lod import build_lod
-        build_lod(self, crc64)
+        build_lod(self, crc64, full_stream)
         from wolfen_icons import replace_icons
         replace_icons(self)
+        return wing_parts
+
+    def build(self):
+        from wolf_logo import replace_title_logo
+        replace_title_logo(self)
+        self.replace_intro_title()
+        self.recolor_lasers()
+        self.swap_shadows()
+        wing_parts = self.build_fighter_meshes()
         from medusa import install_medusa
         install_medusa(self, crc64)
         from crew_hud import install as install_crew_hud
