@@ -207,7 +207,7 @@ class Compiler:
         modes = [{10497: 0, 33071: 2, 33648: 1}[sampler.get(axis, 10497)] for axis in ('wrapS', 'wrapT')]
         return address, path, width, height, modes, region, palette
 
-    def emit(self, glb, mesh_transforms, path, setup=True, finish=True):
+    def emit(self, glb, mesh_transforms, path, setup=True, finish=True, vertex_limit=30):
         raw, native = [], []
         triangles = 0
 
@@ -347,7 +347,7 @@ class Compiler:
 
                 for face in indices.reshape(-1, 3):
                     triangle = [vertices[i] for i in face]
-                    if len(set(triangle) - cache.keys()) + len(batch) > 30:
+                    if len(set(triangle) - cache.keys()) + len(batch) > vertex_limit:
                         flush()
                     ids = []
                     for vertex in triangle:

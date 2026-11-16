@@ -127,6 +127,8 @@ class Fighter(Builder):
         return 'ast_allies', 0xB880, multiply(matrix, BILL_FIT), keep
 
     def build(self):
+        from wing_skinning import WingRoots
+        self.wing_roots = WingRoots(self, 'ast_allies', 0xB880, self.part, BILL_FIT)
         body_matrix = self.matrices[0x9B60]
         cockpit_shift = [row[:] for row in IDENTITY]
         cockpit_shift[1][3] = -COCKPIT_DROP
@@ -135,13 +137,15 @@ class Fighter(Builder):
         sources = [self.hull(inverse(body_matrix), 'body'),
                    ('ast_arwing', 0x9B60,
                     multiply(inverse(body_matrix), multiply(cockpit_shift, body_matrix)), cockpit)]
-        _, stream = self.emit(sources, 'body')
+        _, stream = self.emit(sources, 'body', preload=self.wing_roots)
         self.gfx(PREFIX + 'BodyDL', stream)
         for offset, side, label in ((0x15D80, 'right', 'Right'), (0x16660, 'left', 'Left')):
             for broken in (False, True):
                 name = side + ('_broken' if broken else '')
-                _, stream = self.emit([self.hull(inverse(self.matrices[offset]), side, broken)], name)
-                self.gfx(PREFIX + label + 'Wing' + ('Broken' if broken else '') + 'DL', stream)
+                _, stream = self.emit([self.hull(inverse(self.matrices[offset]), side, broken)], name, roots=self.wing_roots)
+                path = PREFIX + label + 'Wing' + ('Broken' if broken else '') + 'DL'
+                self.gfx(path, stream)
+                self.wing_roots.paths.add(path)
         for name, offset in (('HeadDL', 0x5AB0), ('CanopyDL', 0x194E0)):
             _, stream = self.emit([('ast_arwing', offset, IDENTITY, lambda p, v, ids: True)], name)
             self.gfx(PREFIX + name, stream)
@@ -163,7 +167,12 @@ class Fighter(Builder):
             if resource[4:8] != b'TLDO':
                 continue
             position, loaded, triangles = 88, set(), 0
-            cache, actual_points = {}, []
+            cache, actual_points, fixed_points = {}, [], []
+            if path in self.wing_roots.paths:
+                side = 'left' if 'Left' in path else 'right'
+                bone = 0x16660 if side == 'left' else 0x15D80
+                cache = self.wing_roots.reference_cache(self.matrices[bone])
+                loaded.update(cache)
             while position < len(resource):
                 w0, w1 = struct.unpack_from('<II', resource, position)
                 position += 8
@@ -185,13 +194,19 @@ class Fighter(Builder):
                         if any((packed >> shift & 255) // 2 not in loaded for shift in (16, 8, 0)):
                             raise ValueError(f'Unloaded vertex in {path}')
                         actual_points.append([cache[(packed >> shift & 255) // 2] for shift in (16, 8, 0)])
+                        fixed_points.append([path in self.wing_roots.paths and (packed >> shift & 255) // 2 in self.wing_roots.slots for shift in (16, 8, 0)])
                         triangles += 1
             geometry_name = {'BodyDL': 'body', 'LeftWingDL': 'left', 'RightWingDL': 'right',
                              'LeftWingBrokenDL': 'left_broken', 'RightWingBrokenDL': 'right_broken',
                              'HeadDL': 'HeadDL', 'CanopyDL': 'CanopyDL', 'HullDL': 'HullDL', 'LaserDL': 'LaserDL'}[path.removeprefix(PREFIX)]
             expected_points = [[tuple(round(c) for c in p) for p in tri] for tri in self.geometry[geometry_name]]
-            if actual_points != expected_points:
-                raise ValueError(f'Native vertex cache differs from source geometry: {path}')
+            if len(actual_points) != len(expected_points):
+                raise ValueError(f'Native triangle count differs from source geometry: {path}')
+            for actual, expected, anchored in zip(actual_points, expected_points, fixed_points):
+                for point, reference, fixed in zip(actual, expected, anchored):
+                    # Fixed roots pass through two separately quantized limb spaces.
+                    if any(abs(a - b) > 1.1 for a, b in zip(point, reference)) if fixed else point != reference:
+                        raise ValueError(f'Native vertex cache differs from source geometry: {path}')
             if not triangles:
                 raise ValueError(f'Empty fighter part: {path}')
         if len(self.geometry['HeadDL']) < 100:

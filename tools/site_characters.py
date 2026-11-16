@@ -1,7 +1,6 @@
 """Install reviewed character sources into the existing native and browser slots."""
 import hashlib
 import json
-import re
 import struct
 import zipfile
 from types import SimpleNamespace
@@ -179,9 +178,9 @@ class SiteCharacters:
             raise ValueError('Missing reviewed Bill cockpit module')
         private = SimpleNamespace(base=b.base, resources=b.resources, gfx=b.gfx, segments={'ast_arwing': bytearray()})
         self.cockpit_compiler = Compiler(private, 'ast_arwing', 'characters/vitzy/cockpit')
-        _, cockpit, triangles = self.cockpit_compiler.emit(glb, module, 'characters/vitzy/CockpitDL')
-        _, hull = fighter.emit([fighter.hull(body_inverse.tolist(), 'body')], 'reviewed_hull')
-        # Both component streams restore their own material state.
+        _, cockpit, triangles = self.cockpit_compiler.emit(glb, module, 'characters/vitzy/CockpitDL', vertex_limit=fighter.wing_roots.start)
+        _, hull = fighter.emit([fighter.hull(body_inverse.tolist(), 'body')], 'reviewed_hull', preload=fighter.wing_roots)
+        # The cockpit keeps the upper vertex slots reserved for body-space wing roots.
         b.gfx('ships/vitzy_fighter/BodyDL', hull[:-1] + cockpit)
         b.gfx('ships/vitzy_fighter/CanopyDL', [END])
         full_module = [(i, mount @ fit @ world[i]) for i, n in enumerate(glb.doc['nodes'])
@@ -243,6 +242,8 @@ class SiteCharacters:
         with zipfile.ZipFile(DEFAULT) as archive:
             for name in ['CREDITS.md', 'README_TheRegressor.txt', 'Vitzy_README.md']:
                 self.builder.resources['characters/' + name] = archive.read(name)
+        from starfox_rivals import install as install_rivals
+        install_rivals(self.builder)
         for stem in self.storage.original:
             data = self.builder.segments[stem]
             data.extend(b'\0' * (-len(data) % 16))
@@ -253,31 +254,12 @@ class SiteCharacters:
         self.bodies.patch_rom(rom)
         virtual, _ = manifest('ast_arwing')
         old_end = virtual + len(self.builder.original_arwing)
-        needle = struct.pack('>II', virtual, old_end)
-        self.scene_ranges = []
-        for offset in range(0xCAFB4, 0xCC9D4, 4):
-            if self.builder.rom[offset:offset + 8] == needle:
-                new_end = virtual + len(self.builder.segments['ast_arwing'])
-                replace_word(rom, offset + 4, old_end, new_end)
-                self.scene_ranges.append((offset, virtual, new_end))
-        if len(self.scene_ranges) != 33:
+        from n64_scenes import resize_asset, scene_memory
+        new_end = virtual + len(self.builder.segments['ast_arwing'])
+        self.scene_ranges = resize_asset(rom, virtual, old_end, new_end)
+        if len(self.scene_ranges) != 25:
             raise ValueError('Unexpected Arwing scene table references')
-        self.scene_memory = []
-        offset = 0xCAFB4
-        source = (ROOT / 'src/engine/fox_load_inits.c').read_text()
-        for name, count in re.findall(r'Scene (\w+)\[(\d+)\]', source):
-            for index in range(int(count)):
-                words = struct.unpack_from('>38I', rom, offset)
-                used = (words[1] - words[0]) + (words[3] - words[2]) if words[0] else 0
-                used += sum(words[j + 1] - words[j] for j in range(8, 38, 2) if words[j])
-                end = 0x80187520 + used
-                self.scene_memory.append({'scene': name, 'setup': index, 'end': end,
-                                          'free_bytes': 0x80281000 - end})
-                if end > 0x80281000:
-                    raise ValueError(f'Reviewed assets overlap fixed buffers in {name}[{index}] by {end - 0x80281000} bytes')
-                offset += 0x98
-        if offset != 0xCC9D4:
-            raise ValueError('Unexpected scene table length')
+        self.scene_memory = scene_memory(rom)
         for offset, (old, new) in self.rom_patches.items():
             replace_word(rom, offset, old, new)
 
@@ -285,6 +267,8 @@ class SiteCharacters:
         b = self.builder
         self.storage.verify()
         self.bodies.verify(rom)
+        from starfox_rivals import verify as verify_rivals
+        verify_rivals(b, rom)
         for stem, source in self.final_segments.items():
             table = 0xDE480 + b.table_indices[stem] * 16
             _, start, end, compressed = struct.unpack_from('>IIII', rom, table)

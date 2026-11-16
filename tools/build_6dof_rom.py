@@ -1,0 +1,148 @@
+#!/usr/bin/env python3
+"""Build an experimental US1.1 N64 6DOF patch from the checked ED64 Plus candidate."""
+import argparse
+import hashlib
+import json
+import os
+from pathlib import Path
+import struct
+import subprocess
+
+from check_ed64plus import verify
+from comptool import calculate_crcs
+
+ROOT = Path(__file__).resolve().parents[1]
+AUDITED_SOURCES = {
+    "fd488b749e4a022acf93fb8a65b7810511339f776aa23fa572a58a8a8f7c09bd": "anchored wings, corrected scenes and Star Fox rivals",
+}
+RAM = 0x80137E90
+RADIO_RAM = 0x80179010
+LOADER_OFFSET = 0x1030
+HOOKS = (
+    ("all_range_steer",0xAF0BC,"3c01800e c42486a8",0),
+    ("on_rails_steer",0xAFC90,"3c01800e c4248710",1),
+    ("on_rails_camera",0xB6898,"3c028017 90427c98",2),
+    ("all_range_camera",0xB6FD0,"3c01800e c4268a8c",3),
+)
+FLAGS = ["-march=vr4300","-mtune=vr4300","-mabi=32","-mfp32","-mno-abicalls","-fno-pic","-G0"]
+
+
+def jump(address, link=False):
+    if address & 3:
+        raise ValueError("Unaligned hook target")
+    return (0x0C000000 if link else 0x08000000) | ((address & 0x0FFFFFFF) >> 2)
+
+
+def main():
+    parser=argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--input-rom",type=Path,default=ROOT/"build/rom/starwolf64.z64")
+    parser.add_argument("--base-rom",type=Path,default=ROOT/"Star Fox 64 (U) (V1.1) [!].z64")
+    parser.add_argument("--output",type=Path,default=ROOT/"build/rom/starwolf64-6dof.z64")
+    parser.add_argument("--build-dir",type=Path,default=ROOT/"build/rom/6dof")
+    parser.add_argument("--toolchain",type=Path,default=Path("/opt/libdragon/bin"))
+    args=parser.parse_args()
+    try:
+        if args.output.resolve() in {args.input_rom.resolve(),args.base_rom.resolve()}:
+            raise ValueError("Output must differ from both input ROMs")
+        source=args.input_rom.read_bytes()
+        base=args.base_rom.read_bytes()
+        verify(base,source)
+        source_sha256=hashlib.sha256(source).hexdigest()
+        if source_sha256 not in AUDITED_SOURCES:
+            raise ValueError("Expected an audited US 1.1 ED64 Plus standard-flight candidate")
+        build=args.build_dir.resolve()
+        build.mkdir(parents=True,exist_ok=True)
+        (build/"tmp").mkdir(exist_ok=True)
+        env=dict(os.environ,TMPDIR=str(build/"tmp"))
+        def run(tool,*arguments):
+            command=[str(args.toolchain/("mips64-elf-"+tool)),*map(str,arguments)]
+            return subprocess.check_output(command,cwd=ROOT,env=env,text=True,stderr=subprocess.STDOUT)
+        cflags=[*FLAGS,"-std=gnu17","-Os","-ffreestanding","-fno-builtin","-fno-math-errno",
+                "-fno-stack-protector","-fno-asynchronous-unwind-tables","-Wall","-Wextra","-Werror"]
+        run("gcc",*cflags,"-c",ROOT/"tools/n64/flight.c","-o",build/"flight.o")
+        run("gcc",*FLAGS,"-c",ROOT/"tools/n64/flight_hooks.S","-o",build/"hooks.o")
+        run("ld","-m","elf32bsmip","-T",ROOT/"tools/n64/flight.ld","-Map",build/"flight.map",
+            "-o",build/"flight.elf",build/"hooks.o",build/"flight.o")
+        symbols={}
+        for line in run("nm","-n",build/"flight.elf").splitlines():
+            parts=line.split()
+            if len(parts)==3:
+                symbols[parts[2]]=int(parts[0],16)
+        run("objcopy","-O","binary",build/"flight.elf",build/"flight.bin")
+        module=(build/"flight.bin").read_bytes()
+        module += bytes(-len(module)%16)
+        if len(module)>4096 or symbols["Flight_End"]>RAM+4096:
+            raise ValueError("Flight patch exceeds retired 4 KiB bootstrap storage")
+        rom=bytearray(source)
+        entries=[struct.unpack_from(">4I",rom,0xDE480+i*16) for i in range(64)]
+        radio=next(row for row in entries if row[0]==0xDE5D50)
+        if radio[3] or radio[2]-radio[1]!=0xE510:
+            raise ValueError("Unexpected permanent radio allocation")
+        loader_at=radio[1]+LOADER_OFFSET
+        if rom[loader_at:loader_at+16]!=bytes.fromhex("3c088018250890880000502591090000"):
+            raise ValueError("Retired voice-filter bytes differ")
+        if rom[loader_at+156:loader_at+169]!=b"WOLF\0PANTHER\0":
+            raise ValueError("Radio labels are outside their checked allocation")
+        if rom[0xC34B8:0xC34C0]!=bytes.fromhex("03e0000894620002"):
+            raise ValueError("Voice filter is still live")
+        occupied=max(len(source.rstrip(b"\0")),max(row[2] for row in entries))
+        destination=(occupied+15)&~15
+        if destination+len(module)>len(rom) or any(rom[destination:destination+len(module)]):
+            raise ValueError("No verified trailing ROM space for the flight patch")
+        run("gcc",*FLAGS,f"-DFLIGHT_ROM_ADDRESS={0xB0000000+destination:#x}",
+            f"-DFLIGHT_MODULE_BYTES={len(module)}",f"-DFLIGHT_ENTRY={symbols['Flight_Entry']:#x}",
+            "-c",ROOT/"tools/n64/flight_loader.S","-o",build/"loader.o")
+        run("ld","-m","elf32bsmip","-Ttext",hex(RADIO_RAM+LOADER_OFFSET),"-e","Flight_Loader",
+            "-o",build/"loader.elf",build/"loader.o")
+        run("objcopy","-j",".text","-O","binary",build/"loader.elf",build/"loader.bin")
+        loader=(build/"loader.bin").read_bytes()
+        aero_loader=next(int(line.split()[0],16) for line in run("nm",build/"loader.elf").splitlines()
+                         if line.split()[-1]=="Flight_AeroLoader")
+        if len(loader)>156:
+            raise ValueError("Loader exceeds the retired voice filter")
+        rom[destination:destination+len(module)]=module
+        rom[loader_at:loader_at+len(loader)]=loader
+        changes=[]
+        for name,offset,original,kind in HOOKS:
+            expected=bytes.fromhex(original)
+            if rom[offset:offset+8]!=expected:
+                raise ValueError("Unexpected original instructions: "+name)
+            struct.pack_into(">II",rom,offset,jump(RADIO_RAM+LOADER_OFFSET,True),0x24190000|kind)
+            changes.append(dict(name=name,rom_offset=offset,original=expected.hex()))
+        for name,offset,original,symbol in (
+            ("boost_loop",0xB329C,"8e1904dc57200027","Flight_BoostGate"),
+            ("brake_uturn",0xB38B8,"8ca2000024070005","Flight_BrakeGate"),
+        ):
+            if rom[offset:offset+8]!=bytes.fromhex(original):
+                raise ValueError("Unexpected original instructions: "+name)
+            struct.pack_into(">II",rom,offset,jump(aero_loader,True),0)
+            changes.append(dict(name=name,rom_offset=offset,original=original))
+        struct.pack_into(">II",rom,0x10,*calculate_crcs(rom))
+        checked=verify(base,rom)
+        checked["limits"]=[
+            "Experimental ROM; physical N64 and ED64 Plus compatibility unverified.",
+            "Attitude HUD not ported. Original stage boundaries remain.",
+            "Save format expected EEPROM4K; power-cycle persistence unverified.",
+        ]
+        report=dict(format="starwolf64-n64-6dof-v1",source_sha256=source_sha256,
+                    source_model=AUDITED_SOURCES[source_sha256],
+                    rom_sha256=checked["rom_sha256"],module_rom=destination,module_ram=RAM,
+                    module_bytes=len(module),loader_bytes=len(loader),aero_loader=aero_loader,symbols=symbols,
+                    hooks=changes,compatibility=checked,hardware_verified=False,
+                    source_files_sha256={str(path.relative_to(ROOT)):hashlib.sha256(path.read_bytes()).hexdigest()
+                        for path in [ROOT/"tools/build_6dof_rom.py",ROOT/"src/port/Flight6DOF.h",
+                                     *sorted((ROOT/"tools/n64").glob("*"))] if path.is_file()},
+                    controls="C-right toggles while radio/call/voice idle; stick X roll, stick Y pitch")
+        args.output.parent.mkdir(parents=True,exist_ok=True)
+        args.output.write_bytes(rom)
+        args.output.with_suffix(".json").write_text(json.dumps(report,indent=2)+"\n")
+        print(f"Built {args.output}: {len(module)}/4096 module bytes, {len(loader)}/156 loader bytes")
+        print("SHA256",checked["rom_sha256"])
+    except (OSError,ValueError,KeyError,subprocess.CalledProcessError) as error:
+        if isinstance(error,subprocess.CalledProcessError):
+            parser.error(error.output)
+        parser.error(str(error))
+
+
+if __name__=="__main__":
+    main()
