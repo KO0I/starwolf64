@@ -1330,11 +1330,11 @@ void Background_DrawGround(void) {
     f32 temp_fv1;
     f32 temp_fa0;
 
-    if ((gCurrentLevel != LEVEL_VENOM_2) && ((gPlayer[0].cam.eye.y > 4000.0f) || !gDrawGround)) {
+    if (gCurrentLevel == LEVEL_BOLSE) {
+        Bolse_DrawDynamicGround();
         return;
     }
-    if ((gCurrentLevel == LEVEL_BOLSE) && gBolseDynamicGround) {
-        Bolse_DrawDynamicGround();
+    if ((gCurrentLevel != LEVEL_VENOM_2) && ((gPlayer[0].cam.eye.y > 4000.0f) || !gDrawGround)) {
         return;
     }
 

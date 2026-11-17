@@ -1,5 +1,6 @@
 #include "sf64math.h"
 #include "fox_hud.h"
+#include "bolse_station.h"
 #include "prevent_bss_reordering.h"
 #include "port/interpolation/FrameInterpolation.h"
 #include "port/hooks/Events.h"
@@ -3673,7 +3674,7 @@ static void HUD_AttitudeSpan(s32 left, s32 right, s32 y) {
 static void HUD_AttitudeIndicator_Draw(void) {
     const s32 centerX = 160, centerY = 66, radius = 19;
     Player* player = &gPlayer[gPlayerNum];
-    if (!CVarGetInteger("gSixDofFlight", 0) || (player->form != FORM_ARWING) ||
+    if (!Player_Uses6DOF(player) || (player->form != FORM_ARWING) ||
         (player->state != PLAYERSTATE_ACTIVE) || (gLevelMode == LEVELMODE_TURRET) ||
         !gShowHud || (D_hud_80161708 == 0)) {
         return;
@@ -3850,6 +3851,7 @@ void HUD_Draw(void) {
     }
     HUD_RadioDamage();
     HUD_AttitudeIndicator_Draw();
+    if (gCurrentLevel == LEVEL_BOLSE) Bolse_StationDrawHUD();
     HUD_PauseScreen_Update();
     gDPSetTextureFilter(gMasterDisp++, G_TF_BILERP);
     CALL_EVENT(DrawGlobalHUDPostEvent);

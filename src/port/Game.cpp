@@ -19,6 +19,7 @@ extern "C" {
 #include <sf64thread.h>
 #include <sf64context.h>
 void Wasm_GetTitleStatus(double* state);
+bool Player_Uses6DOF(const Player* player);
 bool Player_CanToggle6DOF(const Player* player);
 void Audio_PlayVoice(s32 message);
 void Audio_SetVolume(u8 type, u8 volume);
@@ -96,23 +97,24 @@ static void browserStatus(const char* phase) {
         static_cast<double>(gPlayer ? gPlayer[0].rot.x : 0),
         static_cast<double>(gPlayer ? gPlayer[0].yRot_114 + gPlayer[0].rot.y : 0),
         static_cast<double>(gPlayer ? gPlayer[0].bankAngle : 0),
-        static_cast<double>(gLevelMode), static_cast<double>(browserFrames ? CVarGetInteger("gSixDofFlight", 0) : 0),
+        static_cast<double>(gLevelMode), static_cast<double>(browserFrames ? Player_Uses6DOF(gPlayer) : 0),
         static_cast<double>(gRadioState), static_cast<double>(gCallTimer),
         static_cast<double>(gPlayer ? gPlayer[0].camRoll : 0),
+        static_cast<double>(browserFrames ? CVarGetInteger("gSixDofFlight", 0) : 0),
         static_cast<double>(browserFrames && gPlayer && Player_CanToggle6DOF(&gPlayer[0]))
     };
     MAIN_THREAD_EM_ASM({
-        const state = HEAPF64.subarray($1 / 8, $1 / 8 + 35);
+        const state = HEAPF64.subarray($1 / 8, $1 / 8 + 36);
         window.STARSHIP_GAME_STATE = ({phase:UTF8ToString($0), frames:state[0],
             gameState:state[1], titleState:state[2], gameFrame:state[3], onWorker:!!state[4],
             playState:state[5], level:state[6], playerState:state[7], playerX:state[8],
             buttons:state[9], stickX:state[10], stickY:state[11], playerY:state[12],
             shields:state[13], radioDamageTimer:state[14], path:state[15], heapBytes:state[16], titleCutscene:state[17], titleScene:state[18],
             cutsceneFrame:state[19], titleCard:state[20], titleNameVisible:!!state[21], titleCardTimer:state[22], voiceBlips:!!state[23], voiceId:state[24], routedVoiceId:state[25],
-            playerPitch:state[26], playerYaw:state[27], playerRoll:state[28], levelMode:state[29], sixDof:!!state[30], radioState:state[31], callTimer:state[32], cameraRoll:state[33], canToggleSixDof:!!state[34]});
+            playerPitch:state[26], playerYaw:state[27], playerRoll:state[28], levelMode:state[29], sixDof:!!state[30], radioState:state[31], callTimer:state[32], cameraRoll:state[33], sixDofPreference:!!state[34], canToggleSixDof:!!state[35]});
         window.dispatchEvent(new Event('starship-game-state'));
         if (state[0] > 0) {
-            try {localStorage.setItem('starship-six-dof', state[30] ? '1' : '0');} catch {}
+            try {localStorage.setItem('starship-six-dof', state[34] ? '1' : '0');} catch {}
         }
         const label = document.getElementById('game-state');
         if (label && !window.STARSHIP_GAME_ERROR) label.textContent = UTF8ToString($0) === 'initializing' ? 'Initializing game…' : (state[1] === 2 ? 'Title screen running' : 'Game running');
@@ -147,7 +149,7 @@ void push_frame() {
     double title[6];
     Wasm_GetTitleStatus(title);
     int titleName = gGameState == GSTATE_TITLE && title[4] ? static_cast<int>(title[3]) : -1;
-    const int sixDof = CVarGetInteger("gSixDofFlight", 0);
+    const int sixDof = Player_Uses6DOF(gPlayer);
     const bool canToggleSixDof = gPlayer && Player_CanToggle6DOF(&gPlayer[0]);
     if (++browserFrames % 20 == 0 || titleName != previousTitleName ||
         gRadioState != previousRadioState || sixDof != previousSixDof ||

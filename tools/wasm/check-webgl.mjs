@@ -13,6 +13,7 @@ const game = site || process.argv.includes('--game');
 const preloaded = process.argv.includes('--preloaded');
 const touch = process.argv.includes('--touch');
 const collision = process.argv.includes('--collision');
+const bolse = process.argv.includes('--bolse');
 if(touch&&!game) throw Error('--touch requires --game');
 const previewUrl = process.argv.includes('--url') ? process.argv[process.argv.indexOf('--url')+1] : undefined;
 const option = name => { const index=process.argv.indexOf(name); return index<0?undefined:process.argv[index+1]; };
@@ -258,14 +259,17 @@ with zipfile.ZipFile(sys.argv[1]) as z:
     if(game&&result) result.audio={...evaluation.result.value?.audio,state:evaluation.result.value?.audioState};
     isolated = evaluation.result.value?.isolated;
     if(evaluation.result.value?.error) throw Error(evaluation.result.value.error);
-    if(game ? result?.gameState===2&&result.frames>=40&&result.audio?.peak>0.00001 : result?.status === 'pass' || result?.status === 'fail') break;
+    if(game ? (bolse?result?.gameState===7&&result.level===17&&result.playerState===3:result?.gameState===2&&result.frames>=40)&&result.audio?.peak>0.00001 : result?.status === 'pass' || result?.status === 'fail') break;
     if (errors.length) throw Error('Browser reported an error before completing');
     await sleep(100);
   }
   await sleep(100);
   if (!result) throw Error('Renderer probe timed out');
   if (game) {
-    if(result.gameState!==2 || result.frames<40) throw Error('Title screen not reached: '+JSON.stringify(result));
+    if(bolse) {
+      if(result.gameState!==7||result.level!==17||result.playerState!==3||!result.sixDof)
+        throw Error('Bolse preview did not start in active 6DOF flight: '+JSON.stringify(result));
+    } else if(result.gameState!==2 || result.frames<40) throw Error('Title screen not reached: '+JSON.stringify(result));
     if(!result.onWorker || result.audio?.state!=='running' || !(result.audio?.peak>0.00001))
       throw Error('Worker/audio check failed: '+JSON.stringify(result));
   } else if (result.status !== 'pass') throw Error('Renderer probe failed: ' + JSON.stringify(result));
@@ -339,7 +343,61 @@ with zipfile.ZipFile(sys.argv[1]) as z:
     }
     result.voiceBlips=phases;
   }
-  if(game) {
+  if(game&&bolse) {
+    const waitFrames=async(target)=>{
+      const deadline=Date.now()+15000;
+      let state;
+      do {
+        await sleep(100);
+        state=await value('window.STARSHIP_GAME_STATE');
+      } while(state.gameFrame<target&&Date.now()<deadline);
+      if(state.gameFrame<target) throw Error('Bolse flight stopped: '+JSON.stringify(state));
+      return state;
+    };
+    // The native level starts with a controller lock. Measure actual flight frames after it expires.
+    const before=await waitFrames(100);
+    await value('Module._Wasm_SetControllerState(0,40,0)');
+    const steered=await waitFrames(before.gameFrame+30);
+    await value('Module._Wasm_SetControllerState(0,-40,0)');
+    const after=await waitFrames(steered.gameFrame+30);
+    await value('Module._Wasm_SetControllerState(0,0,0)');
+    const turn=Math.abs(((steered.playerRoll-before.playerRoll+540)%360)-180);
+    if(turn<2||after.level!==17||after.playerState!==3||!after.sixDof)
+      throw Error('Bolse did not respond to flight controls: '+JSON.stringify({before,steered,after}));
+    const entryDeadline=Date.now()+15000;
+    let interior;
+    do {
+      await sleep(100);
+      interior=await value('window.STARSHIP_GAME_STATE');
+    } while(interior.gameFrame<260&&Date.now()<entryDeadline);
+    if(interior.gameFrame<260||interior.level!==17||interior.playerState!==3||!interior.sixDof)
+      throw Error('Bolse preview stopped during entry: '+JSON.stringify(interior));
+    const toggleReadyDeadline=Date.now()+15000;
+    let ready=interior;
+    while(!ready.canToggleSixDof&&Date.now()<toggleReadyDeadline) {
+      await sleep(100);ready=await value('window.STARSHIP_GAME_STATE');
+    }
+    if(!ready.canToggleSixDof) throw Error('Bolse flight toggle unavailable: '+JSON.stringify(ready));
+    await value('Module._Wasm_SetControllerState(0x0001,0,0)');
+    const panelFlight=await waitFrames(ready.gameFrame+6);
+    await value('Module._Wasm_SetControllerState(0,0,0)');
+    if(panelFlight.sixDof||panelFlight.sixDofPreference!==ready.sixDofPreference)
+      throw Error('Bolse did not enter panel flight without changing saved preference: '+JSON.stringify(panelFlight));
+    const neutral=await waitFrames(panelFlight.gameFrame+6);
+    await value('Module._Wasm_SetControllerState(0,40,0)');
+    const panelSteered=await waitFrames(neutral.gameFrame+30);
+    await value('Module._Wasm_SetControllerState(0,0,0)');
+    if(Math.abs(panelSteered.playerYaw-neutral.playerYaw)<0.5)
+      throw Error('Panel mode did not steer: '+JSON.stringify({neutral,panelSteered}));
+    await waitFrames(panelSteered.gameFrame+6);
+    await value('Module._Wasm_SetControllerState(0x0001,0,0)');
+    const restored=await waitFrames(panelSteered.gameFrame+12);
+    await value('Module._Wasm_SetControllerState(0,0,0)');
+    if(!restored.sixDof||restored.sixDofPreference!==ready.sixDofPreference)
+      throw Error('Bolse 6DOF toggle did not restore flight mode: '+JSON.stringify(restored));
+    result.bolse={before,steered,after,interior,panelFlight,panelSteered,restored};
+  }
+  if(game&&!bolse) {
     await call('Page.bringToFront');
     await sleep(1600); // Let the game's initial controller lock expire.
     let menu;
@@ -371,6 +429,58 @@ with zipfile.ZipFile(sys.argv[1]) as z:
     if(menu?.gameState!==3) throw Error('Start key did not reach the menu: '+JSON.stringify(menu));
     result.afterStart=menu;
     if(process.argv.includes('--menu-text')) result.menuText.list=await checkRankingMenu({call,value,sleep,output});
+    if(process.argv.includes('--reverse')) {
+      const pulse=async buttons=>{
+        await value('Module._Wasm_SetControllerState('+buttons+',0,0)');
+        await sleep(100);
+        await value('Module._Wasm_SetControllerState(0,0,0)');
+      };
+      const waitReverse=async(predicate,label,timeout=30000)=>{
+        const until=Date.now()+timeout;
+        let state;
+        while(Date.now()<until) {
+          state=await value('window.STARSHIP_GAME_STATE');
+          if(errors.length||await value('!!window.STARSHIP_GAME_ERROR'))
+            throw Error(label+' crashed: '+JSON.stringify({state,errors}));
+          if(state&&predicate(state)) return state;
+          await sleep(150);
+        }
+        throw Error(label+' timed out: '+JSON.stringify(state));
+      };
+      const captureReverse=async name=>{
+        const shot=await call('Page.captureScreenshot',{format:'png'});
+        await writeFile(resolve(output,name+'.png'),Buffer.from(shot.data,'base64'));
+      };
+      await sleep(2000);
+      await pulse(0x8000);
+      let map=await waitReverse(state=>state.gameState===4&&state.level===19,'Default reverse map');
+      await pulse(0x1000);
+      await sleep(900);
+      await captureReverse('reverse-map');
+      const launchDeadline=Date.now()+90000;
+      let launch;
+      while(Date.now()<launchDeadline) {
+        launch=await value('window.STARSHIP_GAME_STATE');
+        if(errors.length) throw Error('Reverse launch error: '+JSON.stringify(errors));
+        if(launch?.gameState===7) break;
+        await pulse(0x9000);
+        await sleep(900);
+      }
+      const opening=await waitReverse(state=>state.gameState===7&&state.level===19&&state.playerState===2&&state.playerY>18000,'Venom cloud opening',10000);
+      const cloud=await waitReverse(state=>state.level===19&&state.playerState===2&&state.playerY<23000&&state.playerY>18000,'High-altitude cloud fly-in',45000);
+      await captureReverse('reverse-cloud-opening');
+      await pulse(0x1000);
+      const arrival=await waitReverse(state=>state.level===19&&state.playerState===2&&state.playerY<7000,'Cloud-to-descent handoff',10000);
+      await waitReverse(state=>state.level===19&&state.playerState===2&&state.playerY<4000,'Venom descent',10000);
+      await pulse(0x1000);
+      const battle=await waitReverse(state=>state.gameState===7&&state.level===19&&state.playerState===3,'Star Fox battle',10000);
+      await value('Module._Wasm_SetControllerState(0x8000,40,0)');
+      await sleep(1500);
+      await value('Module._Wasm_SetControllerState(0,0,0)');
+      const steered=await waitReverse(state=>state.level===19&&state.playerState===3&&state.frames>battle.frames+20&&Math.abs(state.playerX-battle.playerX)>5,'Battle flight controls',10000);
+      await captureReverse('reverse-battle');
+      result.reverse={map,opening,cloud,arrival,battle,steered};
+    }
     if(process.argv.includes('--training')||process.argv.includes('--six-dof')||touch||collision) {
       const menuShot=await call('Page.captureScreenshot',{format:'png'});
       await writeFile(resolve(output,'menu.png'),Buffer.from(menuShot.data,'base64'));
@@ -528,7 +638,7 @@ with zipfile.ZipFile(sys.argv[1]) as z:
     await writeFile(resolve(output,'recovery.png'),Buffer.from(shot.data,'base64'));
     result.recovery={firstError:recovery.error,disabled:recovery.disabled,download:resolve(downloadPath,'starship-crash-report.json')};
   }
-  console.log(game?(result.training?'PASS: title, menu, Training and steering':'PASS: title and Start-key menu'):'PASS: actual GLES renderer in WebGL 2', JSON.stringify(result?.intro?{...result,intro:{samples:result.intro.samples.length,last:result.intro.samples.at(-1)}}:result));
+  console.log(game?(result.reverse?'PASS: default reversed campaign, high-altitude Venom opening and Star Fox battle':result.bolse?'PASS: direct Bolse preview and playable 6DOF controls':result.training?'PASS: title, menu, Training and steering':'PASS: title and Start-key menu'):'PASS: actual GLES renderer in WebGL 2', JSON.stringify(result?.intro?{...result,intro:{samples:result.intro.samples.length,last:result.intro.samples.at(-1)}}:result));
 } catch (error) {
   failure = String(error.stack || error);
   process.exitCode = 1;

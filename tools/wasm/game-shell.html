@@ -275,13 +275,13 @@ body.club-player {
       <canvas tabindex="0" aria-label="Starship game" id="canvas" width="640" height="480"></canvas>
       <img id="splash" src="./launch-background.jpg" alt="" aria-hidden="true" draggable="false">
       <section id="boot-panel" aria-label="Launch game">
-        <h1>Ready for launch.</h1>
+        <h1>Reverse campaign</h1>
         <span id="asset-inputs"><label>Base SF64 <input type="file" id="sf64" accept=".o2r" required></label>
           <label>Port Starship <input type="file" id="starship" accept=".o2r" required></label>
           <label>Mods (optional) <input type="file" id="mods" accept=".o2r" multiple></label>
           <label>Native save (optional) <input type="file" id="save" accept=".sav"></label>
         </span>
-        <span id="preloaded-label" hidden>Game + Wolfen mod loaded</span>
+        <span id="preloaded-label" hidden>Venom to Corneria, with Bolse station</span>
         <button id="launch" type="button" disabled>POWER ON</button>
       </section>
       <section id="crash-panel" hidden aria-label="Game recovery" role="alert">
@@ -520,6 +520,10 @@ window.STARSHIP_INSTALL_ASSETS=archives=>{
   document.getElementById('game-state').textContent='Game and mod ready';checkReady();
 };
 for (const id of ['sf64','starship','mods','save']) document.getElementById(id).addEventListener('change',checkReady);
+if(new URLSearchParams(location.search).get('mission')==='bolse') {
+  document.querySelector('#boot-panel h1').textContent='Bolse station combat preview';
+  launch.textContent='PLAY BOLSE';
+}
 launch.addEventListener('click',async()=>{
   if (started || !runtimeReady) return;
   unlockAudio();
@@ -550,7 +554,7 @@ launch.addEventListener('click',async()=>{
     try {sixDofPreference=Number(localStorage.getItem('starship-six-dof')==='1');} catch {}
     Module.FS.writeFile('/starship.cfg.json', JSON.stringify({
       Window:{Width:640,Height:480},
-      CVars:{gDeveloperTools:{LogLevel:2},gInterpolationFPS:30,gVsyncEnabled:0,gRenderParallelization:0,gSixDofFlight:sixDofPreference,...characterView}
+      CVars:{gDeveloperTools:{LogLevel:2},gInterpolationFPS:30,gVsyncEnabled:0,gRenderParallelization:0,gSixDofFlight:sixDofPreference,gBolsePreview:Number(diagnostic.get('mission')==='bolse'),...characterView}
     }));
     document.getElementById('game-state').textContent='Starting game…';
     Module.callMain([]);
@@ -584,7 +588,7 @@ function updateFlightAssistIndicator() {
   previousFlightAssistState=indicatorState;
   flightAssistButton.classList.toggle('flight-toggle-ready',ready);
   const title=incoming?'Answer incoming radio call':message?'Radio message in progress':
-    ready?(active?'Toggle 6DOF flight off':'Toggle 6DOF flight on'):station?'6DOF flight required in Bolse':'';
+    ready?(active?'Toggle 6DOF flight off':'Toggle 6DOF flight on'):station?'Flight mode toggle temporarily unavailable':'';
   flightAssistButton.title=title;
   flightAssistButton.setAttribute('aria-label',title?'C right, '+title:'C right');
   flightAssistButton.setAttribute('aria-pressed',String(active));

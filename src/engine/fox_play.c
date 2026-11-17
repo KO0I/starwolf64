@@ -24,6 +24,7 @@
 #include "assets/ast_zoness.h"
 #include "port/hooks/Events.h"
 #include "port/Flight6DOF.h"
+#include "bolse_station.h"
 
 extern float gCurrentScreenWidth;
 extern float gCurrentScreenHeight;
@@ -2987,10 +2988,7 @@ void Play_Init(void) {
                 break;
 
             case LEVEL_BOLSE:
-                if (!D_ctx_8017782C) {
-                    Bolse_LoadLevelObjects();
-                    ActorAllRange_SpawnTeam();
-                }
+                Bolse_LoadLevelObjects();
                 break;
 
             case LEVEL_VENOM_2:
@@ -3724,6 +3722,10 @@ void Player_UpdatePath(Player* player) {
 }
 
 void Player_CheckBounds360(Player* player) {
+    if (gCurrentLevel == LEVEL_BOLSE && !gVersusMode) {
+        Bolse_StationConstrain(player);
+        return;
+    }
     f32 var_fv1;
     bool var_v0 = false;
 
@@ -3778,8 +3780,9 @@ void Player_CheckBounds360(Player* player) {
     }
 }
 
-static bool Player_Uses6DOF(Player* player) {
-    return (player->form == FORM_ARWING) && CVarGetInteger("gSixDofFlight", 0);
+bool Player_Uses6DOF(const Player* player) {
+    return player && (player->form == FORM_ARWING) &&
+           (gCurrentLevel == LEVEL_BOLSE ? Bolse_StationUses6DOF() : CVarGetInteger("gSixDofFlight", 0));
 }
 
 bool Player_CanToggle6DOF(const Player* player) {
@@ -3795,10 +3798,10 @@ static void Player_Update6DOFToggle(Player* player) {
         return;
     }
 
-    bool enabled = !CVarGetInteger("gSixDofFlight", 0);
-    CVarSetInteger("gSixDofFlight", enabled);
+    bool enabled = !Player_Uses6DOF(player);
+    if (gCurrentLevel == LEVEL_BOLSE) Bolse_StationSet6DOF(enabled);
+    else { CVarSetInteger("gSixDofFlight", enabled); CVarSave(); }
     AUDIO_PLAY_SFX(enabled ? NA_SE_MAP_WINDOW_OPEN : NA_SE_MAP_WINDOW_CLOSE, gDefaultSfxSource, 4);
-    CVarSave();
     gInputPress->button &= ~R_CBUTTONS;
 }
 
@@ -3833,6 +3836,34 @@ static void Player_Steer6DOF(Player* player, bool allRange) {
     player->rot.z = Flight6DOF_Wrap(roll - extraRoll);
 }
 
+/* Change the steering reference frame without moving the ship or its hitbox. */
+static void Player_RotateFlightFrame(Player* player, f32 angle) {
+    Vec3f right = {1,0,0}, up = {0,1,0}, forward = {0,0,1};
+    Vec3f r, u, f;
+    f32 yaw = player->yRot_114 + player->rot.y + 180;
+    Matrix_RotateZ(gCalcMatrix, angle*M_DTOR, MTXF_NEW);
+    Matrix_RotateY(gCalcMatrix, yaw*M_DTOR, MTXF_APPLY);
+    Matrix_RotateX(gCalcMatrix, -(player->xRot_120+player->rot.x+player->aerobaticPitch)*M_DTOR, MTXF_APPLY);
+    Matrix_RotateZ(gCalcMatrix, -(player->rot.z+player->zRotBank+player->zRotBarrelRoll)*M_DTOR, MTXF_APPLY);
+    Matrix_MultVec3fNoTranslate(gCalcMatrix, &right, &r);
+    Matrix_MultVec3fNoTranslate(gCalcMatrix, &up, &u);
+    Matrix_MultVec3fNoTranslate(gCalcMatrix, &forward, &f);
+    f32 horizontal = sqrtf(SQ(f.x)+SQ(f.z));
+    f32 pitch = atan2f(f.y,horizontal)*M_RTOD;
+    f32 roll;
+    if (horizontal > 0.00001f) {
+        yaw = atan2f(f.x,f.z)*M_RTOD;
+        roll = atan2f(-r.y,u.y)*M_RTOD;
+    } else {
+        f32 cy = COS_DEG(yaw), sy = SIN_DEG(yaw);
+        roll = atan2f(cy*u.x-sy*u.z,cy*r.x-sy*r.z)*M_RTOD;
+    }
+    player->yRot_114 = Flight6DOF_Wrap(yaw-180-player->rot.y);
+    player->rot.x = pitch-player->xRot_120-player->aerobaticPitch;
+    player->rot.z = Flight6DOF_Wrap(roll-player->zRotBank-player->zRotBarrelRoll);
+    player->bankAngle = roll;
+}
+
 void Player_MoveArwing360(Player* player) {
     f32 sp7C;
     f32 sp78;
@@ -3847,6 +3878,12 @@ void Player_MoveArwing360(Player* player) {
     Vec3f sp4C;
     Vec3f sp40;
 
+    bool panelFlight = gCurrentLevel == LEVEL_BOLSE && !Player_Uses6DOF(player);
+    f32 panelAngle = panelFlight ? Bolse_StationFloorAngle(player) : 0;
+    f32 altitude = panelFlight ?
+        -player->pos.x*SIN_DEG(panelAngle)+player->pos.y*COS_DEG(panelAngle)+
+        BOLSE_STATION_RADIUS*COS_DEG(180.0f/BOLSE_STATION_SIDES) : player->pos.y-gGroundHeight;
+    if (panelFlight) Player_RotateFlightFrame(player, -panelAngle);
     if (Player_Uses6DOF(player)) {
         Player_Steer6DOF(player, true);
     } else {
@@ -3916,7 +3953,7 @@ void Player_MoveArwing360(Player* player) {
         var_fa1 = 0.1f;
         temp = -sp78 * gPlayerTurnStickMod;
 
-        if ((temp <= 0.0f) && (player->pos.y < (gGroundHeight + 50.0f))) {
+        if ((temp <= 0.0f) && (altitude < 50.0f)) {
             gPlayerTurnRate *= 2.0f;
             temp = 0.0f;
             var_fa1 = 0.2f;
@@ -3925,7 +3962,7 @@ void Player_MoveArwing360(Player* player) {
         Math_SmoothStepToF(&player->rot.x, temp, var_fa1, gPlayerTurnRate, 0.03f);
 
         var_fv1 = 1.5f;
-        if (player->pos.y < (gGroundHeight + 70.0f)) {
+        if (altitude < 70.0f) {
             var_fv1 = 0.8f;
         }
 
@@ -3936,12 +3973,13 @@ void Player_MoveArwing360(Player* player) {
 
         var_fv0 = 4.0f;
         if (sp7C == 0) {
-            var_fv0 = 1.0f;
+            var_fv0 = panelFlight ? 6.0f : 1.0f;
         }
 
         Math_SmoothStepToF(&player->rot.z, sp7C * 0.6f * var_fv1, 0.1f, var_fv0, 0.03f);
     }
 
+    if (panelFlight) Player_RotateFlightFrame(player, panelAngle);
     player->bankAngle = player->rot.z + player->zRotBank + player->zRotBarrelRoll;
 
     Matrix_RotateY(gCalcMatrix, (player->yRot_114 + player->rot.y + 180.0f) * M_DTOR, MTXF_NEW);
@@ -5012,6 +5050,9 @@ void Player_Setup(Player* playerx) {
                ((gLevelMode != LEVELMODE_ALL_RANGE) || (gAllRangeCheckpoint == 0))) {
         AUDIO_PLAY_BGM(gBgmSeqId);
     }
+    if (gCurrentLevel == LEVEL_BOLSE) {
+        Bolse_StationStart(player);
+    }
     gLevelClearScreenTimer = gBossHealthBar = D_ctx_80177850 = 0;
 
     if ((gCurrentLevel == LEVEL_TRAINING)) {
@@ -5248,7 +5289,7 @@ void Player_ArwingBoost(Player* player) {
     if (gLoopBoostTimers[gPlayerNum] != 0) {
         gLoopBoostTimers[gPlayerNum]--;
     }
-    if (!Player_Uses6DOF(player) && !player->somersault && (gDrawBackdrop < 5)) {
+    if (gCurrentLevel != LEVEL_BOLSE && !Player_Uses6DOF(player) && !player->somersault && (gDrawBackdrop < 5)) {
         if (stickY >= -50) {
             gLoopDownTimers[gPlayerNum] = 5;
         }
@@ -5368,6 +5409,10 @@ void Player_ArwingBrake(Player* player) {
         sp30 = 1.5f;
         sp34 = 0.35f;
     }
+    if (Player_Uses6DOF(player)) {
+        /* The preceding boost pass also drains the shared meter while braking. */
+        sp30 = sp34 + (sp30 - sp34) * 0.25f;
+    }
 
     player->sfx.brake = false;
 
@@ -5383,7 +5428,7 @@ void Player_ArwingBrake(Player* player) {
         gUturnDownTimers[gPlayerNum] = 5;
     }
 
-    if (!Player_Uses6DOF(player) && (gUturnDownTimers[gPlayerNum] > 0) &&
+    if (gCurrentLevel != LEVEL_BOLSE && !Player_Uses6DOF(player) && (gUturnDownTimers[gPlayerNum] > 0) &&
         (gUturnDownTimers[gPlayerNum] < 5) && (gDrawBackdrop < 5) &&
         (gUturnBrakeTimers[gPlayerNum] != 0)) {
         gUturnDownTimers[gPlayerNum] = 0;
@@ -6529,6 +6574,14 @@ static void Camera_Update6DOF(Player* player, bool snap) {
     Matrix_RotateZ(gCalcMatrix, -player->bankAngle * M_DTOR, MTXF_APPLY);
     Matrix_MultVec3fNoTranslate(gCalcMatrix, &offset, &behind);
     Matrix_MultVec3fNoTranslate(gCalcMatrix, &forward, &ahead);
+    bool panelFlight = gCurrentLevel == LEVEL_BOLSE && !Player_Uses6DOF(player);
+    f32 panelAngle = panelFlight ? Bolse_StationFloorAngle(player) : 0;
+    Vec3f normal = {-SIN_DEG(panelAngle), COS_DEG(panelAngle), 0};
+    if (panelFlight) {
+        f32 distance = (player->alternateView ? 1000 : 300)-player->camDist;
+        behind = (Vec3f){-ahead.x/150*distance+normal.x*50,
+                         -ahead.y/150*distance+normal.y*50,-ahead.z/150*distance};
+    }
     if (snap) {
         player->cam.eye.x = player->pos.x + behind.x;
         player->cam.eye.y = player->pos.y + behind.y;
@@ -6541,7 +6594,19 @@ static void Camera_Update6DOF(Player* player, bool snap) {
     player->cam.at.x = player->pos.x + ahead.x;
     player->cam.at.y = player->pos.y + ahead.y;
     player->cam.at.z = player->pos.z + ahead.z;
-    player->camRoll = Flight6DOF_Wrap(-player->bankAngle);
+    if (panelFlight) {
+        Vec3f view = {player->cam.eye.x-player->cam.at.x,player->cam.eye.y-player->cam.at.y,
+                      player->cam.eye.z-player->cam.at.z};
+        f32 horizontal = sqrtf(SQ(view.x)+SQ(view.z));
+        f32 length = sqrtf(SQ(horizontal)+SQ(view.y));
+        if (horizontal > 0.001f && length > 0.001f) {
+            f32 right = normal.x*view.z/horizontal;
+            f32 up = -normal.x*view.x*view.y/(horizontal*length)+normal.y*horizontal/length;
+            f32 roll = Math_RadToDeg(Math_Atan2F(right,up));
+            if (snap) player->camRoll = roll;
+            else Math_SmoothStepToAngle(&player->camRoll,roll,0.15f,4,0.001f);
+        }
+    } else player->camRoll = Flight6DOF_Wrap(-player->bankAngle);
 }
 
 void Camera_UpdateArwing360(Player* player, bool arg1) {
@@ -6558,7 +6623,7 @@ void Camera_UpdateArwing360(Player* player, bool arg1) {
     f32 atY;
     f32 atZ;
 
-    if (Player_Uses6DOF(player) && (player->state == PLAYERSTATE_ACTIVE) && !player->somersault) {
+    if ((Player_Uses6DOF(player) || gCurrentLevel == LEVEL_BOLSE) && (player->state == PLAYERSTATE_ACTIVE) && !player->somersault) {
         Camera_Update6DOF(player, arg1);
         return;
     }

@@ -37,6 +37,9 @@ def load_portrait_segment(builder, stem):
 
 
 def replace_portraits(builder):
+    # Rucker uses the original dog even though the campaign swaps Pepper to Andross.
+    for frame, name in (('closed', 'D_D007A70'), ('talking', 'D_D008990')):
+        builder.resources[f'bolse/rucker_pepper_{frame}'] = builder.base.read(f'ast_allies/{name}')
     for stem in ('ast_allies', 'ast_great_fox'):
         load_portrait_segment(builder, stem)
     load_portrait_segment(builder, 'ast_map')

@@ -444,6 +444,7 @@ void Play_dummy_MuteSfx(void);
 s32 Play_GetMaxShields(void);
 void Play_PlaySfxFirstPlayer(f32*, u32);
 bool Player_IsVitzy(s32 playerNum);
+bool Player_Uses6DOF(const Player* player);
 bool Player_CanToggle6DOF(const Player* player);
 void Player_SetupArwingShot(Player* player, PlayerShot* shot, f32 arg2, f32 arg3, PlayerShotId shotId, f32 speed);
 void Player_SetupTankShot(Player* player, PlayerShot* shot, PlayerShotId shotId, f32 speed);

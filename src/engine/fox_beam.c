@@ -1,4 +1,5 @@
 #include "global.h"
+#include "bolse_station.h"
 #include "assets/vitzy_fighter.h"
 #include "assets/ast_landmaster.h"
 #include "assets/ast_aquas.h"
@@ -76,7 +77,7 @@ void PlayerShot_ExplodeBomb(PlayerShot* shot) {
                 func_enmy_80062B60(shot->obj.pos.x, shot->obj.pos.z, 0, shot->unk_48 * 3.0f);
             }
         }
-        if (gCurrentLevel == LEVEL_BOLSE) {
+        if (gCurrentLevel == LEVEL_BOLSE && !gBolseDynamicGround) {
             var_fv0 = 180.0f - (shot->obj.pos.y / 20.0f);
             if (var_fv0 < 50.0f) {
                 var_fv0 = 50.0f;
@@ -857,7 +858,7 @@ void PlayerShot_CollisionCheck(PlayerShot* shot) {
                     test.y = test.x;
                 }
                 test.z = test.x;
-                if ((i != shot->sourceId) &&
+                if ((i != shot->sourceId) && !Bolse_StationIsFriendlyShot(shot) &&
                     ((player->state == PLAYERSTATE_ACTIVE) || (player->state == PLAYERSTATE_DOWN)) &&
                     (fabsf(player->trueZpos - shot->obj.pos.z) < test.z) &&
                     (fabsf(player->pos.x - shot->obj.pos.x) < test.x) &&
@@ -1100,7 +1101,39 @@ void PlayerShot_DrawHitmark(PlayerShot* shot) {
     }
 }
 
+static Vtx sStrikerLaserVertices[] = {
+    VTX(-6,0,-150,0,0,255,255,255,255), VTX(6,0,-150,0,0,255,255,255,255),
+    VTX(6,0,150,0,0,255,255,255,255), VTX(-6,0,150,0,0,255,255,255,255),
+    VTX(0,-6,-150,0,0,255,255,255,255), VTX(0,6,-150,0,0,255,255,255,255),
+    VTX(0,6,150,0,0,255,255,255,255), VTX(0,-6,150,0,0,255,255,255,255),
+};
+static Gfx sStrikerLaserMesh[] = {
+    gsSPVertex(sStrikerLaserVertices,8,0),
+    gsSP2Triangles(0,1,2,0,0,2,3,0), gsSP2Triangles(4,5,6,0,4,6,7,0),
+    gsSPEndDisplayList(),
+};
+
+static void PlayerShot_DrawStrikerLaser(void) {
+    RCP_SetupDL(&gMasterDisp, SETUPDL_29);
+    gSPClearGeometryMode(gMasterDisp++, G_LIGHTING | G_CULL_BACK | G_FOG);
+    gSPTexture(gMasterDisp++,0,0,0,G_TX_RENDERTILE,G_OFF);
+    gDPSetCycleType(gMasterDisp++,G_CYC_1CYCLE);
+    gDPSetRenderMode(gMasterDisp++,G_RM_AA_ZB_OPA_SURF,G_RM_AA_ZB_OPA_SURF2);
+    gDPSetCombineMode(gMasterDisp++,G_CC_PRIMITIVE,G_CC_PRIMITIVE);
+    gDPSetPrimColor(gMasterDisp++,0,0,35,130,255,255);
+    Matrix_SetGfxMtx(&gMasterDisp);
+    gSPDisplayList(gMasterDisp++,sStrikerLaserMesh);
+    Matrix_Scale(gGfxMatrix,0.3f,0.3f,1,MTXF_APPLY);
+    gDPSetPrimColor(gMasterDisp++,0,0,150,225,255,255);
+    Matrix_SetGfxMtx(&gMasterDisp);
+    gSPDisplayList(gMasterDisp++,sStrikerLaserMesh);
+}
+
 void PlayerShot_DrawLaser(PlayerShot* shot) {
+    if (Bolse_StationIsFriendlyShot(shot)) {
+        PlayerShot_DrawStrikerLaser();
+        return;
+    }
     f32 width;
     f32 length;
     u8 var_a1;
@@ -2271,6 +2304,14 @@ void PlayerShot_UpdateShot(PlayerShot* shot, s32 index) {
     shot->obj.pos.y += shot->vel.y;
     shot->obj.pos.z += shot->vel.z;
 
+    if (gCurrentLevel == LEVEL_BOLSE && !gVersusMode &&
+        ((shot->obj.id == PLAYERSHOT_BOMB && shot->unk_5C == 0) ||
+         (shot->obj.id == PLAYERSHOT_LOCK_ON && shot->unk_5C != 0)) && Bolse_StationBombImpact(shot)) {
+        shot->obj.id = PLAYERSHOT_BOMB;
+        shot->unk_5C = 0;
+        PlayerShot_ExplodeBomb(shot);
+        return;
+    }
     switch (shot->obj.id) {
         case PLAYERSHOT_SINGLE_LASER:
             PlayerShot_UpdateBeam(shot, index);

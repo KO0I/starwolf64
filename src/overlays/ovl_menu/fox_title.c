@@ -232,6 +232,18 @@ void Title_Main(void) {
             break;
 
         case TITLE_UPDATE_ENTRY:
+#ifdef __EMSCRIPTEN__
+            if (CVarGetInteger("gBolsePreview", 0)) {
+                CVarSetInteger("gBolsePreview", 0);
+                gClearPlayerInfo = true;
+                gVersusMode = false;
+                gPlayerNum = 0;
+                gNextLevel = LEVEL_BOLSE;
+                gNextLevelPhase = 0;
+                gNextGameState = GSTATE_PLAY;
+                break;
+            }
+#endif
             gDrawMode = DRAW_TITLE;
             Title_UpdateEntry();
             break;

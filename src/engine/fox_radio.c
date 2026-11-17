@@ -7,6 +7,7 @@
 #include "prevent_bss_reordering.h"
 #include "global.h"
 #include "venom_mission.h"
+#include "bolse_station.h"
 #include "assets/ast_allies.h"
 #include "assets/ast_corneria.h"
 #include "assets/ast_meteo.h"
@@ -478,6 +479,31 @@ void func_radio_800BAAE8(void) {
     }
 }
 
+static void Radio_DrawTextBox(u8* texture, u16* palette, f32 y, f32 scaleY, bool red) {
+    RCP_SetupDL(&gMasterDisp, SETUPDL_85_OPTIONAL);
+    if (red) {
+        gDPSetPrimColor(gMasterDisp++, 0, 0, 255, 25, 25, 170);
+    } else {
+        gDPSetPrimColor(gMasterDisp++, 0, 0, 60, 60, 255, 170);
+    }
+    Lib_TextureRect_CI8(&gMasterDisp, texture, palette, 32, 32, gRadioTextBoxPosX, y,
+                       gRadioTextBoxScaleX, scaleY);
+}
+
+void Radio_DrawCustomDialogue(const RadioCustomMessage* dialogue, s32 visibleChars) {
+    Radio_CalculatePositions();
+    Radio_DrawTextBox((u8*) aMsgWindowBgTex, (u16*) aMsgWindowBgTLUT, gRadioTextBoxPosY + 1.0f, 1.3f, false);
+    dialogue->drawPortrait(dialogue->portraitId, gRadioPortraitPosX, gRadioPortraitPosY + 1.0f);
+
+    RCP_SetupDL(&gMasterDisp, SETUPDL_76_OPTIONAL);
+    gDPSetPrimColor(gMasterDisp++, 0, 0, 255, 255, 0, 255);
+    Graphics_DisplaySmallText(gRadioTextBoxPosX - 1.0f, gRadioPrintPosY - 7, 1.0f, 1.0f, (char*) dialogue->name);
+    if (visibleChars > 0) {
+        RCP_SetupDL(&gMasterDisp, SETUPDL_85_OPTIONAL);
+        Message_DisplayText(&gMasterDisp, dialogue->message, gRadioPrintPosX, gRadioPrintPosY, visibleChars);
+    }
+}
+
 void func_radio_800BB388(void) {
     static f32 D_800D4A78 = -1.0f;
     f32 temp_fa0;
@@ -498,8 +524,6 @@ void func_radio_800BB388(void) {
 
         sp30 = temp_fa0 * D_800D4A78;
 
-        RCP_SetupDL(&gMasterDisp, SETUPDL_85_OPTIONAL);
-
         switch (gGameState) {
             case GSTATE_TITLE:
             case GSTATE_ENDING:
@@ -513,14 +537,8 @@ void func_radio_800BB388(void) {
                 break;
         }
 
-        if (sRadioUseRedBox == true) {
-            gDPSetPrimColor(gMasterDisp++, 0x00, 0x00, 255, 25, 25, 170);
-        } else {
-            gDPSetPrimColor(gMasterDisp++, 0x00, 0x00, 60, 60, 255, 170);
-        }
-
-        Lib_TextureRect_CI8(&gMasterDisp, texture, palette, 32, 32, gRadioTextBoxPosX, gRadioTextBoxPosY + 16.0f + sp30,
-                            gRadioTextBoxScaleX, gRadioTextBoxScaleY);
+        Radio_DrawTextBox(texture, palette, gRadioTextBoxPosY + 16.0f + sp30, gRadioTextBoxScaleY,
+                          sRadioUseRedBox);
     }
 
     if (gRadioTextBoxScaleY == 1.3f) {
@@ -722,6 +740,10 @@ void Radio_Draw(void) {
 
         case 0:
             break;
+    }
+
+    if ((gGameState == GSTATE_PLAY) && (gCurrentLevel == LEVEL_BOLSE) && Bolse_StationDrawRadio()) {
+        return;
     }
 
     if (((gRadioState > 0) && (gRadioState != 100)) && !gHideRadio) {

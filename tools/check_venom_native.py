@@ -370,14 +370,7 @@ while frames < 4200:
         check('gMissionNumber == 1 && sPrevPlanetId == PLANET_VENOM')
         check('sNextPlanetId == PLANET_BOLSE && Map_HasRouteChoice()')
         report['venom_returns_to_map'] = True
-        # Exercise both former penultimate stages' production cutscene exits.
-        setv('gCurrentLevel', 'LEVEL_BOLSE')
-        setv('gPlayer[0].csState', 12)
-        setv('gPlayer[0].csTimer', 0)
-        setv('gFillScreenAlpha', 255)
-        setv('gNextGameState', 'GSTATE_NONE')
-        call('(void)Bolse_LevelComplete(&gPlayer[0])')
-        check('gNextGameState == GSTATE_MAP && gMissionNumber == 1')
+        # Bolse's initialized docking flow is checked by check_bolse_station.py.
         setv('gCurrentLevel', 'LEVEL_AREA_6')
         setv('gPlayer[0].csState', 3)
         setv('gCsFrameCount', 1100)
@@ -385,7 +378,7 @@ while frames < 4200:
         setv('gNextGameState', 'GSTATE_NONE')
         call('(void)Area6_LevelComplete(&gPlayer[0])')
         check('gNextGameState == GSTATE_MAP && gMissionNumber == 1')
-        report['bolse_and_area6_return_to_map'] = True
+        report['area6_returns_to_map'] = True
         # Load the final stage using its normal map-to-play transition.
         setv('sCurrentPlanetId', 'PLANET_CORNERIA')
         call('(void)Map_CurrentLevel_Setup()')

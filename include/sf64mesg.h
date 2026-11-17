@@ -68,6 +68,15 @@ void Radio_CalculatePositions();
 void func_radio_800BB388(void);
 void Radio_Draw(void);
 
+typedef struct RadioCustomMessage {
+    const char* name;
+    u16* message;
+    s32 portraitId;
+    void (*drawPortrait)(s32 portraitId, f32 x, f32 y);
+} RadioCustomMessage;
+
+void Radio_DrawCustomDialogue(const RadioCustomMessage* dialogue, s32 visibleChars);
+
 typedef enum MsgCharCode {
     // Non-printing and whitespace
     /*  0 */ MSGCHAR_END,       // End message
