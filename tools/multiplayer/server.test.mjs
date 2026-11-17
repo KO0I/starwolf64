@@ -266,3 +266,36 @@ test("site manifest cannot expose a file outside its directory", async t => {
   const f=await fixture(t,{siteDir:root});
   await assert.rejects(f.prepare(),/escapes/);
 });
+
+test("BYOROM cutover blocks hosted assets while retaining the builder and signaling", async t => {
+  const root = await mkdtemp(join(tmpdir(), 'sargasso-byorom-'));
+  t.after(() => rm(root, {recursive:true, force:true}));
+  await writeFile(join(root, 'index.html'), '<title>Bring your own ROM</title>');
+  await writeFile(join(root, 'ship-wireframes.json'), '{"copied":"geometry"}');
+  await writeFile(join(root, 'site.json'), JSON.stringify({
+    format:'starwolf64-wasm-site-v1',
+    files:{'index.html':{}, 'ship-wireframes.json':{}, 'portraits/fox_original.png':{}, 'multiplayer/ship-wireframes.json':{}},
+    download:['index.html','ship-wireframes.json','portraits/fox_original.png','multiplayer/ship-wireframes.json']
+  }));
+  await writeFile(join(root, 'prepared-assets.json'), '{"prepared":false}');
+  // Missing runtime directories prove no private archives are read in this mode.
+  const f = await fixture(t, {byoromOnly:true, siteDir:root, gameDir:join(root,'missing'), gameAssets:join(root,'missing')});
+  await f.prepare();
+  const descriptor = await f.request('/api/game');
+  assert.equal(descriptor.body.available, false);
+  assert.match(descriptor.body.reason, /Bring Your Own ROM/);
+  assert.equal(Object.hasOwn(descriptor.body, 'assets'), false);
+  for (const path of ['/game-assets/sf64.o2r', '/game-assets/wolfen.o2r', '/game/Starship.data',
+      '/game/Starship.wasm', '/portraits/fox_original.png', '/multiplayer/portraits/wolf.png',
+      '/ship-wireframes.json', '/multiplayer/ship-wireframes.json']) {
+    assert.equal((await fetch(f.base + path)).status, 404, path);
+  }
+  assert.match(await (await fetch(f.base + '/')).text(), /Bring your own ROM/);
+  assert.equal((await fetch(f.base + '/multiplayer/')).status, 200);
+  assert.equal((await f.request('/api/config')).status, 200);
+  const published = await f.request('/site.json');
+  assert.deepEqual(Object.keys(published.body.files), ['index.html']);
+  assert.deepEqual(published.body.download, ['index.html']);
+  const host = await f.make();
+  assert.equal((await f.join(host)).role, 'guest');
+});

@@ -82,6 +82,7 @@ export class NetworkGame extends EventTarget {
     const r = await fetch('/api/game', {signal:this.abort.signal});
     if (!r.ok) throw Error('Game manifest unavailable');
     this.descriptor = await r.json();
+    if (!this.descriptor.available) throw Error(this.descriptor.reason || 'Playable WASM build unavailable');
     if (this.closed) throw Error('Game closed');
     this.engine = new WasmEngine(this.container, this.descriptor);
     this.engine.addEventListener('error', e => this.fail(Error(e.detail.message)));

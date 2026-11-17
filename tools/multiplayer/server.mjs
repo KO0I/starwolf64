@@ -63,7 +63,7 @@ function validSignal(data) {
     (c.sdpMLineIndex == null || (Number.isInteger(c.sdpMLineIndex) && c.sdpMLineIndex >= 0)) &&
     (c.usernameFragment == null || typeof c.usernameFragment === "string");
 }
-export function createSignalingServer({ host = "127.0.0.1", port = 8670, iceServers = [], roomLimit = 32, maxPeers = 8, graceMs = 5000, allowedOrigins = [], gameDir = null, gameAssets = null, siteDir = null } = {}) {
+export function createSignalingServer({ host = "127.0.0.1", port = 8670, iceServers = [], roomLimit = 32, maxPeers = 8, graceMs = 5000, allowedOrigins = [], gameDir = null, gameAssets = null, siteDir = null, byoromOnly = false } = {}) {
   if (!Number.isInteger(roomLimit) || roomLimit < 1 || !Number.isInteger(maxPeers) || maxPeers < 1 || maxPeers > 8 || !Number.isFinite(graceMs) || graceMs < 0 || !Array.isArray(iceServers) || !Array.isArray(allowedOrigins)) throw new TypeError("invalid signaling configuration");
 
   const siteFiles = (async () => {
@@ -73,6 +73,11 @@ export function createSignalingServer({ host = "127.0.0.1", port = 8670, iceServ
     const manifest = JSON.parse(await readFile(join(root, 'site.json'), 'utf8'));
     if (manifest.format !== 'starwolf64-wasm-site-v1' || !manifest.files || typeof manifest.files !== 'object')
       throw Error('Invalid site manifest');
+    if (byoromOnly) {
+      const blocked = name => name.startsWith('portraits/') || /(?:^|\/)ship-wireframes\.json$/.test(name);
+      manifest.files = Object.fromEntries(Object.entries(manifest.files).filter(([name]) => !blocked(name)));
+      if (Array.isArray(manifest.download)) manifest.download = manifest.download.filter(name => !blocked(name));
+    }
     const types = {html:'text/html; charset=utf-8',mjs:'text/javascript; charset=utf-8',js:'text/javascript; charset=utf-8',css:'text/css; charset=utf-8',json:'application/json',wasm:'application/wasm',png:'image/png',jpg:'image/jpeg',txt:'text/plain; charset=utf-8',md:'text/plain; charset=utf-8'};
     for (const name of [...Object.keys(manifest.files), 'site.json', 'prepared-assets.json']) {
       if (!/^[A-Za-z0-9_./-]+$/.test(name) || name.split('/').some(part => !part || part === '.' || part === '..'))
@@ -82,6 +87,7 @@ export function createSignalingServer({ host = "127.0.0.1", port = 8670, iceServ
       if (!path.startsWith(root + '/')) throw Error('Site file escapes its directory');
       entries.set('/' + name, {bytes:await readFile(path),type:types[name.split('.').at(-1)] || 'application/octet-stream'});
     }
+    if (byoromOnly) entries.set('/site.json', {bytes:Buffer.from(JSON.stringify(manifest)),type:'application/json'});
     if (!entries.has('/index.html')) throw Error('Site has no index.html');
     entries.set('/', entries.get('/index.html'));
     return entries;
@@ -89,6 +95,7 @@ export function createSignalingServer({ host = "127.0.0.1", port = 8670, iceServ
   siteFiles.catch(() => {});
   const runtimeFiles = new Map();
   const descriptor = (async () => {
+    if (byoromOnly) return {available:false,reason:'Multiplayer is temporarily unavailable while Bring Your Own ROM preparation is connected. The main-page ROM builder and room signaling remain available.'};
     if (!gameDir || !gameAssets) return {available:false};
     const assets = [], fingerprint = createHash('sha256');
     for (const [name,type] of [['Starship.html','text/html'],['Starship.js','text/javascript'],['Starship.wasm','application/wasm'],['Starship.data','application/octet-stream']]) {
@@ -181,6 +188,8 @@ export function createSignalingServer({ host = "127.0.0.1", port = 8670, iceServ
         const nested=url.pathname.slice('/multiplayer'.length);
         if(files.has(nested))url.pathname=nested;
       }
+      if (byoromOnly && (/^\/(?:game|game-assets|portraits)(?:\/|$)/.test(url.pathname) || /(?:^|\/)ship-wireframes\.json$/.test(url.pathname)))
+        return json(res,404,{error:'not found'});
       if (req.method === 'GET' && url.pathname === '/api/game') return json(res,200,await descriptor);
       if (req.method === 'GET' && (url.pathname.startsWith('/game/') || url.pathname.startsWith('/game-assets/'))) {
         await descriptor;
@@ -303,7 +312,7 @@ export function createSignalingServer({ host = "127.0.0.1", port = 8670, iceServ
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   try {
-    let host = "127.0.0.1", port = 8670, iceServers = [], gameDir = null, gameAssets = null, siteDir = null;
+    let host = "127.0.0.1", port = 8670, iceServers = [], gameDir = null, gameAssets = null, siteDir = null, byoromOnly = false;
     const allowedOrigins = [];
     for (let i = 2; i < process.argv.length; i++) {
       const arg = process.argv[i];
@@ -312,6 +321,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
       else if (arg === "--game-dir" && process.argv[i + 1]) gameDir = process.argv[++i];
       else if (arg === "--game-assets" && process.argv[i + 1]) gameAssets = process.argv[++i];
       else if (arg === "--site-dir" && process.argv[i + 1]) siteDir = process.argv[++i];
+      else if (arg === "--byorom-only") byoromOnly = true;
       else if (arg === "--ice-config" && process.argv[i + 1]) iceServers = JSON.parse(await readFile(process.argv[++i], "utf8"));
       else if (arg === "--origin" && process.argv[i + 1]) {
         const origin = process.argv[++i];
@@ -321,7 +331,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
       else throw new Error(`unknown or incomplete argument: ${arg}`);
     }
     if (!Number.isInteger(port) || port < 0 || port > 65535) throw new Error("invalid port");
-    const { server, prepare } = createSignalingServer({ host, port, iceServers, allowedOrigins, gameDir, gameAssets, siteDir });
+    const { server, prepare } = createSignalingServer({ host, port, iceServers, allowedOrigins, gameDir, gameAssets, siteDir, byoromOnly });
     await prepare();
     server.listen(port, host, () => console.log(`READY http://${host.includes(":") ? `[${host}]` : host}:${server.address().port}/`));
   } catch (err) { console.error(err.message); process.exitCode = 1; }
