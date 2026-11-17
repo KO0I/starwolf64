@@ -1,0 +1,51 @@
+{
+  "source_triangles": 246,
+  "triangles": 160,
+  "removed_triangles": 86,
+  "parts": [
+    {
+      "part": "Split-color faceted skull",
+      "before": 116,
+      "after": 68
+    },
+    {
+      "part": "Split lower jaw",
+      "before": 36,
+      "after": 20
+    },
+    {
+      "part": "Sculpted brow blue",
+      "before": 12,
+      "after": 6
+    },
+    {
+      "part": "Sculpted brow cream",
+      "before": 12,
+      "after": 6
+    },
+    {
+      "part": "Pointed ear blue",
+      "before": 8,
+      "after": 4
+    },
+    {
+      "part": "Pointed ear cream",
+      "before": 8,
+      "after": 4
+    },
+    {
+      "part": "Quiet mouth",
+      "before": 4,
+      "after": 2
+    }
+  ],
+  "protected_features": [
+    "eye whites",
+    "eye sockets",
+    "pupils",
+    "red muzzle bridge",
+    "philtrum",
+    "nostrils",
+    "ear insets"
+  ]
+}

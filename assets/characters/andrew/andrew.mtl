@@ -1,0 +1,225 @@
+# Andrew material colors and embedded GLB textures exported for OBJ.
+
+newmtl Andrew_black_D_TITLE_601EA00
+Kd 1 1 1
+Ka 1 1 1
+Ks 0 0 0
+d 1
+illum 1
+map_Kd Andrew_black_D_TITLE_601EA00.png
+
+newmtl Andrew_black_D_TITLE_601F200
+Kd 1 1 1
+Ka 1 1 1
+Ks 0 0 0
+d 1
+illum 1
+map_Kd Andrew_black_D_TITLE_601F200.png
+
+newmtl Andrew_black_D_TITLE_601F400
+Kd 1 1 1
+Ka 1 1 1
+Ks 0 0 0
+d 1
+illum 1
+map_Kd Andrew_black_D_TITLE_601F400.png
+
+newmtl Andrew_black_D_TITLE_60214F8
+Kd 1 1 1
+Ka 1 1 1
+Ks 0 0 0
+d 1
+illum 1
+map_Kd Andrew_black_D_TITLE_60214F8.png
+
+newmtl Andrew_black_D_TITLE_6022B40
+Kd 1 1 1
+Ka 1 1 1
+Ks 0 0 0
+d 1
+illum 1
+map_Kd Andrew_black_D_TITLE_6022B40.png
+
+newmtl Andrew_black_D_TITLE_6023B40
+Kd 1 1 1
+Ka 1 1 1
+Ks 0 0 0
+d 1
+illum 1
+map_Kd Andrew_black_D_TITLE_6023B40.png
+
+newmtl Andrew_black_D_TITLE_602DB30
+Kd 1 1 1
+Ka 1 1 1
+Ks 0 0 0
+d 1
+illum 1
+map_Kd Andrew_black_D_TITLE_602DB30.png
+
+newmtl Andrew_black_D_TITLE_6041CF0
+Kd 1 1 1
+Ka 1 1 1
+Ks 0 0 0
+d 1
+illum 1
+map_Kd Andrew_black_D_TITLE_6041CF0.png
+
+newmtl Andrew_gray_D_TITLE_6021F10
+Kd 1 1 1
+Ka 1 1 1
+Ks 0 0 0
+d 1
+illum 1
+map_Kd Andrew_gray_D_TITLE_6021F10.png
+
+newmtl Andrew_gray_D_TITLE_60426E0
+Kd 1 1 1
+Ka 1 1 1
+Ks 0 0 0
+d 1
+illum 1
+map_Kd Andrew_gray_D_TITLE_60426E0.png
+
+newmtl Andrew_purple_D_TITLE_6023B40
+Kd 1 1 1
+Ka 1 1 1
+Ks 0 0 0
+d 1
+illum 1
+map_Kd Andrew_purple_D_TITLE_6023B40.png
+
+newmtl Andrew_purple_D_TITLE_6041CF0
+Kd 1 1 1
+Ka 1 1 1
+Ks 0 0 0
+d 1
+illum 1
+map_Kd Andrew_purple_D_TITLE_6041CF0.png
+
+newmtl Andrew_red_D_TITLE_6023340
+Kd 1 1 1
+Ka 1 1 1
+Ks 0 0 0
+d 1
+illum 1
+map_Kd Andrew_red_D_TITLE_6023340.png
+
+newmtl Andrew_silver_D_TITLE_6026D28
+Kd 1 1 1
+Ka 1 1 1
+Ks 0 0 0
+d 1
+illum 1
+map_Kd Andrew_silver_D_TITLE_6026D28.png
+
+newmtl Ear_burgundy
+Kd 0.18447498977184296 0.014443843625485897 0.040915198624134064
+Ka 1 1 1
+Ks 0 0 0
+d 1
+illum 1
+
+newmtl Ear_dark
+Kd 0.08228270709514618 0.012286487966775894 0.03071344457566738
+Ka 1 1 1
+Ks 0 0 0
+d 1
+illum 1
+
+newmtl Ear_inner
+Kd 0.31398871541023254 0.026241222396492958 0.0666259378194809
+Ka 1 1 1
+Ks 0 0 0
+d 1
+illum 1
+
+newmtl Eye_ivory
+Kd 1 0.8713670969009399 0.5520114302635193
+Ka 1 1 1
+Ks 0 0 0
+d 1
+illum 1
+
+newmtl Eye_socket
+Kd 0.01850022003054619 0.012983032502233982 0.015208514407277107
+Ka 1 1 1
+Ks 0 0 0
+d 1
+illum 1
+
+newmtl Fur_cream
+Kd 0.5394794940948486 0.5088813304901123 0.35640013217926025
+Ka 1 1 1
+Ks 0 0 0
+d 1
+illum 1
+
+newmtl Fur_cream_dark
+Kd 0.3277781009674072 0.31854677200317383 0.24228112399578094
+Ka 1 1 1
+Ks 0 0 0
+d 1
+illum 1
+
+newmtl Fur_cream_light
+Kd 0.6307571530342102 0.5972017645835876 0.43415364623069763
+Ka 1 1 1
+Ks 0 0 0
+d 1
+illum 1
+
+newmtl Fur_navy
+Kd 0.039546236395835876 0.06480326503515244 0.11443537473678589
+Ka 1 1 1
+Ks 0 0 0
+d 1
+illum 1
+
+newmtl Fur_navy_dark
+Kd 0.022173885256052017 0.03688944876194 0.0666259378194809
+Ka 1 1 1
+Ks 0 0 0
+d 1
+illum 1
+
+newmtl Fur_navy_light
+Kd 0.06301001459360123 0.09305896610021591 0.1441284716129303
+Ka 1 1 1
+Ks 0 0 0
+d 1
+illum 1
+
+newmtl Mouth
+Kd 0.014443843625485897 0.009134058840572834 0.012983032502233982
+Ka 1 1 1
+Ks 0 0 0
+d 1
+illum 1
+
+newmtl Muzzle_dark
+Kd 0.12743768095970154 0.01850022003054619 0.022173885256052017
+Ka 1 1 1
+Ks 0 0 0
+d 1
+illum 1
+
+newmtl Muzzle_light
+Kd 0.4564110338687897 0.08228270709514618 0.0382043719291687
+Ka 1 1 1
+Ks 0 0 0
+d 1
+illum 1
+
+newmtl Muzzle_red
+Kd 0.31854677200317383 0.03688944876194 0.028426039963960648
+Ka 1 1 1
+Ks 0 0 0
+d 1
+illum 1
+
+newmtl Pupil
+Kd 0.009721217676997185 0.00802319310605526 0.009721217676997185
+Ka 1 1 1
+Ks 0 0 0
+d 1
+illum 1

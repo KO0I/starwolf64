@@ -1,0 +1,29 @@
+{
+  "loaded": true,
+  "clips": [
+    "Idle",
+    "Run",
+    "Talk"
+  ],
+  "height": 1.855872072518286,
+  "triangles": 406,
+  "meshes": 56,
+  "defaultAnimation": "Idle",
+  "animationNodeDeltas": {
+    "Idle": 0.014858383492104908,
+    "Run": 1.9688959176127718,
+    "Talk": 0.1246124806221306
+  },
+  "wireframe": true,
+  "resetTarget": [
+    -0.006979885078797628,
+    0.9011090285047845,
+    0.019260892672208325
+  ],
+  "mobile": {
+    "width": 390,
+    "overflow": false,
+    "loaded": "true"
+  },
+  "consoleExceptions": 0
+}

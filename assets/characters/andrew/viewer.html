@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Andrew | 3D viewer</title>
+<style>
+  html, body { margin:0; height:100%; overflow:hidden; font-family:sans-serif; background:#111; color:#eee; }
+  #viewer { width:100%; height:100%; display:block; }
+  #ui {
+    position:absolute; top:10px; left:10px; background:rgba(0,0,0,0.6); padding:10px; border-radius:5px; max-width:300px;
+  }
+  #ui h1 { margin:0 0 5px 0; font-size:1.2em; }
+  #ui button, #ui select, #ui label { margin:2px; }
+  a { color:#c5c8ff; }
+  button,select { cursor:pointer; min-height:28px; }
+  @media(max-width:599px) { #ui { top:auto; bottom:10px; left:10px; right:10px; max-width:none; } #ui p { margin:4px 0; } }
+  #error { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); color:#f66; font-size:1.2em; }
+</style>
+<!-- Import map for three.js v0.170.0 -->
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+  }
+}
+</script>
+</head>
+<body>
+<canvas id="viewer"></canvas>
+<div id="ui">
+  <h1>Andrew</h1>
+  <p>Drag to orbit</p>
+  <button data-view="front">Front</button>
+  <button data-view="3/4">3/4</button>
+  <button data-view="side">Side</button>
+  <button data-view="back">Back</button>
+  <button id="reset">Reset</button>
+  <label><input type="checkbox" id="wireframe"> Wireframe</label>
+  <br/>
+  <select id="animSelect" style="display:none;"></select>
+  <br/>
+  <a href="./andrew.glb" download>Download GLB</a> |
+  <a href="./andrew-character.zip" download>Download ZIP</a>
+</div>
+<div id="error" role="status">Loading Andrew... If this remains visible, check your internet connection for the Three.js CDN and serve this folder over HTTP.</div>
+<script type="module">
+import * as THREE from "three";
+import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+
+let scene, camera, renderer, controls, mixer;
+let model;
+let clips = [];
+let fitDistance = 3;
+let clock = new THREE.Clock();
+const stageHeight = () => innerWidth < 600 ? Math.max(250, innerHeight - 185) : innerHeight;
+
+init();
+animate();
+
+function init() {
+  const canvas = document.getElementById('viewer');
+  renderer = new THREE.WebGLRenderer({ canvas, antialias:true, alpha:true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setSize(window.innerWidth, stageHeight());
+  renderer.shadowMap.enabled = false;
+
+  scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x111111);
+
+  camera = new THREE.PerspectiveCamera(45, window.innerWidth / stageHeight(), 0.1, 100);
+  camera.position.set(0, 1.6, 2);
+
+  controls = new OrbitControls(camera, renderer.domElement);
+  controls.target.set(0, 1, 0);
+  controls.update();
+
+  // lights
+  const hemi = new THREE.HemisphereLight(0xffffff, 0x444444, 1.2);
+  scene.add(hemi);
+  const fill = new THREE.DirectionalLight(0xa8c5ff, 1.1);
+  fill.position.set(-3, 2, -2); scene.add(fill);
+  const dir = new THREE.DirectionalLight(0xffeed6, 2.4);
+  dir.position.set(5,10,7);
+  dir.castShadow = false;
+  dir.shadow.camera.top = 10;
+  dir.shadow.camera.bottom = -10;
+  dir.shadow.camera.left = -10;
+  dir.shadow.camera.right = 10;
+  scene.add(dir);
+
+  // floor grid
+  const grid = new THREE.GridHelper(10, 20, 0x555555, 0x222222);
+  grid.receiveShadow = true;
+  scene.add(grid);
+
+  // load model
+  const loader = new GLTFLoader();
+  loader.load('./andrew.glb', gltf => {
+    model = gltf.scene;
+    clips = gltf.animations;
+    window.andrew = {model, clips, camera, controls, renderer};
+    document.body.dataset.loaded = 'true';
+    document.getElementById('error').style.display = 'none';
+    model.traverse(o => { o.castShadow = false; o.receiveShadow = false; });
+    scene.add(model);
+    fitCameraToObject(model);
+    setupAnimations(gltf);
+  }, undefined, err => {
+    console.error('GLTF load error', err);
+    const errDiv = document.createElement('div');
+    errDiv.style.position='absolute'; errDiv.style.top='50%'; errDiv.style.left='50%';
+    errDiv.style.transform='translate(-50%,-50%)'; errDiv.style.color='#f66';
+    errDiv.textContent='Could not load andrew.glb. Serve this folder with python3 -m http.server 8653, then open http://localhost:8653/viewer.html.';
+    document.body.appendChild(errDiv);
+  });
+
+  window.addEventListener('resize', onWindowResize);
+  setupUI();
+}
+
+function fitCameraToObject(object) {
+  const box = new THREE.Box3().setFromObject(object);
+  const size = box.getSize(new THREE.Vector3());
+  const center = box.getCenter(new THREE.Vector3());
+  const maxDim = Math.max(size.y, size.x / camera.aspect);
+  const fov = camera.fov * (Math.PI/180);
+  let distance = maxDim / (2 * Math.tan(fov/2));
+  distance *= 1.28;
+  fitDistance = distance;
+  const dir = new THREE.Vector3().subVectors(camera.position, controls.target).normalize();
+  camera.position.copy(dir.multiplyScalar(distance).add(center));
+  controls.target.copy(center);
+  controls.update();
+  controls.saveState();
+}
+
+function setupAnimations(gltf) {
+  const animSelect = document.getElementById('animSelect');
+  if (!gltf.animations || gltf.animations.length===0) { animSelect.style.display='none'; return; }
+  mixer = new THREE.AnimationMixer(gltf.scene);
+  gltf.animations.forEach((clip) => {
+    const option = document.createElement('option');
+    option.value = clip.name;
+    option.textContent = clip.name;
+    animSelect.appendChild(option);
+  });
+  // default to Idle if present
+  const defaultName = gltf.animations.find(c=>c.name.toLowerCase().includes('idle'))?.name || gltf.animations[0].name;
+  animSelect.value = defaultName;
+  playAnimation(defaultName);
+  animSelect.addEventListener('change', e=>{ playAnimation(e.target.value); });
+  animSelect.style.display='inline';
+}
+
+function playAnimation(name) {
+  if (!mixer) return;
+  mixer.stopAllAction();
+  const clip = THREE.AnimationClip.findByName(clips, name);
+  if (clip) {
+    const action = mixer.clipAction(clip);
+    action.reset();
+    action.play();
+    document.body.dataset.animation = name;
+  }
+}
+
+function setupUI() {
+  document.querySelectorAll('#ui button[data-view]').forEach(btn=>{
+    btn.addEventListener('click',()=>{ setView(btn.dataset.view); });
+  });
+  document.getElementById('reset').addEventListener('click',()=>{ controls.reset(); });
+  document.getElementById('wireframe').addEventListener('change',e=>{ toggleWireframe(e.target.checked); });
+}
+
+function setView(name){
+  if (!model) return;
+  const box = new THREE.Box3().setFromObject(model);
+  const center = box.getCenter(new THREE.Vector3());
+  const distance = fitDistance;
+  let pos = new THREE.Vector3();
+  switch(name){
+    case 'front': pos.set(0,0, distance); break;
+    case 'back': pos.set(0,0,-distance); break;
+    case 'side': pos.set(distance,0,0); break;
+    case '3/4': pos.set(distance/Math.sqrt(2),0,distance/Math.sqrt(2)); break;
+    default: pos.set(0,0,distance);
+  }
+  camera.position.copy(pos.add(center));
+  controls.target.copy(center);
+  controls.update();
+}
+
+function toggleWireframe(enable){
+  if (!model) return;
+  model.traverse(o=>{ if (o.isMesh && o.material){ for (const material of (Array.isArray(o.material) ? o.material : [o.material])) material.wireframe = enable; } });
+}
+
+function onWindowResize(){
+  camera.aspect = window.innerWidth/stageHeight();
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, stageHeight());
+  if (model) fitCameraToObject(model);
+}
+
+function animate(){
+  requestAnimationFrame(animate);
+  const delta = clock.getDelta();
+  if (mixer) mixer.update(delta);
+  renderer.render(scene, camera);
+}
+</script>
+</body>
+</html>

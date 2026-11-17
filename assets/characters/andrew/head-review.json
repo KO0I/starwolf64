@@ -1,0 +1,25 @@
+{
+  "design_review": "Andross family resemblance",
+  "baseline_sha256": "42869ab2512639dbb603129c48c474889bd86f85f0ec8db1a821492b4d1378f2",
+  "traits": [
+    "broader lower jaw",
+    "heavier brow ridge",
+    "shorter wider red nasal bridge",
+    "paired nostrils"
+  ],
+  "retained": [
+    "split navy and cream palette",
+    "pointed red ears",
+    "narrow ivory eyes"
+  ],
+  "head_triangle_budget": 160,
+  "height_factor": 1.2,
+  "height_anchor_y": 1.095,
+  "reference_sha256": {
+    "andross-radio-reference.png": "1f27f5842aa17c452985a166f91e0c0b0b152a893c192cadccd70d854624531d",
+    "andross-ending-reference.png": "78b83736bfcaa62defe04ee6dd47666eedb1f8e9ecdd1900c7d41625bd615d44",
+    "andrew-radio-reference.png": "5d1c515a61da45b51e63b8387e0de9b3c1b9a1b265d16055ba4662b8ae65c5b8"
+  },
+  "interpretation": "Shared simian facial structure; Andrew retains the supplied identity and color split.",
+  "head_sha256": "abe8fd8a2c99985308004e44d94c3dab210c8dd9423d8fe013db830f3072281c"
+}

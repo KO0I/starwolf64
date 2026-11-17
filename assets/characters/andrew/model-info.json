@@ -1,0 +1,38 @@
+{
+  "name": "Andrew",
+  "body_source": "characters/fox/title/body.glb",
+  "source_sha256": "4942f00311d9d87822d70b8fd26f3528073505803c1dda0d093b9cd6968f8097",
+  "body_triangles": 246,
+  "head_triangles": 160,
+  "head_triangle_budget": 160,
+  "head_height_factor": 1.2,
+  "head_width_and_depth_unchanged": true,
+  "head_base_fixed": true,
+  "protected_face_topology_preserved": true,
+  "closed_simplified_parts": true,
+  "triangles": 406,
+  "height_m": 1.8290125950772007,
+  "fox_body_positions_normals_uvs_unchanged": true,
+  "fox_body_triangles_unchanged": true,
+  "fox_body_transforms_unchanged": true,
+  "fox_idle_and_run_animation_samples_unchanged": true,
+  "andrew_head_matches_reviewed_source": true,
+  "family_resemblance_checks": {
+    "jaw_width_ratio": 1.1799999475479126,
+    "nasal_projection_reduced_m": 0.03960001468658447,
+    "paired_nostrils": true,
+    "pointed_ear_outlines_preserved": true,
+    "head_palette_unchanged": true
+  },
+  "head_sha256": "abe8fd8a2c99985308004e44d94c3dab210c8dd9423d8fe013db830f3072281c",
+  "animations": [
+    "Idle",
+    "Run",
+    "Talk"
+  ],
+  "self_contained_glb": true,
+  "valid_geometry": true,
+  "rig": "Original Fox rigid limb hierarchy",
+  "sha256": "07618e5f97a05d8060444c791f0537eb33576bb9489f1a727e057bdd2d1651d0",
+  "mesh_objects": 33
+}
