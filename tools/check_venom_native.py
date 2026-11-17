@@ -12,6 +12,9 @@ ROOT = Path(__file__).resolve().parents[1]
 PROBE = r'''
 import gdb, json, subprocess, re
 OUT = OUTPUT_PATH
+skip_opening = SKIP_OPENING_MODE
+cloud_draws = 0
+cloud_wingmen_drawn = set()
 phase = 'boot'
 frames = 0
 phase_frame = 0
@@ -128,6 +131,10 @@ class Frame(gdb.Breakpoint):
 
 class WingmanDraw(gdb.Breakpoint):
     def stop(self):
+        if phase == 'cloud':
+            index=num('this->index')
+            if num('sizeof(gActors)/sizeof(gActors[0])')-3 <= index < num('sizeof(gActors)/sizeof(gActors[0])'):
+                cloud_wingmen_drawn.add(index)
         if phase in ('escape', 'escape_samples'):
             index=num('this->index')
             if num("sizeof(gActors)/sizeof(gActors[0])")-3<=index<num("sizeof(gActors)/sizeof(gActors[0])"): escape_wingmen_drawn.add(index)
@@ -139,12 +146,19 @@ class OpeningPlanetDraw(gdb.Breakpoint):
         if phase == 'title_planet': opening_planet_draws += 1
         return False
 
+class CloudDraw(gdb.Breakpoint):
+    def stop(self):
+        global cloud_draws
+        if phase == 'cloud': cloud_draws += 1
+        return False
+
+CloudDraw('Effect_Clouds_Draw', internal=True).silent=True
 OpeningPlanetDraw('Title_Corneria_Draw', internal=True).silent=True
 WingmanDraw('ActorTeamArwing_Draw', internal=True).silent=True
 frame_breakpoint = Frame('CrewChatter_Commit', internal=True)
 frame_breakpoint.silent = True
 gdb.execute('run', to_string=True)
-while frames < 2400:
+while frames < 4200:
     frames += 1
     age = frames - phase_frame
     if frames % 20 == 0:
@@ -199,6 +213,42 @@ while frames < 2400:
         phase, phase_frame = 'start_venom', frames
     elif phase == 'start_venom' and num('gGameState == GSTATE_PLAY && gPlayState == PLAY_UPDATE'):
         check('gCurrentLevel == LEVEL_VENOM_2 && gLevelPhase == 0 && gMissionNumber == 0')
+        phase, phase_frame = 'cloud', frames
+    elif phase == 'cloud' and age >= 5:
+        check('gActors[0].obj.status == OBJ_ACTIVE && gActors[0].aiType == AI360_EVENT_HANDLER')
+        for i in range(4,8): check('gActors[%d].obj.status == OBJ_FREE'%i)
+        if num('gVenomMissionPhase == VENOM_CLOUD_OPENING'):
+            for i in range(57,60):
+                check('gActors[%d].obj.status == OBJ_ACTIVE && gActors[%d].obj.id == OBJ_ACTOR_CUTSCENE'%(i,i))
+                check('gActors[%d].iwork[14] == %d'%(i,i-55))
+            state = num('gPlayer[0].csState')
+            timer = num('gPlayer[0].csTimer')
+            if (state == 1 and timer in (200,80)) or (state in (4,6,7) and timer == 60):
+                name = {1:'opening',4:'panther',6:'krystal',7:'kami'}[state]
+                if state == 1 and timer == 80: name = 'wings-open'
+                capture('venom-cloud-' + name)
+                report['cloud_' + name] = {'frame':num('gCsFrameCount'),'timer':timer}
+            if skip_opening and age >= 540:
+                setv('gControllerPress[gMainController].button', 4096)
+                call('(void)VenomMission_Intro(&gPlayer[0])')
+                setv('gControllerPress[gMainController].button', 0)
+                report['cloud_start_skip_requested'] = True
+                phase, phase_frame = 'cloud_skip_wait', frames
+        elif num('gVenomMissionPhase == VENOM_ARRIVAL'):
+            check('gPlayer[0].state == PLAYERSTATE_LEVEL_INTRO && gCsFrameCount == 0')
+            assert all('cloud_' + name in report for name in ('opening','panther','krystal','kami','wings-open'))
+            assert cloud_draws > 0, 'Cloud effects were not rendered'
+            assert cloud_wingmen_drawn == {57,58,59}, cloud_wingmen_drawn
+            report['cloud_draws'] = cloud_draws
+            report['cloud_wingmen_drawn'] = sorted(cloud_wingmen_drawn)
+            report['cloud_opening_handoff'] = True
+            phase, phase_frame = 'arrival', frames
+        else: raise AssertionError('unexpected cloud phase')
+    elif phase == 'cloud_skip_wait' and num('gVenomMissionPhase == VENOM_ARRIVAL'):
+        check('gPlayer[0].state == PLAYERSTATE_LEVEL_INTRO && gCsFrameCount == 0')
+        check('gActors[0].obj.status == OBJ_ACTIVE && gActors[0].aiType == AI360_EVENT_HANDLER')
+        for i in range(57,60): check('gActors[%d].obj.status == OBJ_FREE'%i)
+        report['cloud_start_skip_handoff'] = True
         phase, phase_frame = 'arrival', frames
     elif phase == 'arrival' and age >= 100:
         check('gVenomMissionPhase == VENOM_ARRIVAL')
@@ -206,6 +256,12 @@ while frames < 2400:
         check('gActors[1].iwork[14] == 2 && gActors[2].iwork[14] == 3 && gActors[3].iwork[14] == 4')
         capture('venom-descent')
         report['current_team_descent'] = True
+        if skip_opening:
+            setv('gControllerPress[gMainController].button', 4096)
+            call('(void)VenomMission_Intro(&gPlayer[0])')
+            setv('gControllerPress[gMainController].button', 0)
+            check('gCsFrameCount == 250')
+            report['descent_start_skip'] = True
         phase, phase_frame = 'battle_wait', frames
     elif phase == 'battle_wait' and num('gVenomMissionPhase == VENOM_STAR_FOX_BATTLE'):
         check('gPlayer[0].state == PLAYERSTATE_ACTIVE')
@@ -375,9 +431,10 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--native-build', type=Path, required=True, help='Existing native build with prepared game archives')
     parser.add_argument('--executable', type=Path, default=ROOT/'build/venom-preview/Starship')
+    parser.add_argument('--skip-opening', action='store_true', help='Check Start-button skipping of clouds and descent')
     args = parser.parse_args()
     assets = args.native_build.resolve()
-    output = ROOT/'build/venom-check'
+    output = ROOT/('build/venom-check-skip' if args.skip_opening else 'build/venom-check')
     output.mkdir(parents=True, exist_ok=True)
     session = Path(tempfile.mkdtemp(prefix='session-', dir=output))
     (session/'mods').mkdir()
@@ -389,14 +446,14 @@ def main():
                 (session/'mods'/mod.name).symlink_to(mod)
     script = output/'probe.gdb'
     script.write_text('set pagination off\nset confirm off\nset print thread-events off\nset debuginfod enabled off\npython\n' +
-                      PROBE.replace('OUTPUT_PATH', repr(str(output))) + '\nend\nquit 0\n')
+                      PROBE.replace('OUTPUT_PATH', repr(str(output))).replace('SKIP_OPENING_MODE', repr(args.skip_opening)) + '\nend\nquit 0\n')
     env = dict(os.environ, SHIP_HOME=str(session), SDL_AUDIODRIVER='dummy', LIBGL_ALWAYS_SOFTWARE='1')
     (output/'result.json').unlink(missing_ok=True)
     with (output/'engine.log').open('w') as log:
         process = subprocess.Popen(['xvfb-run', '-a', '-s', '-screen 0 1024x768x24', 'gdb', '-q', '-batch', '-x', str(script), str(args.executable.resolve())],
                                    cwd=session, env=env, stdout=log, stderr=subprocess.STDOUT, start_new_session=True)
         try:
-            code = process.wait(timeout=150)
+            code = process.wait(timeout=240)
         except subprocess.TimeoutExpired:
             os.killpg(process.pid, signal.SIGTERM)
             try:

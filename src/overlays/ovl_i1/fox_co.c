@@ -2867,11 +2867,11 @@ void Corneria_CsTeamSetup(ActorCutscene* this, s32 teamIdx) {
     AUDIO_PLAY_SFX(NA_SE_ARWING_ENGINE_FG, this->sfxSource, 4);
 }
 
-void Corneria_LevelStart(Player* player) {
+bool Cutscene_CloudOpening(Player* player, s32 firstTeamActor, const Vec3f* closeupEyeOffset, bool finishOnRails) {
     s32 i;
-    ActorCutscene* falco = &gActors[0];
-    ActorCutscene* slippy = &gActors[1];
-    ActorCutscene* peppy = &gActors[2];
+    ActorCutscene* falco = &gActors[firstTeamActor];
+    ActorCutscene* slippy = &gActors[firstTeamActor + 1];
+    ActorCutscene* peppy = &gActors[firstTeamActor + 2];
     f32 sp44;
     f32 sp40;
     f32 x;
@@ -3012,9 +3012,9 @@ void Corneria_LevelStart(Player* player) {
                 Math_SmoothStepToF(&D_ctx_80177A48[0], 0.01f, 1.0f, 0.0005f, 0.0f);
             }
 
-            gCsCamEyeX = player->pos.x - 150.0f;
-            gCsCamEyeY = player->pos.y - 70.0f;
-            gCsCamEyeZ = player->trueZpos + 150.0f;
+            gCsCamEyeX = player->pos.x + closeupEyeOffset->x;
+            gCsCamEyeY = player->pos.y + closeupEyeOffset->y;
+            gCsCamEyeZ = player->trueZpos + closeupEyeOffset->z;
 
             gCsCamAtX = player->pos.x;
             gCsCamAtY = player->pos.y;
@@ -3332,6 +3332,7 @@ void Corneria_LevelStart(Player* player) {
             }
 
             if (gFillScreenAlpha == 255) {
+                if (!finishOnRails) return true;
                 AUDIO_PLAY_BGM(gBgmSeqId);
 
                 Object_Kill(&falco->obj, falco->sfxSource);
@@ -3387,6 +3388,12 @@ void Corneria_LevelStart(Player* player) {
     peppy->obj.pos.y -= 3.0f;
     slippy->vwork[20].y -= 3.0f;
     slippy->obj.pos.y -= 3.0f;
+    return false;
+}
+
+void Corneria_LevelStart(Player* player) {
+    static const Vec3f closeupEyeOffset = { -150.0f, -70.0f, 150.0f };
+    Cutscene_CloudOpening(player, 0, &closeupEyeOffset, true);
 }
 
 f32 D_i1_80199AE4[3] = { -1500.0f, 700.0f, 0.0f };

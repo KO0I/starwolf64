@@ -1,4 +1,5 @@
 #include "global.h"
+#include "i1.h"
 #include "venom_mission.h"
 #include "assets/ast_venom_1.h"
 #include <stdlib.h>
@@ -56,7 +57,45 @@ static void VenomMission_EntryPose(s32 ship, s32 frame, Vec3f* pos, Vec3f* rot) 
     rot->z *= 1.0f - (f32) frame / VENOM_ARRIVAL_FRAMES;
 }
 
+static bool VenomMission_CloudOpening(Player* player) {
+    static const Vec3f closeupEyeOffset = { -200.0f, 100.0f, -300.0f };
+    if (player->csState == 0) {
+        player->pos.x = player->pos.z = player->trueZpos = player->camDist = 0.0f;
+        player->rot.x = player->rot.y = player->rot.z = player->yRot_114 = player->bankAngle = 0.0f;
+        player->baseSpeed = 0.0f;
+        player->vel.x = player->vel.y = player->vel.z = 0.0f;
+        player->wingPosition = 1;
+        player->camRoll = 0.0f;
+        AUDIO_PLAY_BGM(NA_BGM_START_DEMO);
+    } else if ((gCsFrameCount > 60) && (gControllerPress[gMainController].button & START_BUTTON)) {
+        player->csState = 9;
+        player->csTimer = 0;
+        Audio_ClearVoice();
+    }
+    if (!Cutscene_CloudOpening(player, VENOM_WINGMAN_FIRST, &closeupEyeOffset, false)) return true;
+
+    for (s32 i = VENOM_WINGMAN_FIRST; i <= VENOM_WINGMAN_LAST; i++) {
+        Object_Kill(&gActors[i].obj, gActors[i].sfxSource);
+    }
+    for (s32 i = 0; i < ARRAY_COUNT(gEffects); i++) {
+        if (gEffects[i].obj.id == OBJ_EFFECT_CLOUDS) Object_Kill(&gEffects[i].obj, gEffects[i].sfxSource);
+    }
+    gVenomMissionPhase = VENOM_ARRIVAL;
+    gCsFrameCount = player->csState = player->csTimer = 0;
+    player->camRoll = player->camDist = player->yBob = player->rockAngle = 0.0f;
+    player->wingPosition = 0;
+    player->arwing.wingsZrot = player->arwing.teamFaceXrot = 0.0f;
+    player->arwing.upperRightFlapYrot = player->arwing.upperLeftFlapYrot = 0.0f;
+    player->arwing.bottomRightFlapYrot = player->arwing.bottomLeftFlapYrot = 0.0f;
+    player->unk_190 = player->unk_194 = 0.0f;
+    D_ctx_80177950 = 1.0f;
+    for (s32 i = 0; i < ARRAY_COUNT(gPlayerGlareAlphas); i++) gPlayerGlareAlphas[i] = 0;
+    Audio_ClearVoice();
+    return false;
+}
+
 void VenomMission_Intro(Player* player) {
+    if ((gVenomMissionPhase == VENOM_CLOUD_OPENING) && VenomMission_CloudOpening(player)) return;
     Vec3f rot;
     s32 frame = gCsFrameCount;
     f32 follow;
@@ -120,14 +159,20 @@ static void VenomMission_StartBattle(Actor* event) {
 
 void VenomMission_ArenaEvents(Actor* event) {
     if (event->state == 0) {
-        gVenomMissionPhase = VENOM_ARRIVAL;
+        gVenomMissionPhase = VENOM_CLOUD_OPENING;
+        gPlayer[0].csState = 0;
         gAllRangeFrameCount = gStarWolfMsgTimer = 0;
         gCsFrameCount = 0;
         for (s32 i = 0; i < 4; i++) gStarWolfTeamAlive[i] = 1;
         event->state = 1;
         gPlayer[0].state = PLAYERSTATE_LEVEL_INTRO;
     }
-    if (gVenomMissionPhase == VENOM_ARRIVAL) {
+    if (gVenomMissionPhase == VENOM_CLOUD_OPENING) {
+        for (s32 i = 1; i <= 3; i++) {
+            gActors[i].obj.pos.y = -10000.0f;
+            gActors[i].vel.x = gActors[i].vel.y = gActors[i].vel.z = 0.0f;
+        }
+    } else if (gVenomMissionPhase == VENOM_ARRIVAL) {
         for (s32 i = 1; i <= 3; i++) {
             Actor* ally = &gActors[i];
             if (ally->obj.status == OBJ_FREE) continue;
@@ -187,7 +232,8 @@ void VenomMission_Departure(Player* player) {
 }
 
 bool VenomMission_UpdateActor(Actor* actor) {
-    if (VenomMission_IsArena() && (gVenomMissionPhase == VENOM_ARRIVAL) &&
+    if (VenomMission_IsArena() &&
+        ((gVenomMissionPhase == VENOM_CLOUD_OPENING) || (gVenomMissionPhase == VENOM_ARRIVAL)) &&
         (actor->aiType >= AI360_FALCO) && (actor->aiType <= AI360_PEPPY)) {
         return true;
     }

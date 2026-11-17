@@ -11,6 +11,7 @@ extern Gfx* D_VE1_8019A008[];
 extern f32 aVe1GolemechHitbox[];
 
 extern void Corneria_LevelStart(Player*);
+bool Cutscene_CloudOpening(Player*, s32 firstTeamActor, const Vec3f* closeupEyeOffset, bool finishOnRails);
 extern void Corneria_LevelComplete1(Player*);
 extern void Venom1_LevelStart(Player*);
 
