@@ -19,33 +19,56 @@ export async function checkSixDofFlight({value, sleep, call, output}) {
     return wait(current=>current.frames>=start.frames+count);
   };
   const angle = degrees => ((degrees+540)%360)-180;
-  const checkAssistIndicator=async active=>{
-    const button=await value(`(()=>{const b=document.querySelector('[data-button="0x0001"]');return {title:b.title,label:b.getAttribute('aria-label'),pressed:b.getAttribute('aria-pressed'),background:getComputedStyle(b).backgroundImage}})()`);
-    if(button.pressed!==String(active)||button.title!==(active?'flight assist off':'')||
-       button.background.includes('rgb(146, 255, 255)')!==active||
-       (active&&!button.label.includes('flight assist off')))
-      throw Error('C-right flight-assist indicator is incorrect: '+JSON.stringify({active,button}));
-    return button;
+  const checkAssistIndicator=async(active,ready,name)=>{
+    const deadline=Date.now()+45000;
+    while(Date.now()<deadline) {
+      const button=await value(`(()=>{
+        const b=document.querySelector('[data-button="0x0001"]'),s=window.STARSHIP_GAME_STATE;
+        return {title:b.title,label:b.getAttribute('aria-label'),pressed:b.getAttribute('aria-pressed'),
+          background:getComputedStyle(b).backgroundImage,active:s.sixDof,ready:s.canToggleSixDof,
+          incoming:!!s.callTimer,message:!!(s.radioState||s.voiceId)};
+      })()`);
+      if(button.active!==active) throw Error('6DOF mode changed unexpectedly: '+JSON.stringify(button));
+      if(button.ready!==ready) {await sleep(80);continue;}
+      const title=button.incoming?'Answer incoming radio call':button.message?'Radio message in progress':
+        ready?(active?'Toggle 6DOF flight off':'Toggle 6DOF flight on'):'';
+      const color=ready?'rgb(146, 255, 255)':'rgb(255, 230, 140)';
+      if(button.pressed!==String(active)||button.title!==title||!button.label.includes(title)||
+         !button.background.includes(color))
+        throw Error('C-right availability color is incorrect: '+JSON.stringify({active,ready,button}));
+      if(name) {
+        const box=await value(`(()=>{const r=document.querySelector('[data-button="0x0001"]').getBoundingClientRect(),f=window.frameElement?.getBoundingClientRect();return{x:r.x+(f?.x??0)+window.top.scrollX-6,y:r.y+(f?.y??0)+window.top.scrollY-6,width:r.width+12,height:r.height+12,scale:1};})()`);
+        const shot=await call('Page.captureScreenshot',{format:'png',clip:box});
+        await writeFile(resolve(output,name+'.png'),Buffer.from(shot.data,'base64'));
+      }
+      return button;
+    }
+    throw Error('C-right did not reach the expected availability: '+JSON.stringify({active,ready,state:await state()}));
   };
   const initial=await state();
   if(initial.sixDof) throw Error('6DOF must be off by default');
-  await checkAssistIndicator(false);
+  const readyOffIndicator=await checkAssistIndicator(false,true,"c-right-ready-off");
   if(initial.levelMode!==0) throw Error('Expected on-rails Training for the browser control check');
   if(!await value(`document.getElementById('six-dof')===null&&typeof Module._Wasm_SetSixDof==='undefined'`))
     throw Error('The external 6DOF toggle is still exposed');
-  const idle=current=>current.radioState===0&&current.callTimer===0&&current.voiceId===0;
+  const idle=current=>current.canToggleSixDof;
   await value('Module._Wasm_ProbeVoice(2050,0,99)');
   await wait(current=>current.voiceId===2050);
   await pad(0,0,1);await frames(20);
   const busy=await state();
   if(busy.sixDof) throw Error('C-right toggled while a message was playing');
-  await checkAssistIndicator(false);
+  const messageOffIndicator=await checkAssistIndicator(false,false,"c-right-message-off");
   await wait(idle);await frames(20);
   if((await state()).sixDof) throw Error('Holding C-right toggled when a message finished');
   await pad();await frames(20);await wait(idle);
   await pad(0,0,1);await wait(current=>current.sixDof);await frames(40);
   if(!(await state()).sixDof) throw Error('Holding C-right repeatedly toggled 6DOF');
-  const assistIndicator=await checkAssistIndicator(true);
+  const assistIndicator=await checkAssistIndicator(true,true,"c-right-ready-on");
+  await pad();await frames(20);
+  await value('Module._Wasm_ProbeVoice(2050,0,99)');
+  await wait(current=>current.voiceId===2050);
+  await pad(0,0,1);await frames(20);
+  const messageOnIndicator=await checkAssistIndicator(true,false,"c-right-message-on");
   await pad();await frames(60);
   const captureHud=async(name,current,visible)=>{
     const box=await value(`(()=>{const r=document.getElementById('canvas').getBoundingClientRect(),frame=window.frameElement?.getBoundingClientRect();return{x:r.x+(frame?.x??0)+window.top.scrollX+(160-24)*r.width/320,y:r.y+(frame?.y??0)+window.top.scrollY+(66-25)*r.height/240,width:48*r.width/320,height:55*r.height/240,scale:1};})()`);
@@ -75,7 +98,13 @@ export async function checkSixDofFlight({value, sleep, call, output}) {
     })()`});
     if(evaluation.exceptionDetails) throw Error(JSON.stringify(evaluation.exceptionDetails));
     const {points,...pixels}=evaluation.result.value;
+    const frameSegments=Array.from({length:24},(_,index)=>{
+      const angle=index*Math.PI/12,x=21*Math.cos(angle),y=21*Math.sin(angle);
+      return points.some(point=>Math.hypot(point.x-x,point.y-y)<1.5);
+    }).filter(Boolean).length;
+    pixels.frameSegments=frameSegments;
     if(visible) {
+      if(frameSegments<18) throw Error('Attitude indicator frame is missing: '+JSON.stringify(pixels));
       if(pixels.counts[0]<80) throw Error('Green wireframe attitude indicator is missing: '+JSON.stringify(pixels));
       if(pixels.counts.slice(1,4).some(n=>n>5)) throw Error('Attitude indicator still has colored fills: '+JSON.stringify(pixels));
       const pitch=current.playerPitch*Math.PI/180,roll=current.playerRoll*Math.PI/180;
@@ -98,7 +127,7 @@ export async function checkSixDofFlight({value, sleep, call, output}) {
       if(horizon.length<8) throw Error('Wireframe horizon does not match craft attitude: '+JSON.stringify({current,pixels,horizon:horizon.length}));
       if(!points.some(point=>Math.abs(point.x+8)<2&&Math.abs(point.y)<2)) throw Error('Fixed green craft marker is missing');
       pixels.horizon=horizon.length;
-    } else if(points.filter(point=>point.x*point.x+point.y*point.y<=22*22).length>5) throw Error('Attitude indicator remained after disabling 6DOF');
+    } else if(frameSegments>=18) throw Error('Attitude indicator remained after disabling 6DOF');
     return pixels;
   };
   const samples=[];
@@ -140,10 +169,11 @@ export async function checkSixDofFlight({value, sleep, call, output}) {
     if(!await value(`localStorage.getItem('starship-six-dof')==='1'`)) throw Error('6DOF preference was not saved');
     await wait(idle);await pad(0,0,1);await wait(current=>!current.sixDof);
     await pad();await frames(100);
-    await checkAssistIndicator(false);
+    await checkAssistIndicator(false,true);
     const hiddenHud=await captureHud('6dof-attitude-off',await state(),false);
     await pad(85);const standard=await frames(60);await pad();
     if(standard.playerYaw>=-10) throw Error('Standard yaw controls were not restored');
-    return {busy,samples,right,standard,hiddenHud,assistIndicator,persisted:true};
+    return {busy,samples,right,standard,hiddenHud,assistIndicator,readyOffIndicator,
+      messageOffIndicator,messageOnIndicator,persisted:true};
   } finally {await pad();}
 }

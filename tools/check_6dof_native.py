@@ -25,6 +25,7 @@ void Audio_PlaySfx(u32 id, f32* source, u8 token, f32* frequency, f32* volume, s
 }
 s32 gPlayState, gRadioState, gCallTimer;
 LevelMode gLevelMode;
+GameState gGameState;
 u8 gLevelType;
 s32 gFovYMode;
 f32 gGroundHeight, gPathProgress;
@@ -52,15 +53,25 @@ int main(void) {
     player.state = PLAYERSTATE_ACTIVE;
     gPlayState = PLAY_UPDATE;
     gLevelMode = LEVELMODE_ON_RAILS;
+    gGameState = GSTATE_PLAY;
+    CHECK(Player_CanToggle6DOF(&player));
+    gGameState = GSTATE_MAP;
+    CHECK(!Player_CanToggle6DOF(&player));
+    gGameState = GSTATE_PLAY;
     pad.button = R_CBUTTONS | A_BUTTON;
     Player_Update6DOFToggle(&player);
     CHECK(enabled && saves == 1 && pad.button == A_BUTTON);
     CHECK(sfxCalls == 1 && playedSfx == NA_SE_MAP_WINDOW_OPEN && playedSource == gDefaultSfxSource && playedToken == 4);
+    CHECK(Player_CanToggle6DOF(&player));
+    gRadioState = 4;
+    CHECK(!Player_CanToggle6DOF(&player));
+    gRadioState = 0;
     Player_Update6DOFToggle(&player);
     CHECK(enabled && saves == 1 && sfxCalls == 1);
     pad.button = R_CBUTTONS;
     Player_Update6DOFToggle(&player);
     CHECK(!enabled && saves == 2 && pad.button == 0);
+    CHECK(Player_CanToggle6DOF(&player));
     CHECK(sfxCalls == 2 && playedSfx == NA_SE_MAP_WINDOW_CLOSE);
     const int radioStates[] = {1, 4, 6, 100};
     for (int i = 0; i < 4; i++) {

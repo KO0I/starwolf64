@@ -29,7 +29,7 @@ Publish only the exported directory. Keep its licenses and `.nojekyll` file. The
 
 ## Optional 6DOF flight mod
 
-Tap **C-right** during flight to toggle **6DOF flight**. On a keyboard, use the **Right arrow**. It is off by default, and the browser remembers your choice. Incoming calls and active dialogue keep C-right for radio actions; the toggle is available once messages finish. Holding C-right toggles only once per press. Entering 6DOF plays the map window-open sound; returning to normal flight plays the map window-close sound.
+Tap **C-right** during flight to toggle **6DOF flight**. On a keyboard, use the **Right arrow**. It is off by default, and the browser remembers your choice. C-right is light blue whenever 6DOF can be toggled, whether it is on or off. It turns yellow during incoming calls and active dialogue, which keep C-right for radio actions; the toggle is available once messages finish. Holding C-right toggles only once per press. Entering 6DOF plays the map window-open sound; returning to normal flight plays the map window-close sound.
 
 While enabled, a HUD attitude indicator shows a wireframe outline, a rotating horizon, and a fixed craft marker in the same green as the targeting reticle. A faint translucent green fill marks the ground-facing side; the sky-facing side stays clear. It disappears when the mode is disabled.
 

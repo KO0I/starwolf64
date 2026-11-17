@@ -3779,12 +3779,16 @@ static bool Player_Uses6DOF(Player* player) {
     return (player->form == FORM_ARWING) && CVarGetInteger("gSixDofFlight", 0);
 }
 
+bool Player_CanToggle6DOF(const Player* player) {
+    return (gGameState == GSTATE_PLAY) &&
+           (player->num == 0) && (player->form == FORM_ARWING) &&
+           (player->state == PLAYERSTATE_ACTIVE) && (gPlayState == PLAY_UPDATE) &&
+           (gLevelMode != LEVELMODE_TURRET) && !player->somersault &&
+           (gRadioState == 0) && (gCallTimer == 0) && (Audio_GetCurrentVoice() == 0);
+}
+
 static void Player_Update6DOFToggle(Player* player) {
-    if ((player->num != 0) || (player->form != FORM_ARWING) ||
-        (player->state != PLAYERSTATE_ACTIVE) || (gPlayState != PLAY_UPDATE) ||
-        (gLevelMode == LEVELMODE_TURRET) || player->somersault ||
-        !(gInputPress->button & R_CBUTTONS) || (gRadioState != 0) ||
-        (gCallTimer != 0) || (Audio_GetCurrentVoice() != 0)) {
+    if (!(gInputPress->button & R_CBUTTONS) || !Player_CanToggle6DOF(player)) {
         return;
     }
 
