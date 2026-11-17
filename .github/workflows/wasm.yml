@@ -39,7 +39,7 @@ jobs:
       - name: Test archive and mod preparation
         run: |
           python3 -m unittest discover -s tools/wasm -p 'test_*.py' -v
-          node --test tools/wasm/web/zip.test.mjs browser/rom-file.test.mjs browser/rom-patch.test.mjs
+          node --test tools/multiplayer/*.test.mjs tools/shared/*.test.mjs tools/wasm/web/zip.test.mjs browser/rom-file.test.mjs browser/rom-patch.test.mjs
       - name: Install pinned toolchain
         run: python3 tools/wasm/run.py bootstrap
       - name: Cross-build and verify dependencies

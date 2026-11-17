@@ -1,7 +1,7 @@
 # ADR 0005: Bring your own ROM for browser multiplayer
 
 Date: 2026-11-16
-Status: Accepted; implementation and verification in progress.
+Status: Implemented; local extraction, sign-in, storage, downloads, and four-player gameplay verified.
 
 ## Context
 
@@ -46,3 +46,7 @@ Serving extracted archives behind Tailscale was rejected because network access 
 Browser-only persistence requires local storage space and can be evicted by the browser. Missing, corrupt, or incompatible data requires local preparation again. A delayed guest remains outside gameplay while the host continues.
 
 The immediate hosted-asset block was deployed before this migration. It must remain effective throughout the cutover and afterward.
+
+## Verification
+
+The actual WASM extractor reconstructs all 15,898 base resources, 2,742 mod resources, and four port shaders byte for byte against private references. The JavaScript suite passes 78 tests; publication and recipe checks pass 17 Python tests. Real Chromium checks cover 26 four-player ship/gameplay assertions and 22 sign-in, storage, import, download, and main-page handoff assertions. A complete downloaded game reaches the native title through its own launcher without selecting a ROM again. These checks do not establish full-campaign support or remote TURN connectivity.

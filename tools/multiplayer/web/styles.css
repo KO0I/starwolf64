@@ -168,7 +168,7 @@ footer { padding: 4px 0 0; text-align: center; color: #c7bed9; font-size: 13px; 
 .site-ring strong { display: block; color: #f1cdf9; letter-spacing: 1px; }
 .site-ring a { white-space: nowrap; margin: 0 5px; }
 .web-badges { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 15px; }
-.web-badges span { display: flex; flex-direction: column; justify-content: center; width: 100px; min-height: 35px; border: 2px outset #c6c4db; background: #230d49; color: #b7ffff; font: bold 10px/1.25 "Courier New", monospace; }
+.web-badges span, .web-badges .sound-effects-badge, .web-badges .multiplayer-badge { display: flex; flex-direction: column; justify-content: center; width: 100px; min-height: 35px; border: 2px outset #c6c4db; background: #230d49; color: #b7ffff; font: bold 10px/1.25 "Courier New", monospace; }
 .web-badges span:nth-child(2) { background: #171b3e; color: #fff381; }
 .web-badges span:nth-child(3) { background: #440a40; color: #ffcbec; }
 
@@ -286,3 +286,6 @@ main {background:#030318cc;width:min(1120px,100%);}
 #selection-screen:fullscreen{overflow:auto;padding:20px;background:linear-gradient(#050411,#230c5c 35%,#8e1e65 72%,#050411);color:#f1edff;}
 
 .squadron-card .radio-rain{display:block;flex-shrink:0;width:44px;height:44px;border:1px solid #9991bc;background:#030a08;image-rendering:pixelated}.byorom-controls label{display:block;margin:14px 0}.byorom-controls input[type=checkbox]{width:auto}.byorom-controls [role=alert]{color:#ffb7b7}.byorom-controls button{margin:4px}.byorom-controls small{display:block;font-style:italic}
+
+.web-badges .sound-effects-badge{text-decoration:none;min-height:44px}.web-badges .sound-effects-badge:hover{background:#3d0967;color:#fff075}
+.web-badges .multiplayer-badge{text-decoration:none;min-height:44px;background:#075347;color:#d5fff2;border-color:#a2ebd1 #14443c #14443c #a2ebd1}.web-badges .multiplayer-badge:hover{background:#0b6c5e;color:#fff5a3}

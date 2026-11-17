@@ -1,24 +1,21 @@
-# Current WASM mod snapshot
+# Browser mod inputs
 
-`mod/recipe.json` and `mod/literals.dat` reconstruct the current character mod with the Starwolf dialogue-blip add-on applied last. Base resources are referenced by path and content hash. Changed byte ranges and new mod resources are stored as patch data.
+The public site uses the v2 source-bound recipe in mod/recipe.json, XOR changes in mod/literals.dat, and the pinned mod/restoration.bps patch. The browser extracts the base ROM, restores the required mod model locally, and reconstructs the reviewed native resource set. It does not download prepared archives or a raw chatter bank.
 
-`mod/chatter.dat` matches `assets/audio/chatter/bank.bin`. The archive retains that PCM bank, but the dialogue-blip marker selects native sequence playback and suppresses the legacy mixer. The current snapshot includes the crew HUD, Medusa launch updates, reviewed character refinements, and Panther title-eye correction.
+mod/provenance.json records each target, its true base or restored-model inputs, and generator witnesses. Historical snapshot resources distinguish regenerated hashes from reviewed target hashes. The freeze proves exact reconstruction of the reviewed target; it does not claim every current generator reproduces that historical target. mod/archives.json identifies all three resource sets independently of ZIP encoding.
 
-The browser's pinned Torch extractor supplies the original game assets from the visitor's ROM. No base archive or ROM is stored here. The recipe contains each resource hash and a canonical resource-set SHA-256. ZIP timestamps and compression may differ; reconstructed resource bytes must match.
+The target contains 2,742 mod resources. The port archive contains four shaders. The original 15,898 resources come from each visitor's US v1.1 ROM.
 
-To rebuild and verify the snapshot from current sources:
-
-```sh
-python3 tools/wasm/refresh_mod.py
-python3 tools/wasm/refresh_mod.py --check
-```
-
-These commands require the verified base ROM, `sf64.o2r`, and its matching `audio_data` export. The refresh command runs the existing character and audio builders, combines their resource maps in native load order, and compares every reconstructed resource before writing the recipe.
-
-`mod/sources.json` records SHA-256 hashes of versioned asset inputs and the builders' transitive local Python imports. Public export and CI verify these inputs without a ROM:
+Freeze a reviewed native overlay using the existing frozen snapshot as the starting target:
 
 ```sh
-python3 tools/wasm/refresh_mod.py --verify-sources
+python3 -B tools/wasm/freeze_public_mod.py --base /private/sf64.o2r --rom /private/base.z64 --overlay /private/wolfen.o2r --port /private/shader-only-starship.o2r --private-project /path/to/native-authoring-project
+python3 -B tools/wasm/refresh_mod.py --check --base /private/sf64.o2r
+python3 -B tools/wasm/refresh_mod.py --verify-sources
 ```
 
-Commit source changes with the recipe, literals, chatter, and source hashes. The browser's asset fingerprint identifies the snapshot in prepared downloads.
+The authoring project supplies matching private audio reports and portrait source inputs. Unknown resource lineage stops the freeze. Commit reviewed source changes with recipe.json, literals.dat, restoration.bps, provenance.json, archives.json, and sources.json.
+
+Public export needs no ROM. It verifies source hashes, resource coverage, recipe hashes, and the extractor's exact preload inventory. It refuses preloaded runtimes, unexpected extractor payloads, prepared archives, extracted portraits, and generated geometry. The older mod/chatter.dat is a legacy authoring snapshot excluded from publication.
+
+Run the actual WASM extraction check with --reference-base, --reference-mod, and --reference-port to compare every reconstructed resource against private references.

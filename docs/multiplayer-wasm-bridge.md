@@ -7,12 +7,12 @@ One local camera and the single-player HUD draw the participant's native player 
 ## Ownership and messages
 
 `NetworkGame` coordinates a room with a `WasmEngine` instance.
-The engine adapter prepares a same-origin iframe, verifies archive SHA-256 values, and starts the real Emscripten main worker from a launch gesture.
+The engine adapter prepares a same-origin iframe, receives locally verified archives from the shared preparation service, and starts the real Emscripten main worker from a launch gesture.
 The worker alone changes C gameplay state.
 JavaScript submits bounded commands and scene imports through atomic shared-memory mailboxes at frame boundaries.
 
-Protocol version 4 uses the reliable ordered WebRTC channel for controls and admission.
-A guest must match the host's runtime/archive fingerprint and schema before admission.
+Protocol version 5 uses the reliable ordered WebRTC channel for controls and admission.
+A guest must match the host's runtime, schema, ROM revision, and semantic resource-set fingerprint and schema before admission.
 The host sends a reliable baseline, checks its match, epoch, incarnation and tick acknowledgment, then repeats that barrier with a fresh complete image.
 The host worker activates the slot after both imports. Guest controls remain disabled until the imported scene contains that incarnation.
 Per-slot activation/removal commands are serialized. Failed admission cancels only that guest.
@@ -29,6 +29,10 @@ Controls become neutral after 60 host frames without an update.
 Removing a player clears their shots. Fresh admission resets equipment and lock-on state.
 Campaign re-admission can resume the same participant's equipment after a topology change; slot reuse cannot inherit it.
 Host departure ends the session.
+
+## Local asset preparation
+
+Every browser prepares its own ROM. The server pins a publication-audited site and never serves archives, portraits, or ship geometry. Shared preparation verifies all three semantic resource digests and derives presentation locally. Anonymous status carries only hacking/signing-in state and draft hue. Host-accepted confirmation reveals pilot and ship. Withdrawal cancels pending admission and rejects stale world acknowledgments before a new incarnation enters.
 
 ## Native scene format
 

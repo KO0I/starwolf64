@@ -189,14 +189,20 @@ body.club-player {
 @media (max-width:360px) { .club-editor .brand strong { font-size:14px; } }
 
 .byorom-controls input[type=checkbox]{width:auto}.byorom-controls label{margin:16px 0}.byorom-controls small{font-style:italic}.byorom-controls [role=alert]{color:#ffb7b7}.byorom-controls button{margin:4px 2px}
+
+#setup footer .preview-links{display:grid;grid-template-columns:repeat(2,minmax(0,160px));justify-content:center;gap:12px;margin-top:14px}
+#setup footer .preview-link{display:flex;flex-direction:column;justify-content:center;min-width:0;min-height:48px;padding:7px 8px;border:2px outset #c6c4db;background:#230d49;color:#b7ffff;text-decoration:none;font:bold 11px/1.4 "Courier New",monospace;box-shadow:2px 2px #000}
+#setup footer .preview-link:hover{background:#3d0967;color:#fff075}
+#setup footer .multiplayer-badge{background:#075347;color:#d5fff2;border-color:#a2ebd1 #14443c #14443c #a2ebd1}
+#setup footer .preview-link:focus-visible{outline:2px solid #75ffff;outline-offset:4px}
 </style>
 </head><body class="flight-club club-player">
 <main id="setup"><header><h1 class="club-logo">A Wolf In Space</h1></header>
 <p id="intro">Choose your Star Fox 64 US v1.1 ROM. The game and mod are prepared on this device.</p>
 <section><div id="preparation"></div></section>
-<div id="actions"><a href="./multiplayer/" class="multiplayer-entry">Multiplayer / Sargasso Hideout</a><button id="play" disabled>Play</button></div>
+<div id="actions"><button id="play" disabled>Play</button></div>
 <small id="download-note">Includes your prepared game and a Python 3 launcher for desktop use. Keep it for your own use.</small>
-<footer><p>Single player · Keyboard, gamepad and touch</p><a href="https://github.com/KO0I/starwolf64/tree/starwolf/dev">Source and build process</a></footer>
+<footer><p>Single player · Keyboard, gamepad and touch</p><a href="https://github.com/KO0I/starwolf64/tree/starwolf/dev">Source and build process</a><div class="preview-links"><a class="preview-link multiplayer-entry multiplayer-badge" data-multiplayer-link href="./multiplayer/">MULTIPLAYER<br>SARGASSO HIDEOUT</a><a class="preview-link sound-effects-badge" data-sound-effects-link href="https://nepthys.tail1396a4.ts.net:8672/" target="_blank" rel="noopener">SOUND EFFECTS<br>BRING YOUR ROM</a></div></footer>
 </main>
 <div id="toolbar" hidden><button id="back-setup">Back to setup</button><button id="change-rom">Change ROM</button><button id="game-download">Download game</button><span id="play-status" role="status"></span></div>
 <div id="game-host" hidden></div>

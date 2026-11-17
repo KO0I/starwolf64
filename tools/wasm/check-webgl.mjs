@@ -144,7 +144,7 @@ try {
       while(Date.now()<deadline) {
         state=await value('window.STARWOLF_PREPARATION');
         if(state?.phase===phase) return state;
-        if(state?.phase==='error'&&phase!=='error') throw Error('ROM preparation failed: '+await value('document.getElementById("error").textContent'));
+        if(state?.phase==='error'&&phase!=='error') throw Error('ROM preparation failed: '+await value('document.querySelector("[data-byorom-error]").textContent'));
         if(errors.length) throw Error('Browser preparation errors: '+JSON.stringify(errors.slice(0,3)));
         await sleep(100);
       }
@@ -153,12 +153,12 @@ try {
     if(option('--rom')) {
       await waitSite('selecting');
       const document=await call('DOM.getDocument');
-      const input=await call('DOM.querySelector',{nodeId:document.root.nodeId,selector:'#rom'});
+      const input=await call('DOM.querySelector',{nodeId:document.root.nodeId,selector:'[data-byorom-rom]'});
       if(process.argv.includes('--site-invalid')) {
         const invalid=resolve(output,'invalid.z64');await writeFile(invalid,new Uint8Array(4));
         await call('DOM.setFileInputFiles',{nodeId:input.nodeId,files:[invalid]});
         await waitSite('error');
-        if(!await value('document.getElementById("play").disabled&&document.getElementById("download").disabled'))
+        if(!await value('document.getElementById("play").disabled&&document.querySelector("[data-download=game]").disabled'))
           throw Error('Invalid ROM left Play or Download enabled');
       }
       await call('DOM.setFileInputFiles',{nodeId:input.nodeId,files:[resolve(option('--rom'))]});
@@ -170,7 +170,7 @@ try {
     if(process.argv.includes('--site-download')) {
       const downloadPath=await mkdtemp(resolve(output,'game-download-'));
       await call('Browser.setDownloadBehavior',{behavior:'allow',downloadPath});
-      await call('Runtime.evaluate',{expression:'document.getElementById("download").click()',userGesture:true});
+      await call('Runtime.evaluate',{expression:'document.querySelector("[data-download=game]").click()',userGesture:true});
       let downloaded;
       for(let attempt=0;attempt<600;attempt++) {
         downloaded=(await readdir(downloadPath)).find(name=>name.endsWith('.zip'));
@@ -192,6 +192,8 @@ with zipfile.ZipFile(sys.argv[1]) as z:
         assert len(data)==a['size'] and hashlib.sha256(data).hexdigest()==a['sha256']
 `,siteResult.download]);
     }
+    const playerDeadline=Date.now()+90000;
+    while(!await value('!document.getElementById("play").disabled')){if(Date.now()>playerDeadline)throw Error('Prepared player did not initialize');await sleep(100);}
     await call('Runtime.evaluate',{expression:'document.getElementById("play").click()',userGesture:true});
     const tree=await call('Page.getFrameTree');
     const child=tree.frameTree.childFrames?.find(f=>f.frame.url.includes('/runtime/Starship.html'));

@@ -298,41 +298,22 @@ python3 tools/wasm/run.py public
 python3 tools/wasm/serve_site.py --directory build/wasm/site
 ```
 
-Publish only `build/wasm/site/`. The export refuses a preloaded runtime and checks
-that its runtime data package contains only the controller database. It copies
-an explicit list of tools and mod inputs. The public directory contains no ROM,
-extracted base archive, or private preloaded game package. The CI workflow
-`.github/workflows/wasm.yml` builds this same directory without a ROM and uploads
-it as `starwolf-wasm-browser-builder`.
+Publish only the exported directory. Export verifies the controller-only runtime package, the extractor's exact 55-file preload inventory, and source-bound mod provenance. The extractor package contains config, 50 YAML/YML schemas, and four shaders. Extracted portraits, ship geometry, prepared O2Rs, and the raw legacy chatter bank are excluded.
 
-The page supports raw .z64/.v64/.n64 files and a ZIP with exactly one ROM. It checks
-the normalized ROM's size and SHA-256 before starting Torch. File reading,
-extraction, mod assembly and download preparation happen locally. Browser checks
-against the local server recorded only GET/HEAD requests.
+Preparation and downloads happen locally. Main-page and Sargasso preparation share one in-memory owner. Optional storage retains prepared archives only, never the ROM. Imports must match actual resource digests. See [multiplayer setup](../multiplayer/README.md) and [the recipe guide](../../assets/wasm/README.md).
 
-Play uses the existing N64 controller and audio gesture handling through a same-origin
-player frame. Download creates a ZIP with the engine, prepared assets and a small
-Python 3 localhost launcher. Running `python3 start.py` in the unpacked directory
-opens the prepared game with the required isolation headers. No extraction tools
-or ROM selection are needed for that downloaded copy. A direct file:// launch is
-not supported. Downloaded prepared assets remain personal local output.
-
-The current character and dialogue-blip mods are frozen in `assets/wasm/mod/`.
-Run `python3 tools/wasm/refresh_mod.py` after source changes, then repeat with
-`--check` to compare every resource. Public export verifies the recorded source
-hashes and rejects a stale snapshot. See [the browser guide](../../browser/README.md)
-for the default export, preview, custom-domain, and asset refresh commands.
+Download game includes a Python 3 localhost launcher. Unpack and run python3 start.py. A direct file:// launch is unsupported. Individual O2Rs and an archive bundle are also available as personal local outputs.
 
 ### Verification
 
 ```sh
 python3 -m unittest discover -s tools/wasm -p 'test_*.py' -v
-node --test tools/wasm/web/zip.test.mjs browser/rom-file.test.mjs browser/rom-patch.test.mjs
+node --test tools/shared/*.test.mjs tools/wasm/web/zip.test.mjs browser/rom-file.test.mjs browser/rom-patch.test.mjs
 node tools/wasm/check-extraction.mjs --build-dir build/wasm/public-build --rom /path/base.z64 --reference-base /path/sf64.o2r --reference-mod /path/wolfen.o2r
 node tools/wasm/check-webgl.mjs --site --rom /path/base.z64 --site-invalid --site-download --audio-session --touch --output build/wasm/site-check
 ```
 
-The extraction comparison verified all 15,898 base resources and all 1,668 mod
+The extraction comparison verified all 15,898 base resources and all 2,742 mod
 resources against the native preview. The browser check rejected an invalid ROM,
 prepared a valid ROM locally, generated a ZIP whose contents passed independent
 Python ZIP/hash checks, entered Training, exercised touch input and scrolling, and

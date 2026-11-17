@@ -19,7 +19,7 @@ const romPath=resolve(process.argv[romIndex+1]);
 const sleep = ms => new Promise(done => setTimeout(done, ms));
 const report = {ok:false, assertions:{}, signalKinds:[], diagnostics:{}, errors:[]};
 const requests = [], pending = new Map(), pages = [];
-let server, chrome, ws, profile, id = 0, interrupted = false;
+let offlineProcess, server, chrome, ws, profile, id = 0, interrupted = false;
 process.once('SIGINT', () => { interrupted = true; });
 const deadline = Date.now() + 600000;
 function assert(value, name, detail) {
@@ -78,7 +78,7 @@ async function page(label, url) {
   }
   await call('Page.navigate', {url}, sessionId);
   await wait(`${label} page`, async () => {
-    try { return await value(p, 'Boolean(window.STARWOLF_MP && window.STARWOLF_MP_PROOF)'); }
+    try { return await value(p, label.endsWith('main')?'Boolean(window.STARWOLF_PREPARATION_SERVICE)': 'Boolean(window.STARWOLF_MP && window.STARWOLF_MP_PROOF)'); }
     catch (error) { if (/context|navigat/i.test(String(error))) return false; throw error; }
   });
   if(!process.argv.includes('--sign-in'))await prepareLocal(p);
@@ -172,7 +172,111 @@ try {
   };
   ws.onclose = () => { for (const entry of pending.values()) entry.reject(Error('CDP disconnected')); pending.clear(); };
 
-  if(process.argv.includes('--native-menu')) {
+
+  if(process.argv.includes('--sign-in')) {
+    const host=await page('host',url),guest=await page('guest',url);
+    await value(host,"document.getElementById('host').click()");
+    const room=await wait('host room',async()=>(await state(host)).room);
+    await joinViaUI(guest,room,'Wingmate');
+    await wait('room membership',async()=>(await state(host)).setup?.members.length===2);
+    const own=async p=>{const current=await state(p);return current.setup.members.find(m=>m.peer===current.peer);};
+    const member=async(viewer,peer)=> (await state(viewer)).setup.members.find(m=>m.peer===peer);
+    const hostPeer=(await state(host)).peer;
+    assert((await own(host)).status==='hacking' && !(await own(host)).selection,'unprepared room members are anonymous hacking transmissions');
+    const anonymous=await value(guest,"(()=>{const r=document.querySelector('.radio-rain');return {visible:!r.hidden,pixels:r.getContext('2d').getImageData(0,0,44,44).data.some(v=>v!==0)};})()");
+    assert(anonymous.visible && anonymous.pixels,'anonymous radio portrait is rendered code rain',anonymous);
+    await prepareLocal(host);
+    await wait('host signing in',async()=>(await member(guest,hostPeer)).status==='signing-in');
+    await value(host,"document.getElementById('pilot-krystal').click();document.getElementById('hue-4').click()");
+    const draft=await wait('draft hue arrives privately',async()=>{const m=await member(guest,hostPeer);return m.hue===4&&m;});
+    assert(draft.selection===null && !('pilot' in draft) && !('vehicle' in draft),'only draft hue crosses the network before confirmation',draft);
+    await choosePilot(host,{pilot:'krystal',vehicle:'wolfen',hue:4});
+    const remote=JSON.stringify(hostPeer);
+    const art=await value(guest,"(()=>{const card=[...document.querySelectorAll('.squadron-card')].find(c=>c.dataset.peer==="+remote+");return {rain:!card.querySelector('.radio-rain').hidden,portrait:!card.querySelector('.roster-portrait').hidden,ship:!card.querySelector('.roster-ship').hidden};})()");
+    assert(art.rain&&!art.portrait&&!art.ship,'unprepared viewer keeps code rain for confirmed peers',art);
+    await prepareLocal(guest);
+    await wait('local artwork appears',()=>value(guest,"(()=>{const c=[...document.querySelectorAll('.squadron-card')].find(c=>c.dataset.peer==="+remote+");return c.querySelector('.radio-rain').hidden&&!c.querySelector('.roster-portrait').hidden&&!c.querySelector('.roster-ship').hidden;})()"));
+    assert(true,'prepared viewer derives confirmed portrait and ship locally');
+    await value(host,"document.getElementById('hue-2').click()");
+    await wait('withdrawn confirmation',async()=>{const m=await member(guest,hostPeer);return m.status==='signing-in'&&m.selection===null&&m.hue===2;});
+    assert(true,'editing a confirmed choice withdraws host registration');
+    await choosePilot(host,{pilot:'krystal',vehicle:'wolfen',hue:2});
+    await value(guest,"window.matchMedia('(prefers-reduced-motion: reduce)').matches");
+    await call('Emulation.setEmulatedMedia',{features:[{name:'prefers-reduced-motion',value:'reduce'}]},guest.sessionId);
+    assert(await value(guest,"matchMedia('(prefers-reduced-motion: reduce)').matches"),'code rain respects reduced-motion media');
+    await invoke(host,'close');await invoke(guest,'close');
+    await call('Browser.setDownloadBehavior',{behavior:'allow',downloadPath:output,browserContextId:host.browserContextId,eventsEnabled:true});
+    await value(host,"document.querySelector('[data-download=\"archives\"]').click()");
+    const {readFile,stat}=await import('node:fs/promises');
+    const bundle=resolve(output,'Starwolf-archives.zip');
+    await wait('local archive download',async()=>{try{return (await stat(bundle)).size>1000000;}catch{return false;}},30000);
+    const {readZip,zipStored}=await import('../shared/zip.mjs');
+    const {sha256}=await import('../shared/files.mjs');
+    const bundleFiles=await readZip(new Uint8Array(await readFile(bundle)));
+    assert(bundleFiles.size===4&&bundleFiles.has('prepared-assets.json'),'archive bundle is assembled locally with verification metadata');
+    const importer=await page('importer',url);
+    async function importFile(p,path) {
+      const input=await call('Runtime.evaluate',{expression:"document.querySelector('[data-byorom-import]')"},p.sessionId);
+      await call('DOM.setFileInputFiles',{files:[path],objectId:input.result.objectId},p.sessionId);
+    }
+    await importFile(importer,bundle);
+    await wait('prepared bundle accepted',()=>value(importer,"window.STARWOLF_PREPARATION_SERVICE.phase==='ready'"),30000);
+    assert(true,'prepared bundle can be imported in a fresh browser');
+    const metadata=JSON.parse(new TextDecoder().decode(bundleFiles.get('prepared-assets.json')));
+    const baseFiles=await readZip(bundleFiles.get('sf64.o2r')),first=baseFiles.keys().next().value;
+    const changed=baseFiles.get(first).slice();changed[0]^=1;baseFiles.set(first,changed);
+    const forged=new Uint8Array(await zipStored([...baseFiles].map(([name,bytes])=>({name,bytes}))).arrayBuffer());
+    bundleFiles.set('sf64.o2r',forged);
+    const info=metadata.archives.find(a=>a.name==='sf64.o2r');info.size=forged.length;info.sha256=await sha256(forged);
+    bundleFiles.set('prepared-assets.json',new TextEncoder().encode(JSON.stringify(metadata)));
+    const tampered=resolve(output,'tampered-archives.zip');
+    await writeFile(tampered,Buffer.from(await zipStored([...bundleFiles].map(([name,bytes])=>({name,bytes}))).arrayBuffer()));
+    await importFile(importer,tampered);
+    await wait('forged contents rejected',()=>value(importer,"window.STARWOLF_PREPARATION_SERVICE.error.includes('do not match')"),30000);
+    assert(true,'forged byte hashes do not bypass real resource verification');
+    await value(host,"document.querySelector('[data-byorom-remember]').click()");
+    const cached=p=>value(p,"new Promise((done,reject)=>{const r=indexedDB.open('starwolf-prepared-v1',1);r.onsuccess=()=>{const db=r.result,q=db.transaction('game').objectStore('game').get('current');q.onsuccess=()=>{done(Boolean(q.result?.remember&&q.result.archives.length===3));db.close();};q.onerror=()=>reject(q.error);};r.onerror=()=>reject(r.error);})");
+    await wait('opt-in save',()=>cached(host));
+    await call('Page.reload',{},host.sessionId);
+    await wait('cache restores after reload',()=>value(host,"window.STARWOLF_PREPARATION_SERVICE?.phase==='ready'"),30000);
+    assert(true,'opted-in prepared archives restore after reload');
+    await value(host,"document.querySelector('[data-byorom-forget]').click()");
+    await wait('cached game deleted',async()=>!(await cached(host)));
+    assert(await value(host,"window.STARWOLF_PREPARATION_SERVICE.phase==='ready'"),'deleting remembered game keeps current in-memory play available');
+    await call('Page.reload',{},host.sessionId);
+    await wait('deleted game stays deleted',()=>value(host,"window.STARWOLF_PREPARATION_SERVICE?.phase==='selecting'"),30000);
+    assert(true,'deleted prepared archives stay absent after reload');
+
+    await call('Browser.setDownloadBehavior',{behavior:'allow',downloadPath:output,browserContextId:guest.browserContextId,eventsEnabled:true});
+    await value(guest,"document.querySelector('[data-download=\"game\"]').click()");
+    const gameZip=resolve(output,'Starwolf-WASM.zip');
+    await wait('complete game ZIP generated',async()=>{try{return (await stat(gameZip)).size>20000000;}catch{return false;}},60000);
+    const gameFiles=await readZip(new Uint8Array(await readFile(gameZip)));
+    assert(gameFiles.has('start.py')&&gameFiles.has('shared/preparation.mjs')&&gameFiles.has('prepared/sf64.o2r')&&!gameFiles.has('extractor/extractor.data'),'complete game download contains local prepared assets and its launcher');
+    const offlineRoot=resolve(output,'downloaded-game');
+    for(const [name,bytes] of gameFiles){const target=resolve(offlineRoot,name);await mkdir(resolve(target,'..'),{recursive:true});await writeFile(target,bytes);}
+    offlineProcess=spawn('python3',[resolve(offlineRoot,'start.py'),'--port','0','--no-browser'],{stdio:['ignore','pipe','ignore']});
+    const offlineURL=await bound(new Promise((done,reject)=>{let out='';offlineProcess.once('error',reject);offlineProcess.stdout.on('data',chunk=>{out+=chunk;const found=out.match(/http:\/\/127\.0\.0\.1:\d+\//);if(found)done(found[0]);});}),'downloaded launcher');
+    const downloaded=await page('downloaded-main',offlineURL);
+    await wait('downloaded game verifies without ROM',()=>value(downloaded,"window.STARWOLF_PREPARATION_SERVICE.phase==='ready'"),30000);
+    await wait('downloaded player initialized',()=>value(downloaded,"document.getElementById('game')?.contentWindow?.STARSHIP_RUNTIME_READY&&!document.getElementById('play').disabled"),60000);
+    assert(await value(downloaded,"document.getElementById('game').contentWindow.Module.FS.stat('/sf64.o2r').size>0"),'downloaded player has installed its verified archives');
+    await value(downloaded,"document.getElementById('play').click()");
+    await wait('downloaded game enters native title',()=>value(downloaded,"document.getElementById('game')?.contentWindow?.STARSHIP_GAME_STATE?.gameState===2"),60000);
+    assert(true,'downloaded game runs through its own launcher without another ROM selection');
+    await call('Target.disposeBrowserContext',{browserContextId:downloaded.browserContextId});
+    offlineProcess.kill('SIGTERM');offlineProcess=null;
+
+    const main=await page('main',new URL('../',url).href);
+    await prepareLocal(main);
+    await value(main,"window.ORIGINAL_PREPARATION=window.STARWOLF_PREPARATION_SERVICE;document.querySelector('.multiplayer-entry').click()");
+    await wait('main to Sargasso handoff',()=>value(main,"document.getElementById('multiplayer-frame')?.contentWindow?.STARWOLF_MP"));
+    assert(await value(main,"document.getElementById('multiplayer-frame').contentWindow.STARWOLF_PREPARATION_SERVICE===window.ORIGINAL_PREPARATION && window.ORIGINAL_PREPARATION.phase==='ready'"),'main page and Sargasso share the same prepared assets in memory');
+    await value(main,"document.getElementById('back-setup').click()");
+    await wait('main setup returns',()=>value(main,"!document.getElementById('multiplayer-frame')&&!document.getElementById('setup').hidden"));
+    assert(await value(main,"window.STARWOLF_PREPARATION_SERVICE===window.ORIGINAL_PREPARATION"),'returning to setup retains local preparation');
+    assert(report.errors.length===0,'no asset uploads or uncaught browser errors',report.errors);
+  } else if(process.argv.includes('--native-menu')) {
   const host=await page('host',url);
   await value(host,"document.getElementById('host').click()");
   await wait('room',async()=>(await state(host)).room);
@@ -480,6 +584,7 @@ try {
   ws?.close();
   for (const entry of pending.values()) entry.reject(Error('Checker finished'));
   pending.clear();
+  offlineProcess?.kill('SIGTERM');
   if (chrome && chrome.exitCode === null && chrome.signalCode === null) {
     chrome.kill('SIGTERM');
     await Promise.race([new Promise(done => chrome.once('exit', done)), sleep(2000)]);

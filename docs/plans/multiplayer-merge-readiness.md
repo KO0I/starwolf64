@@ -33,6 +33,8 @@ Radio synchronization carries a canonical text resource ID separately from the v
 Muted edited dialogue keeps its silent voice alias.
 Guests display the host's radio state without advancing the local radio state machine.
 
+Shared local BYOROM preparation, anonymous code rain, private draft hues, automatic confirmed registration, local portraits and wireframes, verified imports, optional storage, and deletion are implemented. See [ADR 0005](../adr/0005-byorom-multiplayer-assets.md).
+
 ## Supported scope
 
 The playable routes are Corneria Points and Corneria story phase zero, including rails and all-range topology.
@@ -59,7 +61,7 @@ Its report records checkpoint and debug-completion use.
 A debug completion does not prove a boss defeat.
 See [the multiplayer guide](../../tools/multiplayer/README.md) for reproducible commands and artifact locations.
 
-The final run passed 43 unit tests, 38 setup-browser assertions, 20 four-ship VS assertions,
+Before the BYOROM migration, the gameplay run passed 43 unit tests, 38 setup-browser assertions, 20 four-ship VS assertions,
 16 four-player campaign assertions, and six audio assertions.
 The campaign report records all four active slots in rails and all-range, followed by native map state 4.
 That return-map check uses debug completion. The full earlier two-browser rails flight used the ordinary story route.
@@ -75,7 +77,11 @@ These checks cover ROM export data, not native or WASM Landmaster gameplay.
 - Verify an ordinary boss defeat through completion and return to the host map.
 - Audit and enable the remaining story stages.
 - Check a native desktop build and ordinary offline play.
-- Keep the private game archives outside the public static site export.
+- Keep the BYOROM publication gate enabled. Every player prepares locally; the audited server blocks archives and extracted presentation files.
 
 The current implementation is a Corneria co-op increment. It does not establish full-campaign completion,
 eight-player capacity, Safari support, or TURN fallback across remote networks.
+
+## BYOROM verification
+
+The migration passes 78 JavaScript tests and 17 Python publication/recipe tests. Actual WASM extraction matches 15,898 base resources, 2,742 mod resources, and four shaders byte for byte. Real-browser runs verify 26 four-player gameplay assertions and 22 sign-in, import, cache deletion, complete-download launch, and shared main-page preparation assertions. The audited export contains no prepared archives or extracted portrait/geometry routes.

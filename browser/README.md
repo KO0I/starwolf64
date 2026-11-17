@@ -44,9 +44,15 @@ python3 tools/wasm/refresh_mod.py
 python3 tools/wasm/refresh_mod.py --check
 ```
 
-The refresh command rebuilds the character mod and native dialogue-blip add-on, applies the add-on last, then compares every reconstructed resource before saving the recipe. Commit the source changes and all files under `assets/wasm/mod/` together. Public export and CI reject changed source inputs until the snapshot is refreshed. CI needs no private ROM or extracted assets.
+The refresh command freezes a reviewed native overlay against verified source resources and compares each reconstructed resource before saving. Supply --base, --rom, --overlay, and --private-project when those inputs are outside the default authoring tree. See the recipe guide for the shader-only port reference. Commit the source changes and all files under `assets/wasm/mod/` together. Public export and CI reject changed source inputs until the snapshot is refreshed. CI needs no private ROM or extracted assets.
 
 See [character integration](../assets/characters/INTEGRATION.md), [the WASM build guide](../tools/wasm/README.md), and [snapshot details](../assets/wasm/README.md).
+
+## Multiplayer and local preparation
+
+Enter Multiplayer / Sargasso Hideout to host or join through WebRTC. Each player prepares their own ROM. Main-page preparation survives entry and return. The signaling service never receives a ROM or distributes prepared assets. See [hosting instructions](../tools/multiplayer/README.md).
+
+Remember this game on this device opts into prepared archive storage. Delete remembered game removes that copy. The ROM itself is never retained. Imported ZIPs must pass actual resource verification. Individual O2Rs, an archive bundle, and the complete game ZIP are generated locally.
 
 ## Play and save
 

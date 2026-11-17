@@ -93,7 +93,9 @@ def export(build, output, *, domain=None):
     contents["asset-audit.json"] = audit_bytes
     metadata = {name: {"size": len(data), "sha256": hashlib.sha256(data).hexdigest()} for name, data in contents.items()}
     download = [name for name in contents if not name.startswith(("mod/", "extractor/")) and name not in ("prepare-worker.mjs", "CNAME", ".nojekyll")]
-    network = {"schema": 1, "capacity": 4}
+    control_version = int(subprocess.check_output(["node", "--input-type=module", "-e",
+        "import {VERSION} from "+json.dumps((ROOT/"tools/multiplayer/web/protocol.mjs").as_uri())+";process.stdout.write(String(VERSION))"], text=True))
+    network = {"schema": 1, "capacity": 4, "controlVersion": control_version}
     identity = {"network":network, "rom":ROM["sha256"], "archives":archive_digests,
                 "runtime":{name:metadata[name]["sha256"] for name in metadata if name.startswith("runtime/")}}
     fingerprint = hashlib.sha256(json.dumps(identity, sort_keys=True, separators=(",", ":")).encode()).hexdigest()

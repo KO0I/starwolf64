@@ -1,152 +1,64 @@
 # Play a browser-hosted match
 
-Build the WASM game with the pinned SDK and dependencies described in [the WASM guide](../wasm/README.md).
-Supply your existing local sf64.o2r, starship.o2r and wolfen.o2r archives in one directory.
+Every browser brings its own unmodified Star Fox 64 US v1.1 ROM. Preparation, portraits, wireframes, and downloads happen locally. The signaling server never receives a ROM or serves prepared archives.
+
+## Build and host
+
+Use the pinned dependencies in [the WASM guide](../wasm/README.md):
 
 ```sh
 python3 tools/wasm/run.py configure
 python3 tools/wasm/run.py build
-node tools/multiplayer/server.mjs --port 8670 --game-dir build/wasm/game --game-assets /absolute/path/to/archives
+python3 tools/wasm/export_site.py --build-dir build/wasm/game --output build/wasm/site
+node tools/multiplayer/server.mjs --host 127.0.0.1 --port 8670 --site-dir build/wasm/site
 ```
 
-Open http://127.0.0.1:8670/ in a browser. Create a room, save Corneria / Points, click **Prepare game**, then **Start game**.
-Guests enter the room code, click **Prepare game**, then **Join host game**.
-The host keeps playing while a guest downloads archives and imports the current world.
+Open http://127.0.0.1:8670/ and enter **Multiplayer / Sargasso Hideout**. Create or join a room before preparing. Choose your ROM or import a prepared ZIP, then confirm pilot, aircraft, and hue. Valid confirmations register automatically; repeated pilots receive distinct hues.
 
-Each participant sees one camera with the single-player HUD for their local pilot.
-Arrow keys or WASD steer, Z or Space fires, X drops a bomb, Shift boosts, Ctrl brakes, and Q/E roll.
-The embedded player also provides touch controls and a fullscreen button.
-Leave and create another room to start a fresh match.
+A preparing member appears as **hacking**, with procedural code rain as the anonymous portrait. Selection shows **pilot signing in…** and the draft hue. Pilot and ship stay private until confirmed. Editing before spawning withdraws confirmation. Active pilots remain fixed.
 
-The engine supports four players on Corneria Points and Corneria story co-op.
-Rooms hold eight people, but only the first four slots can enter this build.
-Confirmed aircraft render as the original Arwing, Wolfen, Katt's fighter, or Vitzy's fighter.
-Lasers use the accepted hue. Arwing engines retain Star Fox's red planet glow and blue space glow.
-Other aircraft engines use the accepted hue. Arwing radar uses the original blue window and white frame; other all-range radar stays purple.
-Katt and Vitzy have intact hull models only.
-Vitzy stays visible and unavailable as "portrait pending".
+Each viewer derives confirmed portraits and hue-coordinated wireframes from their own archives. Unprepared viewers see code rain. Reduced-motion preferences use static glyphs. Main-page preparation survives entry into Sargasso and return.
 
-To host story co-op, select **Main game co-op**, choose one crew, and confirm each pilot's aircraft and hue.
-Click **Prepare game**, then **Start game**. Use Enter for Start and Z to confirm on the native story map.
-Guests prepare and join once, then wait while the host chooses the mission or watches a story sequence.
-They import a fresh world before joining flight, including the rails-to-all-range transition.
-Corneria is the first supported story mission. Guests wait during other missions while the host continues.
+**Remember this game on this device** opts into prepared archive storage. **Delete remembered game** deletes the saved copy and keeps the current in-memory game. The ROM is never retained. Individual O2Rs, an archive bundle, and a complete browser-game ZIP are generated locally. Imports must pass actual resource-set digests, even when their own manifests and hashes agree.
 
-Other VS maps, eight-player Venom, vehicle switching, and distinct in-game pilot heads remain pending.
-The selector shows actual radio portraits and source-mesh wireframes.
+## Playable scope
 
-## Use the existing private tailnet address
+For battle, select Corneria / Points, confirm your loadout, click **Prepare game**, then **Start game**. Guests prepare their own assets and choose **Join host game**.
 
-Keep the Node service on loopback and configure the allowed page origin:
+For story, select **Main game co-op** and one crew. Players use that crew's matching aircraft. The host chooses missions on the native story map. Guests join once and follow supported transitions. Corneria supports rails and all-range flight with up to four total players. Other missions leave guests waiting while the host continues.
+
+Each browser uses one camera and the single-player HUD. Arrow keys or WASD steer, Z or Space fires, X drops a bomb, Shift boosts, Ctrl brakes, and Q/E roll. Loading, timeout, or departure never pauses the host.
+
+Selected hulls are Arwing, Wolfen, Katt's fighter, and Vitzy's fighter. Lasers use accepted hues. Arwing retains Star Fox engine colors and blue radar; other aircraft use selected engine hues and purple radar. Katt and Vitzy have intact hulls only. Vitzy's pilot is unavailable as **portrait pending**.
+
+Rooms hold eight people; this engine admits the first four slots. Other VS maps, eight-player Venom, vehicle switching, distinct in-game pilot heads, and remaining campaign stages need further work.
+
+## Tailscale
 
 ```sh
-node tools/multiplayer/server.mjs --port 8670 --origin https://your-node.your-tailnet.ts.net:8670 --game-dir build/wasm/game --game-assets /absolute/path/to/archives
+node tools/multiplayer/server.mjs --host 127.0.0.1 --port 8670 --origin https://your-node.your-tailnet.ts.net:8670 --site-dir build/wasm/site
 tailscale serve --bg --https=8670 http://127.0.0.1:8670
 ```
 
-Open the HTTPS address while connected to the tailnet.
-Cross-origin isolation and shared WASM memory require HTTPS or localhost.
-The server exposes only explicit runtime, archive, page and portrait routes.
-Restart it after rebuilding; each process pins its runtime files and archive fingerprints.
-Game archives remain local deployment inputs and are not committed.
+HTTPS or localhost is required for shared WASM memory. Restart after exporting: the server pins the audited snapshot at startup. It rejects prepared sites, missing receipts, changed files, and paths outside the manifest. Legacy archive, portrait, and geometry routes stay blocked. The old --game-dir and --game-assets options are removed.
 
-Signaling forwards only offers, answers and ICE candidates.
-Inputs and complete native world images travel over WebRTC between browsers.
-Optional STUN/TURN settings remain available through `--ice-config /path/to/ice-servers.json`.
-A local direct test does not establish TURN fallback or connectivity across every remote network.
+Signaling carries membership, offers, answers, and ICE candidates. WebRTC carries status, confirmed choices, controls, and native world images. Neither carries ROMs or archives. Compatibility covers runtime, schema, ROM revision, and all three semantic resource sets. ZIP compression and timestamps do not change resource identity. Optional STUN/TURN uses --ice-config /path/to/ice-servers.json; local tests do not prove connectivity through every remote network.
 
-## Verify the bridge
+## Verify
+
+Supply a running audited service and a local ROM. Chromium is required at /usr/bin/chromium.
 
 ```sh
-node --test tools/multiplayer/*.test.mjs
+node --test tools/multiplayer/*.test.mjs tools/shared/*.test.mjs
 python3 tools/multiplayer/generate-scene-schema.py --check
-node tools/multiplayer/check-browser.mjs --output build/multiplayer-setup-check
-node tools/multiplayer/check-game-browser.mjs --url http://127.0.0.1:8670/ --output build/multiplayer-game-check
+node tools/multiplayer/check-game-browser.mjs --sign-in --rom /path/base.z64 --url http://127.0.0.1:8670/multiplayer/ --output build/byorom-sign-in
+node tools/multiplayer/check-game-browser.mjs --ship-models --rom /path/base.z64 --url http://127.0.0.1:8670/multiplayer/ --output build/byorom-ships
+node tools/multiplayer/check-game-browser.mjs --campaign --campaign-route --campaign-four --campaign-checkpoint --campaign-return-map --rom /path/base.z64 --url http://127.0.0.1:8670/multiplayer/ --output build/byorom-campaign
+node tools/multiplayer/check-audio-browser.mjs --rom /path/base.z64 --url http://127.0.0.1:8670/multiplayer/ --output build/byorom-audio
 ```
 
-Check map-entry sound with `node tools/multiplayer/check-audio-browser.mjs --url http://127.0.0.1:8670/ --output build/multiplayer-audio-check`. It checks the native start state, finished startup boost effects, battle music and actual PCM output.
+Reports and screenshots go to the selected directory. The campaign checkpoint starts near the end of rails. Return-map verification uses debug completion and does not prove a boss defeat. Omit those flags for an ordinary route flight. Use --native-menu to activate the actual native Multiplayer menu. The setup checker also accepts --rom and --url.
 
-The gameplay check requires a running configured service and Chromium at /usr/bin/chromium.
-It launches actual WASM host/guest workers, sends controls into a distinct native slot, imports live scenes, and records both cameras.
-It also covers interrupted admission, guest departure, slot reuse, stale-incarnation rejection and host departure.
-Reports and screenshots are written to the chosen output directory.
-The setup checker continues to verify portraits, ship previews, crew policies and synchronized choices.
+## Maintain assets
 
-For a bounded real-input combat flight:
-
-```sh
-node tools/multiplayer/check-combat-browser.mjs --url http://127.0.0.1:8670/ --output build/multiplayer-combat-check
-```
-
-This flight uses ordinary steering, fire and bomb inputs. It never writes health, scores or player positions.
-A successful flight must observe replicated projectiles, damage, native scoring and a subsequent respawn.
-
-## Maintain assets and the scene schema
-
-Regenerate the selector wireframes from existing local game assets:
-
-```sh
-python3 tools/multiplayer/export-wireframes.py --source-root /path/to/local/game-assets
-```
-
-Regenerate the numeric field inventory after changing engine declarations:
-
-```sh
-python3 tools/multiplayer/generate-scene-schema.py
-```
-
-The native and WASM archives use the textured Wolfen hull for multiplayer and the campaign-map ship.
-The intact and three damaged-wing variants keep their detailed materials. Map vertices preserve UVs and rotate their surface normals into the map's coordinates.
-The separate ROM retains its segment-local fallback geometry.
-
-To update only these native models in an existing mod archive:
-
-```sh
-python3 -B tools/multiplayer/export-wolfen-detail.py --rom "/path/to/Star Fox 64 (U) (V1.1) [!].z64" --assets /path/to/sf64.o2r --source-mod /path/to/wolfen.o2r --output build/wolfen-detail/wolfen.o2r
-python3 -B tools/test_wolfen_lod.py
-```
-
-The exporter preserves unrelated resources and writes a model verification report beside the output archive.
-The regular Wolfen asset build generates the same detailed native models.
-
-Read [the bridge reference](../../docs/multiplayer-wasm-bridge.md) before adding a stage or entity type.
-
-## Merge preparation
-
-The native main menu now says Multiplayer and opens Sargasso Hideout.
-The selection page uses the main site's sunset gradient, a portrait roster,
-hue controls, and a matching ship wireframe for each confirmed player.
-The accepted hue travels with the native world and colors aircraft lasers and charge effects.
-The accepted aircraft selects its native hull. Original Arwing resources use a separate net/original namespace, including their display-list dependencies.
-
-The optional `--site-dir build/wasm/site` serves an exported main site at `/`
-and Sargasso at `/multiplayer/`, sharing the same signaling service.
-Only files listed by that export's `site.json` are served.
-Exporting the static site alone does not provide signaling or multiplayer game archives.
-
-Story co-op keeps player zero as the sole mission authority and simulates three independent companions.
-The native camera count remains one. Scripted NPC wingmen still own their original story roles.
-Guest loading, departure, and timeouts do not pause the host.
-See [merge readiness](../../docs/plans/multiplayer-merge-readiness.md) for the remaining campaign release checks.
-
-Check aircraft and campaign handoff against a configured service:
-
-```sh
-node tools/multiplayer/check-game-browser.mjs --ship-models --url http://127.0.0.1:8670/multiplayer/ --output build/multiplayer-ships-check
-node tools/multiplayer/check-game-browser.mjs --campaign --campaign-route --url http://127.0.0.1:8670/multiplayer/ --output build/multiplayer-campaign-check
-node tools/multiplayer/check-game-browser.mjs --campaign --campaign-route --campaign-four --campaign-checkpoint --campaign-return-map --url http://127.0.0.1:8670/multiplayer/ --output build/multiplayer-campaign-four
-```
-
-The route checks use existing invincibility and rapid-fire settings.
-The checkpoint option starts near the end of the rails section using the matching native object index.
-The return-map option uses the existing completion debug control. It checks completion and map handoff, not a boss defeat.
-The ordinary route check flies the actual intro and rails section without changing mission state.
-
-Verify the native menu handoff with the same game checker:
-
-```sh
-node tools/multiplayer/check-game-browser.mjs --native-menu --url http://127.0.0.1:8670/multiplayer/ --output build/multiplayer-menu-check
-```
-
-This enters the actual native menu, captures the Multiplayer label, and activates it.
-It does not use a browser button as a substitute for the native menu.
+See [the recipe guide](../../assets/wasm/README.md) for source-bound mod freezing, [the bridge reference](../../docs/multiplayer-wasm-bridge.md) for scene ownership, and [merge readiness](../../docs/plans/multiplayer-merge-readiness.md) for campaign release checks. The offline wireframe exporter remains an authoring diagnostic. Its generated geometry is excluded from publication.

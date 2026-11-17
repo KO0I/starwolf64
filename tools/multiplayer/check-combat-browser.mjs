@@ -11,6 +11,10 @@ const urlIndex = process.argv.indexOf('--url');
 if (urlIndex !== -1 && !process.argv[urlIndex + 1]) throw Error('--url requires a URL');
 const hostedURL = urlIndex < 0 ? null : new URL(process.argv[urlIndex + 1]);
 if (hostedURL && !['http:', 'https:'].includes(hostedURL.protocol)) throw Error('--url must use HTTP or HTTPS');
+const romIndex=process.argv.indexOf('--rom');
+if(romIndex<0||!process.argv[romIndex+1])throw Error('Supply --rom with your local US 1.1 ROM.');
+const romPath=resolve(process.argv[romIndex+1]);
+
 const sleep = ms => new Promise(done => setTimeout(done, ms));
 const report = {ok:false, assertions:{}, signalKinds:[], diagnostics:{}, errors:[]};
 const requests = [], pending = new Map(), pages = [];
@@ -76,6 +80,9 @@ async function page(label, url) {
     try { return await value(p, 'Boolean(window.STARWOLF_MP && window.STARWOLF_MP_PROOF)'); }
     catch (error) { if (/context|navigat/i.test(String(error))) return false; throw error; }
   });
+  const input=await call('Runtime.evaluate',{expression:"document.querySelector('[data-byorom-rom]')"},sessionId);
+  await call('DOM.setFileInputFiles',{files:[romPath],objectId:input.result.objectId},sessionId);
+  await wait(label+' local preparation',()=>value(p,"window.STARWOLF_PREPARATION_SERVICE?.phase==='ready'"),180000);
   return p;
 }
 const state = p => value(p, 'window.STARWOLF_MP.state');
