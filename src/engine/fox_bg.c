@@ -1,4 +1,5 @@
 #include "global.h"
+#include "venom_mission.h"
 #include "assets/ast_katina.h"
 #include "assets/ast_venom_1.h"
 #include "assets/ast_venom_2.h"
@@ -525,6 +526,9 @@ void Background_DrawBackdrop(void) {
                 case LEVEL_VENOM_2:
                 case LEVEL_VERSUS:
                     bgYpos = (gPlayer[gPlayerNum].camPitch * -6000.0f) - (gPlayer[gPlayerNum].cam.eye.y * 0.4f);
+                    if (VenomMission_IsArena() && (gVenomMissionPhase == VENOM_CLOUD_OPENING)) {
+                        bgYpos += VENOM_CLOUD_ALTITUDE_OFFSET * 0.4f;
+                    }
                     sp13C = Math_ModF(Math_RadToDeg(gPlayer[gPlayerNum].camYaw) * (-7280.0f / 360.0f) * 5.0f, 7280.0f);
                     Matrix_RotateZ(gGfxMatrix, gPlayer[gPlayerNum].camRoll * M_DTOR, MTXF_APPLY);
 

@@ -2867,7 +2867,8 @@ void Corneria_CsTeamSetup(ActorCutscene* this, s32 teamIdx) {
     AUDIO_PLAY_SFX(NA_SE_ARWING_ENGINE_FG, this->sfxSource, 4);
 }
 
-bool Cutscene_CloudOpening(Player* player, s32 firstTeamActor, const Vec3f* closeupEyeOffset, bool finishOnRails) {
+bool Cutscene_CloudOpening(Player* player, s32 firstTeamActor, f32 initialAltitude, const Vec3f* closeupEyeOffset,
+                           bool finishOnRails) {
     s32 i;
     ActorCutscene* falco = &gActors[firstTeamActor];
     ActorCutscene* slippy = &gActors[firstTeamActor + 1];
@@ -2978,7 +2979,7 @@ bool Cutscene_CloudOpening(Player* player, s32 firstTeamActor, const Vec3f* clos
             gCsFrameCount = 0;
             player->csState = 1;
             player->csTimer = 600;
-            player->pos.y = 6000.0f;
+            player->pos.y = initialAltitude;
             player->pos.x = 0.1f;
 
             Corneria_CsTeamSetup(falco, 0);
@@ -3393,7 +3394,7 @@ bool Cutscene_CloudOpening(Player* player, s32 firstTeamActor, const Vec3f* clos
 
 void Corneria_LevelStart(Player* player) {
     static const Vec3f closeupEyeOffset = { -150.0f, -70.0f, 150.0f };
-    Cutscene_CloudOpening(player, 0, &closeupEyeOffset, true);
+    Cutscene_CloudOpening(player, 0, 6000.0f, &closeupEyeOffset, true);
 }
 
 f32 D_i1_80199AE4[3] = { -1500.0f, 700.0f, 0.0f };

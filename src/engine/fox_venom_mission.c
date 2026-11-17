@@ -66,13 +66,15 @@ static bool VenomMission_CloudOpening(Player* player) {
         player->vel.x = player->vel.y = player->vel.z = 0.0f;
         player->wingPosition = 1;
         player->camRoll = 0.0f;
+        gProjectFar = 51200.0f;
         AUDIO_PLAY_BGM(NA_BGM_START_DEMO);
     } else if ((gCsFrameCount > 60) && (gControllerPress[gMainController].button & START_BUTTON)) {
         player->csState = 9;
         player->csTimer = 0;
         Audio_ClearVoice();
     }
-    if (!Cutscene_CloudOpening(player, VENOM_WINGMAN_FIRST, &closeupEyeOffset, false)) return true;
+    if (!Cutscene_CloudOpening(player, VENOM_WINGMAN_FIRST, 6000.0f + VENOM_CLOUD_ALTITUDE_OFFSET,
+                               &closeupEyeOffset, false)) return true;
 
     for (s32 i = VENOM_WINGMAN_FIRST; i <= VENOM_WINGMAN_LAST; i++) {
         Object_Kill(&gActors[i].obj, gActors[i].sfxSource);
@@ -81,6 +83,7 @@ static bool VenomMission_CloudOpening(Player* player) {
         if (gEffects[i].obj.id == OBJ_EFFECT_CLOUDS) Object_Kill(&gEffects[i].obj, gEffects[i].sfxSource);
     }
     gVenomMissionPhase = VENOM_ARRIVAL;
+    gProjectFar = 12800.0f;
     gCsFrameCount = player->csState = player->csTimer = 0;
     player->camRoll = player->camDist = player->yBob = player->rockAngle = 0.0f;
     player->wingPosition = 0;
