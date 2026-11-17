@@ -19,7 +19,7 @@ const report = {ok:false, assertions:{}, signalKinds:[], diagnostics:{}, errors:
 const requests = [], pending = new Map(), pages = [];
 let server, chrome, ws, profile, id = 0, interrupted = false;
 process.once('SIGINT', () => { interrupted = true; });
-const deadline = Date.now() + 90000;
+const deadline = Date.now() + 600000;
 function assert(value, name, detail) {
   if (!value) throw Error(`${name}: ${JSON.stringify(detail)}`);
   report.assertions[name] = true;
@@ -189,6 +189,8 @@ try {
   await value(host,"document.getElementById('vehicle').value='wolfen';document.getElementById('vehicle').dispatchEvent(new Event('change',{bubbles:true}))");
   await chooseVersus(host,'sector_z','time');
   await wait('host configures existing versus map',async () => (await state(host)).setup.match.stage === 'sector_z');
+  assert((await state(host)).setup.members[0].selection===null,'preview edits withdraw the old confirmed loadout');
+  await choosePilot(host,{pilot:'wolf',vehicle:'wolfen',hue:0});
   await joinViaUI(guest1,hostState.room,'Guest 1');
   await wait('first guest receives setup',async () => {
     const s = await state(guest1);

@@ -30,3 +30,35 @@ test('host attributes anonymous status, relays confirmation and withdrawal, and 
   assert.deepEqual(session.setup,locked);
   assert.throws(()=>session.acceptSelection(guest,{pilot:'fox_original',vehicle:'arwing',hue:0}),/locked/i);
 });
+
+function closingPeer(t) {
+  t.mock.timers.enable({apis:['setTimeout']});
+  const session=new BrowserSession({baseURL:'https://example.test',iceServers:[],timeoutMs:100});
+  const host='1'.repeat(32),peer='2'.repeat(32),errors=[];
+  Object.assign(session,{role:'host',phase:'connected',peer:host,slot:0,
+    peers:[{peer:host,slot:0,role:'host'},{peer,slot:1,role:'guest'}]});
+  const link={peer,slot:1,hello:true,closed:false,abort:new AbortController(),pc:{close(){}},timer:null};
+  const channel={label:'control',readyState:'open',close(){this.readyState='closed';this.onclose?.();}};
+  session.attachChannel(link,channel);session.links.set(peer,link);
+  session.addEventListener('error',event=>errors.push(event.detail.message));
+  t.after(()=>session.finish('closed'));
+  return {session,channel,errors,host,peer};
+}
+
+test('a normal peer departure cancels a transport error that arrives before the room notice',t=>{
+  const {session,channel,errors,host}=closingPeer(t);
+  channel.onerror();
+  assert.equal(session.links.size,0,'failed transport is removed immediately');
+  assert.deepEqual(errors,[]);
+  session.updateRoster([{peer:host,slot:0,role:'host'}]);
+  t.mock.timers.tick(101);
+  assert.deepEqual(errors,[]);
+  assert.equal(session.departureTimers.size,0);
+});
+
+test('an unexplained lost transport still reports an error after its bounded membership wait',t=>{
+  const {session,channel,errors}=closingPeer(t);
+  channel.onerror();t.mock.timers.tick(101);
+  assert.deepEqual(errors,['Data channel failed']);
+  assert.equal(session.departureTimers.size,0);
+});

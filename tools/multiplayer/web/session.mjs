@@ -21,6 +21,7 @@ export class BrowserSession extends EventTarget {
     this.events = null;
     this.eventTimer = null;
     this.peerErrorTimer = null;
+    this.departureTimers = new Map();
     this.lastTick = -1;
     this.setup = null;
     this.selectionRequests = new Map();
@@ -121,6 +122,7 @@ export class BrowserSession extends EventTarget {
   updateRoster(peers) {
     if (!Array.isArray(peers)) throw new Error('Invalid room roster');
     this.peers = peers;
+    for(const [peer,timer] of this.departureTimers){if(!peers.some(member=>member.peer===peer)){clearTimeout(timer);this.departureTimers.delete(peer);}}
     const wanted = peers.filter(p => p.peer !== this.peer && (this.role === 'host' ? p.role === 'guest' : p.role === 'host'));
     for (const link of this.links.values()) {
       if (!wanted.some(p => p.peer === link.peer && p.slot === link.slot)) this.removeLink(link);
@@ -133,6 +135,7 @@ export class BrowserSession extends EventTarget {
   }
 
   createLink(peer) {
+    clearTimeout(this.departureTimers.get(peer.peer));this.departureTimers.delete(peer.peer);
     const pc = new RTCPeerConnection({iceServers: this.iceServers, iceTransportPolicy: this.forceRelay ? 'relay' : 'all'});
     const link = {peer: peer.peer, slot: peer.slot, pc, control: null, stateChannel: null, state: 'connecting', hello: false, lastSeq: -1, pendingIce: [], chain: Promise.resolve(), timer: null, closed: false, abort: new AbortController()};
     this.links.set(link.peer, link);
@@ -142,7 +145,7 @@ export class BrowserSession extends EventTarget {
     };
     pc.onconnectionstatechange = () => {
       if (link.closed) return;
-      if (pc.connectionState === 'failed' || pc.connectionState === 'closed') this.linkError(link, 'Peer connection failed');
+      if (pc.connectionState === 'failed' || pc.connectionState === 'closed') this.transportError(link, 'Peer connection failed');
       else this.refresh();
     };
     pc.ondatachannel = event => {
@@ -204,8 +207,8 @@ export class BrowserSession extends EventTarget {
       if (channel === link.control) this.sendControl(link, {type: 'hello', version: VERSION});
       this.refresh();
     };
-    channel.onclose = () => { if (!link.closed) this.linkError(link, 'Data channel closed'); };
-    channel.onerror = () => { if (!link.closed) this.linkError(link, 'Data channel failed'); };
+    channel.onclose = () => { if (!link.closed) this.transportError(link, 'Data channel closed'); };
+    channel.onerror = () => { if (!link.closed) this.transportError(link, 'Data channel failed'); };
     channel.onmessage = event => {
       if (link.closed) return;
       try {
@@ -480,6 +483,18 @@ export class BrowserSession extends EventTarget {
     if (closeTransport) this.closeTransport(link);
   }
 
+  transportError(link, message) {
+    if(link.closed)return;
+    if(this.role!=='host')return this.linkError(link,message);
+    this.removeLink(link);
+    this.refresh();
+    const timer=setTimeout(()=>{
+      this.departureTimers.delete(link.peer);
+      if(this.peers.some(peer=>peer.peer===link.peer)&&!this.links.has(link.peer))this.emit('error',{message});
+    },this.timeoutMs);
+    this.departureTimers.set(link.peer,timer);
+  }
+
   linkError(link, message) {
     if (link.closed) return;
     this.removeLink(link);
@@ -516,6 +531,8 @@ export class BrowserSession extends EventTarget {
     clearTimeout(this.eventTimer);
     clearTimeout(this.peerErrorTimer);
     this.peerErrorTimer = null;
+    for(const timer of this.departureTimers.values())clearTimeout(timer);
+    this.departureTimers.clear();
     const links = [...this.links.values()];
     for (const link of links) this.removeLink(link, false);
     this.token = null;
