@@ -17,13 +17,13 @@ Save gDefaultSave = {
     // rankNameEntry
     'W', 'L', 'F',
     'F', 'O', 'X',
-    'S', 'L', 'P',
-    'F', 'A', 'L',
+    'B', 'I', 'L',
     'K', 'R', 'Y',
+    'F', 'A', 'L',
     'L', 'O', 'N',
     'P', 'I', 'G',
     'K', 'A', 'M',
-    'B', 'I', 'L',
+    'S', 'L', 'P',
     'K', 'A', 'T',
 
     // rankingRoute
@@ -150,12 +150,20 @@ s32 Save_Write(void) {
 
 static void Save_UpdateDefaultRankingNames(void) {
     static const u8 originalNames[] = "FOXPEPSLPFALWLFLONPIGANRBILKAT";
+    static const u8 previousNames[] = "WLFFOXSLPFALKRYLONPIGKAMBILKAT";
+    static const u8 swappedNames[] = "WLFFOXBILFALKRYLONPIGKAMSLPKAT";
+    s32 swappedMatch = true;
+    s32 originalMatch = true;
+    s32 previousMatch = true;
     s32 i;
 
     for (i = 0; i < sizeof(gSaveFile.save.data.rankNameEntry); i++) {
-        if (gSaveFile.save.raw[0x18 + i] != originalNames[i]) {
-            return;
-        }
+        originalMatch &= gSaveFile.save.raw[0x18 + i] == originalNames[i];
+        previousMatch &= gSaveFile.save.raw[0x18 + i] == previousNames[i];
+        swappedMatch &= gSaveFile.save.raw[0x18 + i] == swappedNames[i];
+    }
+    if (!originalMatch && !previousMatch && !swappedMatch) {
+        return;
     }
     for (i = 0x36; i < 0xEA; i++) {
         if (gSaveFile.save.raw[i] != gDefaultSave.raw[i]) {
