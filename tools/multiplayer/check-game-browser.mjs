@@ -272,7 +272,10 @@ try {
     offlineProcess.kill('SIGTERM');offlineProcess=null;
 
     const main=await page('main',new URL('../',url).href);
+    await call('Page.addScriptToEvaluateOnNewDocument',{source:"if(location.pathname.endsWith('/runtime/Starship.html')){for(const name of ['instantiate','instantiateStreaming']){const original=WebAssembly[name];WebAssembly[name]=async function(...args){await new Promise(done=>setTimeout(done,3000));return original.apply(this,args);};}}"},main.sessionId);
     await prepareLocal(main);
+    await wait('main native player still loading',()=>value(main,"(()=>{const w=document.getElementById('game')?.contentWindow;return Boolean(w?.Module?._Wasm_SetControllerState&&!w.STARSHIP_RUNTIME_READY);})()"),30000);
+    assert(true,'main to Sargasso handoff deliberately starts before native initialization');
     await value(main,"(()=>{const service=window.STARWOLF_PREPARATION_SERVICE,add=service.addEventListener,remove=service.removeEventListener;window.CHILD_PREPARATION_LISTENERS=new Set();service.addEventListener=function(type,fn,options){if(type==='statechange')window.CHILD_PREPARATION_LISTENERS.add(fn);return add.call(this,type,fn,options);};service.removeEventListener=function(type,fn,options){if(type==='statechange')window.CHILD_PREPARATION_LISTENERS.delete(fn);return remove.call(this,type,fn,options);};})()");
     await value(main,"window.ORIGINAL_PREPARATION=window.STARWOLF_PREPARATION_SERVICE;document.querySelector('.multiplayer-entry').click()");
     await wait('main to Sargasso handoff',()=>value(main,"document.getElementById('multiplayer-frame')?.contentWindow?.STARWOLF_MP"));

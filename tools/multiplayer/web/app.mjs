@@ -328,7 +328,7 @@ function dispose(){
   rosterViews.clear();
 }
 window.STARWOLF_DISPOSE=dispose;
-window.addEventListener('pagehide',dispose,{once:true});
+window.addEventListener('pagehide',event=>{if(!event.persisted)dispose();});
 for(const link of document.querySelectorAll('a[href="/"]'))link.addEventListener('click',async event=>{if(window.parent===window)return;event.preventDefault();await session.close();window.parent.postMessage({type:'starwolf-back-to-setup'},location.origin);});
 
 $('prepare-game').addEventListener('click',async()=>{const game=window.STARWOLF_GAME;try{$('prepare-game').disabled=true;await game.prepare();}catch(e){if(game===window.STARWOLF_GAME)notice(e.message);}});
