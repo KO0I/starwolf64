@@ -163,7 +163,7 @@ try {
     } else if (message.method === 'Network.requestWillBeSent') {
       const request = message.params.request;
       const path=new URL(request.url).pathname;
-      if(/^\/(?:game-assets|portraits)\//.test(path) || path.endsWith('/ship-wireframes.json'))
+      if(/^\/(?:game-assets|portraits)\//.test(path) || path.endsWith('/ship-wireframes.json') || path.endsWith('/launch-background.jpg'))
         report.errors.push({forbiddenAssetRequest:path});
       if(request.method==='POST' && request.postData && Buffer.byteLength(request.postData)>65536)
         report.errors.push({unexpectedUpload:path});

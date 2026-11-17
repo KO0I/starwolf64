@@ -69,6 +69,7 @@ def export(build, output, *, domain=None):
                     "licenses/coi-serviceworker": ROOT / "browser/coi-serviceworker.LICENSE"})
     contents = {name: path.read_bytes() for name, path in sources.items()}
     contents["README.txt"] = ("Starwolf WASM\n\nSelect a Star Fox 64 US v1.1 ROM in the browser builder.\nPreparation happens on your device; the ROM is never uploaded.\n\nFor a downloaded prepared game, run: python3 start.py\nThis uses only Python 3 and opens the game on localhost.\nYou can choose a different port with: python3 start.py --port 8666\nThe player needs HTTP hosting; opening index.html as a file will not run it.\n\nA prepared download contains assets extracted from your ROM. Keep it for your own use.\nSource: https://github.com/KO0I/starwolf64/tree/starwolf/dev\n").encode()
+    contents["licenses/restoration-source.json"] = (ROOT / "assets/medusa/source.json").read_bytes()
     contents[".nojekyll"] = b""
     if domain:
         import re

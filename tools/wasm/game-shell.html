@@ -26,7 +26,7 @@
   #screen {position:relative;justify-self:center;width:min(100%,calc((100dvh - 146px) * 4 / 3));aspect-ratio:4/3;border:2px solid #454652;border-radius:12px;background:#000;box-shadow:0 16px 45px #0009;overflow:hidden;}
   canvas {display:block;width:100%;height:100%;object-fit:contain;background:#000;touch-action:none;outline:none;}
   #boot-panel {position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:16px;padding:20px;background:radial-gradient(ellipse at center,#292a3f,#0b0c12);text-align:center;overflow:auto;}
-  #splash {position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000;pointer-events:none;user-select:none;}
+  #splash {position:absolute;inset:0;width:100%;height:100%;background:radial-gradient(ellipse at 50% 40%,#8e1e65,#230c5c 45%,#050411 80%);pointer-events:none;user-select:none;}
   #screen #boot-panel {background:#0009;}
   #boot-panel h1 {margin:0;font-size:clamp(20px,4vw,36px);letter-spacing:.06em;}
   #preloaded-label {color:#bdb9d6;font-size:13px;}
@@ -273,7 +273,7 @@ body.club-player {
     </section>
     <div id="screen">
       <canvas tabindex="0" aria-label="Starship game" id="canvas" width="640" height="480"></canvas>
-      <img id="splash" src="./launch-background.jpg" alt="" aria-hidden="true" draggable="false">
+      <div id="splash" aria-hidden="true"></div>
       <section id="boot-panel" aria-label="Launch game">
         <h1>Ready for launch.</h1>
         <span id="asset-inputs"><label>Base SF64 <input type="file" id="sf64" accept=".o2r" required></label>
