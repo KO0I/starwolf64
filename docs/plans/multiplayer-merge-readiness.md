@@ -85,3 +85,5 @@ eight-player capacity, Safari support, or TURN fallback across remote networks.
 ## BYOROM verification
 
 The migration passes 78 JavaScript tests and 17 Python publication/recipe tests. Actual WASM extraction matches 15,898 base resources, 2,742 mod resources, and four shaders byte for byte. Real-browser runs verify 26 four-player gameplay assertions and 22 sign-in, import, cache deletion, complete-download launch, and shared main-page preparation assertions. The audited export contains no prepared archives or extracted portrait/geometry routes.
+
+Four actual browsers also pass 20 co-op assertions through the host map, checkpoint-assisted rails, all-range handoff, and debug completion back to the map. The final main-page check passes invalid-ROM rejection, prepared download verification, native title/menu launch, and actual audio without hosted image requests.

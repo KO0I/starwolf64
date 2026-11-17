@@ -57,7 +57,7 @@ node tools/multiplayer/check-game-browser.mjs --campaign --campaign-route --camp
 node tools/multiplayer/check-audio-browser.mjs --rom /path/base.z64 --url http://127.0.0.1:8670/multiplayer/ --output build/byorom-audio
 ```
 
-Reports and screenshots go to the selected directory. The campaign checkpoint starts near the end of rails. Return-map verification uses debug completion and does not prove a boss defeat. Omit those flags for an ordinary route flight. Use --native-menu to activate the actual native Multiplayer menu. The setup checker also accepts --rom and --url.
+Use --site-dir /path/to/audited/site instead of --url to have the gameplay checker start and stop its own signaling server on a free port. Reports and screenshots go to the selected directory. The campaign checkpoint starts near the end of rails. Return-map verification uses debug completion and does not prove a boss defeat. Omit those flags for an ordinary route flight. Use --native-menu to activate the actual native Multiplayer menu. The setup checker also accepts --rom and --url.
 
 ## Maintain assets
 

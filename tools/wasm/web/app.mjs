@@ -52,6 +52,7 @@ document.querySelector('.multiplayer-entry').addEventListener('click',event=>{
 async function backToSetup(){
   if(multiplayer){
     try{await multiplayer.contentWindow.STARWOLF_MP?.close();}catch{}
+    try{multiplayer.contentWindow.STARWOLF_DISPOSE?.();}catch{}
     multiplayer.remove();multiplayer=null;
   }
   $('setup').hidden=false;$('toolbar').hidden=true;$('game-host').hidden=true;

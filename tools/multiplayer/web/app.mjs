@@ -14,7 +14,7 @@ const shipPreview = window.STARWOLF_SHIP_PREVIEW = new ShipPreview($('ship-previ
 let session, inputSequence = 0, snapshotTick = 0, draftSelection, draftMatch;
 let selectionBusy = false, matchBusy = false;
 let autoName = 'Wolf', customName = false, requestedName = null;
-let presenceKey=null,presenceTransport=null;
+let presenceKey=null,presenceTransport=null,disposed=false;
 
 function syncPilotName(pilot,publish=false) {
   const field = $('name');
@@ -174,6 +174,7 @@ function renderSelection(state,active) {
   syncPresence();
 }
 function render() {
+  if(disposed)return;
   const state = session.state;
   for (const peer of lastInputs.keys()) if (!state.peers.some(member => member.peer === peer)) lastInputs.delete(peer);
   const connections = state.connections || [];
@@ -314,8 +315,20 @@ $('send-state').addEventListener('click',() => {
   } catch(error) { notice(error.message); }
 });
 newSession();
-preparation.addEventListener('statechange',()=>{syncPresence();render();});
-mountPreparation($('local-preparation'));
+const preparationChanged=()=>{syncPresence();render();};
+preparation.addEventListener('statechange',preparationChanged);
+const unmountPreparation=mountPreparation($('local-preparation'));
+function dispose(){
+  if(disposed)return;
+  disposed=true;
+  preparation.removeEventListener('statechange',preparationChanged);
+  unmountPreparation();
+  shipPreview.destroy();
+  for(const view of rosterViews.values()){view.preview?.destroy();view.rain.destroy();}
+  rosterViews.clear();
+}
+window.STARWOLF_DISPOSE=dispose;
+window.addEventListener('pagehide',dispose,{once:true});
 for(const link of document.querySelectorAll('a[href="/"]'))link.addEventListener('click',async event=>{if(window.parent===window)return;event.preventDefault();await session.close();window.parent.postMessage({type:'starwolf-back-to-setup'},location.origin);});
 
 $('prepare-game').addEventListener('click',async()=>{const game=window.STARWOLF_GAME;try{$('prepare-game').disabled=true;await game.prepare();}catch(e){if(game===window.STARWOLF_GAME)notice(e.message);}});

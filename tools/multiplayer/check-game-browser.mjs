@@ -11,6 +11,9 @@ const urlIndex = process.argv.indexOf('--url');
 if (urlIndex !== -1 && !process.argv[urlIndex + 1]) throw Error('--url requires a URL');
 const hostedURL = urlIndex < 0 ? null : new URL(process.argv[urlIndex + 1]);
 if (hostedURL && !['http:', 'https:'].includes(hostedURL.protocol)) throw Error('--url must use HTTP or HTTPS');
+const siteIndex=process.argv.indexOf('--site-dir');
+const siteDirectory=siteIndex<0?undefined:process.argv[siteIndex+1];
+if(siteIndex>=0&&!siteDirectory)throw Error('--site-dir requires an audited export directory');
 const shipModels = process.argv.includes('--ship-models');
 const romIndex=process.argv.indexOf('--rom');
 if(romIndex<0 || !process.argv[romIndex+1])throw Error('Supply --rom with your local US 1.1 ROM for each test browser.');
@@ -139,11 +142,12 @@ await mkdir(output, {recursive:true});
 try {
   if (!hostedURL) {
     const {createSignalingServer} = await import('./server.mjs');
-    server = createSignalingServer({host:'127.0.0.1', port:0});
+    if(!siteDirectory)throw Error('Provide --url or --site-dir with an audited exported site');
+    server = createSignalingServer({host:'127.0.0.1', port:0,siteDir:resolve(siteDirectory)});
+    await server.prepare();
     await bound(new Promise((done, reject) => { server.server.once('error', reject); server.server.listen(0, '127.0.0.1', done); }), 'server startup');
   }
-  if(!hostedURL)throw Error('Provide --url for a configured playable game service');
-  const url = hostedURL?.href ?? `http://127.0.0.1:${server.server.address().port}/`;
+  const url = hostedURL?.href ?? `http://127.0.0.1:${server.server.address().port}/multiplayer/`;
   report.url = url;
   profile = await mkdtemp(resolve(tmpdir(), 'starship-mp-game-'));
   chrome = spawn('/usr/bin/chromium', ['--headless', '--no-sandbox', '--disable-dev-shm-usage', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--remote-debugging-port=0', `--user-data-dir=${profile}`, 'about:blank'], {stdio:['ignore','ignore','pipe']});
@@ -269,12 +273,14 @@ try {
 
     const main=await page('main',new URL('../',url).href);
     await prepareLocal(main);
+    await value(main,"(()=>{const service=window.STARWOLF_PREPARATION_SERVICE,add=service.addEventListener,remove=service.removeEventListener;window.CHILD_PREPARATION_LISTENERS=new Set();service.addEventListener=function(type,fn,options){if(type==='statechange')window.CHILD_PREPARATION_LISTENERS.add(fn);return add.call(this,type,fn,options);};service.removeEventListener=function(type,fn,options){if(type==='statechange')window.CHILD_PREPARATION_LISTENERS.delete(fn);return remove.call(this,type,fn,options);};})()");
     await value(main,"window.ORIGINAL_PREPARATION=window.STARWOLF_PREPARATION_SERVICE;document.querySelector('.multiplayer-entry').click()");
     await wait('main to Sargasso handoff',()=>value(main,"document.getElementById('multiplayer-frame')?.contentWindow?.STARWOLF_MP"));
     assert(await value(main,"document.getElementById('multiplayer-frame').contentWindow.STARWOLF_PREPARATION_SERVICE===window.ORIGINAL_PREPARATION && window.ORIGINAL_PREPARATION.phase==='ready'"),'main page and Sargasso share the same prepared assets in memory');
     await value(main,"document.getElementById('back-setup').click()");
     await wait('main setup returns',()=>value(main,"!document.getElementById('multiplayer-frame')&&!document.getElementById('setup').hidden"));
     assert(await value(main,"window.STARWOLF_PREPARATION_SERVICE===window.ORIGINAL_PREPARATION"),'returning to setup retains local preparation');
+    assert(await value(main,"window.CHILD_PREPARATION_LISTENERS.size===0"),'leaving Sargasso releases listeners on the retained preparation owner');
     assert(report.errors.length===0,'no asset uploads or uncaught browser errors',report.errors);
   } else if(process.argv.includes('--native-menu')) {
   const host=await page('host',url);
