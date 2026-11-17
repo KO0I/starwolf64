@@ -2,6 +2,8 @@
 
 The [character asset archive](starwolf64-character-assets.zip) contains the reviewed models from the Star Wolf 64 Characters Site, with Kami body updates from the supplied `Kami_models.zip` on November 9, 2026. Its [manifest](starwolf64-character-assets.manifest.json) records the original Site revision, supplied update hashes, model counts, animation clips, textures, laser defaults, and file checksums.
 
+Pigma's [current head and body models](pigma-eyes/README.md) keep the original Before head, orange bodies and headset, with shaped goggle rims, sleepy yellow eyes and a red mouth. The original snout and nostrils are preserved. The folder includes editable GLBs, rendered views, the reference sheet, and the preservation report.
+
 The archive contains these assets:
 
 - Nine full characters, each with title and on-foot variants: Wolf, Krystal, Kami, Panther, Pigma, Fox, Falco, Peppy, and Slippy.
