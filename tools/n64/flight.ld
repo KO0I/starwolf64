@@ -28,3 +28,8 @@ gPlayState = 0x80177854;
 gLevelMode = 0x80177880;
 gRadioState = 0x8017829C;
 gCallTimer = 0x80161690;
+
+gMasterDisp = 0x80137E64;
+gPlayer = 0x80178280;
+gHudAlpha = 0x80161708;
+gCamCount = 0x801778A8;

@@ -109,6 +109,14 @@ def main():
                 raise ValueError("Unexpected original instructions: "+name)
             struct.pack_into(">II",rom,offset,jump(RADIO_RAM+LOADER_OFFSET,True),0x24190000|kind)
             changes.append(dict(name=name,rom_offset=offset,original=expected.hex()))
+        # HUD_Draw has restored its caller's RA and SP here. Tail-call the
+        # loader so the C renderer returns directly to that original caller.
+        offset=0x90A70
+        original="03e0000800000000"
+        if rom[offset:offset+8]!=bytes.fromhex(original):
+            raise ValueError("Unexpected HUD_Draw return instructions")
+        struct.pack_into(">II",rom,offset,jump(RADIO_RAM+LOADER_OFFSET),0x24190006)
+        changes.append(dict(name="attitude_hud",rom_offset=offset,original=original))
         for name,offset,original,symbol in (
             ("boost_loop",0xB329C,"8e1904dc57200027","Flight_BoostGate"),
             ("brake_uturn",0xB38B8,"8ca2000024070005","Flight_BrakeGate"),
@@ -121,7 +129,7 @@ def main():
         checked=verify(base,rom)
         checked["limits"]=[
             "Experimental ROM; physical N64 and ED64 Plus compatibility unverified.",
-            "Attitude HUD not ported. Original stage boundaries remain.",
+            "Original stage boundaries remain.",
             "Save format expected EEPROM4K; power-cycle persistence unverified.",
         ]
         report=dict(format="starwolf64-n64-6dof-v1",source_sha256=source_sha256,

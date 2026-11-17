@@ -37,6 +37,12 @@ extern int32_t gPlayState;
 extern int32_t gLevelMode;
 extern int32_t gRadioState;
 extern int32_t gCallTimer;
+typedef struct { uint32_t w0, w1; } FlightGfx;
+_Static_assert(sizeof(FlightGfx) == 8, "N64 display-list command size");
+extern FlightGfx *gMasterDisp;
+extern void *gPlayer;
+extern int32_t gHudAlpha;
+extern int32_t gCamCount;
 
 /* Math functions */
 extern float Math_Atan2F(float y, float x);

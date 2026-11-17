@@ -1,7 +1,7 @@
 # N64 flight patch reference
 
 This module targets the fixed US 1.1 checkpoint candidate identified by
-`SOURCE_SHA256` in `tools/build_6dof_rom.py`. Function addresses and displaced
+`AUDITED_SOURCES` in `tools/build_6dof_rom.py`. Function addresses and displaced
 instructions were checked against that ROM. The host engine is not rebuilt
 for N64.
 
@@ -17,6 +17,24 @@ instructions. The on-rails camera hook overrides roll after stock eye/target
 updates. The all-range hook supplies the checkpoint's full craft-frame camera.
 Boost and brake gates suppress their automatic aerobatic triggers when enabled.
 
+The HUD hook replaces the return at ROM offset `0x90a70` (RAM `0x8008fe70`).
+The original epilogue has already restored RA and SP. A non-linking jump to
+the loader sets kind 6; the entry tail-calls `Flight_DrawAttitude`, which
+returns directly to the original HUD caller. Caller-saved registers may be
+clobbered, and the C function preserves callee-saved registers.
+
+The renderer uses original F3DEX fill rectangles, primitive RGBA and
+`G_RM_CLD_SURF` blending. Its green is `(66, 255, 82)`; ground uses one
+quarter of the stock HUD fade alpha. World up is projected onto a sphere
+so the horizon remains correct through vertical and inverted flight.
+The outer ring follows a single-pixel inner boundary. The horizon band uses
+a 0.4-unit half-width, and the fixed craft marker has fine center ticks.
+The ring, horizon and marker use full HUD alpha. Stock setup 76
+at `0x800d4710` establishes graphics state before drawing and restores it
+afterward. No textures or new heap allocations are required. The indicator
+draws only during enabled, active, single-player Arwing flight with a visible
+HUD. Original HUD calls already honor `gShowHud`.
+
 ## Memory ownership
 
 | Allocation | Address | Capacity | Owner |
@@ -25,12 +43,12 @@ Boost and brake gates suppress their automatic aerobatic triggers when enabled.
 | Loader | Radio offset `0x1030`, RAM `0x8017a040` | 156 bytes | Retired voice filter |
 | Module image | Trailing unused cartridge bytes | Checked at build | ROM builder |
 
-The module is 2784 bytes and its loader is 132 bytes in this build.
+The module is 3808 bytes and its loader is 132 bytes in this build.
 The linker rejects growth beyond `0x80138e90`, where the idle-thread object
 begins. The builder also checks the padded binary size.
 
 The initial bootstrap SP is `0x80138e90`. It must not be overwritten during
-boot. Loading occurs only on gameplay movement/camera/boost/brake entry,
+boot. Loading occurs only on gameplay movement/camera/boost/brake/HUD entry,
 after thread startup. In the original ROM, the first `osStartThread` checks
 `__osRunningThread` at `0x800c7eb0`, initially zero, and dispatches via
 `__osDispatchThread`. Dispatch restores the new thread SP and EPC and exits

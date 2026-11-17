@@ -3,6 +3,9 @@
 .section .text.entry,"ax",@progbits
 .globl Flight_Entry
 Flight_Entry:
+    addiu $at,$t9,-6
+    beqz $at,Flight_DrawAttitude
+    nop
     sltiu $at,$t9,4
     bnez $at,normalHook
     nop

@@ -23,7 +23,11 @@ to the save file.
 On rails, the ship stays inside the stage corridor. All-range mode permits
 pitching through vertical and keeps the camera in the ship's orientation.
 Original terrain collisions, ceilings and forced boundary U-turns remain.
-The attitude indicator has not been ported.
+While 6DOF is enabled, a green wireframe attitude indicator appears above
+the ship. The outline uses a single-pixel contour, a narrow horizon band and
+fine center ticks. Its translucent ground hemisphere follows pitch and roll,
+including vertical and inverted flight. The sky stays transparent and there is no text
+label. Switching back to normal flight hides it.
 
 Avoid combining the toggle and boost/brake in the same instant. This first
 attempt handles the toggle in movement, after those two actions for that frame.
@@ -65,17 +69,21 @@ make test-rom-6dof-allrange
 
 The on-rails check navigates to Corneria using controller inputs. It checks
 stock and 6DOF pitch direction, persistent roll beyond 90 degrees, camera roll,
-and restoration of stock steering. It writes no emulated RAM.
+and restoration of stock steering. Screenshot assertions check the indicator's
+wireframe and craft marker in level flight and their absence in stock flight.
+Read-only display-list checks verify the single-pixel contour and fine marker
+in every tested enabled orientation, even during screen-tinting damage flashes.
+It writes no emulated RAM.
 
 The all-range check selects Training using controller inputs, then sets the
 course-end position and requests the game's original all-range transition.
 The engine performs its normal cutscene and allocation. Subsequent pitch,
-roll and toggle assertions use controller input. Its JSON explicitly records
+roll, toggle and rendered HUD assertions use controller input. Its JSON explicitly records
 these setup writes. This is a focused test, not a full Training-course test.
 For a natural course run, invoke the checker directly with
 `--all-range --natural-training --rom build/rom/starwolf64-6dof.z64`.
 
-Both checks passed on the experimental candidate with 4,194,304 bytes of RAM.
+Both checks run with 4,194,304 bytes of RAM.
 The all-range run turned beyond vertical and retained bank after releasing
 the stick. Terrain collisions still occurred during the test.
 Physical N64 boot, cache behavior, sustained play and SD save persistence

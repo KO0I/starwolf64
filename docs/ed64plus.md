@@ -3,8 +3,8 @@
 Use the `wolf_rom` branch, starting at `checkpoint_before_lan`
 (`d279d7b4`). The first cartridge build uses standard Star Fox 64 flight.
 It includes the Wolfen, reviewed characters, portraits and cartridge dialogue.
-The separate experimental build adds 6DOF movement and camera rotation.
-The attitude indicator still requires an N64 code port.
+The separate experimental build adds 6DOF movement, camera rotation and a
+green wireframe attitude indicator with translucent ground shading.
 Rival encounters use Fox, Falco, Peppy and Slippy in Arwings, with matching
 radio portraits, names and voice blips. The replacement uses the original
 Arwing assets inside the existing rival segment allocation.

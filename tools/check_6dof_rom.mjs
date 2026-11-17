@@ -75,6 +75,81 @@ try{
     const result=await call('Page.captureScreenshot',{format:'png'});
     await writeFile(join(output,name+'.png'),Buffer.from(result.data,'base64'));
   };
+  const checkHud=async (visible,name)=>{
+    const current=await state();
+    const result=await call('Page.captureScreenshot',{format:'png'});
+    await writeFile(join(output,name+'.png'),Buffer.from(result.data,'base64'));
+    const pixels=await evaluate(`(async()=>{
+      const canvas=document.querySelector('#game canvas');
+      if(!canvas)throw Error('No emulated N64 canvas');
+      const r=canvas.getBoundingClientRect();
+      const image=new Image();image.src='data:image/png;base64,'+${JSON.stringify(result.data)};
+      await image.decode();
+      const c=document.createElement('canvas');c.width=image.width;c.height=image.height;
+      const ctx=c.getContext('2d');ctx.drawImage(image,0,0);
+      const data=ctx.getImageData(0,0,c.width,c.height).data;
+      const green=(x,y)=>{
+        // parallel_n64 preserves the 4:3 VI image inside a wider canvas.
+        const scale=r.height/240,left=r.left+(r.width-r.height*4/3)/2;
+        const px=Math.floor(left+(x+.5)*scale),py=Math.floor(r.top+(y+.5)*scale);
+        const i=(py*c.width+px)*4;
+        return data[i+1]>185&&data[i]<130&&data[i+2]<155;
+      };
+      let marker=0,ring=0;
+      for(let x=148;x<156;x++)marker+=green(x,66);
+      for(let x=165;x<173;x++)marker+=green(x,66);
+      for(let x=158;x<163;x++)marker+=green(x,68);
+      for(let x=159;x<162;x++)marker+=green(x,69);
+      for(let y=45;y<=87;y++)for(let x=139;x<=181;x++){
+        const radius=(x-160)**2+(y-66)**2;
+        if(radius>=400&&radius<=441)ring+=green(x,y);
+      }
+      let nativeHud=null;
+      if(${visible}){
+        // Check native rectangles directly; the VI filter spreads screenshot edges.
+        for(let attempt=0;attempt<20&&!nativeHud;attempt++){
+          const d=new DataView(EJS_emulator.gameManager.Module.HEAPU8.buffer,smokeRam);
+          const end=d.getUint32(0x137e64,true)&0x1fffffff;
+          for(let p=end-16;p>=Math.max(0,end-0x20000);p-=8){
+            if(d.getUint32(p,true)!==0xfcffffff||d.getUint32(p+4,true)!==0xfffdf6fb||
+               d.getUint32(p+8,true)!==0xb900031d||d.getUint32(p+12,true)!==0x00504340)continue;
+            const opaque=new Uint8Array(320*240),alphas=new Set(),rects=[];
+            let alpha=0,complete=false;
+            for(let a=p+16;a+8<=end;a+=8){
+              const w0=d.getUint32(a,true),w1=d.getUint32(a+4,true);
+              if(w0===0x06000000&&w1===0x800d4710){complete=true;break;}
+              if(w0===0xfa000000){alpha=w1&255;alphas.add(alpha);}
+              if((w0>>>24)!==0xf6||alpha!==d.getInt32(0x161708,true))continue;
+              const left=(w1>>>14)&1023,top=(w1>>>2)&1023,right=(w0>>>14)&1023,bottom=(w0>>>2)&1023;
+              rects.push({left,top,right,bottom});
+              for(let y=top;y<bottom;y++)for(let x=left;x<right;x++)
+                if(x<320&&y<240)opaque[y*320+x]=1;
+            }
+            if(!complete)continue;
+            nativeHud={
+              doubledCardinalStrokes:[[160,86],[180,66],[160,46],[140,66]].filter(([x,y])=>opaque[y*320+x]).length,
+              markerWidths:rects.slice(-5).map(r=>r.right-r.left),
+              markerHeights:rects.slice(-5).map(r=>r.bottom-r.top),
+              alphas:[...alphas]
+            };
+            break;
+          }
+          if(!nativeHud)await new Promise(r=>setTimeout(r,50));
+        }
+        if(!nativeHud)throw Error('No completed native attitude display list');
+      }
+      return {marker,ring,nativeHud,canvas:{left:r.left,top:r.top,width:r.width,height:r.height}};
+    })()`);
+    report.attitude_hud??=[];
+    report.attitude_hud.push({name,expected_visible:visible,state:current,...pixels});
+    // Terrain damage can tint the whole screen after the HUD draws.
+    // Require green screenshot pixels in level flight and native geometry in every pose.
+    const badPixels=visible?name.includes('level')&&(pixels.marker<18||pixels.ring<70):pixels.marker>8&&pixels.ring>40;
+    const badGeometry=visible&&(pixels.nativeHud.doubledCardinalStrokes>0||
+      pixels.nativeHud.markerWidths.join(',')!=='8,8,3,1,1'||pixels.nativeHud.markerHeights.some(h=>h!==1));
+    if(badPixels||badGeometry)
+      throw Error('Attitude HUD visibility failed: '+JSON.stringify({name,visible,...pixels}));
+  };
   const tap=async button=>{
     await evaluate(`EJS_emulator.gameManager.simulateInput(0,${button},1)`);
     await sleep(150);
@@ -133,6 +208,7 @@ try{
   if(!success)throw Error('Did not reach advancing Corneria gameplay: '+JSON.stringify(await state()));
 
 
+  await checkHud(false,'hud-stock');
   if(allRange){
   const input=async(button,value)=>evaluate(`EJS_emulator.gameManager.simulateInput(0,${button},${value})`);
   const holdFrames=async(button,value,frames)=>{
@@ -151,6 +227,7 @@ try{
     if(current.enabled===1){enabled=true;report.toggle_on=current;break;}
   }
   if(!enabled)throw Error('Cannot enable all-range 6DOF: '+JSON.stringify(await state()));
+  await checkHud(true,'hud-allrange-level');
   const initial=await state();
   const pitched=await holdFrames(19,32767,110);
   report.pitch_loop={initial,pitched};
@@ -162,7 +239,7 @@ try{
   report.pitch_loop.forward_dot=a.reduce((sum,v,i)=>sum+v*b[i],0);
   if(report.pitch_loop.forward_dot>-.1)throw Error('Pitch input did not turn through vertical');
   if(pitched.mode!==1||pitched.playerState!==3)throw Error('All-range flight left active mode while pitching');
-  await shot('allrange-pitch-loop');
+  await checkHud(true,'allrange-pitch-loop');
   const beforeRoll=await state();
   const rolled=await holdFrames(16,32767,60);
   await sleep(1000);
@@ -172,7 +249,7 @@ try{
   if(Math.abs(delta(rolled.roll,beforeRoll.roll))<100)throw Error('All-range roll did not accumulate');
   if(Math.abs(delta(neutral.roll,rolled.roll))>3)throw Error('All-range roll auto-centered');
   if(Math.abs(delta(neutral.camRoll,-neutral.bank))>1)throw Error('All-range camera roll differs from bank');
-  await shot('allrange-roll');
+  await checkHud(true,'allrange-roll');
   let disabled=false;
   for(let i=0;i<120;i++){
     await input(20,32767);await sleep(100);await input(20,0);await sleep(250);
@@ -180,6 +257,7 @@ try{
     if(current.enabled===0){disabled=true;report.toggle_off=current;break;}
   }
   if(!disabled)throw Error('Cannot restore standard all-range flight');
+  await checkHud(false,'hud-allrange-off');
   report.sixdof_allrange_verified=true;
   report.sixdof_onrails_verified=false;
   }else{
@@ -197,6 +275,7 @@ try{
     if(current.enabled===1){enabled=true;report.toggle_on=current;break;}
   }
   if(!enabled)throw Error('C-right did not enable 6DOF: '+JSON.stringify(await state()));
+  await checkHud(true,'hud-onrails-level');
   const sixPitch=await hold(19,18000,500);
   report.sixdof_pitch=sixPitch;
   if(!(sixPitch.pitch<0))throw Error('6DOF pitch sign differs from stock flight');
@@ -211,7 +290,7 @@ try{
   await input(16,0);
   await sleep(100);
   const rolled=await state();
-  await shot('sixdof-roll');
+  await checkHud(true,'sixdof-roll');
   await sleep(1000);
   const neutral=await state();
   report.roll={before:beforeRoll,held:rolled,neutral};
@@ -222,7 +301,7 @@ try{
   if(neutral.updates<=beforeRoll.updates+15)throw Error('6DOF update hook did not keep running');
   const bankedPitch=await hold(19,10000,500);
   report.banked_pitch=bankedPitch;
-  await shot('sixdof-banked-pitch');
+  await checkHud(true,'sixdof-banked-pitch');
   let disabled=false;
   for(let i=0;i<120;i++){
     await input(20,32767);await sleep(100);await input(20,0);await sleep(250);
@@ -234,15 +313,16 @@ try{
   const afterNormal=await hold(16,18000,1200);
   report.normal_restored={before:beforeNormal,after:afterNormal};
   if(afterNormal.updates!==beforeNormal.updates)throw Error('6DOF steering still ran after toggling off');
-  await shot('normal-restored');
+  await checkHud(false,'normal-restored');
   report.sixdof_onrails_verified=true;
   report.sixdof_allrange_verified=false;
 
   }
+  report.attitude_hud_verified=true;
   report.stock_4mb_gameplay_verified=true;
   report.hardware_verified=false;report.save_persistence_verified=false;
   await writeFile(join(output,'proof.json'),JSON.stringify(report,null,2)+'\n');
-  console.log('PASS: '+(allRange?'all-range':'on-rails')+' 6DOF controls, camera and return to stock flight in 4 MiB RDRAM');
+  console.log('PASS: '+(allRange?'all-range':'on-rails')+' 6DOF attitude HUD, controls, camera and return to stock flight in 4 MiB RDRAM');
 }catch(error){
   report.error=String(error);
   await writeFile(join(output,'proof.json'),JSON.stringify(report,null,2)+'\n');throw error;

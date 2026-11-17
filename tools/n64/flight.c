@@ -90,3 +90,60 @@ int Flight_Hook(void* p, int kind, int snap) {
     else camera(p,kind==3,snap);
     return 1;
 }
+
+/* Original F3DEX/RDP command encoding. */
+static void gfx(uint32_t w0, uint32_t w1) {
+    FlightGfx *d = gMasterDisp++;
+    d->w0 = w0;
+    d->w1 = w1;
+}
+
+static void span(int left, int right, int y) {
+    gfx(0xF6000000 | ((right + 160) << 14) | ((y + 67) << 2),
+        ((left + 160) << 14) | ((y + 66) << 2));
+}
+
+void Flight_DrawAttitude(void) {
+    if (!gFlightState.enabled || !active(gPlayer) || !gHudAlpha || gCamCount != 1) return;
+    float pitch = (PF(gPlayer,P_PITCH_BASE) + PF(gPlayer,P_ROT_X) +
+                   PF(gPlayer,P_AEROBATIC)) * .01745329252f;
+    float roll = PF(gPlayer,P_BANK) * .01745329252f;
+    float upX = cosf(pitch) * sinf(roll);
+    float upY = cosf(pitch) * cosf(roll);
+    float upZ = sinf(pitch);
+    /* Stock setup 76, one cycle, primitive RGBA, cloud-surface alpha blend. */
+    gfx(0x06000000,0x800D4710);
+    gfx(0xE7000000,0);
+    gfx(0xBA001402,0);
+    gfx(0xBA000402,0x30);
+    gfx(0xBA000602,0xC0);
+    gfx(0xFCFFFFFF,0xFFFDF6FB);
+    gfx(0xB900031D,0x00504340);
+    for (int layer = 0; layer < 2; layer++) {
+        gfx(0xE7000000,0);
+        gfx(0xFA000000,0x42FF5200 | (layer ? gHudAlpha : gHudAlpha / 4));
+        for (int y = -21; y <= 21; y++) {
+            int start = -22;
+            for (int x = -21; x <= 22; x++) {
+                int squared = x*x + y*y;
+                /* Trace the inner pixel boundary, avoiding doubled cardinal strokes. */
+                int edge = __builtin_abs(x);
+                if (__builtin_abs(y) > edge) edge = __builtin_abs(y);
+                int on = layer && squared <= 441 && squared + 2*edge + 1 > 441;
+                if (x < 22 && squared <= 361) {
+                    float height = upX*x - upY*y + upZ*__builtin_sqrtf((float)(361-squared));
+                    on = layer ? __builtin_fabsf(height) < .4f : height < -.65f;
+                }
+                if (on && start == -22) start = x;
+                if (!on && start != -22) {
+                    span(start,x,y);
+                    start = -22;
+                }
+            }
+        }
+    }
+    static const int8_t marks[][3] = {{-12,-4,0},{5,13,0},{-1,2,2},{0,1,3},{0,1,-23}};
+    for (unsigned i = 0; i < sizeof(marks)/sizeof(*marks); i++)
+        span(marks[i][0],marks[i][1],marks[i][2]);
+    gfx(0x06000000,0x800D4710);
+}
