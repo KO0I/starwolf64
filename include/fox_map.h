@@ -51,10 +51,7 @@ typedef struct {
     /* 0x20 */ f32 scale;
     /* 0x24 */ s32 alpha;
     /* 0x28 */ PlanetAnim anim;
-    /* 0x2C */ PlanetId dest1;
-    /* 0x30 */ PlanetId dest2;
-    /* 0x34 */ PlanetId warp;
-} Planet; // size = 0x38
+} Planet; // size = 0x2C
 
 typedef struct {
     /* 0x0 */ u8* texture;

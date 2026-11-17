@@ -438,7 +438,20 @@ void Option_Setup(void) {
     if ((gLastGameState == GSTATE_GAME_OVER) || (gLastGameState == GSTATE_ENDING)) {
         if (gLastGameState == GSTATE_ENDING) {
             gMissionPlanet[gMissionNumber] = PLANET_VENOM;
-            if (gLeveLClearStatus[LEVEL_VENOM_ANDROSS] == 1) {
+            if (gCurrentLevel == LEVEL_CORNERIA) {
+                gMissionPlanet[gMissionNumber] = PLANET_CORNERIA;
+                PlanetData* planet = &gSaveFile.save.data.planet[PLANET_CORNERIA];
+                planet->played = 1;
+                gMissionMedal[gMissionNumber] = gLeveLClearStatus[LEVEL_CORNERIA] == 2;
+                if (playedExpertMode) {
+                    planet->expertClear = 1;
+                    planet->expertMedal |= gMissionMedal[gMissionNumber];
+                } else {
+                    planet->normalClear = 1;
+                    planet->normalMedal |= gMissionMedal[gMissionNumber];
+                }
+                Save_Write();
+            } else if (gLeveLClearStatus[LEVEL_VENOM_ANDROSS] == 1) {
                 gSaveFile.save.data.planet[SAVE_SLOT_VENOM_1].played = 1;
                 if (playedExpertMode) {
                     gSaveFile.save.data.planet[SAVE_SLOT_VENOM_1].expertClear = 1;

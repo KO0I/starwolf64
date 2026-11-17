@@ -737,6 +737,8 @@ def main():
         header = base.read("ast_audio/ast_audio_v1_sequence_DEA20")[:64]
         builder.resources["audio/crew_chatter"] = header + struct.pack("<I", len(data)) + data
         rom = builder.patched_rom()
+        from venom_assets import preserve_starfox
+        builder.resources.update(preserve_starfox(builder.base))
         builder.verify(rom)
         from site_characters import SiteCharacters
         reviewed = SiteCharacters(builder)

@@ -5,6 +5,7 @@
  */
 
 #include "global.h"
+#include "venom_mission.h"
 #include "assets/vitzy_fighter.h"
 #include "medusa.h"
 #include "assets/ast_aquas.h"
@@ -2327,6 +2328,7 @@ void func_demo_8004F798(ActorCutscene* this) {
 }
 
 void ActorCutscene_Update(ActorCutscene* this) {
+    if (VenomMission_UpdateActor(this)) return;
     if (gCurrentLevel == LEVEL_AQUAS) {
         Aquas_CsIntroActors_Update(this);
         return;

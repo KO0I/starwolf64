@@ -13,6 +13,7 @@
 #include "prevent_bss_reordering2.h"
 // #include "prevent_bss_reordering3.h"
 #include "assets/ast_map.h"
+#include "assets/ast_venom_1.h"
 #include "assets/ast_text.h"
 #include "assets/ast_font_3d.h"
 #include "port/interpolation/FrameInterpolation.h"
@@ -41,7 +42,6 @@ s32 sUnusedPathIdx[24]; // Path index, set but not used
 s32 D_menu_801CD8A0[15];
 s32 D_menu_801CD8E0[7];
 s32 D_menu_801CD900[15]; // planet alpha used for something?
-MissionStatus sPrevMissionStatus;
 s32 D_menu_801CD940;
 s32 sMapState;
 s32 sMapSubState; // Another type of map state? Investigate
@@ -162,8 +162,6 @@ f32 D_menu_801CEEC0;
 s32 D_menu_801CEEC4;
 s32 D_menu_801CEEC8;
 s32 D_menu_801CEECC;
-s32 D_menu_801CEED0;
-s32 D_menu_801CEED4;
 s32 D_menu_801CEED8;
 f32 D_menu_801CEEDC;
 f32 D_menu_801CEEE0;
@@ -174,7 +172,6 @@ s32 D_menu_801CEFC8;
 s32 D_menu_801CEFCC;
 s32 D_menu_801CEFD0;
 s32 D_menu_801CEFD4;
-bool D_menu_801CEFD8;
 s32 D_menu_801CEFDC;
 f32 D_menu_801CEFE0;
 f32 D_menu_801CEFE8[3];
@@ -223,9 +220,6 @@ Planet sPlanets[PLANET_MAX] = {
         1.0f,
         0,
         PL_ANIM_STATIC,
-        PLANET_FORTUNA,
-        PLANET_NONE,
-        PLANET_KATINA,
     },
     {
         PLANET_AREA_6,
@@ -235,9 +229,6 @@ Planet sPlanets[PLANET_MAX] = {
         0.15f,
         0,
         PL_ANIM_ROTATE_Y,
-        PLANET_NONE,
-        PLANET_NONE,
-        PLANET_NONE,
     },
     {
         PLANET_BOLSE,
@@ -247,9 +238,6 @@ Planet sPlanets[PLANET_MAX] = {
         0.15f,
         0,
         PL_ANIM_ROTATE_Y,
-        PLANET_NONE,
-        PLANET_NONE,
-        PLANET_NONE,
     },
     {
         PLANET_SECTOR_Z,
@@ -259,9 +247,6 @@ Planet sPlanets[PLANET_MAX] = {
         2.5f * 2.0f,
         0,
         PL_ANIM_BILLBOARD,
-        PLANET_BOLSE,
-        PLANET_AREA_6,
-        PLANET_NONE,
     },
     {
         PLANET_SECTOR_X,
@@ -271,9 +256,6 @@ Planet sPlanets[PLANET_MAX] = {
         2.5f * 2.0f,
         0,
         PL_ANIM_BILLBOARD,
-        PLANET_TITANIA,
-        PLANET_MACBETH,
-        PLANET_SECTOR_Z,
     },
     {
         PLANET_SECTOR_Y,
@@ -283,9 +265,6 @@ Planet sPlanets[PLANET_MAX] = {
         2.5f * 2.0f,
         0,
         PL_ANIM_BILLBOARD,
-        PLANET_KATINA,
-        PLANET_AQUAS,
-        PLANET_NONE,
     },
     {
         PLANET_KATINA,
@@ -295,9 +274,6 @@ Planet sPlanets[PLANET_MAX] = {
         2.5f,
         0,
         PL_ANIM_SPIN,
-        PLANET_SECTOR_X,
-        PLANET_SOLAR,
-        PLANET_NONE,
     },
     {
         PLANET_MACBETH,
@@ -307,9 +283,6 @@ Planet sPlanets[PLANET_MAX] = {
         2.5f,
         0,
         PL_ANIM_SPIN,
-        PLANET_BOLSE,
-        PLANET_AREA_6,
-        PLANET_NONE,
     },
     {
         PLANET_ZONESS,
@@ -319,9 +292,6 @@ Planet sPlanets[PLANET_MAX] = {
         2.5f,
         0,
         PL_ANIM_SPIN,
-        PLANET_MACBETH,
-        PLANET_SECTOR_Z,
-        PLANET_NONE,
     },
     {
         PLANET_CORNERIA,
@@ -331,9 +301,6 @@ Planet sPlanets[PLANET_MAX] = {
         5.0f,
         0,
         PL_ANIM_SPIN,
-        PLANET_METEO,
-        PLANET_SECTOR_Y,
-        PLANET_NONE,
     },
     {
         PLANET_TITANIA,
@@ -343,9 +310,6 @@ Planet sPlanets[PLANET_MAX] = {
         2.5f,
         0,
         PL_ANIM_SPIN,
-        PLANET_BOLSE,
-        PLANET_NONE,
-        PLANET_NONE,
     },
     {
         PLANET_AQUAS,
@@ -355,9 +319,6 @@ Planet sPlanets[PLANET_MAX] = {
         2.5f,
         0,
         PL_ANIM_SPIN,
-        PLANET_ZONESS,
-        PLANET_NONE,
-        PLANET_NONE,
     },
     {
         PLANET_FORTUNA,
@@ -367,9 +328,6 @@ Planet sPlanets[PLANET_MAX] = {
         2.5f,
         0,
         PL_ANIM_SPIN,
-        PLANET_SECTOR_X,
-        PLANET_SOLAR,
-        PLANET_NONE,
     },
     {
         PLANET_VENOM,
@@ -379,9 +337,6 @@ Planet sPlanets[PLANET_MAX] = {
         9.0f,
         0,
         PL_ANIM_SPIN,
-        PLANET_NONE,
-        PLANET_NONE,
-        PLANET_NONE,
     },
     {
         PLANET_SOLAR,
@@ -391,9 +346,6 @@ Planet sPlanets[PLANET_MAX] = {
         10.0f,
         0,
         PL_ANIM_ROTATE_Z,
-        PLANET_MACBETH,
-        PLANET_NONE,
-        PLANET_NONE,
     },
 };
 
@@ -406,12 +358,13 @@ PlanetId sPlanetList[] = {
 
 Gfx* sExplosionAnimDLs[4] = { aMapExplosion1DL, aMapExplosion2DL, aMapExplosion3DL, aMapExplosion4DL };
 
-TitleCard sPlanetNameCards[14] = {
+TitleCard sPlanetNameCards[15] = {
     { D_MAP_6007B90, 128, 28, 95.0f }, { D_MAP_60030D0, 96, 28, 110.0f },  { D_MAP_60131A0, 176, 12, 73.0f },
     { D_MAP_6009AD0, 168, 28, 77.0f }, { D_MAP_600B9B0, 168, 28, 74.0f },  { D_MAP_6001C80, 96, 13, 106.0f },
     { D_MAP_6011660, 176, 12, 75.0f }, { D_MAP_6010010, 112, 13, 109.0f }, { D_MAP_6017640, 112, 28, 101.0f },
     { D_MAP_6015CE0, 96, 28, 108.0f }, { D_MAP_600E210, 160, 28, 78.0f },  { D_MAP_6014360, 176, 12, 73.0f },
     { D_MAP_6004AC0, 168, 19, 72.0f }, { D_MAP_6006320, 104, 28, 105.0f },
+    { aVe1TitleCardTex, 128, 28, 96.0f },
 };
 
 TitleCard sPlanetTitleCards[] = {
@@ -456,31 +409,83 @@ ObjPosition sMapArea6Ships[4] = {
 };
 
 PlanetPath sPaths[24] = {
-    { PL_PATH_BLU, PLANET_CORNERIA, PLANET_METEO, 5, 0, 0, 0 },
-    { PL_PATH_BLU, PLANET_METEO, PLANET_FORTUNA, 5, 0, 0, 0 },
-    { PL_PATH_BLU, PLANET_FORTUNA, PLANET_SECTOR_X, 5, 0, 0, 0 },
-    { PL_PATH_BLU, PLANET_SECTOR_X, PLANET_TITANIA, 5, 0, 0, 0 },
-    { PL_PATH_BLU, PLANET_TITANIA, PLANET_BOLSE, 5, 0, 0, 0 },
-    { PL_PATH_BLU, PLANET_KATINA, PLANET_SECTOR_X, 5, 0, 0, 0 },
-    { PL_PATH_BLU, PLANET_MACBETH, PLANET_BOLSE, 5, 0, 0, 0 },
-    { PL_PATH_BLU, PLANET_SECTOR_Z, PLANET_BOLSE, 5, 0, 0, 0 },
-    { PL_PATH_BLU, PLANET_BOLSE, PLANET_VENOM, 5, 0, 0, 0 },
-    { PL_PATH_YLW, PLANET_SECTOR_Y, PLANET_KATINA, 5, 0, 0, 0 },
-    { PL_PATH_YLW, PLANET_KATINA, PLANET_SOLAR, 5, 0, 0, 0 },
-    { PL_PATH_YLW, PLANET_SOLAR, PLANET_MACBETH, 5, 0, 0, 0 },
-    { PL_PATH_YLW, PLANET_SECTOR_X, PLANET_MACBETH, 5, 0, 0, 0 },
-    { PL_PATH_YLW, PLANET_FORTUNA, PLANET_SOLAR, 5, 0, 0, 0 },
-    { PL_PATH_YLW, PLANET_ZONESS, PLANET_MACBETH, 5, 0, 0, 0 },
-    { PL_PATH_RED, PLANET_CORNERIA, PLANET_SECTOR_Y, 5, 0, 0, 0 },
-    { PL_PATH_RED, PLANET_SECTOR_Y, PLANET_AQUAS, 5, 0, 0, 0 },
-    { PL_PATH_RED, PLANET_AQUAS, PLANET_ZONESS, 5, 0, 0, 0 },
-    { PL_PATH_RED, PLANET_ZONESS, PLANET_SECTOR_Z, 5, 0, 0, 0 },
-    { PL_PATH_RED, PLANET_SECTOR_Z, PLANET_AREA_6, 5, 0, 0, 0 },
-    { PL_PATH_RED, PLANET_MACBETH, PLANET_AREA_6, 5, 0, 0, 0 },
-    { PL_PATH_RED, PLANET_AREA_6, PLANET_VENOM, 5, 0, 0, 0 },
-    { PL_WARP_YLW, PLANET_METEO, PLANET_KATINA, 5, 0, 0, 0 },
-    { PL_WARP_RED, PLANET_SECTOR_X, PLANET_SECTOR_Z, 10, 0, 0, 0 },
+    { PL_PATH_BLU, PLANET_METEO, PLANET_CORNERIA, 5, 0, 0, 0 },
+    { PL_PATH_BLU, PLANET_FORTUNA, PLANET_METEO, 5, 0, 0, 0 },
+    { PL_PATH_BLU, PLANET_SECTOR_X, PLANET_FORTUNA, 5, 0, 0, 0 },
+    { PL_PATH_BLU, PLANET_TITANIA, PLANET_SECTOR_X, 5, 0, 0, 0 },
+    { PL_PATH_BLU, PLANET_BOLSE, PLANET_TITANIA, 5, 0, 0, 0 },
+    { PL_PATH_BLU, PLANET_SECTOR_X, PLANET_KATINA, 5, 0, 0, 0 },
+    { PL_PATH_BLU, PLANET_BOLSE, PLANET_MACBETH, 5, 0, 0, 0 },
+    { PL_PATH_BLU, PLANET_BOLSE, PLANET_SECTOR_Z, 5, 0, 0, 0 },
+    { PL_PATH_BLU, PLANET_VENOM, PLANET_BOLSE, 5, 0, 0, 0 },
+    { PL_PATH_YLW, PLANET_KATINA, PLANET_SECTOR_Y, 5, 0, 0, 0 },
+    { PL_PATH_YLW, PLANET_SOLAR, PLANET_KATINA, 5, 0, 0, 0 },
+    { PL_PATH_YLW, PLANET_MACBETH, PLANET_SOLAR, 5, 0, 0, 0 },
+    { PL_PATH_YLW, PLANET_MACBETH, PLANET_SECTOR_X, 5, 0, 0, 0 },
+    { PL_PATH_YLW, PLANET_SOLAR, PLANET_FORTUNA, 5, 0, 0, 0 },
+    { PL_PATH_YLW, PLANET_MACBETH, PLANET_ZONESS, 5, 0, 0, 0 },
+    { PL_PATH_RED, PLANET_SECTOR_Y, PLANET_CORNERIA, 5, 0, 0, 0 },
+    { PL_PATH_RED, PLANET_AQUAS, PLANET_SECTOR_Y, 5, 0, 0, 0 },
+    { PL_PATH_RED, PLANET_ZONESS, PLANET_AQUAS, 5, 0, 0, 0 },
+    { PL_PATH_RED, PLANET_SECTOR_Z, PLANET_ZONESS, 5, 0, 0, 0 },
+    { PL_PATH_RED, PLANET_AREA_6, PLANET_SECTOR_Z, 5, 0, 0, 0 },
+    { PL_PATH_RED, PLANET_AREA_6, PLANET_MACBETH, 5, 0, 0, 0 },
+    { PL_PATH_RED, PLANET_VENOM, PLANET_AREA_6, 5, 0, 0, 0 },
+    { PL_WARP_YLW, PLANET_KATINA, PLANET_METEO, 5, 0, 0, 0 },
+    { PL_WARP_RED, PLANET_SECTOR_Z, PLANET_SECTOR_X, 10, 0, 0, 0 },
 };
+
+static s32 Map_GetRouteCount(PlanetId planet) {
+    s32 count = 0;
+    for (s32 i = 0; i < ARRAY_COUNT(sPaths); i++) {
+        if (sPaths[i].start == planet) {
+            count++;
+        }
+    }
+    return count;
+}
+
+static bool Map_PathIsWarp(s32 path) {
+    return (sPaths[path].type == PL_WARP_YLW) || (sPaths[path].type == PL_WARP_RED);
+}
+
+static bool Map_HasRouteChoice(void) {
+    return (sPrevPlanetId != PLANET_NONE) && (Map_GetRouteCount(sPrevPlanetId) > 1);
+}
+
+static s32 Map_NextRouteId(PlanetId planet, s32 previousPath) {
+    for (s32 step = 1; step <= ARRAY_COUNT(sPaths); step++) {
+        s32 path = (previousPath + step) % ARRAY_COUNT(sPaths);
+        if (sPaths[path].start == planet) {
+            return path;
+        }
+    }
+    return ARRAY_COUNT(sPaths);
+}
+
+static s32 Map_DefaultRouteId(PlanetId planet, MissionStatus status) {
+    s32 first = Map_NextRouteId(planet, -1);
+    if (status == MISSION_WARP) {
+        for (s32 i = 0; i < ARRAY_COUNT(sPaths); i++) {
+            if ((sPaths[i].start == planet) && Map_PathIsWarp(i)) {
+                return i;
+            }
+        }
+    }
+    if ((status == MISSION_ACCOMPLISHED) && (Map_GetRouteCount(planet) > 1)) {
+        return Map_NextRouteId(planet, first);
+    }
+    return first;
+}
+
+static void Map_PreviewRoutes(PlanetId planet, bool visible) {
+    for (s32 i = 0; i < ARRAY_COUNT(sPaths); i++) {
+        if (sPaths[i].start == planet) {
+            gPlanetPathStatus[i] = visible ? 1 : 0;
+            sPaths[i].alpha = visible ? 255 : 0;
+        }
+    }
+}
 
 f32 D_menu_801AFFB8[] = {
     90.0f, 170.0f, 130.0f, 100.0f, 100.0f, 100.0f, 80.0f, 80.0f, 80.0f, 150.0f, 80.0f, 80.0f, 80.0f, 270.0f, 250.0f,
@@ -1330,12 +1335,12 @@ void Map_Setup(void) {
     sMapCamUpX = 0.0f;
     sMapCamUpY = 1.0f;
     sMapCamUpZ = 0.0f;
-    sMapCamAtX = -150.55215f;
+    sMapCamAtX = 150.55215f;
     sMapCamAtY = -489.68f;
     sMapCamAtZ = 0.0f;
     D_menu_801CDA0C = -42.750008f;
-    D_menu_801CDA10 = -9.849999f;
-    D_menu_801CDA14 = 3375.0f; // 15^3
+    D_menu_801CDA10 = 170.150001f;
+    D_menu_801CDA14 = 4500.0f;
     D_menu_801CDA18 = 0.0f;
     D_menu_801CDA1C = 0.0f;
 
@@ -1463,8 +1468,6 @@ void Map_Setup_Play(void) {
         }
     }
 
-    sPrevMissionStatus = gMissionStatus;
-
     sCurrentPlanetId = Map_GetPlanetId(gCurrentLevel);
 
     sPrevPlanetId = sCurrentPlanetId;
@@ -1487,19 +1490,7 @@ void Map_Setup_Play(void) {
 
     Map_CurrentPlanet_SetAlpha();
 
-    switch (sPrevMissionStatus) {
-        case MISSION_COMPLETE:
-            sNextPlanetId = sPlanets[sCurrentPlanetId].dest1;
-            break;
-
-        case MISSION_ACCOMPLISHED:
-            sNextPlanetId = sPlanets[sCurrentPlanetId].dest2;
-            break;
-
-        case MISSION_WARP:
-            sNextPlanetId = sPlanets[sCurrentPlanetId].warp;
-            break;
-    }
+    sNextPlanetId = sPaths[Map_DefaultRouteId(sCurrentPlanetId, gMissionStatus)].end;
 
     gMissionNumber++;
 
@@ -1512,12 +1503,6 @@ void Map_Setup_Play(void) {
     D_menu_801CEFE8[0] = 255.0f;
     D_menu_801CEFE8[1] = 255.0f;
     D_menu_801CEFE8[2] = 255.0f;
-
-    D_menu_801CEFD8 = 0;
-
-    if (sPrevMissionStatus != MISSION_COMPLETE) {
-        D_menu_801CEFD8 = 1;
-    }
 
     gHitCount = 0;
 
@@ -1572,8 +1557,6 @@ void Map_Setup_GameOver(void) {
 
 void Map_Setup_Menu(void) {
     s32 i;
-    s32 path1;
-    s32 path2;
 
     gTotalHits = 0;
     gHitCount = 0;
@@ -1610,13 +1593,13 @@ void Map_Setup_Menu(void) {
         gMissionTeamStatus[i] = 0x00FFFFFF;
     }
 
-    gMissionPlanet[0] = PLANET_CORNERIA;
+    gMissionPlanet[0] = PLANET_VENOM;
     gMissionPlanet[1] = PLANET_NONE;
     gMissionPlanet[2] = PLANET_NONE;
     gMissionPlanet[3] = PLANET_NONE;
     gMissionPlanet[4] = PLANET_NONE;
     gMissionPlanet[5] = PLANET_NONE;
-    gMissionPlanet[6] = PLANET_VENOM;
+    gMissionPlanet[6] = PLANET_NONE;
 
     for (i = 0; i < ARRAY_COUNT(sPaths); i++) {
         sPaths[i].alpha = 255;
@@ -1624,18 +1607,15 @@ void Map_Setup_Menu(void) {
 
     Multilock_Reset();
     gMissionNumber = 0;
-    gCurrentLevel = LEVEL_CORNERIA;
+    gCurrentLevel = LEVEL_VENOM_2;
 
-    sCurrentPlanetId = PLANET_CORNERIA;
+    sCurrentPlanetId = PLANET_VENOM;
     D_menu_801CEA9C = 0.0f;
     D_menu_801CD9B0 = 0.002f;
     D_menu_801CD9B4 = 0.01f;
     sMapState = MAP_PROLOGUE;
 
-    path1 = Map_GetPathId(sCurrentPlanetId, sPlanets[sCurrentPlanetId].dest1);
-    path2 = Map_GetPathId(sCurrentPlanetId, sPlanets[sCurrentPlanetId].dest2);
-    gPlanetPathStatus[path1] = 1;
-    gPlanetPathStatus[path2] = 1;
+    Map_PreviewRoutes(sCurrentPlanetId, true);
 }
 
 void Map_PathStatus_Setup(void) {
@@ -2788,13 +2768,13 @@ void Map_801A281C(void) {
     D_menu_801CEEE8[5].y = D_menu_801CEEE8[4].y = D_menu_801CEEE8[3].y = D_menu_801CEEE8[2].y;
     D_menu_801CEEE8[5].z = D_menu_801CEEE8[4].z = D_menu_801CEEE8[3].z = D_menu_801CEEE8[2].z;
 
-    D_menu_801CEF58[7].x = D_menu_801CEF58[6].x = -150.55215f;
+    D_menu_801CEF58[7].x = D_menu_801CEF58[6].x = 150.55215f;
     D_menu_801CEF58[7].y = D_menu_801CEF58[6].y = -489.68f;
     D_menu_801CEF58[7].z = D_menu_801CEF58[6].z = 0.0f;
 
     D_menu_801CDA0C = -42.750008f;
-    D_menu_801CDA10 = -9.849999f;
-    D_menu_801CDA14 = 3375.0f; // 15^3
+    D_menu_801CDA10 = 170.150001f;
+    D_menu_801CDA14 = 4500.0f;
 
     Map_SetCamRot(D_menu_801CEF58[6].x, D_menu_801CEF58[6].y, D_menu_801CEF58[6].z, &D_menu_801CEEE8[6].x,
                   &D_menu_801CEEE8[6].y, &D_menu_801CEEE8[6].z, D_menu_801CDA14, D_menu_801CDA0C, D_menu_801CDA10);
@@ -2805,7 +2785,7 @@ void Map_801A281C(void) {
 
     D_menu_801CEECC = Map_GetPathId(sCurrentPlanetId, sNextPlanetId);
 
-    if (sPrevMissionStatus == MISSION_WARP) {
+    if (Map_PathIsWarp(D_menu_801CEECC)) {
         gPlanetPathStatus[D_menu_801CEECC] = 5;
         sPaths[D_menu_801CEECC].unk_14 = 5;
     } else {
@@ -2927,11 +2907,9 @@ void Map_ZoomPlanetPath_Update(void) {
 
 void Map_801A2EB8(void) {
     s32 i;
-    s32 temp1;
-    s32 temp2;
 
     if (D_menu_801CD9C4 == 30) {
-        if (sPrevMissionStatus == MISSION_WARP) {
+        if (Map_PathIsWarp(D_menu_801CEECC)) {
             AUDIO_PLAY_SFX(NA_SE_MAP_ARWING_WARP_DASH, gDefaultSfxSource, 4);
         } else {
             AUDIO_PLAY_SFX(NA_SE_MAP_ARWING_DASH, gDefaultSfxSource, 4);
@@ -3006,7 +2984,7 @@ void Map_801A2EB8(void) {
     }
 
     if ((D_menu_801CEED8 == 5) && (D_menu_801CEEDC == 0.0f)) {
-        if (sPrevMissionStatus != MISSION_WARP) {
+        if (!Map_PathIsWarp(D_menu_801CEECC)) {
             sPaths[D_menu_801CEECC].unk_14 = 2;
             D_menu_801CEEA0 = 0;
             D_menu_801CEEA4 = 100;
@@ -3017,21 +2995,7 @@ void Map_801A2EB8(void) {
 
     if (D_menu_801CEED8 == -1) {
 
-        D_menu_801CEED4 = -1;
-        if (sPlanets[sNextPlanetId].dest1 != PLANET_NONE) {
-            temp1 = Map_GetPathId(sNextPlanetId, sPlanets[sNextPlanetId].dest1);
-            gPlanetPathStatus[temp1] = 1;
-            sPaths[temp1].alpha = 255;
-            D_menu_801CEED4 = temp1;
-        }
-
-        D_menu_801CEED0 = -1;
-        if (sPlanets[sNextPlanetId].dest2 != PLANET_NONE) {
-            temp2 = Map_GetPathId(sNextPlanetId, sPlanets[sNextPlanetId].dest2);
-            gPlanetPathStatus[temp2] = 1;
-            sPaths[temp2].alpha = 255;
-            D_menu_801CEED0 = temp2;
-        }
+        Map_PreviewRoutes(sNextPlanetId, true);
         sMapTimer3 = 50;
         D_menu_801CD94C++;
     }
@@ -3526,7 +3490,7 @@ void Map_PathChange_Update(void) {
                 sRestartLevelStates = 0;
 
                 var_a0 = D_menu_801CEFDC;
-                if (sPrevMissionStatus != MISSION_COMPLETE) {
+                if (Map_HasRouteChoice()) {
                     var_a0 += 2;
                 }
 
@@ -3573,7 +3537,7 @@ void Map_PathChange_Input(void) {
 
     if (Map_Input_CursorY() != 0) {
         D_menu_801CEFE8[D_menu_801CEFDC] = 255.0f;
-        if (sPrevMissionStatus != MISSION_COMPLETE) {
+        if (Map_HasRouteChoice()) {
             if (D_menu_801CEFD4 < 0) {
                 D_menu_801CEFDC++;
                 if (D_menu_801CEFDC >= 3) {
@@ -3609,8 +3573,8 @@ void Map_PathChange_Input(void) {
         AUDIO_PLAY_SFX(NA_SE_DECIDE, gDefaultSfxSource, 4);
         D_menu_801CF000[D_menu_801CEFDC] = 10;
 
-        if (((sPrevMissionStatus != MISSION_COMPLETE) && (D_menu_801CEFDC == 2)) ||
-            ((sPrevMissionStatus == MISSION_COMPLETE) && (D_menu_801CEFDC == 1))) {
+        if ((Map_HasRouteChoice() && (D_menu_801CEFDC == 2)) ||
+            (!Map_HasRouteChoice() && (D_menu_801CEFDC == 1))) {
             D_menu_801CEFD0 = true;
             D_menu_801CF00C = 10;
         }
@@ -3628,8 +3592,6 @@ void Map_GoToGameOver(void) {
 
 void Map_RetryCourse(void) {
     s32 i;
-    s32 temp;
-    s32 temp2;
 
     gPlayerNum = 0;
 
@@ -3648,23 +3610,7 @@ void Map_RetryCourse(void) {
     gLaserStrength[gPlayerNum] = 0;
     gBombCount[gPlayerNum] = 3;
 
-    if (sPlanets[sCurrentPlanetId].dest1 != PLANET_NONE) {
-        temp2 = Map_GetPathId(sCurrentPlanetId, sPlanets[sCurrentPlanetId].dest1);
-        gPlanetPathStatus[temp2] = 0;
-        sPaths[temp2].alpha = 0;
-    }
-
-    if (sPlanets[sCurrentPlanetId].dest2 != PLANET_NONE) {
-        temp = Map_GetPathId(sCurrentPlanetId, sPlanets[sCurrentPlanetId].dest2);
-        gPlanetPathStatus[temp] = 0;
-        sPaths[temp].alpha = 0;
-    }
-
-    if (sPlanets[sCurrentPlanetId].warp != PLANET_NONE) {
-        temp = Map_GetPathId(sCurrentPlanetId, sPlanets[sCurrentPlanetId].warp);
-        gPlanetPathStatus[temp] = 0;
-        sPaths[temp].alpha = 0;
-    }
+    Map_PreviewRoutes(sCurrentPlanetId, false);
 
     sPaths[D_menu_801CEECC].unk_14 = 0;
     D_menu_801CEEA0 = 0;
@@ -3684,67 +3630,20 @@ void Map_RetryCourse(void) {
 
     sCurrentPlanetId = sPrevPlanetId;
 
-    if (sPlanets[sCurrentPlanetId].dest1 != PLANET_NONE) {
-        temp2 = Map_GetPathId(sCurrentPlanetId, sPlanets[sCurrentPlanetId].dest1);
-        gPlanetPathStatus[temp2] = 1;
-        sPaths[temp2].alpha = 255;
-    }
-
-    if (sPlanets[sCurrentPlanetId].dest2 != PLANET_NONE) {
-        temp = Map_GetPathId(sCurrentPlanetId, sPlanets[sCurrentPlanetId].dest2);
-        gPlanetPathStatus[temp] = 1;
-        sPaths[temp].alpha = 255;
-    }
-
-    if (sPlanets[sCurrentPlanetId].warp != PLANET_NONE) {
-        temp = Map_GetPathId(sCurrentPlanetId, sPlanets[sCurrentPlanetId].warp);
-        gPlanetPathStatus[temp] = 0;
-        sPaths[temp].alpha = 0;
-    }
+    Map_PreviewRoutes(sCurrentPlanetId, true);
 
     Map_CurrentLevel_Setup();
 }
 
 void Map_ChangePath(void) {
-    s32 temp;
-    s32 temp2;
-
-    D_menu_801CEFD8 ^= 1;
-
-    if (sPlanets[sCurrentPlanetId].dest1 != PLANET_NONE) {
-        temp2 = Map_GetPathId(sCurrentPlanetId, sPlanets[sCurrentPlanetId].dest1);
-        gPlanetPathStatus[temp2] = 0;
-        sPaths[temp2].alpha = 0;
-    }
-
-    if (sPlanets[sCurrentPlanetId].dest2 != PLANET_NONE) {
-        temp = Map_GetPathId(sCurrentPlanetId, sPlanets[sCurrentPlanetId].dest2);
-        gPlanetPathStatus[temp] = 0;
-        sPaths[temp].alpha = 0;
-    }
-
+    Map_PreviewRoutes(sCurrentPlanetId, false);
     gPlanetPathStatus[D_menu_801CEECC] = 0;
-
     sPaths[D_menu_801CEECC].alpha = 0;
     sPaths[D_menu_801CEECC].unk_14 = 0;
 
     sCurrentPlanetId = sPrevPlanetId;
-
-    if (!D_menu_801CEFD8) {
-        sNextPlanetId = sPlanets[sCurrentPlanetId].dest1;
-    } else if (sPrevMissionStatus != MISSION_WARP) {
-        if (sPlanets[sCurrentPlanetId].dest2 != PLANET_NONE) {
-            sNextPlanetId = sPlanets[sCurrentPlanetId].dest2;
-        } else {
-            sNextPlanetId = sPlanets[sCurrentPlanetId].dest1;
-        }
-    } else if (sPlanets[sCurrentPlanetId].warp != PLANET_NONE) {
-        sNextPlanetId = sPlanets[sCurrentPlanetId].warp;
-    } else {
-        sNextPlanetId = sPlanets[sCurrentPlanetId].dest1;
-    }
-
-    D_menu_801CEECC = Map_GetPathId(sCurrentPlanetId, sNextPlanetId);
+    D_menu_801CEECC = Map_NextRouteId(sCurrentPlanetId, D_menu_801CEECC);
+    sNextPlanetId = sPaths[D_menu_801CEECC].end;
 
     sPaths[D_menu_801CEECC].alpha = 255;
 
@@ -3767,17 +3666,7 @@ void Map_ChangePath(void) {
 
     Map_CurrentLevel_Setup();
 
-    if (sPlanets[sNextPlanetId].dest1 != PLANET_NONE) {
-        temp2 = Map_GetPathId(sNextPlanetId, sPlanets[sNextPlanetId].dest1);
-        gPlanetPathStatus[temp2] = 1;
-        sPaths[temp2].alpha = 255;
-    }
-
-    if (sPlanets[sNextPlanetId].dest2 != PLANET_NONE) {
-        temp = Map_GetPathId(sNextPlanetId, sPlanets[sNextPlanetId].dest2);
-        gPlanetPathStatus[temp] = 1;
-        sPaths[temp].alpha = 255;
-    }
+    Map_PreviewRoutes(sNextPlanetId, true);
 }
 
 bool Map_Input_CursorY(void) {
@@ -3842,7 +3731,7 @@ void Map_PathChange_DrawOptions(void) {
     }
 
     optionBgScaleIdx = 1;
-    if (sPrevMissionStatus == MISSION_COMPLETE) {
+    if (!Map_HasRouteChoice()) {
         optionBgScaleIdx = 0;
     }
 
@@ -3872,7 +3761,7 @@ void Map_PathChange_DrawOptions(void) {
     z = 24.0f;
     colorIndex++;
 
-    if (sPrevMissionStatus != MISSION_COMPLETE) {
+    if (Map_HasRouteChoice()) {
         mask = 0xFFFFFFFF;
         if (D_menu_801CF000[colorIndex] != 0) {
             mask = 0x00000001;
@@ -4033,6 +3922,11 @@ void Map_LevelStart_Update(void) {
 
 void Map_LevelStart_AudioSpecSetup(LevelId level) {
     switch (level) {
+        case LEVEL_VENOM_1:
+        case LEVEL_VENOM_2:
+            AUDIO_SET_SPEC(SFXCHAN_0, AUDIOSPEC_6);
+            break;
+
         case LEVEL_CORNERIA:
             AUDIO_SET_SPEC(SFXCHAN_0, AUDIOSPEC_CO);
             break;
@@ -4118,6 +4012,10 @@ bool Map_LevelPlayedStatus_Check(PlanetId planet) {
             planetSaveSlot = SAVE_SLOT_SOLAR;
             break;
 
+        case PLANET_VENOM:
+            planetSaveSlot = SAVE_SLOT_VENOM_1;
+            break;
+
         default:
             planetSaveSlot = planet;
             break;
@@ -4189,7 +4087,7 @@ void Map_CurrentLevel_Setup(void) {
             break;
 
         case PLANET_VENOM:
-            gCurrentLevel = LEVEL_VENOM_1;
+            gCurrentLevel = LEVEL_VENOM_2;
             break;
 
         case PLANET_SOLAR:
@@ -5435,10 +5333,11 @@ void Map_Wipe_Draw(void) {
     }
 }
 
+static const s32 sPlanetCardIndices[PLANET_MAX] = { 1, 13, 12, 11, 6, 2, 4, 10, 8, 0, 9, 5, 3, 14, 7 };
+
 void Map_TitleCards_Draw(void) {
-    static s32 sMapCurPlanetCards[] = { 1, 13, 12, 11, 6, 2, 4, 10, 8, 0, 9, 5, 3, 7, 7 };
     s32 i;
-    s32 planetCardIdx = sMapCurPlanetCards[sCurrentPlanetId];
+    s32 planetCardIdx = sPlanetCardIndices[sCurrentPlanetId];
 
     RCP_SetupDL(&gMasterDisp, SETUPDL_83_OPTIONAL);
 
@@ -5454,83 +5353,14 @@ void Map_TitleCards_Draw(void) {
 }
 
 void Map_801A9A8C(void) {
-    s32 i;
-    s32 planetIdx;
-    u8* missionNoTex;
+    static u8* missionNumbers[] = {
+        aLargeText_0, aLargeText_1, aLargeText_2, aLargeText_3,
+        aLargeText_4, aLargeText_5, aLargeText_6, aLargeText_7,
+    };
+    s32 planetIdx = sPlanetCardIndices[sCurrentPlanetId];
+    u8* missionNoTex = missionNumbers[gMissionNumber + 1];
     static f32 sCardXpos[2] = { 91.0f, 207.0f };
     static f32 sCardYpos[2] = { 61.0f, 61.0f };
-
-    switch (gCurrentLevel) {
-        case LEVEL_CORNERIA:
-            missionNoTex = aLargeText_1;
-            planetIdx = 0;
-            break;
-
-        case LEVEL_METEO:
-            missionNoTex = aLargeText_2;
-            planetIdx = 1;
-            break;
-
-        case LEVEL_SECTOR_Y:
-            missionNoTex = aLargeText_2;
-            planetIdx = 2;
-            break;
-
-        case LEVEL_FORTUNA:
-            missionNoTex = aLargeText_3;
-            planetIdx = 3;
-            break;
-
-        case LEVEL_KATINA:
-            missionNoTex = aLargeText_3;
-            planetIdx = 4;
-            break;
-
-        case LEVEL_AQUAS:
-            missionNoTex = aLargeText_3;
-            planetIdx = 5;
-            break;
-
-        case LEVEL_SECTOR_X:
-            missionNoTex = aLargeText_4;
-            planetIdx = 6;
-            break;
-
-        case LEVEL_SOLAR:
-            missionNoTex = aLargeText_4;
-            planetIdx = 7;
-            break;
-
-        case LEVEL_ZONESS:
-            missionNoTex = aLargeText_4;
-            planetIdx = 8;
-            break;
-
-        case LEVEL_TITANIA:
-            missionNoTex = aLargeText_5;
-            planetIdx = 9;
-            break;
-
-        case LEVEL_MACBETH:
-            missionNoTex = aLargeText_5;
-            planetIdx = 10;
-            break;
-
-        case LEVEL_SECTOR_Z:
-            missionNoTex = aLargeText_5;
-            planetIdx = 11;
-            break;
-
-        case LEVEL_BOLSE:
-            missionNoTex = aLargeText_6;
-            planetIdx = 12;
-            break;
-
-        case LEVEL_AREA_6:
-            missionNoTex = aLargeText_6;
-            planetIdx = 13;
-            break;
-    }
 
     RCP_SetupDL(&gMasterDisp, SETUPDL_83_OPTIONAL);
     gDPSetPrimColor(gMasterDisp++, 0, 0, 255, 255, 255, 255);
@@ -5545,8 +5375,10 @@ void Map_801A9A8C(void) {
     Lib_TextureRect_IA8(&gMasterDisp, sPlanetNameCards[planetIdx].texture, sPlanetNameCards[planetIdx].width,
                         sPlanetNameCards[planetIdx].height, sPlanetNameCards[planetIdx].xPos, 94.0f, 1.0f, 1.0f);
 
-    Lib_TextureRect_IA8(&gMasterDisp, sPlanetTitleCards[planetIdx].texture, sPlanetTitleCards[planetIdx].width,
-                        sPlanetTitleCards[planetIdx].height, sPlanetTitleCards[planetIdx].xPos, 140.0f, 1.0f, 1.0f);
+    if (sCurrentPlanetId != PLANET_VENOM) {
+        Lib_TextureRect_IA8(&gMasterDisp, sPlanetTitleCards[planetIdx].texture, sPlanetTitleCards[planetIdx].width,
+                            sPlanetTitleCards[planetIdx].height, sPlanetTitleCards[planetIdx].xPos, 140.0f, 1.0f, 1.0f);
+    }
 }
 
 void Map_801A9DE8(void) {
@@ -5953,6 +5785,11 @@ void Map_PathPlanetMedal_Draw(f32 x, f32 y, f32 z) {
 }
 
 void Map_BriefingRadio_Setup(void) {
+    if (sBriefingMsg[sCurrentPlanetId][0] == NULL) {
+        D_menu_801CF018 = 7;
+        D_menu_801CD9A0 = false;
+        return;
+    }
     D_menu_801CD940 = 0;
     gRadioMsg = SEGMENTED_TO_VIRTUAL(sBriefingMsg[sCurrentPlanetId][D_menu_801CD940]);
     gRadioMsgRadioId = D_menu_801AF420[D_menu_801CD940];
@@ -5962,6 +5799,9 @@ void Map_BriefingRadio_Setup(void) {
 }
 
 void Map_BriefingRadio_Update(void) {
+    if (sBriefingMsg[sCurrentPlanetId][0] == NULL) {
+        return;
+    }
     if (gRadioStateTimer > 0) {
         gRadioStateTimer--;
     }
@@ -6637,6 +6477,28 @@ void Map_PathLines_Draw(s32 index) {
     }
 }
 
+static f32 Map_PlanetPathRadius(PlanetId planet) {
+    switch (planet) {
+        case PLANET_FORTUNA:
+            return 50.0f;
+        case PLANET_TITANIA:
+        case PLANET_METEO:
+            return 60.0f;
+        case PLANET_SOLAR:
+        case PLANET_SECTOR_X:
+        case PLANET_SECTOR_Y:
+        case PLANET_SECTOR_Z:
+            return 20.0f;
+        case PLANET_AREA_6:
+        case PLANET_BOLSE:
+            return 1200.0f;
+        case PLANET_VENOM:
+            return 30.0f;
+        default:
+            return 40.0f;
+    }
+}
+
 void Map_PathLinePos(s32 index, Vec3f* src, Vec3f* dest) {
     f32 x1;
     f32 y1;
@@ -6649,68 +6511,8 @@ void Map_PathLinePos(s32 index, Vec3f* src, Vec3f* dest) {
     f32 temp1;
     f32 temp2;
 
-    temp1 = 40.0f;
-
-    if (sPaths[index].start == PLANET_FORTUNA) {
-        temp1 = 50.0f;
-    }
-    if (sPaths[index].start == PLANET_TITANIA) {
-        temp1 = 60.0f;
-    }
-    if (sPaths[index].start == PLANET_SOLAR) {
-        temp1 = 20.0f;
-    }
-    if (sPaths[index].start == PLANET_METEO) {
-        temp1 = 60.0f;
-    }
-    if (sPaths[index].start == PLANET_SECTOR_X) {
-        temp1 = 20.0f;
-    }
-    if (sPaths[index].start == PLANET_SECTOR_Y) {
-        temp1 = 20.0f;
-    }
-    if (sPaths[index].start == PLANET_SECTOR_Z) {
-        temp1 = 20.0f;
-    }
-    if (sPaths[index].start == PLANET_AREA_6) {
-        temp1 = 1200.0f;
-    }
-    if (sPaths[index].start == PLANET_BOLSE) {
-        temp1 = 1200.0f;
-    }
-
-    temp2 = 40.0f;
-
-    if (sPaths[index].end == PLANET_TITANIA) {
-        temp2 = 60.0f;
-    }
-    if (sPaths[index].end == PLANET_FORTUNA) {
-        temp2 = 50.0f;
-    }
-    if (sPaths[index].end == PLANET_SOLAR) {
-        temp2 = 20.0f;
-    }
-    if (sPaths[index].end == PLANET_METEO) {
-        temp2 = 60.0f;
-    }
-    if (sPaths[index].end == PLANET_SECTOR_X) {
-        temp2 = 20.0f;
-    }
-    if (sPaths[index].end == PLANET_SECTOR_Y) {
-        temp2 = 20.0f;
-    }
-    if (sPaths[index].end == PLANET_SECTOR_Z) {
-        temp2 = 20.0f;
-    }
-    if (sPaths[index].end == PLANET_AREA_6) {
-        temp2 = 1200.0f;
-    }
-    if (sPaths[index].end == PLANET_BOLSE) {
-        temp2 = 1200.0f;
-    }
-    if (sPaths[index].end == PLANET_VENOM) {
-        temp2 = 30.0f;
-    }
+    temp1 = Map_PlanetPathRadius(sPaths[index].start);
+    temp2 = Map_PlanetPathRadius(sPaths[index].end);
 
     v0.x = sPlanets[sPaths[index].end].pos.x - sPlanets[sPaths[index].start].pos.x;
     v0.y = sPlanets[sPaths[index].end].pos.y - sPlanets[sPaths[index].start].pos.y;
@@ -6761,7 +6563,7 @@ void Map_Idle_Update(void) {
         if (CVarGetInteger("gLevelSelector", 0) == 1) {
             goto loadLevel;
         }
-        if ((gLastGameState == GSTATE_PLAY) && (sPrevMissionStatus != MISSION_COMPLETE) && !D_menu_801CEFD0) {
+        if ((gLastGameState == GSTATE_PLAY) && Map_HasRouteChoice() && !D_menu_801CEFD0) {
             Audio_PlayMapMenuSfx(1);
             D_menu_801CEFC4 = 1;
             D_menu_801CEFD4 = 0;

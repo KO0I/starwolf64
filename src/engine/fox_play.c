@@ -1,5 +1,6 @@
 #include "prevent_bss_reordering.h"
 #include "global.h"
+#include "venom_mission.h"
 #include "fox_map.h"
 #include "assets/ast_corneria.h"
 #include "assets/ast_training.h"
@@ -2614,6 +2615,8 @@ void Player_InitializeAll(void) {
     }
 }
 
+extern s32 D_ending_80196D00;
+
 void Player_Initialize(Player* player) {
     u8* ptr = (u8*) player;
     u32 i;
@@ -4779,7 +4782,7 @@ void Player_Setup(Player* playerx) {
     }
 
     gHitCount = gSavedHitCount;
-    if ((gCurrentLevel == LEVEL_VENOM_ANDROSS) || ((gCurrentLevel == LEVEL_VENOM_2) && (gLevelPhase == 2))) {
+    if (VenomMission_IsEscape() || (gCurrentLevel == LEVEL_VENOM_ANDROSS) || ((gCurrentLevel == LEVEL_VENOM_2) && (gLevelPhase == 2))) {
         if (D_ctx_80177C9C != 0) {
             player->shields = D_ctx_80177C9C - 1;
             gGoldRingCount[0] = D_ctx_80177C94;
@@ -5065,6 +5068,7 @@ void Player_Setup(Player* playerx) {
         player->arwing.laserGunsYpos = -10.0f;
     }
     gPauseEnabled = false;
+    if (VenomMission_IsEscape()) VenomMission_InitEscape(player);
 }
 
 void Player_UpdateArwingRoll(Player* player) {
@@ -6267,7 +6271,13 @@ void Player_Update(Player* player) {
                             }
                             break;
                         case 4:
-                            gNextGameState = GSTATE_MAP;
+                            if (gCurrentLevel == LEVEL_CORNERIA) {
+                                gNextGameState = GSTATE_ENDING;
+                                D_ending_80196D00 = 0;
+                                AUDIO_SET_SPEC(SFXCHAN_0, AUDIOSPEC_27);
+                            } else {
+                                gNextGameState = GSTATE_MAP;
+                            }
                             gLastGameState = GSTATE_PLAY;
                             gDrawMode = DRAW_NONE;
                             break;
@@ -7173,6 +7183,7 @@ void Play_Update(void) {
         Player_Update(&gPlayer[i]);
     }
 
+    VenomMission_UpdateEscape();
     Object_Update();
     PlayerShot_UpdateAll();
     BonusText_Update();
@@ -7309,7 +7320,7 @@ void Play_Main(void) {
             }
 
             if ((gControllerPress[gMainController].button & START_BUTTON) &&
-                (gPlayer[0].state == PLAYERSTATE_LEVEL_INTRO) &&
+                (gPlayer[0].state == PLAYERSTATE_LEVEL_INTRO) && !VenomMission_IsArena() &&
                 gSaveFile.save.data.planet[sSaveSlotFromLevel[gCurrentLevel]].normalClear) {
                 Audio_ClearVoice();
                 Audio_SetEnvSfxReverb(0);

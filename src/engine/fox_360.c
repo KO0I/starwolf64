@@ -1,4 +1,5 @@
 #include "global.h"
+#include "venom_mission.h"
 #include "assets/ast_katina.h"
 #include "assets/ast_venom_2.h"
 #include "assets/ast_fortuna.h"
@@ -1301,6 +1302,7 @@ void ActorAllRange_Update(ActorAllRange* this) {
         ActorAllRange_UpdateEvents(this);
         return;
     }
+    if (VenomMission_UpdateActor(this)) return;
     if ((this->iwork[17] != 0) && (this->iwork[16] == STATE360_0) && (this->aiType >= AI360_WOLF)) {
         switch (RAND_INT(3.9f)) {
             case 0:
@@ -2368,6 +2370,7 @@ void ActorAllRange_Draw(ActorAllRange* this) {
             gSPFogPosition(gMasterDisp++, gFogNear, 1005);
         }
 
+        if (VenomMission_DrawEnemy(this)) return;
         switch (this->aiType) {
             case AI360_FOX:
             case AI360_FALCO:

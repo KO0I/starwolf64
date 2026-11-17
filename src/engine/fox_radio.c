@@ -6,6 +6,7 @@
 
 #include "prevent_bss_reordering.h"
 #include "global.h"
+#include "venom_mission.h"
 #include "assets/ast_allies.h"
 #include "assets/ast_corneria.h"
 #include "assets/ast_meteo.h"
@@ -56,6 +57,7 @@ s32 func_radio_800BA7BC(u16* msg, s32 priority) {
 }
 
 void Radio_PlayMessage(u16* msg, RadioCharacterId character) {
+    if (VenomMission_IsArena() && (character >= RCID_WOLF) && (character <= RCID_ANDREW_2)) return;
     TeamId teamId;
     s32 pad;
     s32 priority;

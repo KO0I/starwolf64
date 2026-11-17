@@ -2924,10 +2924,8 @@ void Area6_LevelComplete(Player* player) {
 
                     Play_ClearObjectData();
 
-                    gNextGameState = GSTATE_PLAY;
-                    gNextLevel = LEVEL_VENOM_2;
-
-                    HUD_Bolse_Area6_SaveData();
+                    gNextGameState = GSTATE_MAP;
+                    gLastGameState = GSTATE_PLAY;
                 }
             }
 

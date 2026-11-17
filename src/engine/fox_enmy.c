@@ -1,4 +1,5 @@
 #include "global.h"
+#include "venom_mission.h"
 #include "assets/ast_corneria.h"
 #include "assets/ast_sector_x.h"
 #include "assets/ast_sector_y.h"
@@ -566,6 +567,7 @@ void Object_LoadLevelObjects(void) {
     } else {
         gLevelObjects = SEGMENTED_TO_VIRTUAL(gLevelObjectInits[gCurrentLevel]);
     }
+    if (VenomMission_IsEscape()) gLevelObjects = VenomMission_EscapeObjects();
     if (gGroundClipMode == 0) {
         for (j = 0; j < gDrawSmallRocks; j++) {
             if (gCurrentLevel == LEVEL_AQUAS) {

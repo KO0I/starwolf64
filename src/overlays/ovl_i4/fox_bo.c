@@ -1652,8 +1652,8 @@ void Bolse_LevelComplete(Player* player) {
                 gFillScreenAlphaTarget = 255;
                 if (gFillScreenAlpha == 255) {
                     gSavedGoldRingCount[0] = gGoldRingCount[0];
-                    gNextGameState = GSTATE_PLAY;
-                    gNextLevel = LEVEL_VENOM_1;
+                    gNextGameState = GSTATE_MAP;
+                    gLastGameState = GSTATE_PLAY;
                     Audio_StopPlayerNoise(0);
                     Audio_KillSfxBySource(player->sfxSource);
                     gLeveLClearStatus[LEVEL_BOLSE] = Play_CheckMedalStatus(150) + 1;
@@ -1669,7 +1669,6 @@ void Bolse_LevelComplete(Player* player) {
                             gPrevPlanetTeamShields[i] = 255;
                         }
                     }
-                    HUD_Bolse_Area6_SaveData();
                 }
             }
             break;

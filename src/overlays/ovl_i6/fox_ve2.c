@@ -5,6 +5,7 @@
  */
 
 #include "global.h"
+#include "venom_mission.h"
 #include "assets/ast_venom_2.h"
 
 void Venom2_Ve2Base_Update(Ve2Base* this) {
@@ -38,6 +39,7 @@ Vec3f sTeamInitPos[6] = {
 f32 sTeamInitRot[3] = { 300.0f, 70.0f, 280.0f };
 
 void Venom2_UpdateEvents(ActorAllRange* this) {
+    if (VenomMission_IsArena()) { VenomMission_ArenaEvents(this); return; }
     ActorAllRange* team;
     ActorAllRange* wolf = &gActors[4];
     Player* player = &gPlayer[0];
@@ -232,6 +234,7 @@ void Venom2_LoadLevelObjects(void) {
 }
 
 void Venom2_LevelStart(Player* player) {
+    if (VenomMission_IsArena()) { VenomMission_Intro(player); return; }
     Vec3f vec;
     Vec3f vel;
     f32 temp_fv0;
@@ -264,6 +267,7 @@ void Venom2_LevelStart(Player* player) {
 }
 
 void Venom2_LevelComplete(Player* player) {
+    if (VenomMission_IsArena()) { VenomMission_Departure(player); return; }
     s32 i;
     s32 pad;
     f32 sp94;

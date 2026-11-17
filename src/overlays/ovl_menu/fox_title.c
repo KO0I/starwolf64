@@ -7,6 +7,10 @@
 #include "prevent_bss_reordering.h"
 #include "prevent_bss_reordering2.h"
 #include "global.h"
+#include "assets/ast_map.h"
+extern Gfx gMapVenomDL[];
+extern u8 gMapVenomTex[];
+extern void Map_Texture_Sphere(u8*, u8*, f32*);
 #include "fox_title.h"
 #include "medusa.h"
 #include "assets/ast_title.h"
@@ -2535,11 +2539,14 @@ void Title_ArwingShadow_Draw(s32 teamIdx) {
 }
 
 void Title_Corneria_Draw(f32 zPos) {
+    static f32 venomOffset;
+    static bool venomTextureReady;
     f32 xRot;
     f32 yRot;
 
     Title_GetCamRot(&xRot, &yRot);
-    RCP_SetupDL(&gMasterDisp, SETUPDL_53);
+    RCP_SetupDL(&gMasterDisp, SETUPDL_64);
+    gDPSetPrimColor(gMasterDisp++, 0, 0, 255, 255, 255, 255);
 
     if (zPos != 0.0f) {
         sTitleCorneria.pos.z = gCsCamEyeZ - zPos;
@@ -2552,9 +2559,12 @@ void Title_Corneria_Draw(f32 zPos) {
     Matrix_Scale(gGfxMatrix, sTitleCorneria.scale, sTitleCorneria.scale, sTitleCorneria.scale, MTXF_APPLY);
     Matrix_SetGfxMtx(&gMasterDisp);
 
-    gSPDisplayList(gMasterDisp++, aPlanetCorneriaDL);
-
-    Title_CorneriaExplosions_Draw();
+    if (!venomTextureReady) {
+        memset(gMapVenomTex, 81, 96 * 96);
+        venomTextureReady = true;
+    }
+    Map_Texture_Sphere(gMapVenomTex, (u8*) aMapVenomTex, &venomOffset);
+    gSPDisplayList(gMasterDisp++, gMapVenomDL);
 
     Matrix_Pop(&gGfxMatrix);
 }

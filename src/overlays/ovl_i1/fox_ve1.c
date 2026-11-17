@@ -2510,24 +2510,16 @@ void Venom1_Ve1Golemech_SetShadow(Ve1Golemech* this) {
 }
 
 void Venom1_80198414(void) {
-    s32 i;
-
-    for (i = TEAM_ID_FALCO; i < ARRAY_COUNT(gTeamShields); i++) {
-        gPrevPlanetTeamShields[i] = gSavedTeamShields[i];
-        gPrevPlanetSavedTeamShields[i] = gSavedTeamShields[i];
-        gSavedTeamShields[i] = gTeamShields[i];
-    }
-    gBgColor = 0xFFFF; // 248, 248, 248
-    gNextGameState = GSTATE_PLAY;
-    gNextLevel = LEVEL_VENOM_2;
-    gNextLevelPhase = 2;
-    D_ctx_80177C94 = gGoldRingCount[0];
-    D_ctx_80177C9C = gPlayer[0].shields + 1;
-    D_ctx_80177CA4 = gHitCount;
-    D_ctx_80177CAC = gPlayer[0].arwing.rightWingState;
-    D_ctx_80177CB4 = gPlayer[0].arwing.leftWingState;
-    D_ctx_80177CBC = gRightWingHealth[0];
-    D_ctx_80177CC4 = gLeftWingHealth[0];
+    HUD_SetMissionTeamStatus();
+    gLifeCount[0] += ((gTotalHits % 100) + gHitCount) / 100;
+    gTotalHits += gHitCount;
+    gLeveLClearStatus[LEVEL_VENOM_1] = Play_CheckMedalStatus(200) + 1;
+    gMissionStatus = MISSION_COMPLETE;
+    gNextGameState = GSTATE_MAP;
+    gLastGameState = GSTATE_PLAY;
+    gNextLevelPhase = 0;
+    gBgColor = 0;
+    Audio_FadeOutAll(10);
     Audio_StopPlayerNoise(0);
     Audio_KillSfxBySource(gPlayer[0].sfxSource);
 }

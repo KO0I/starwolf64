@@ -55,6 +55,7 @@ f32 sGoldRingsFwork[20];
 s32 D_80161900[20];
 
 #include "global.h"
+#include "venom_mission.h"
 
 #include "assets/ast_bg_space.h"
 #include "assets/ast_bg_planet.h"
@@ -636,6 +637,10 @@ void HUD_VenomTitleCard_Draw(void) {
 }
 
 void HUD_TitleCard_Draw(f32 x, f32 y) {
+    static u8* missionNumbers[] = {
+        aLargeText_0, aLargeText_1, aLargeText_2, aLargeText_3,
+        aLargeText_4, aLargeText_5, aLargeText_6, aLargeText_7,
+    };
     s32 i;
     s32 levelIdx;
     f32 x0;
@@ -646,6 +651,7 @@ void HUD_TitleCard_Draw(f32 x, f32 y) {
     f32 y2;
 
     levelIdx = HUD_GetLevelIndex();
+    if (VenomMission_IsArena()) levelIdx = 14;
 
     x0 = x;
     y0 = y;
@@ -699,10 +705,11 @@ void HUD_TitleCard_Draw(f32 x, f32 y) {
     RCP_SetupDL(&gMasterDisp, SETUPDL_76_OPTIONAL);
     gDPSetPrimColor(gMasterDisp++, 0, 0, 255, 255, 255, 255);
 
-    if ((levelIdx != 14) && (levelIdx != 15)) { // LEVEL_KATINA || LEVEL_FORTUNA
+    if ((gCurrentLevel != LEVEL_VENOM_2) || VenomMission_IsArena()) {
         Lib_TextureRect_IA8(&gMasterDisp, aTextMissionNo, 112, 19, x0 - 12.0f, y0 + 4.0f, 1.0f, 1.0f);
 
-        Lib_TextureRect_IA8(&gMasterDisp, sLevelTitleCard[levelIdx].levelIdxTex, sLevelTitleCard[levelIdx].width,
+        Lib_TextureRect_IA8(&gMasterDisp, missionNumbers[gCurrentLevel == LEVEL_TRAINING ? 0 : gMissionNumber + 1],
+                            sLevelTitleCard[levelIdx].width,
                             sLevelTitleCard[levelIdx].height, x1 + 28.0f, y1 + 4.0f, 1.0f, 1.0f);
     } else {
         HUD_VenomTitleCard_Draw();
@@ -1289,41 +1296,6 @@ void HUD_SetMissionTeamStatus(void) {
             gMissionTeamStatus[gMissionNumber] |= mask;
         }
         mask >>= 8;
-    }
-}
-
-void HUD_Bolse_Area6_SaveData(void) {
-    PlanetId planetId;
-
-    if ((gCurrentLevel == LEVEL_BOLSE) || (gCurrentLevel == LEVEL_AREA_6)) {
-        planetId = PLANET_BOLSE;
-
-        if (gCurrentLevel == LEVEL_AREA_6) {
-            planetId = PLANET_AREA_6;
-        }
-
-        gSaveFile.save.data.planet[planetId].played = 1;
-
-        if (gExpertMode) {
-            gSaveFile.save.data.planet[planetId].expertClear = 1;
-        } else {
-            gSaveFile.save.data.planet[planetId].normalClear = 1;
-        }
-
-        if (gLeveLClearStatus[gCurrentLevel] == 2) {
-            gMissionMedal[gMissionNumber] = 1;
-
-            if (gExpertMode) {
-                gSaveFile.save.data.planet[planetId].expertMedal = 1;
-            } else {
-                gSaveFile.save.data.planet[planetId].normalMedal = 1;
-            }
-        }
-
-        gMissionNumber++;
-        gHitCount = 0;
-
-        Save_Write();
     }
 }
 
@@ -3881,6 +3853,7 @@ void HUD_Draw(void) {
     HUD_PauseScreen_Update();
     gDPSetTextureFilter(gMasterDisp++, G_TF_BILERP);
     CALL_EVENT(DrawGlobalHUDPostEvent);
+    VenomMission_DrawHUD();
 }
 
 void FoBase_Draw(Boss* this) {
