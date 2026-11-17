@@ -75,7 +75,7 @@ export class BrowserSession extends EventTarget {
       this.slot = result.slot;
       this.token = result.token;
       this.peers = result.peers;
-      if (role === 'host') this.setup = {revision:0, match:{...DEFAULT_MATCH}, members:result.peers.map(p => ({peer:p.peer, slot:p.slot, selection:null}))};
+      if (role === 'host') this.setup = {revision:0, match:{...DEFAULT_MATCH}, members:result.peers.map(p => ({peer:p.peer, slot:p.slot, selection:null,status:'hacking',hue:0}))};
       this.openEvents(epoch);
       this.changed();
     } catch (error) {
@@ -233,6 +233,8 @@ export class BrowserSession extends EventTarget {
           link.hello = true;
           this.refresh();
           if (this.role === 'host') this.sendControl(link, {type:'room-state', version:VERSION, setup:this.setup});
+        } else if (channel === link.control && this.role === 'host' && link.hello && message.type === 'pilot-status') {
+          this.acceptStatus(link.peer,message.status,message.hue);
         } else if (channel === link.control && this.role === 'host' && link.hello && message.type === 'select-loadout') {
           let error = null;
           try { this.acceptSelection(link.peer, message.selection); }
@@ -242,7 +244,10 @@ export class BrowserSession extends EventTarget {
           if (!message.setup.members.some(member => member.peer === this.peer && member.slot === this.slot) ||
               !message.setup.members.some(member => member.peer === link.peer && member.slot === 0)) throw new Error('Room setup does not match this session');
           if (!this.setup || message.setup.revision > this.setup.revision) {
+            const previous=this.setup?.members.find(member=>member.peer===this.peer)?.selection;
             this.setup = message.setup;
+            if(previous && !this.setup.members.find(member=>member.peer===this.peer)?.selection)
+              this.emit('selection-withdrawn',{peer:this.peer});
             this.changed();
           }
         } else if (channel === link.control && this.role === 'guest' && link.hello && message.type === 'selection-result') {
@@ -275,10 +280,8 @@ export class BrowserSession extends EventTarget {
 
   syncSetupRoster() {
     if (!this.setup) return;
-    const members = this.peers.map(peer => ({
-      peer:peer.peer, slot:peer.slot,
-      selection:this.setup.members.find(member => member.peer === peer.peer && member.slot === peer.slot)?.selection ?? null
-    })).sort((a,b) => a.slot-b.slot);
+    const members = this.peers.map(peer => this.setup.members.find(member=>member.peer===peer.peer && member.slot===peer.slot) ??
+      {peer:peer.peer,slot:peer.slot,selection:null,status:'hacking',hue:0}).sort((a,b)=>a.slot-b.slot);
     if (JSON.stringify(members) !== JSON.stringify(this.setup.members)) {
       this.setup = {...this.setup, revision:this.setup.revision+1, members};
       this.broadcastSetup();
@@ -292,16 +295,35 @@ export class BrowserSession extends EventTarget {
     this.changed();
   }
 
+  acceptStatus(peer,status,hue) {
+    if(this.lockedLoadouts.has(peer))return;
+    if(!['hacking','signing-in'].includes(status)||!Number.isInteger(hue)||hue<0||hue>7)throw Error('Invalid pilot status');
+    const member=this.setup?.members.find(item=>item.peer===peer);
+    if(!member)throw Error('This player is no longer in the room');
+    if(member.status===status && member.hue===hue && member.selection===null)return;
+    this.setup={...this.setup,revision:this.setup.revision+1,members:this.setup.members.map(item=>item.peer===peer?{...item,status,hue,selection:null}:item)};
+    if(member.selection)this.emit('selection-withdrawn',{peer});
+    this.broadcastSetup();
+  }
+  updatePilotStatus(status,hue) {
+    if(!this.setup || !['hosting','connected'].includes(this.phase))return false;
+    if(this.role==='host'){this.acceptStatus(this.peer,status,hue);return true;}
+    const link=[...this.links.values()].find(item=>item.state==='connected');
+    return Boolean(link && this.sendControl(link,{type:'pilot-status',version:VERSION,status,hue}));
+  }
+
   acceptSelection(peer, request) {
     if(this.lockedLoadouts.has(peer))throw Error("Your loadout is locked for this match.");
     const member = this.setup?.members.find(member => member.peer === peer);
     if (!member) throw new Error('This player is no longer in the room');
+    if(member.status==='hacking')throw Error('Prepare your game before confirming a pilot.');
     const others = this.setup.members.filter(member => member.peer !== peer).map(member => member.selection);
     const selection = assignSelection(request, member.selection, others, this.setup.match);
     this.setup = {
       ...this.setup, revision:this.setup.revision+1,
-      members:this.setup.members.map(member => member.peer === peer ? {...member, selection} : member)
+      members:this.setup.members.map(member => member.peer === peer ? {...member, selection,status:'confirmed',hue:selection.hue} : member)
     };
+    if(member.selection && JSON.stringify(member.selection)!==JSON.stringify(selection))this.emit('selection-withdrawn',{peer});
     this.broadcastSetup();
     return structuredClone(selection);
   }
@@ -347,7 +369,8 @@ export class BrowserSession extends EventTarget {
       members:this.setup.members.map(member => {
         const selected = member.selection;
         const invalid = selected && selectionProblem({pilot:selected.pilot,vehicle:selected.vehicle,hue:selected.hue},match);
-        return {...member,selection:invalid ? null : selected};
+        if(invalid)this.emit('selection-withdrawn',{peer:member.peer});
+        return invalid?{...member,selection:null,status:'signing-in'}:member;
       })
     };
     this.broadcastSetup();
@@ -449,6 +472,11 @@ export class BrowserSession extends EventTarget {
     this.emit('peer-left',{peer:link.peer,slot:link.slot});
     this.lockedLoadouts.delete(link.peer);
     this.links.delete(link.peer);
+    if(this.role==='host' && this.setup){
+      this.setup={...this.setup,revision:this.setup.revision+1,members:this.setup.members.map(member=>
+        member.peer===link.peer?{...member,selection:null,status:'hacking',hue:0}:member)};
+      this.broadcastSetup();
+    }
     if (closeTransport) this.closeTransport(link);
   }
 

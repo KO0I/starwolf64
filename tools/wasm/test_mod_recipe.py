@@ -1,6 +1,6 @@
 import copy
 import unittest
-from mod_recipe import create, apply
+from mod_recipe import create_v1 as create, apply
 
 
 class ModRecipeTests(unittest.TestCase):

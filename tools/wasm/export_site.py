@@ -38,26 +38,28 @@ def export(build, output, *, domain=None):
     except ImportError:
         from refresh_mod import verify_sources
     verify_sources(ROOT)
+    try:
+        from .mod_recipe import verify_publication
+        from .publication import audit_contents, verify_extractor_package
+    except ImportError:
+        from mod_recipe import verify_publication
+        from publication import audit_contents, verify_extractor_package
+    recipe_audit = verify_publication(ROOT)
+    verify_extractor_package(build, ROOT)
     sources = {}
-    for name in ("index.html", "app.mjs", "prepare-worker.mjs", "files.mjs", "zip.mjs"):
+    for name in ("index.html", "app.mjs", "prepare-worker.mjs"):
         sources[name] = ROOT / "tools/wasm/web" / name
     for name in ("rom-file.mjs", "rom-patch.mjs", "coi-serviceworker.js"):
         sources[name] = ROOT / "browser" / name
-    for name in ("index.html","app.mjs","session.mjs","catalog.mjs","styles.css","ship-preview.mjs","ship-wireframes.json","protocol.mjs","world-protocol.mjs","game.mjs","engine.mjs","setup-controls.mjs"):
-        sources["multiplayer/"+name] = ROOT / "tools/multiplayer/web" / name
-    catalog = ROOT / "tools/multiplayer/web/catalog.mjs"
-    pilot_data = subprocess.check_output(["node","--input-type=module","-e",
-        "import("+json.dumps(catalog.as_uri())+").then(({PILOTS})=>process.stdout.write(JSON.stringify(PILOTS)))"],text=True)
-    for pilot in json.loads(pilot_data):
-        if pilot.get("portrait"):
-            sources["portraits/"+pilot["id"]+".png"] = ROOT / "assets" / pilot["portrait"]
-    sources["runtime/launch-background.jpg"] = ROOT / "browser/launch-background.jpg"
-    sources["licenses/Arwing.txt"] = ROOT / "browser/Arwing-source.txt"
+    for directory, prefix in ((ROOT / "tools/shared", "shared"), (ROOT / "tools/multiplayer/web", "multiplayer")):
+        for path in sorted(directory.iterdir()):
+            if path.suffix == ".mjs" and ".test." not in path.name or path.name in ("index.html", "styles.css"):
+                sources[prefix + "/" + path.name] = path
     for suffix in ("html", "js", "wasm", "data"):
         sources["runtime/Starship." + suffix] = build / ("Starship." + suffix)
     for suffix in ("mjs", "wasm", "data"):
         sources["extractor/extractor." + suffix] = build / ("extractor." + suffix)
-    for name in ("recipe.json", "literals.dat", "chatter.dat"):
+    for name in ("recipe.json", "literals.dat", "restoration.bps", "provenance.json", "archives.json"):
         sources["mod/" + name] = ROOT / "assets/wasm/mod" / name
     sources.update({"start.py": ROOT / "tools/wasm/serve_site.py",
                     "licenses/Starship.md": ROOT / "LICENSE.md",
@@ -78,13 +80,29 @@ def export(build, output, *, domain=None):
         for name in ("CREDITS.md", "README_TheRegressor.txt", "Vitzy_README.md"):
             contents["licenses/characters/" + name] = characters.read(name)
     recipe = json.loads(contents["mod/recipe.json"])
-    if recipe["format"] != "starwolf64-native-mod-v1" or hashlib.sha1(contents["mod/literals.dat"]).hexdigest() != recipe["literalsSha1"]:
+    if recipe["format"] not in ("starwolf64-native-mod-v1", "starwolf64-native-mod-v2") or hashlib.sha1(contents["mod/literals.dat"]).hexdigest() != recipe["literalsSha1"]:
         raise ValueError("Mod recipe integrity check failed")
+    archive_digests = json.loads(contents["mod/archives.json"])
+    import re
+    if set(archive_digests) != {"sf64.o2r", "starship.o2r", "wolfen.o2r"} or any(
+            not isinstance(value, str) or not re.fullmatch(r"[0-9a-f]{64}", value)
+            for value in archive_digests.values()):
+        raise ValueError("Invalid prepared resource-set identities")
+    publication = audit_contents(contents, recipe_audit)
+    audit_bytes = (json.dumps(publication, indent=2) + "\n").encode()
+    contents["asset-audit.json"] = audit_bytes
     metadata = {name: {"size": len(data), "sha256": hashlib.sha256(data).hexdigest()} for name, data in contents.items()}
     download = [name for name in contents if not name.startswith(("mod/", "extractor/")) and name not in ("prepare-worker.mjs", "CNAME", ".nojekyll")]
+    network = {"schema": 1, "capacity": 4}
+    identity = {"network":network, "rom":ROM["sha256"], "archives":archive_digests,
+                "runtime":{name:metadata[name]["sha256"] for name in metadata if name.startswith("runtime/")}}
+    fingerprint = hashlib.sha256(json.dumps(identity, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
     manifest = {"format": "starwolf64-wasm-site-v1", "sourceRevision": subprocess.check_output(
         ["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip(), "rom": ROM,
-        "modAssetSetSha256": recipe["assetSetSha256"], "files": metadata, "download": download}
+        "modAssetSetSha256": recipe["assetSetSha256"], "archiveDigests":archive_digests,
+        "buildFingerprint":fingerprint, "network":network, "files":metadata, "download":download,
+        "publication":{"format":publication["format"], "policy":"byorom", "audit":"asset-audit.json",
+                       "sha256":hashlib.sha256(audit_bytes).hexdigest()}}
     contents["site.json"] = (json.dumps(manifest, indent=2) + "\n").encode()
     contents["prepared-assets.json"] = b'{"format":"starwolf64-prepared-v1","prepared":false}\n'
     staging = output.with_name(output.name + ".staging")

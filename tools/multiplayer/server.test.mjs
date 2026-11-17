@@ -1,5 +1,6 @@
+import {createHash} from "node:crypto";
 import test from "node:test";
-import {mkdtemp,writeFile,rm,symlink} from "node:fs/promises";
+import {mkdtemp,writeFile,rm,symlink,mkdir} from "node:fs/promises";
 import {tmpdir} from "node:os";
 import {join} from "node:path";
 import assert from "node:assert/strict";
@@ -189,43 +190,6 @@ test("peers that never open an event stream expire", { timeout: 10000 }, async t
   assert.equal((await f.leave(guest)).status, 403);
 });
 
-test('only registered radio portraits are served', {timeout:10000},async t => {
-  const f = await fixture(t);
-  for (const pilot of ['fox_original','falco_original','slippy_original','peppy_original','wolf','leon','pigma','katt','panther','krystal','kami']) {
-    const response = await fetch(f.base + '/portraits/' + pilot + '.png');
-    assert.equal(response.status,200,pilot);
-    assert.equal(response.headers.get('content-type'),'image/png');
-    const bytes = new Uint8Array(await response.arrayBuffer());
-    assert.deepEqual([...bytes.slice(0,8)],[137,80,78,71,13,10,26,10]);
-  }
-  for (const path of ['/portraits/vitzy.png','/portraits/unknown.png','/assets/portraits/manifest.json']) {
-    assert.equal((await fetch(f.base+path)).status,404,path);
-  }
-});
-test("configured runtime routes pin the manifest and serve only explicit files", async t => {
-  const {mkdtemp,writeFile,rm}=await import("node:fs/promises");
-  const {tmpdir}=await import("node:os");
-  const {join}=await import("node:path");
-  const {createHash}=await import("node:crypto");
-  const directory=await mkdtemp(join(tmpdir(),"starship-runtime-"));
-  t.after(()=>rm(directory,{recursive:true,force:true}));
-  const names=["Starship.html","Starship.js","Starship.wasm","Starship.data","sf64.o2r","starship.o2r","wolfen.o2r"];
-  for(const name of names)await writeFile(join(directory,name),"fixture-"+name);
-  const f=await fixture(t,{gameDir:directory,gameAssets:directory});
-  const manifest=await f.request("/api/game");
-  assert.equal(manifest.body.available,true);assert.equal(manifest.body.capacity,4);
-  assert.match(manifest.body.fingerprint,/^[a-f0-9]{64}$/);
-  const archive=manifest.body.assets.find(a=>a.name==="sf64.o2r");
-  assert.equal(archive.sha256,createHash("sha256").update("fixture-sf64.o2r").digest("hex"));
-  await writeFile(join(directory,"Starship.wasm"),"changed-after-start");
-  const runtime=await fetch(f.base+"/game/Starship.wasm");
-  assert.equal(await runtime.text(),"fixture-Starship.wasm");
-  assert.equal(runtime.headers.get("content-type"),"application/wasm");
-  assert.equal(runtime.headers.get("cross-origin-embedder-policy"),"require-corp");
-  assert.equal((await fetch(f.base+"/game/config.yml")).status,404);
-  assert.equal((await fetch(f.base+"/game-assets/unknown.o2r")).status,404);
-});
-
 test("authenticated name updates reach the roster and validate input",async t=>{
   const f=await fixture(t);const host=await f.make();const guest=await f.join(host);
   const events=await f.events(host);t.after(events.close);await events.next();
@@ -237,65 +201,94 @@ test("authenticated name updates reach the roster and validate input",async t=>{
   assert.equal((await events.next()).data.peers.find(p=>p.peer===guest.peer).name,"Krystal");
 });
 
-test("main site and canonical multiplayer routes share signaling and isolation", async t => {
-  const root=await mkdtemp(join(tmpdir(),'sargasso-site-'));
-  t.after(()=>rm(root,{recursive:true,force:true}));
-  await writeFile(join(root,'index.html'),'<title>Main site</title>');
-  await writeFile(join(root,'site.json'),JSON.stringify({format:'starwolf64-wasm-site-v1',files:{'index.html':{}}}));
-  await writeFile(join(root,'prepared-assets.json'),'{}');
-  await writeFile(join(root,'private.txt'),'must not be served');
-  const f=await fixture(t,{siteDir:root});
+
+async function writeSite(root, files, extra={}) {
+  const metadata={};
+  for(const [name,body] of Object.entries(files)) {
+    await mkdir(join(root,name,'..'),{recursive:true});
+    await writeFile(join(root,name),body);
+    metadata[name]={size:Buffer.byteLength(body),sha256:createHash('sha256').update(body).digest('hex')};
+  }
+  const audit=JSON.stringify({format:'starwolf64-publication-v1',policy:'byorom',mod:{status:'pass'},files:structuredClone(metadata)});
+  await writeFile(join(root,'asset-audit.json'),audit);
+  metadata['asset-audit.json']={size:Buffer.byteLength(audit),sha256:createHash('sha256').update(audit).digest('hex')};
+  const manifest={format:'starwolf64-wasm-site-v1',
+    publication:{format:'starwolf64-publication-v1',policy:'byorom',audit:'asset-audit.json',sha256:metadata['asset-audit.json'].sha256},
+    files:metadata,download:Object.keys(metadata),...extra};
+  await writeFile(join(root,'site.json'),JSON.stringify(manifest));
+  await writeFile(join(root,'prepared-assets.json'),'{"prepared":false}');
+  return manifest;
+}
+test("archive and extracted-preview routes are always unavailable",async t=>{
+  const f=await fixture(t,{gameDir:'/missing-private-runtime',gameAssets:'/missing-private-assets'});
   await f.prepare();
-  assert.equal(await (await fetch(f.base+'/')).text(),'<title>Main site</title>');
+  const descriptor=await f.request('/api/game');
+  assert.equal(descriptor.body.available,false);
+  assert.equal(Object.hasOwn(descriptor.body,'assets'),false);
+  for(const path of ['/game-assets/sf64.o2r','/game-assets/wolfen.o2r','/game/Starship.data',
+    '/portraits/fox_original.png','/portraits/panther.png','/multiplayer/portraits/wolf.png',
+    '/ship-wireframes.json','/multiplayer/ship-wireframes.json']) {
+    assert.equal((await fetch(f.base+path)).status,404,path);
+  }
+});
+test("audited snapshot serves the builder and canonical multiplayer while retaining signaling",async t=>{
+  const root=await mkdtemp(join(tmpdir(),'sargasso-public-'));
+  t.after(()=>rm(root,{recursive:true,force:true}));
+  await writeSite(root,{'index.html':'<title>Bring your own ROM</title>',
+    'multiplayer/index.html':'<title>SARGASSO HIDEOUT</title>','multiplayer/app.mjs':'export const audited=true;'});
+  await writeFile(join(root,'private.txt'),'must not be served');
+  const f=await fixture(t,{siteDir:root});await f.prepare();
+  assert.match(await (await fetch(f.base+'/')).text(),/Bring your own ROM/);
   const lobby=await fetch(f.base+'/multiplayer/');
   assert.equal(lobby.status,200);
   assert.match(await lobby.text(),/SARGASSO HIDEOUT/);
   assert.equal(lobby.headers.get('cross-origin-embedder-policy'),'require-corp');
   assert.equal((await fetch(f.base+'/multiplayer')).url,f.base+'/multiplayer/');
-  assert.equal((await fetch(f.base+'/multiplayer/setup-controls.mjs')).status,200);
+  await writeFile(join(root,'multiplayer/app.mjs'),'changed after startup');
+  assert.equal(await (await fetch(f.base+'/multiplayer/app.mjs')).text(),'export const audited=true;');
   assert.equal((await fetch(f.base+'/private.txt')).status,404);
-  assert.equal((await f.request('/api/config')).status,200);
+  assert.equal((await fetch(f.base+'/multiplayer/setup-controls.mjs')).status,404);
+  const host=await f.make();assert.equal((await f.join(host)).role,'guest');
 });
-test("site manifest cannot expose a file outside its directory", async t => {
-  const root=await mkdtemp(join(tmpdir(),'sargasso-containment-'));
-  const outside=await mkdtemp(join(tmpdir(),'sargasso-outside-'));
+test("unaudited or prepared sites cannot be hosted",async t=>{
+  for(const kind of ['unaudited','prepared']){
+    const root=await mkdtemp(join(tmpdir(),'sargasso-reject-'));
+    t.after(()=>rm(root,{recursive:true,force:true}));
+    await writeSite(root,{'index.html':'safe'},kind==='unaudited'?{publication:null}:{});
+    if(kind==='prepared')await writeFile(join(root,'prepared-assets.json'),'{"prepared":true}');
+    const f=await fixture(t,{siteDir:root});
+    await assert.rejects(f.prepare(),kind==='prepared'?/Prepared game/:/publication audit/);
+  }
+});
+test("ROM archives and unaudited image or geometry files cannot enter the snapshot",async t=>{
+  for(const name of ['sf64.o2r','renamed.z64','portraits/fox.png','multiplayer/ship-wireframes.json','model.glb']){
+    const root=await mkdtemp(join(tmpdir(),'sargasso-original-'));
+    t.after(()=>rm(root,{recursive:true,force:true}));
+    await writeSite(root,{'index.html':'safe',[name]:'original asset'});
+    const f=await fixture(t,{siteDir:root});await assert.rejects(f.prepare(),/asset path/);
+  }
+});
+test("changed public files fail verification before the service is prepared",async t=>{
+  const root=await mkdtemp(join(tmpdir(),'sargasso-hash-'));
+  t.after(()=>rm(root,{recursive:true,force:true}));
+  await writeSite(root,{'index.html':'safe'});
+  await writeFile(join(root,'index.html'),'unreviewed change');
+  const f=await fixture(t,{siteDir:root});await assert.rejects(f.prepare(),/verification/);
+});
+test("site manifest cannot expose a file outside its directory",async t=>{
+  const root=await mkdtemp(join(tmpdir(),'sargasso-containment-')), outside=await mkdtemp(join(tmpdir(),'sargasso-outside-'));
   t.after(()=>Promise.all([rm(root,{recursive:true,force:true}),rm(outside,{recursive:true,force:true})]));
+  await writeSite(root,{'index.html':'safe'});
+  await rm(join(root,'index.html'));
   await writeFile(join(outside,'secret.txt'),'secret');
   await symlink(join(outside,'secret.txt'),join(root,'index.html'));
-  await writeFile(join(root,'site.json'),JSON.stringify({format:'starwolf64-wasm-site-v1',files:{'index.html':{}}}));
-  const f=await fixture(t,{siteDir:root});
-  await assert.rejects(f.prepare(),/escapes/);
+  const f=await fixture(t,{siteDir:root});await assert.rejects(f.prepare(),/escapes/);
 });
 
-test("BYOROM cutover blocks hosted assets while retaining the builder and signaling", async t => {
-  const root = await mkdtemp(join(tmpdir(), 'sargasso-byorom-'));
-  t.after(() => rm(root, {recursive:true, force:true}));
-  await writeFile(join(root, 'index.html'), '<title>Bring your own ROM</title>');
-  await writeFile(join(root, 'ship-wireframes.json'), '{"copied":"geometry"}');
-  await writeFile(join(root, 'site.json'), JSON.stringify({
-    format:'starwolf64-wasm-site-v1',
-    files:{'index.html':{}, 'ship-wireframes.json':{}, 'portraits/fox_original.png':{}, 'multiplayer/ship-wireframes.json':{}},
-    download:['index.html','ship-wireframes.json','portraits/fox_original.png','multiplayer/ship-wireframes.json']
-  }));
-  await writeFile(join(root, 'prepared-assets.json'), '{"prepared":false}');
-  // Missing runtime directories prove no private archives are read in this mode.
-  const f = await fixture(t, {byoromOnly:true, siteDir:root, gameDir:join(root,'missing'), gameAssets:join(root,'missing')});
-  await f.prepare();
-  const descriptor = await f.request('/api/game');
-  assert.equal(descriptor.body.available, false);
-  assert.match(descriptor.body.reason, /Bring Your Own ROM/);
-  assert.equal(Object.hasOwn(descriptor.body, 'assets'), false);
-  for (const path of ['/game-assets/sf64.o2r', '/game-assets/wolfen.o2r', '/game/Starship.data',
-      '/game/Starship.wasm', '/portraits/fox_original.png', '/multiplayer/portraits/wolf.png',
-      '/ship-wireframes.json', '/multiplayer/ship-wireframes.json']) {
-    assert.equal((await fetch(f.base + path)).status, 404, path);
-  }
-  assert.match(await (await fetch(f.base + '/')).text(), /Bring your own ROM/);
-  assert.equal((await fetch(f.base + '/multiplayer/')).status, 200);
-  assert.equal((await f.request('/api/config')).status, 200);
-  const published = await f.request('/site.json');
-  assert.deepEqual(Object.keys(published.body.files), ['index.html']);
-  assert.deepEqual(published.body.download, ['index.html']);
-  const host = await f.make();
-  assert.equal((await f.join(host)).role, 'guest');
+test("a publication flag cannot substitute for a content-bound audit receipt",async t=>{
+  const root=await mkdtemp(join(tmpdir(),'sargasso-audit-'));
+  t.after(()=>rm(root,{recursive:true,force:true}));
+  await writeSite(root,{'index.html':'safe'});
+  await writeFile(join(root,'asset-audit.json'),'{"policy":"byorom"}');
+  const f=await fixture(t,{siteDir:root});await assert.rejects(f.prepare(),/receipt failed verification/);
 });

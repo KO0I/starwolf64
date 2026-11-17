@@ -11,6 +11,9 @@ const urlIndex = process.argv.indexOf('--url');
 if (urlIndex !== -1 && !process.argv[urlIndex + 1]) throw Error('--url requires a URL');
 const hostedURL = urlIndex < 0 ? null : new URL(process.argv[urlIndex + 1]);
 if (hostedURL && !['http:', 'https:'].includes(hostedURL.protocol)) throw Error('--url must use HTTP or HTTPS');
+const romIndex=process.argv.indexOf('--rom');
+if(romIndex<0 || !process.argv[romIndex+1])throw Error('Supply --rom with your local US 1.1 ROM.');
+const romPath=resolve(process.argv[romIndex+1]);
 const sleep = ms => new Promise(done => setTimeout(done, ms));
 const report = {ok:false, assertions:{}, signalKinds:[], diagnostics:{}, errors:[]};
 const requests = [], pending = new Map(), pages = [];
@@ -76,7 +79,20 @@ async function page(label, url) {
     try { return await value(p, 'Boolean(window.STARWOLF_MP && window.STARWOLF_MP_PROOF)'); }
     catch (error) { if (/context|navigat/i.test(String(error))) return false; throw error; }
   });
+  await prepareLocal(p);
   return p;
+}
+async function prepareLocal(p) {
+  await wait(p.label+' local ROM controls',()=>value(p,"Boolean(document.querySelector('[data-byorom-rom]'))"),30000);
+  const handle=await call('Runtime.evaluate',{expression:"document.querySelector('[data-byorom-rom]')"},p.sessionId);
+  if(!handle.result.objectId)throw Error('Local ROM input missing');
+  await call('DOM.setFileInputFiles',{files:[romPath],objectId:handle.result.objectId},p.sessionId);
+  await wait(p.label+' local preparation',async()=>{
+    const state=await value(p,"({phase:window.STARWOLF_PREPARATION_SERVICE?.phase,error:window.STARWOLF_PREPARATION_SERVICE?.error})");
+    if(state.phase==='error')throw Error(p.label+' preparation: '+state.error);
+    return state.phase==='ready';
+  },180000);
+  assert(true,p.label+' prepares its own ROM locally');
 }
 const state = p => value(p, 'window.STARWOLF_MP.state');
 const events = p => value(p, 'window.STARWOLF_MP_PROOF');
@@ -117,6 +133,7 @@ try {
     server = createSignalingServer({host:'127.0.0.1', port:0});
     await bound(new Promise((done, reject) => { server.server.once('error', reject); server.server.listen(0, '127.0.0.1', done); }), 'server startup');
   }
+  if(!hostedURL)throw Error('Provide --url for an audited BYOROM site.');
   const url = hostedURL?.href ?? `http://127.0.0.1:${server.server.address().port}/`;
   report.url = url;
   profile = await mkdtemp(resolve(tmpdir(), 'starship-mp-'));
@@ -199,7 +216,7 @@ try {
       const setup=window.STARWOLF_MP.state.setup;
       return setup.members.filter(m=>m.selection).every(member=>{
         const card=[...document.querySelectorAll('#peers .squadron-card')].find(card=>card.dataset.peer===member.peer);
-        const canvas=card?.querySelector('canvas'),image=card?.querySelector('img'),ctx=canvas?.getContext('2d');
+        const canvas=card?.querySelector('canvas[aria-label$="wireframe preview"]'),image=card?.querySelector('img'),ctx=canvas?.getContext('2d');
         if(!ctx || !image.complete || !image.naturalWidth || canvas.hidden)return false;
         const colors=['#e7e0ff','#ffcf51','#79e98e','#7cf4ff','#8da7ff','#ce98ff','#ff94c5','#ffa16a'];
         if(ctx.strokeStyle!==colors[member.selection.hue])return false;

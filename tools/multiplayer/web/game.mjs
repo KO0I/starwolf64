@@ -1,9 +1,12 @@
+import {preparation} from '../../shared/preparation.mjs';
 import {nativeLoadout} from './catalog.mjs';
 import {WasmEngine,StaleStageError} from './engine.mjs';
 export class NetworkGame extends EventTarget {
-  constructor(session, container) {
+  constructor(session, container, provider = preparation) {
+    const localPreparation=provider;
     super();
     this.session = session;
+    this.preparation = localPreparation;
     this.container = container;
     this.members = new Map();
     this.slotChanges = Array.from({length: 4}, () => Promise.resolve());
@@ -48,6 +51,17 @@ export class NetworkGame extends EventTarget {
               }
             }).catch(e => this.ignoreStale(e));
     });
+    session.addEventListener('selection-withdrawn',e=>{
+      if(session.role==='host'){
+        const member=this.members.get(e.detail.peer);
+        if(member && !member.active){clearTimeout(member.timer);this.members.delete(e.detail.peer);}
+      }else if(e.detail.peer===session.peer && !this.active){
+        this.baseline=this.pending=null;this.incarnation=this.appliedIncarnation=0;
+        this.stageKey=null;++this.stageRevision;
+        if(this.engine?.frame)this.engine.frame.hidden=true;
+        this.status('pilot signing in…');
+      }
+    });
     session.addEventListener('statechange', () => {
       if (['closed', 'error'].includes(session.phase))
         this.close();
@@ -72,6 +86,7 @@ export class NetworkGame extends EventTarget {
     }
   }
   prepare() {
+    if(this.preparation.phase!=='ready')return Promise.reject(Error('Prepare your game first'));
     return this.preparing ??= this.prepareEngine().catch(e => {
       this.fail(e);
       throw e;
@@ -79,11 +94,13 @@ export class NetworkGame extends EventTarget {
   }
   async prepareEngine() {
     if (this.closed) throw Error('Game closed');
-    const r = await fetch('/api/game', {signal:this.abort.signal});
-    if (!r.ok) throw Error('Game manifest unavailable');
-    this.descriptor = await r.json();
-    if (!this.descriptor.available) throw Error(this.descriptor.reason || 'Playable WASM build unavailable');
-    if (this.closed) throw Error('Game closed');
+    const prepared=this.preparation;
+    if(prepared.phase!=='ready')throw Error('Prepare your game first');
+    const network=prepared.manifest?.network;
+    if(network?.schema!==1||network?.capacity!==4)throw Error('Playable WASM build unavailable');
+    this.descriptor={available:true,schema:network.schema,capacity:network.capacity,runtime:'/runtime/Starship.html',
+      fingerprint:prepared.fingerprint,archives:prepared.archives};
+    if(this.closed)throw Error('Game closed');
     this.engine = new WasmEngine(this.container, this.descriptor);
     this.engine.addEventListener('error', e => this.fail(Error(e.detail.message)));
     this.engine.addEventListener('status', () => {
@@ -204,6 +221,7 @@ export class NetworkGame extends EventTarget {
     if(invitation.fingerprint!==this.descriptor.fingerprint)throw Error('Host and guest game builds differ');
     this.match=invitation.match;this.epoch=invitation.epoch;this.running=true;
     return this.engine.start({role:'guest',matchId:this.match,epoch:this.epoch,slot:this.session.slot,mode:this.mode}).then(()=>{
+      if(this.closed||this.invitation!==invitation||!this.session.setup?.members.find(member=>member.peer===this.session.peer)?.selection)return;
       if(this.mode==='campaign'){
         if(this.pendingStage)this.receiveStage(this.pendingStage);
         else this.status('Waiting for the host to choose a mission.');
@@ -237,7 +255,7 @@ export class NetworkGame extends EventTarget {
   offer() {
     if(!this.running||this.session.role!=='host'||!this.engine||(this.mode==='campaign'?!this.stage:!this.engine.state.ready))return;
     for(const link of this.session.links.values()){
-      if(link.state!=='connected'||this.members.has(link.peer)||link.slot>=4)continue;
+      if(link.state!=='connected'||this.members.has(link.peer)||link.slot>=4||!this.session.setup?.members.find(item=>item.peer===link.peer)?.selection)continue;
       const member={slot:link.slot,incarnation:0,active:false,phase:'waiting',revision:this.stageRevision,epoch:this.epoch};
       this.members.set(link.peer,member);
       if(this.mode!=='campaign'){member.incarnation=++this.incarnations[link.slot];member.phase='offered';}
@@ -272,8 +290,16 @@ export class NetworkGame extends EventTarget {
   async receive({peer,slot,message:m}) {
     if(this.closed)return;
     if(m.op==='start'){
-      if(this.running)return;
-      this.invitation=m;this.status('Host has started. Prepare and join the game.');return;
+      if(this.active)return;
+      if(this.running && (m.match!==this.match||m.fingerprint!==this.descriptor.fingerprint||m.epoch<this.epoch))return;
+      this.invitation=m;
+      if(this.running && this.session.role==='guest'){
+        const invitation=m,link=this.session.links.get(peer);
+        await this.engine.starting;
+        if(this.closed||this.invitation!==invitation||!link||link.closed||!this.session.setup?.members.find(member=>member.peer===this.session.peer)?.selection)return;
+        if(this.mode!=='campaign')this.session.sendGame(link,this.control('ready',m.incarnation));
+      }else this.status('Host has started. Prepare and join the game.');
+      return;
     }
     if(!this.running||m.match!==this.match||m.epoch!==this.epoch||m.fingerprint!==this.descriptor.fingerprint)return;
     const link=this.session.links.get(peer);if(!link)return;
@@ -310,7 +336,7 @@ export class NetworkGame extends EventTarget {
     }else if(m.op==='end')this.finishMatch(m.winner);
   }
   world(image) {
-    if (!this.running || this.session.role !== 'guest' || image.match !== this.match ||
+    if (!this.running || this.session.role !== 'guest' || !this.session.setup?.members.find(member=>member.peer===this.session.peer)?.selection || image.match !== this.match ||
         image.epoch !== this.epoch || (this.mode==='campaign' && this.stage?.status!==3))
       return;
     if (image.reliable)
@@ -324,14 +350,15 @@ export class NetworkGame extends EventTarget {
     this.importing=true;
     try{
       while(this.baseline||this.pending){
-        const image=this.baseline??this.pending,revision=this.stageRevision;
+        const image=this.baseline??this.pending,revision=this.stageRevision,invitation=this.invitation;
         if(this.baseline)this.baseline=null;else this.pending=null;
         try{await this.engine.importWorld(image.bytes);}
-        catch(e){if(e instanceof StaleStageError||(this.mode==='campaign'&&revision!==this.stageRevision))continue;throw e;}
-        if(this.mode==='campaign'&&(revision!==this.stageRevision||image.epoch!==this.epoch||this.stage?.status!==3))continue;
+        catch(e){if(e instanceof StaleStageError||revision!==this.stageRevision)continue;throw e;}
+        if(this.closed||revision!==this.stageRevision||invitation!==this.invitation||!this.session.setup?.members.find(member=>member.peer===this.session.peer)?.selection)continue;
+        if(this.mode==='campaign'&&(image.epoch!==this.epoch||this.stage?.status!==3))continue;
         this.appliedIncarnation=new DataView(image.bytes).getUint32((6+this.session.slot)*4,true);
         if(image.reliable){
-          const link=this.session.links.get(image.peer),incarnation=this.mode==='campaign'?this.stage.incarnation:this.invitation.incarnation;
+          const link=this.session.links.get(image.peer),incarnation=this.mode==='campaign'?this.stage.incarnation:invitation.incarnation;
           if(link)this.session.sendGame(link,this.control('baseline-ack',incarnation,image.tick));
         }
         this.checkActive();
@@ -343,6 +370,7 @@ export class NetworkGame extends EventTarget {
     if (this.incarnation && this.appliedIncarnation === this.incarnation &&
         (this.engine.state.activeMask & (1 << this.session.slot))) {
       this.active = true;
+      this.session.lockedLoadouts.add(this.session.peer);
       if(this.engine.frame)this.engine.frame.hidden=false;
       this.status('Connected to the host world.');
     }

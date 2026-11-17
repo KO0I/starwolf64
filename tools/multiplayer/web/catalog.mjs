@@ -43,7 +43,6 @@ export const pilotById = id => PILOTS.find(pilot => pilot.id === id);
 export const campaignVehicle = pilot => pilot.signatureVehicle || (pilot.crew === 'star_fox' ? 'arwing' : 'wolfen');
 export const vehicleById = id => VEHICLES.find(vehicle => vehicle.id === id);
 export const hueById = id => HUES.find(hue => hue.id === id);
-export const portraitURL = pilot => pilot.portrait ? '/portraits/' + pilot.id + '.png' : null;
 
 const record = value => value !== null && typeof value === 'object' && !Array.isArray(value);
 const keys = (value, names) => record(value) && Object.keys(value).length === names.length && names.every(name => Object.hasOwn(value, name));
@@ -90,7 +89,7 @@ export function validAcceptedSelection(value) {
 
 export function validSetup(value) {
   if (!keys(value, ['revision','match','members']) || !Number.isSafeInteger(value.revision) || value.revision < 0 || !validMatch(value.match) || !Array.isArray(value.members) || value.members.length < 1 || value.members.length > 8) return false;
-  if (!value.members.every(member => keys(member, ['peer','slot','selection']) && typeof member.peer === 'string' && /^[a-f0-9]{32}$/.test(member.peer) && Number.isInteger(member.slot) && member.slot >= 0 && member.slot < 8 &&
+  if (!value.members.every(member => keys(member, ['peer','slot','selection','status','hue']) && ['hacking','signing-in','confirmed'].includes(member.status) && Boolean(hueById(member.hue)) && (member.status === 'confirmed') === (member.selection !== null) && (!member.selection || member.hue === member.selection.hue) && typeof member.peer === 'string' && /^[a-f0-9]{32}$/.test(member.peer) && Number.isInteger(member.slot) && member.slot >= 0 && member.slot < 8 &&
     (member.selection === null || (validAcceptedSelection(member.selection) && !selectionProblem({pilot:member.selection.pilot, vehicle:member.selection.vehicle, hue:member.selection.hue}, value.match))))) return false;
   if (!value.members.some(member => member.slot === 0) || new Set(value.members.map(member => member.peer)).size !== value.members.length || new Set(value.members.map(member => member.slot)).size !== value.members.length) return false;
   const selected = value.members.map(member => member.selection).filter(Boolean);

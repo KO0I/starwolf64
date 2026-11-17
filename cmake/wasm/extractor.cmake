@@ -12,8 +12,11 @@ target_link_options(wasm-extractor PRIVATE
     "-sEXPORTED_RUNTIME_METHODS=['FS','callMain']"
     "SHELL:--preload-file \"${PROJECT_SOURCE_DIR}/config.yml@/source/config.yml\""
     "SHELL:--preload-file \"${PROJECT_SOURCE_DIR}/assets/yaml/us/rev1@/source/assets/yaml/us/rev1\""
-    "SHELL:--preload-file \"${PROJECT_SOURCE_DIR}/port@/source/port\"")
+    "SHELL:--preload-file \"${PROJECT_SOURCE_DIR}/port/shaders/directx/default.shader.hlsl@/source/port/shaders/directx/default.shader.hlsl\""
+    "SHELL:--preload-file \"${PROJECT_SOURCE_DIR}/port/shaders/metal/default.shader.metal@/source/port/shaders/metal/default.shader.metal\""
+    "SHELL:--preload-file \"${PROJECT_SOURCE_DIR}/port/shaders/opengl/default.shader.fs@/source/port/shaders/opengl/default.shader.fs\""
+    "SHELL:--preload-file \"${PROJECT_SOURCE_DIR}/port/shaders/opengl/default.shader.vs@/source/port/shaders/opengl/default.shader.vs\"")
 file(GLOB_RECURSE extractor_metadata CONFIGURE_DEPENDS
-    "${PROJECT_SOURCE_DIR}/assets/yaml/us/rev1/*" "${PROJECT_SOURCE_DIR}/port/*")
+    "${PROJECT_SOURCE_DIR}/assets/yaml/us/rev1/*" "${PROJECT_SOURCE_DIR}/port/shaders/*")
 set_property(TARGET wasm-extractor APPEND PROPERTY LINK_DEPENDS
     "${PROJECT_SOURCE_DIR}/config.yml" ${extractor_metadata})

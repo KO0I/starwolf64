@@ -11,12 +11,15 @@ const urlIndex = process.argv.indexOf('--url');
 if (urlIndex !== -1 && !process.argv[urlIndex + 1]) throw Error('--url requires a URL');
 const hostedURL = urlIndex < 0 ? null : new URL(process.argv[urlIndex + 1]);
 if (hostedURL && !['http:', 'https:'].includes(hostedURL.protocol)) throw Error('--url must use HTTP or HTTPS');
+const romIndex=process.argv.indexOf('--rom');
+if(romIndex<0 || !process.argv[romIndex+1])throw Error('Supply --rom with your local US 1.1 ROM.');
+const romPath=resolve(process.argv[romIndex+1]);
 const sleep = ms => new Promise(done => setTimeout(done, ms));
 const report = {ok:false, assertions:{}, signalKinds:[], diagnostics:{}, errors:[]};
 const requests = [], pending = new Map(), pages = [];
 let server, chrome, ws, profile, id = 0, interrupted = false;
 process.once('SIGINT', () => { interrupted = true; });
-const deadline = Date.now() + 240000;
+const deadline = Date.now() + 600000;
 function assert(value, name, detail) {
   if (!value) throw Error(`${name}: ${JSON.stringify(detail)}`);
   report.assertions[name] = true;
@@ -76,7 +79,20 @@ async function page(label, url) {
     try { return await value(p, 'Boolean(window.STARWOLF_MP && window.STARWOLF_MP_PROOF)'); }
     catch (error) { if (/context|navigat/i.test(String(error))) return false; throw error; }
   });
+  await prepareLocal(p);
   return p;
+}
+async function prepareLocal(p) {
+  await wait(p.label+' local ROM controls',()=>value(p,"Boolean(document.querySelector('[data-byorom-rom]'))"),30000);
+  const handle=await call('Runtime.evaluate',{expression:"document.querySelector('[data-byorom-rom]')"},p.sessionId);
+  if(!handle.result.objectId)throw Error('Local ROM input missing');
+  await call('DOM.setFileInputFiles',{files:[romPath],objectId:handle.result.objectId},p.sessionId);
+  await wait(p.label+' local preparation',async()=>{
+    const state=await value(p,"({phase:window.STARWOLF_PREPARATION_SERVICE?.phase,error:window.STARWOLF_PREPARATION_SERVICE?.error})");
+    if(state.phase==='error')throw Error(p.label+' preparation: '+state.error);
+    return state.phase==='ready';
+  },180000);
+  assert(true,p.label+' prepares its own ROM locally');
 }
 const state = p => value(p, 'window.STARWOLF_MP.state');
 const events = p => value(p, 'window.STARWOLF_MP_PROOF');

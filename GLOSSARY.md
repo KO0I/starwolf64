@@ -59,3 +59,15 @@ The export and listening catalog exist. Replacement import is not yet implemente
 | Loop markers | Authored start and end points in the replacement recording. Conversion maps these points to the converted sample and generates the decoder state needed to repeat it. |
 | ADPCM predictor book | Coefficients used to decode an ADPCM sample. The replacement payload, predictor book, endpoint, and loop state must agree. |
 | Paired audio build | Starwolf64's matching native archive and browser game artifacts produced from the same replacement manifest and conversion results. Neither target becomes the published result if either target fails validation. Shared tooling and the native writer can also be used independently by upstream Starship. |
+
+## Browser preparation and publication
+
+| Term | Meaning |
+| --- | --- |
+| BYOROM | Bring your own ROM. Each player supplies and validates their own ROM locally; the ROM and extracted assets are not supplied by the server or other players. |
+| Published site | The audited hosted code, extraction tools, reviewed modification inputs, original material, and licenses. It excludes prepared game assets and unexplained copies of original content. |
+| Prepared game | The archives produced locally from the verified ROM and current mod inputs. They may be used in memory, explicitly remembered on the device, imported after verification, or downloaded locally. |
+| Mod lineage | The content-bound relationship between a generated resource, its verified base inputs, authored inputs, and generator. A new path or valid checksum alone does not establish provenance. |
+| Build identity | The compatible runtime, network schema, ROM revision, and semantic resource-set digests. ZIP packaging differences do not change it. |
+| Room presence | A connected member's preparation or selection state. "hacking" means preparing; "pilot signing in…" means selecting. Neither state establishes a registered loadout or active ship. |
+| Roster registration | The host's acceptance of a confirmed pilot, ship, and hue. It is withdrawn by edits before spawning or by timeout, departure, or disconnection. |

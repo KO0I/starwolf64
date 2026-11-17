@@ -44,36 +44,40 @@ def verify_sources(root=ROOT):
     if expected != actual:
         changed = sorted(name for name in expected.keys() | actual.keys() if expected.get(name) != actual.get(name))
         raise ValueError("Browser mod sources changed: " + ", ".join(changed) + ". Run python3 tools/wasm/refresh_mod.py")
-    if (root / "assets/wasm/mod/chatter.dat").read_bytes() != (root / "assets/audio/chatter/bank.bin").read_bytes():
+    if (root / "assets/wasm/mod/chatter.dat").is_file() and (root / "assets/wasm/mod/chatter.dat").read_bytes() != (root / "assets/audio/chatter/bank.bin").read_bytes():
         raise ValueError("Browser chatter differs from the approved bank; refresh the browser mod")
     print(f"Verified {len(actual)} current mod source inputs")
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--check", action="store_true", help="Rebuild and compare every frozen resource without replacing the snapshot")
-    parser.add_argument("--verify-sources", action="store_true", help="Check committed source hashes without a ROM or native build")
+    parser.add_argument("--check",action="store_true",help="Verify provenance and exact local reconstruction")
+    parser.add_argument("--verify-sources",action="store_true",help="Verify frozen inputs without a ROM or native build")
+    parser.add_argument("--base",type=Path,default=ROOT/"sf64.o2r")
+    parser.add_argument("--rom",type=Path,default=ROOT/"Star Fox 64 (U) (V1.1) [!].z64")
+    parser.add_argument("--overlay",type=Path,default=ROOT/"build-cmake/mods/wolfen.o2r")
+    parser.add_argument("--private-project",type=Path,default=ROOT)
     args = parser.parse_args()
-    if args.verify_sources:
+    if args.verify_sources or args.check:
+        from mod_recipe import verify_publication, archive_files, asset_digest, apply
         verify_sources()
+        report = verify_publication(ROOT)
+        if args.check:
+            recipe = json.loads((ROOT/"assets/wasm/mod/recipe.json").read_text())
+            base = archive_files(args.base)
+            digests = json.loads((ROOT/"assets/wasm/mod/archives.json").read_text())
+            if asset_digest(base) != digests["sf64.o2r"]:
+                raise ValueError("Base archive differs from the pinned ROM extraction")
+            rebuilt = apply(recipe,(ROOT/"assets/wasm/mod/literals.dat").read_bytes(),base,
+                            project_sources={"restoration-model.bin":(ROOT/"assets/medusa/battleship.f3d").read_bytes()})
+            if asset_digest(rebuilt) != digests["wolfen.o2r"]:
+                raise ValueError("Prepared resource set differs")
+        print(json.dumps(report))
         return
-
-    def run(*arguments):
-        subprocess.run([sys.executable, *map(str, arguments)], cwd=ROOT, check=True)
-
-    native = ROOT / "build-cmake/mods/wolfen.o2r"
-    run("tools/build_wolfen.py", *(["--check"] if args.check else []))
-    run("tools/voice_blips.py", "build", "--game-set", "starwolf64", "--targets", "native")
-    release = ROOT / "build/dialogue-blips/starwolf64"
-    addon = release / json.loads((release / "latest.json").read_text())["directory"] / "zz-voice-blips-starwolf64.o2r"
-    run("tools/wasm/mod_recipe.py", "--base", ROOT / "sf64.o2r", "--mod", native,
-        "--overlay", addon, "--chatter", ROOT / "assets/audio/chatter/bank.bin",
-        "--output", ROOT / "assets/wasm/mod", *(["--check"] if args.check else []))
-    if args.check:
-        verify_sources()
-    else:
-        (ROOT / "assets/wasm/mod/sources.json").write_text(json.dumps(source_hashes(ROOT), indent=2) + "\n")
-        verify_sources()
+    subprocess.run([sys.executable,"-B","tools/wasm/freeze_public_mod.py",
+                    "--base",str(args.base),"--rom",str(args.rom),
+                    "--overlay",str(args.overlay),"--private-project",str(args.private_project)],
+                   cwd=ROOT,check=True)
 
 
 if __name__ == "__main__":

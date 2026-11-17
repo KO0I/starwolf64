@@ -1,7 +1,7 @@
 import {validSelection, validSetup} from './catalog.mjs';
 
 // Gameplay control messages. Bulk scenes use world-protocol.mjs.
-export const VERSION = 4;
+export const VERSION = 5;
 export const MAX_FRAME = 65536;
 const encoder = new TextEncoder();
 const decoder = new TextDecoder('utf-8', { fatal: true });
@@ -19,6 +19,7 @@ export function validateMessage(value) {
   if (value.type === 'game') return keys(value,['type','version','op','match','epoch','incarnation','fingerprint','tick','winner']) && ['start','ready','baseline-ack','active','end'].includes(value.op) && u32(value.match) && value.match > 0 && u32(value.epoch) && value.epoch > 0 && u32(value.incarnation) && u32(value.tick) && [0,1,2,3,4,100].includes(value.winner) && typeof value.fingerprint === 'string' && /^[a-f0-9]{64}$/.test(value.fingerprint);
   if (value.type === 'stage') return keys(value, ['type','version','match','epoch','status','level','phase','topology','incarnation','fingerprint']) && u32(value.match) && value.match > 0 && u32(value.epoch) && value.epoch > 0 && [1,2,3].includes(value.status) && u32(value.level) && (value.level <= 20 || value.level === 78) && u32(value.phase) && u32(value.topology) && value.topology <= 2 && u32(value.incarnation) && (value.status !== 3 || (value.level === 1 && value.topology > 0 && value.incarnation > 0)) && typeof value.fingerprint === 'string' && /^[a-f0-9]{64}$/.test(value.fingerprint);
   if (value.type === 'hello') return keys(value, ['type', 'version']);
+  if (value.type === 'pilot-status') return keys(value,['type','version','status','hue']) && ['hacking','signing-in'].includes(value.status) && uint(value.hue,7);
   if (value.type === 'select-loadout') return keys(value, ['type','version','request','selection']) && validRequest(value.request) && validSelection(value.selection);
   if (value.type === 'selection-result') return keys(value, ['type','version','request','error']) && validRequest(value.request) && (value.error === null || (typeof value.error === 'string' && value.error.length > 0 && value.error.length <= 160));
   if (value.type === 'room-state') return keys(value, ['type','version','setup']) && validSetup(value.setup);

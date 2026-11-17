@@ -1,24 +1,23 @@
-import {StaleStageError} from './web/engine.mjs';
+import {WasmEngine,StaleStageError} from './web/engine.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {NetworkGame} from './web/game.mjs';
 
-test('leaving during manifest parsing cannot create a stale game',async t=>{
-  let parsed, signal;
-  t.mock.method(globalThis,'fetch',async (_url,options)=>{
-    signal=options.signal;
-    return {ok:true,json:()=>new Promise(resolve=>{parsed=resolve;})};
-  });
-  const session=Object.assign(new EventTarget(),{setup:null,phase:'idle'});
-  const game=new NetworkGame(session,{});
-  const preparing=game.prepare();
-  await new Promise(resolve=>setImmediate(resolve));
-  assert.equal(typeof parsed,'function');
-  game.close();
-  assert.equal(signal.aborted,true);
-  parsed({available:true});
-  await assert.rejects(preparing,/Game closed/);
-  assert.equal(game.engine,undefined);
+test('preparation can finish while the room stays open',async t=>{
+  const provider={phase:'loading',manifest:null,archives:[],fingerprint:null};
+  const session=Object.assign(new EventTarget(),{setup:null,phase:'hosting',role:'host',links:new Map()});
+  const game=new NetworkGame(session,{},provider);
+  t.mock.method(globalThis,'fetch',()=>{throw Error('unexpected network request');});
+  t.mock.method(WasmEngine.prototype,'prepare',async function(){this.prepared=true;return this.state;});
+  await assert.rejects(game.prepare(),/prepare your game first/i);
+  assert.equal(game.closed,false);
+  provider.phase='ready';provider.manifest={network:{schema:1,capacity:4}};provider.fingerprint='a'.repeat(64);
+  provider.archives=['sf64.o2r','starship.o2r','wolfen.o2r'].map(name=>({name,bytes:new Uint8Array([1])}));
+  await game.prepare();
+  assert.equal(game.descriptor.fingerprint,provider.fingerprint);
+  assert.equal(game.descriptor.archives,provider.archives);
+  assert.equal(game.descriptor.runtime,'/runtime/Starship.html');
+  assert.equal(game.engine.state.prepared,true);game.close();
 });
 
 function gameFor(match,{slot=0,selection={pilot:'fox_original',vehicle:'arwing',preferredHue:0,hue:0},role='host'}={}){
@@ -117,4 +116,41 @@ test('campaign lobby guests can prepare at their own pace before admission start
     assert.equal(disconnected,false);
     assert.equal(game.members.get('guest').phase,'offered');
   }finally{game.close();}
+});
+
+test('withdrawal cancels in-flight admission and reoffer uses a fresh incarnation', async () => {
+  const {game,session,selection}=campaignHost();let release,entered,activations=0;
+  const gate=new Promise(resolve=>{release=resolve;}),started=new Promise(resolve=>{entered=resolve;});
+  game.engine={activate(){activations++;return Promise.resolve();},close(){}};
+  game.sendBaseline=async()=>{entered();await gate;};
+  try{
+    game.hostStage(campaignStage(1,3));const old=game.members.get('guest');
+    const pending=game.receive({peer:'guest',slot:1,message:{op:'ready',match:42,epoch:1,incarnation:old.incarnation,fingerprint:'a'.repeat(64)}});
+    await started;session.setup.members[0].selection=null;
+    session.dispatchEvent(new CustomEvent('selection-withdrawn',{detail:{peer:'guest'}}));
+    release();await pending;await game.receive(admissionAck({...old,phase:'catchup',baselineTick:12},1,12));
+    assert.equal(activations,0);assert.equal(game.members.has('guest'),false);
+    session.setup.members[0].selection=selection;game.offer();
+    assert.ok(game.members.get('guest').incarnation>old.incarnation);
+  }finally{release();game.close();}
+});
+test('withdrawn versus admission cannot acknowledge an old world as a new incarnation',async()=>{
+  const link={peer:'host',slot:0,state:'connected',closed:false},sent=[];
+  const session=Object.assign(new EventTarget(),{role:'guest',peer:'guest',slot:1,phase:'connected',
+    links:new Map([['host',link]]),setup:{members:[{peer:'guest',slot:1,selection:{pilot:'fox_original',vehicle:'arwing',preferredHue:0,hue:0}}]},
+    lockedLoadouts:new Set(),sendGame(_link,message){sent.push(message);return true;}});
+  const game=new NetworkGame(session,{});let release,entered;
+  const gate=new Promise(resolve=>{release=resolve;}),started=new Promise(resolve=>{entered=resolve;});
+  game.engine={starting:Promise.resolve(),frame:{hidden:false},state:{activeMask:0},
+    importWorld:async()=>{entered();await gate;},close(){}};
+  Object.assign(game,{running:true,mode:'versus',match:42,epoch:1,descriptor:{fingerprint:'a'.repeat(64)},invitation:{incarnation:1}});
+  try{
+    game.world({peer:'host',match:42,epoch:1,tick:19,reliable:true,bytes:new ArrayBuffer(88)});await started;
+    session.setup.members[0].selection=null;
+    session.dispatchEvent(new CustomEvent('selection-withdrawn',{detail:{peer:'guest'}}));
+    session.setup.members[0].selection={pilot:'fox_original',vehicle:'arwing',preferredHue:0,hue:0};
+    await game.receive({peer:'host',slot:0,message:{op:'start',match:42,epoch:1,incarnation:2,fingerprint:'a'.repeat(64)}});
+    release();await new Promise(resolve=>setImmediate(resolve));
+    assert.equal(sent.some(message=>message.op==='baseline-ack'),false);
+  }finally{release();game.close();}
 });

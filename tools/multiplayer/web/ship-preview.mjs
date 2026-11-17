@@ -1,5 +1,4 @@
-let meshRequest;
-function loadMeshes(){return meshRequest??=fetch(new URL("./ship-wireframes.json",import.meta.url)).then(response=>{if(!response.ok)throw Error("Ship geometry unavailable");return response.json();}).catch(error=>{meshRequest=null;throw error;});}
+import {preparation} from '../../shared/preparation.mjs';
 export class ShipPreview {
   constructor(canvas,caption) {
     this.canvas=canvas; this.caption=caption; this.context=canvas.getContext('2d');
@@ -10,7 +9,11 @@ export class ShipPreview {
     document.addEventListener('visibilitychange',this.refresh);
     this.resizeObserver=new ResizeObserver(()=>this.draw(performance.now()));this.resizeObserver.observe(canvas);
     this.intersectionObserver=new IntersectionObserver(entries=>{if(this.destroyed)return;this.visible=entries[0].isIntersecting;this.update();});this.intersectionObserver.observe(canvas);
-    this.loaded=loadMeshes().then(meshes=>{if(this.destroyed)return;this.meshes=meshes;this.update();}).catch(()=>{if(!this.destroyed)this.caption.textContent='Ship preview unavailable. Your selection is still saved.';});
+    this.presentationChanged=()=>{this.meshes=preparation.presentation?.meshes||{};this.update();};
+    preparation.addEventListener('statechange',this.presentationChanged);
+    this.meshes=preparation.presentation?.meshes||{};
+    this.loaded=Promise.resolve();
+
   }
   select(ship,name,color) {
     if(this.destroyed || this.ship===ship && this.color===color && this.name===name)return;
@@ -23,7 +26,7 @@ export class ShipPreview {
     return {ship:this.ship,frames:this.frames,edges:this.meshes?.[this.ship]?.edges.length||0,
       animated:this.frame!==null,ready:Boolean(this.meshes?.[this.ship])};
   }
-  destroy(){if(this.destroyed)return;this.destroyed=true;if(this.frame!==null)cancelAnimationFrame(this.frame);this.frame=null;this.resizeObserver.disconnect();this.intersectionObserver.disconnect();this.motion.removeEventListener("change",this.refresh);document.removeEventListener("visibilitychange",this.refresh);}
+  destroy(){if(this.destroyed)return;this.destroyed=true;preparation.removeEventListener('statechange',this.presentationChanged);if(this.frame!==null)cancelAnimationFrame(this.frame);this.frame=null;this.resizeObserver.disconnect();this.intersectionObserver.disconnect();this.motion.removeEventListener("change",this.refresh);document.removeEventListener("visibilitychange",this.refresh);}
   update() {
     if(this.destroyed)return;
     if(this.frame!==null)cancelAnimationFrame(this.frame);

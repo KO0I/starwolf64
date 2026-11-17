@@ -8,7 +8,7 @@ import {
 
 const read = path => readFileSync(new URL('../../' + path, import.meta.url));
 const selection = (pilot = 'fox_original', vehicle = 'arwing', hue = 0) => ({pilot, vehicle, hue});
-const member = (slot, selected = null) => ({peer: String(slot + 1).padStart(32, '0'), slot, selection: selected});
+const member = (slot, selected = null) => ({peer: String(slot + 1).padStart(32, '0'), slot, selection: selected,status:selected?'confirmed':'hacking',hue:selected?.hue??0});
 const accepted = (pilot = 'fox_original', vehicle = 'arwing', hue = 0) => ({pilot, vehicle, preferredHue: hue, hue});
 const setup = members => ({revision: 0, match: DEFAULT_MATCH, members});
 
@@ -101,6 +101,9 @@ test('setup rejects malformed matches, members, and duplicate pilot hues', () =>
     {...valid, match: {kind: 'versus', stage: 'katina', rules: 'points'}},
     {...valid, match: {kind: 'campaign', crew: 'other'}},
     {...valid, match: {...DEFAULT_MATCH, extra: true}},
+    {...valid,members:[a,{...b,status:'signing-in'}]},
+    {...valid,members:[a,{...b,selection:null}]},
+    {...valid,members:[a,{...b,hue:(b.hue+1)%8}]},
     {...valid, members: []}, {...valid, members: [b]},
     {...valid, members: [a, {...b, slot: 0}]},
     {...valid, members: [a, {...b, peer: a.peer}]},

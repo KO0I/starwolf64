@@ -1,8 +1,10 @@
+import {preparation,mountPreparation} from '../../shared/preparation.mjs';
+import {RadioRain} from './radio-rain.mjs';
 import './setup-controls.mjs';
 import {NetworkGame} from './game.mjs';
 import {ShipPreview} from './ship-preview.mjs';
 import {BrowserSession} from './session.mjs';
-import {PILOTS, VEHICLES, HUES, STAGES, DEFAULT_MATCH, pilotById, vehicleById, hueById, crewName, portraitURL, campaignVehicle} from './catalog.mjs';
+import {PILOTS, VEHICLES, HUES, STAGES, DEFAULT_MATCH, pilotById, vehicleById, hueById, crewName, campaignVehicle} from './catalog.mjs';
 
 const $ = id => document.getElementById(id);
 const proof = window.STARWOLF_MP_PROOF = {inputs:[], snapshots:[], errors:[]};
@@ -12,13 +14,15 @@ const shipPreview = window.STARWOLF_SHIP_PREVIEW = new ShipPreview($('ship-previ
 let session, inputSequence = 0, snapshotTick = 0, draftSelection, draftMatch;
 let selectionBusy = false, matchBusy = false;
 let autoName = 'Wolf', customName = false, requestedName = null;
+let presenceKey=null,presenceTransport=null;
 
-function syncPilotName(pilot) {
+function syncPilotName(pilot,publish=false) {
   const field = $('name');
   if (!customName && field.value.trim() && field.value !== autoName) customName = true;
   if (!customName) field.value = autoName = pilot.name;
   const name = field.value.trim() || pilot.name;
   const current = session;
+  if(!publish)return;
   if (!current.room || !current.token || ['closed','error'].includes(current.phase)) return;
   if (current.peers.find(peer => peer.peer === current.peer)?.name === name || requestedName === name) return;
   requestedName = name;
@@ -26,7 +30,7 @@ function syncPilotName(pilot) {
 }
 $('name').addEventListener('input', () => { customName = Boolean($('name').value.trim()); });
 $('name').addEventListener('change', () => {
-  if (session?.state.setup) syncPilotName(pilotById(draftSelection.pilot));
+  if (session?.state.setup) syncPilotName(pilotById(draftSelection.pilot),customName);
 });
 
 function record(list,value) { list.push(value); if (list.length > 100) list.shift(); }
@@ -54,7 +58,7 @@ function matchLabel(match) {
 }
 function setPortrait(image,pilot,hue) {
   image.alt = pilot.name + ' radio portrait';
-  const url = portraitURL(pilot);
+  const url = preparation.presentation?.portraits?.[pilot.id];
   image.hidden = !url;
   if (url) image.src = url;
   else image.removeAttribute('src');
@@ -69,7 +73,7 @@ for (const pilot of PILOTS) {
   radio.type = 'radio'; radio.name = 'pilot'; radio.id = label.htmlFor; radio.value = pilot.id;
   const art = document.createElement(pilot.portrait ? 'img' : 'span');
   if (pilot.portrait) {
-    art.src = portraitURL(pilot); art.alt = pilot.name + ' radio portrait'; art.width = art.height = 44;
+    const url=preparation.presentation?.portraits?.[pilot.id];if(url)art.src=url; art.alt = pilot.name + ' radio portrait'; art.width = art.height = 44;
   } else {
     art.className = 'portrait-pending'; art.textContent = '?'; art.setAttribute('aria-hidden','true');
   }
@@ -82,7 +86,7 @@ for (const pilot of PILOTS) {
     draftSelection.pilot = pilot.id;
     const match = session.state.setup.match;
     if (match.kind === 'campaign' || pilot.signatureVehicle) draftSelection.vehicle = campaignVehicle(pilot);
-    render();
+    syncPresence(true);render();
   });
 }
 for (const vehicle of VEHICLES) $('vehicle').append(option(vehicle.id,vehicle.name));
@@ -93,14 +97,26 @@ for (const hue of HUES) {
   dot.className = 'hue-dot'; dot.style.background = hue.color; dot.setAttribute('aria-hidden','true');
   label.append(radio,dot,document.createTextNode(hue.name));
   $('hue-options').append(label);
-  radio.addEventListener('change',() => { draftSelection.hue = hue.id; render(); });
+  radio.addEventListener('change',() => { draftSelection.hue = hue.id; syncPresence(true);render(); });
 }
 for (const stage of STAGES) $('map').append(option(stage.id,stage.name));
 
+function syncPresence(force=false){
+  if(!session?.setup)return;
+  const transport=session.role==='host'?session:[...session.links.values()].find(link=>link.state==='connected')?.control;
+  if(!transport)return;
+  const member=session.setup.members.find(member=>member.peer===session.peer);
+  const status=preparation.phase==='ready'?'signing-in':'hacking',hue=draftSelection?.hue??0;
+  if(member?.selection&&!force&&status==='signing-in')return;
+  const key=status+':'+hue;
+  if(!force&&presenceKey===key&&presenceTransport===transport)return;
+  presenceKey=key;presenceTransport=transport;
+  if(!session.updatePilotStatus(status,hue)){presenceKey=null;presenceTransport=null;}
+}
 function renderSelection(state,active) {
-  const loadoutLocked=Boolean(window.STARWOLF_GAME?.running);
+  const loadoutLocked=Boolean(session.lockedLoadouts.has(session.peer));
   const setup = state.setup;
-  $('pilot-panel').hidden = !active || !setup;
+  $('pilot-panel').hidden = !active || !setup || preparation.phase!=='ready';
   $('match-panel').hidden = !active || !setup;
   if (!setup || !active) return;
   if (!draftSelection) draftSelection = defaultSelection(setup.match);
@@ -112,6 +128,8 @@ function renderSelection(state,active) {
   syncPilotName(selectedPilot);
   for (const pilot of PILOTS) {
     const radio = $('pilot-' + pilot.id), label = radio.parentElement;
+    const art=label.querySelector('img'),url=preparation.presentation?.portraits?.[pilot.id];
+    if(art){art.hidden=!url;if(url&&art.getAttribute('src')!==url)art.src=url;if(!url)art.removeAttribute('src');}
     radio.checked = draftSelection.pilot === pilot.id;
     radio.disabled = loadoutLocked || selectionBusy || Boolean(pilot.unavailable) || (campaign && pilot.crew !== setup.match.crew);
     label.dataset.selected = String(radio.checked);
@@ -136,7 +154,7 @@ function renderSelection(state,active) {
     'Confirmed: ' + pilotById(accepted.pilot).name + ' / ' + vehicleById(accepted.vehicle).name + ' / ' + hueById(accepted.hue).name +
       (accepted.hue !== accepted.preferredHue ? '. The host assigned a distinct hue for this duplicate pilot.' : '.') :
     'Choose your pilot, starting aircraft, and hue, then confirm.';
-  $('save-pilot').disabled = loadoutLocked || selectionBusy || (state.role === 'guest' && state.phase !== 'connected');
+  $('save-pilot').disabled = preparation.phase!=='ready' || loadoutLocked || selectionBusy || (state.role === 'guest' && state.phase !== 'connected');
   $('crew-rule').textContent = campaign ? 'Main game uses one crew: ' + crewName(setup.match.crew) + ', with crew aircraft and signature ships.' :
     'Versus allows either crew and any available aircraft. Repeated pilots receive distinct hues.';
   if (!draftMatch) draftMatch = structuredClone(setup.match);
@@ -153,6 +171,7 @@ function renderSelection(state,active) {
     $('rules').value = draftMatch.rules;
   } else $('crew').value = draftMatch.crew;
   $('save-match').disabled = matchBusy || loadoutLocked;
+  syncPresence();
 }
 function render() {
   const state = session.state;
@@ -170,41 +189,51 @@ function render() {
   $('send-input').disabled = window.STARWOLF_GAME?.running || !active || state.role !== 'guest' || live === 0;
   $('send-state').disabled = window.STARWOLF_GAME?.running || !active || state.role !== 'host' || live === 0;
   const present=new Set(state.peers.map(peer=>peer.peer));
-  for(const [peer,view]of rosterViews)if(!present.has(peer)){view.preview?.destroy();view.item.remove();rosterViews.delete(peer);}
+  for(const [peer,view]of rosterViews)if(!present.has(peer)){view.preview?.destroy();view.rain?.destroy();view.item.remove();rosterViews.delete(peer);}
   for(const peer of state.peers){
     let view=rosterViews.get(peer.peer);
     if(!view){
-      const item=document.createElement('li'),identity=document.createElement('div'),image=document.createElement('img'),text=document.createElement('div'),name=document.createElement('strong'),detail=document.createElement('small'),status=document.createElement('span'),canvas=document.createElement('canvas'),caption=document.createElement('figcaption');
+      const item=document.createElement('li'),identity=document.createElement('div'),image=document.createElement('img'),text=document.createElement('div'),name=document.createElement('strong'),detail=document.createElement('small'),status=document.createElement('span'),canvas=document.createElement('canvas'),caption=document.createElement('figcaption'),rainCanvas=document.createElement('canvas');
       item.className='squadron-card';item.dataset.peer=peer.peer;identity.className='roster-identity';image.className='roster-portrait';image.width=image.height=44;detail.className='roster-detail';
-      text.append(name,detail);identity.append(image,text);item.append(identity,canvas,caption,status);$('peers').append(item);
-      view={item,image,name,detail,status,canvas,caption,preview:null};rosterViews.set(peer.peer,view);
+      rainCanvas.className='radio-rain';rainCanvas.setAttribute('role','img');rainCanvas.setAttribute('aria-label','Anonymous radio transmission');canvas.className='roster-ship';
+      text.append(name,detail);identity.append(rainCanvas,image,text);item.append(identity,canvas,caption,status);$('peers').append(item);
+      view={item,image,name,detail,status,canvas,caption,rainCanvas,rain:new RadioRain(rainCanvas),preview:null};rosterViews.set(peer.peer,view);
     }
     view.name.textContent=peer.name+(peer.peer===state.peer?' / you':'');
-    const selected=state.setup?.members.find(member=>member.peer===peer.peer)?.selection;
-    view.canvas.hidden=!selected;view.caption.hidden=!selected;
+    const member=state.setup?.members.find(member=>member.peer===peer.peer),selected=member?.selection;
+    const hue=hueById(selected?.hue??member?.hue??0);
+    const hasPortrait=preparation.phase==='ready' && Boolean(selected&&preparation.presentation?.portraits?.[selected.pilot]);
+    const hasShip=preparation.phase==='ready' && Boolean(selected&&preparation.presentation?.meshes?.[selected.vehicle]);
+    view.rainCanvas.hidden=hasPortrait;
+    view.rain.setColor(member?.status==='hacking'&&member.hue===0?'#79e98e':hue.color);view.rain.update();
+    view.canvas.hidden=!hasShip;view.caption.hidden=!hasShip;
     if(selected){
-      const hue=hueById(selected.hue);
-      setPortrait(view.image,pilotById(selected.pilot),selected.hue);
+      if(hasPortrait)setPortrait(view.image,pilotById(selected.pilot),selected.hue);
+      else{view.image.hidden=true;view.image.removeAttribute('src');}
       view.detail.textContent=pilotById(selected.pilot).name+' / '+vehicleById(selected.vehicle).name+' / '+hue.name;
       view.item.style.setProperty('--pilot-hue',hue.color);
-      view.preview??=new ShipPreview(view.canvas,view.caption);
-      view.preview.select(selected.vehicle,vehicleById(selected.vehicle).name,hue.color);
+      if(hasShip){view.preview??=new ShipPreview(view.canvas,view.caption);view.preview.select(selected.vehicle,vehicleById(selected.vehicle).name,hue.color);}
     }else{
-      view.image.hidden=true;view.detail.textContent='Choosing a pilot';view.item.style.removeProperty('--pilot-hue');view.preview?.destroy();view.preview=null;
+      view.image.hidden=true;view.image.removeAttribute('src');
+      view.detail.textContent=member?.status==='signing-in'?'pilot signing in…':'hacking';
+      view.item.style.setProperty('--pilot-hue',hue.color);
     }
+    if(!hasShip){view.preview?.destroy();view.preview=null;}
     const connection=connections.find(item=>item.peer===peer.peer);
     view.status.textContent=peer.role==='host'?'Host':connection?.state||'Guest';
+
   }
   const availability=window.STARWOLF_GAME?.launchAvailability(state.setup);
   $('launch-availability').textContent=availability?.reason||'';
+  $('prepare-game').disabled=preparation.phase!=='ready'||Boolean(window.STARWOLF_GAME?.engine)||Boolean(window.STARWOLF_GAME?.closed);
   $('launch-game').disabled=!availability?.available || !window.STARWOLF_GAME?.engine?.state.prepared || window.STARWOLF_GAME.running || window.STARWOLF_GAME.closed;
   $('choose-campaign').setAttribute('aria-pressed',String(draftMatch?.kind==='campaign'));
   $('choose-versus').setAttribute('aria-pressed',String(draftMatch?.kind!=='campaign'));
   renderSelection(state,active);
 }
 function newSession() {
-  requestedName = null;
-  for(const view of rosterViews.values()){view.preview?.destroy();view.item.remove();}rosterViews.clear();
+  requestedName = null;presenceKey=presenceTransport=null;
+  for(const view of rosterViews.values()){view.preview?.destroy();view.rain?.destroy();view.item.remove();}rosterViews.clear();
   inputSequence = snapshotTick = 0; lastInputs.clear();
   draftSelection = draftMatch = null; selectionBusy = matchBusy = false;
   window.STARWOLF_GAME?.close();
@@ -246,11 +275,11 @@ async function connect(role) {
 $('host').addEventListener('click',() => connect('host'));
 $('join').addEventListener('click',() => connect('guest'));
 $('leave').addEventListener('click',async () => { try { await session.close(); } catch(error) { notice(error.message); } render(); });
-$('vehicle').addEventListener('change',() => { draftSelection.vehicle = $('vehicle').value; render(); });
+$('vehicle').addEventListener('change',() => { draftSelection.vehicle = $('vehicle').value; syncPresence(true);render(); });
 $('loadout-form').addEventListener('submit',async event => {
   event.preventDefault(); notice(''); selectionBusy = true; render();
   const current = session;
-  try { await current.selectLoadout({...draftSelection}); }
+  try { syncPresence();const accepted=await current.selectLoadout({...draftSelection});if(session===current)syncPilotName(pilotById(accepted.pilot),true); }
   catch(error) { if (session === current) notice(error.message); }
   finally { if (session === current) { selectionBusy = false; render(); } }
 });
@@ -285,6 +314,9 @@ $('send-state').addEventListener('click',() => {
   } catch(error) { notice(error.message); }
 });
 newSession();
+preparation.addEventListener('statechange',()=>{syncPresence();render();});
+mountPreparation($('local-preparation'));
+for(const link of document.querySelectorAll('a[href="/"]'))link.addEventListener('click',async event=>{if(window.parent===window)return;event.preventDefault();await session.close();window.parent.postMessage({type:'starwolf-back-to-setup'},location.origin);});
 
 $('prepare-game').addEventListener('click',async()=>{const game=window.STARWOLF_GAME;try{$('prepare-game').disabled=true;await game.prepare();}catch(e){if(game===window.STARWOLF_GAME)notice(e.message);}});
 $('launch-game').addEventListener('click',()=>{try{window.STARWOLF_GAME.launch().catch(e=>notice(e.message));}catch(e){notice(e.message);}});

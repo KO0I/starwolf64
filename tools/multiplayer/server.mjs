@@ -2,7 +2,6 @@ import { createServer } from "node:http";
 import { createHash, randomBytes } from "node:crypto";
 import { readFile, realpath } from "node:fs/promises";
 import { pathToFileURL } from "node:url";
-import { PILOTS } from "./web/catalog.mjs";
 import { VERSION } from "./web/protocol.mjs";
 
 import { resolve, join } from "node:path";
@@ -15,13 +14,9 @@ const files = new Map([
   ["/session.mjs", ["session.mjs", "text/javascript; charset=utf-8"]],
   ["/protocol.mjs", ["protocol.mjs", "text/javascript; charset=utf-8"]],
   ["/ship-preview.mjs", ["ship-preview.mjs", "text/javascript; charset=utf-8"]],
-  ["/ship-wireframes.json", ["ship-wireframes.json", "application/json"]],
   ["/catalog.mjs", ["catalog.mjs", "text/javascript; charset=utf-8"]],
   ["/styles.css", ["styles.css", "text/css; charset=utf-8"]],
 ]);
-for (const pilot of PILOTS) {
-  if (pilot.portrait) files.set("/portraits/" + pilot.id + ".png", [new URL("../../assets/" + pilot.portrait, import.meta.url), "image/png"]);
-}
 const MAX_BODY = 64 * 1024;
 const MAX_PENDING = 64;
 const MAX_PENDING_BYTES = 256 * 1024;
@@ -63,7 +58,7 @@ function validSignal(data) {
     (c.sdpMLineIndex == null || (Number.isInteger(c.sdpMLineIndex) && c.sdpMLineIndex >= 0)) &&
     (c.usernameFragment == null || typeof c.usernameFragment === "string");
 }
-export function createSignalingServer({ host = "127.0.0.1", port = 8670, iceServers = [], roomLimit = 32, maxPeers = 8, graceMs = 5000, allowedOrigins = [], gameDir = null, gameAssets = null, siteDir = null, byoromOnly = false } = {}) {
+export function createSignalingServer({ host = "127.0.0.1", port = 8670, iceServers = [], roomLimit = 32, maxPeers = 8, graceMs = 5000, allowedOrigins = [], siteDir = null } = {}) {
   if (!Number.isInteger(roomLimit) || roomLimit < 1 || !Number.isInteger(maxPeers) || maxPeers < 1 || maxPeers > 8 || !Number.isFinite(graceMs) || graceMs < 0 || !Array.isArray(iceServers) || !Array.isArray(allowedOrigins)) throw new TypeError("invalid signaling configuration");
 
   const siteFiles = (async () => {
@@ -73,47 +68,41 @@ export function createSignalingServer({ host = "127.0.0.1", port = 8670, iceServ
     const manifest = JSON.parse(await readFile(join(root, 'site.json'), 'utf8'));
     if (manifest.format !== 'starwolf64-wasm-site-v1' || !manifest.files || typeof manifest.files !== 'object')
       throw Error('Invalid site manifest');
-    if (byoromOnly) {
-      const blocked = name => name.startsWith('portraits/') || /(?:^|\/)ship-wireframes\.json$/.test(name);
-      manifest.files = Object.fromEntries(Object.entries(manifest.files).filter(([name]) => !blocked(name)));
-      if (Array.isArray(manifest.download)) manifest.download = manifest.download.filter(name => !blocked(name));
-    }
+    if (manifest.publication?.policy !== 'byorom' || manifest.publication?.format !== 'starwolf64-publication-v1')
+      throw Error('Site must pass the BYOROM publication audit');
+    const prepared = JSON.parse(await readFile(join(root, 'prepared-assets.json'), 'utf8'));
+    if (prepared.prepared !== false) throw Error('Prepared game assets cannot be hosted');
+    if (manifest.publication.audit !== 'asset-audit.json')
+      throw Error('Missing publication audit receipt');
+    const auditBytes = await readFile(join(root, 'asset-audit.json'));
+    if (createHash('sha256').update(auditBytes).digest('hex') !== manifest.publication.sha256)
+      throw Error('Publication audit receipt failed verification');
+    const audit = JSON.parse(auditBytes);
+    const names = Object.keys(manifest.files).filter(name => name !== 'asset-audit.json');
+    if (audit.format !== 'starwolf64-publication-v1' || audit.policy !== 'byorom' || audit.mod?.status !== 'pass' ||
+        !audit.files || Object.keys(audit.files).length !== names.length ||
+        names.some(name => audit.files[name]?.sha256 !== manifest.files[name]?.sha256 || audit.files[name]?.size !== manifest.files[name]?.size))
+      throw Error('Publication audit does not cover the site files');
     const types = {html:'text/html; charset=utf-8',mjs:'text/javascript; charset=utf-8',js:'text/javascript; charset=utf-8',css:'text/css; charset=utf-8',json:'application/json',wasm:'application/wasm',png:'image/png',jpg:'image/jpeg',txt:'text/plain; charset=utf-8',md:'text/plain; charset=utf-8'};
     for (const name of [...Object.keys(manifest.files), 'site.json', 'prepared-assets.json']) {
       if (!/^[A-Za-z0-9_./-]+$/.test(name) || name.split('/').some(part => !part || part === '.' || part === '..'))
         throw Error('Invalid site manifest path');
-      if (/^(multiplayer|api|game|game-assets|portraits)(\/|$)/.test(name)) continue;
+      if (/^(api|game|game-assets|portraits|prepared)(\/|$)/.test(name) || /(?:^|\/)ship-wireframes\.json$/.test(name) || /\.(?:o2r|otr|z64|v64|n64|glb|png|jpg|jpeg)$/i.test(name))
+        throw Error('Site contains a ROM-derived or unreviewed asset path');
       const path = await realpath(join(root, name));
       if (!path.startsWith(root + '/')) throw Error('Site file escapes its directory');
-      entries.set('/' + name, {bytes:await readFile(path),type:types[name.split('.').at(-1)] || 'application/octet-stream'});
+      const bytes = await readFile(path);
+      const metadata = manifest.files[name];
+      if (metadata && (bytes.length !== metadata.size || createHash('sha256').update(bytes).digest('hex') !== metadata.sha256))
+        throw Error('Published site file failed verification: ' + name);
+      entries.set('/' + name, {bytes,type:types[name.split('.').at(-1)] || 'application/octet-stream'});
     }
-    if (byoromOnly) entries.set('/site.json', {bytes:Buffer.from(JSON.stringify(manifest)),type:'application/json'});
     if (!entries.has('/index.html')) throw Error('Site has no index.html');
     entries.set('/', entries.get('/index.html'));
+    if (entries.has('/multiplayer/index.html')) entries.set('/multiplayer/', entries.get('/multiplayer/index.html'));
     return entries;
   })();
   siteFiles.catch(() => {});
-  const runtimeFiles = new Map();
-  const descriptor = (async () => {
-    if (byoromOnly) return {available:false,reason:'Multiplayer is temporarily unavailable while Bring Your Own ROM preparation is connected. The main-page ROM builder and room signaling remain available.'};
-    if (!gameDir || !gameAssets) return {available:false};
-    const assets = [], fingerprint = createHash('sha256');
-    for (const [name,type] of [['Starship.html','text/html'],['Starship.js','text/javascript'],['Starship.wasm','application/wasm'],['Starship.data','application/octet-stream']]) {
-      const path = join(resolve(gameDir),name), bytes = await readFile(path);
-      fingerprint.update(bytes);
-      runtimeFiles.set('/game/'+name,{bytes,type});
-    }
-    for (const name of ['sf64.o2r','starship.o2r','wolfen.o2r']) {
-      const path = join(resolve(gameAssets),name), bytes = await readFile(path);
-      if (!bytes.length || bytes.length > 64*1024*1024) throw Error('Invalid game archive size');
-      const sha256 = createHash('sha256').update(bytes).digest('hex');
-      fingerprint.update(sha256);
-      assets.push({name,url:'/game-assets/'+name,sha256});
-      runtimeFiles.set('/game-assets/'+name,{bytes,type:'application/octet-stream'});
-    }
-    return {available:true,runtime:'/game/Starship.html',schema:1,capacity:4,fingerprint:fingerprint.digest('hex'),assets};
-  })();
-  descriptor.catch(() => {});
   const rooms = new Map();
   let closing = false;
   const publicPeers = room => [...room.peers.values()].map(({ peer, slot, role, name }) => ({ peer, slot, role, name }));
@@ -183,30 +172,23 @@ export function createSignalingServer({ host = "127.0.0.1", port = 8670, iceServ
       const url = new URL(req.url, "http://localhost");
 
       if(req.method==='GET' && url.pathname==='/multiplayer'){res.writeHead(302,{location:'/multiplayer/'});return res.end();}
+      const publicPath=url.pathname;
       const multiplayerPath=url.pathname.startsWith('/multiplayer/');
       if(multiplayerPath) {
         const nested=url.pathname.slice('/multiplayer'.length);
         if(files.has(nested))url.pathname=nested;
       }
-      if (byoromOnly && (/^\/(?:game|game-assets|portraits)(?:\/|$)/.test(url.pathname) || /(?:^|\/)ship-wireframes\.json$/.test(url.pathname)))
+      if (/^\/(?:game|game-assets|portraits)(?:\/|$)/.test(url.pathname) || /(?:^|\/)ship-wireframes\.json$/.test(url.pathname))
         return json(res,404,{error:'not found'});
-      if (req.method === 'GET' && url.pathname === '/api/game') return json(res,200,await descriptor);
-      if (req.method === 'GET' && (url.pathname.startsWith('/game/') || url.pathname.startsWith('/game-assets/'))) {
-        await descriptor;
-        const entry = runtimeFiles.get(url.pathname);
-        if (!entry) return json(res,404,{error:'not found'});
-        const body = entry.bytes;
-        res.writeHead(200,{'content-type':entry.type,'content-length':body.length,'cache-control':'no-cache','cross-origin-opener-policy':'same-origin','cross-origin-embedder-policy':'require-corp','cross-origin-resource-policy':'same-origin','x-content-type-options':'nosniff'});
-        return res.end(body);
-      }
+      if (req.method === 'GET' && url.pathname === '/api/game')
+        return json(res,200,{available:false,reason:'Bring your own ROM to prepare the game in this browser.'});
       if (req.method === "POST" && !allowedOrigin(req)) return json(res, 403, { error: "origin denied" });
       if (req.method === "GET" && url.pathname === "/api/config") return json(res, 200, { protocol: VERSION, iceServers });
-      if (req.method === 'GET' && siteDir && !multiplayerPath && !url.pathname.startsWith('/api/')) {
-        const entry = (await siteFiles).get(url.pathname);
-        if (entry) {
-          res.writeHead(200, {'content-type':entry.type,'content-length':entry.bytes.length,'cache-control':'no-cache','cross-origin-opener-policy':'same-origin','cross-origin-embedder-policy':'require-corp','x-content-type-options':'nosniff'});
-          return res.end(entry.bytes);
-        }
+      if (req.method === 'GET' && siteDir && !publicPath.startsWith('/api/')) {
+        const entry = (await siteFiles).get(publicPath);
+        if (!entry) return json(res,404,{error:'not found'});
+        res.writeHead(200, {'content-type':entry.type,'content-length':entry.bytes.length,'cache-control':'no-cache','cross-origin-opener-policy':'same-origin','cross-origin-embedder-policy':'require-corp','cross-origin-resource-policy':'same-origin','x-content-type-options':'nosniff'});
+        return res.end(entry.bytes);
       }
       if (req.method === "GET" && files.has(url.pathname)) {
         const [name, type] = files.get(url.pathname);
@@ -307,21 +289,18 @@ export function createSignalingServer({ host = "127.0.0.1", port = 8670, iceServ
       server.closeAllConnections();
     });
   }
-  return { server, close, prepare:async () => { await Promise.all([descriptor, siteFiles]); } };
+  return { server, close, prepare:async () => { await siteFiles; } };
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   try {
-    let host = "127.0.0.1", port = 8670, iceServers = [], gameDir = null, gameAssets = null, siteDir = null, byoromOnly = false;
+    let host = "127.0.0.1", port = 8670, iceServers = [], siteDir = null;
     const allowedOrigins = [];
     for (let i = 2; i < process.argv.length; i++) {
       const arg = process.argv[i];
       if (arg === "--host" && process.argv[i + 1]) host = process.argv[++i];
       else if (arg === "--port" && process.argv[i + 1] !== undefined) port = Number(process.argv[++i]);
-      else if (arg === "--game-dir" && process.argv[i + 1]) gameDir = process.argv[++i];
-      else if (arg === "--game-assets" && process.argv[i + 1]) gameAssets = process.argv[++i];
       else if (arg === "--site-dir" && process.argv[i + 1]) siteDir = process.argv[++i];
-      else if (arg === "--byorom-only") byoromOnly = true;
       else if (arg === "--ice-config" && process.argv[i + 1]) iceServers = JSON.parse(await readFile(process.argv[++i], "utf8"));
       else if (arg === "--origin" && process.argv[i + 1]) {
         const origin = process.argv[++i];
@@ -331,7 +310,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
       else throw new Error(`unknown or incomplete argument: ${arg}`);
     }
     if (!Number.isInteger(port) || port < 0 || port > 65535) throw new Error("invalid port");
-    const { server, prepare } = createSignalingServer({ host, port, iceServers, allowedOrigins, gameDir, gameAssets, siteDir, byoromOnly });
+    const { server, prepare } = createSignalingServer({ host, port, iceServers, allowedOrigins, siteDir });
     await prepare();
     server.listen(port, host, () => console.log(`READY http://${host.includes(":") ? `[${host}]` : host}:${server.address().port}/`));
   } catch (err) { console.error(err.message); process.exitCode = 1; }

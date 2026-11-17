@@ -1,5 +1,6 @@
+import {restoreModel} from './shared/restoration.mjs';
 import {readRomFile} from './rom-file.mjs';
-import {fetchVerified,sha256,archiveNames} from './files.mjs';
+import {fetchVerified,sha256,archiveNames} from './shared/files.mjs';
 let busy=false;
 self.onmessage=async({data})=>{
   if(busy) return;
@@ -11,9 +12,10 @@ self.onmessage=async({data})=>{
     const rom=await readRomFile(file,manifest.rom.size);
     if(await sha256(rom)!==manifest.rom.sha256) throw Error('Choose an unmodified Star Fox 64 US v1.1 ROM.');
     self.postMessage({type:'progress',message:'Loading the asset extractor'});
-    const [recipe,literals,chatter,wasm,packageData]=await Promise.all(
-      ['mod/recipe.json','mod/literals.dat','mod/chatter.dat','extractor/extractor.wasm','extractor/extractor.data']
+    const [recipe,literals,restoration,wasm,packageData]=await Promise.all(
+      ['mod/recipe.json','mod/literals.dat','mod/restoration.bps','extractor/extractor.wasm','extractor/extractor.data']
         .map(path=>fetchVerified(base,path,manifest.files[path])));
+    const model=await restoreModel(rom,restoration);
     const {default:createExtractor}=await import(new URL('extractor/extractor.mjs',base));
     const print=text=>{
       text=String(text);logs.push(text);if(logs.length>40) logs.shift();
@@ -24,7 +26,7 @@ self.onmessage=async({data})=>{
       getPreloadedPackage:()=>packageData.buffer});
     engine.FS.mkdirTree('/mod');
     engine.FS.writeFile('/input.z64',rom);
-    for(const [name,bytes] of [['recipe.json',recipe],['literals.dat',literals],['chatter.dat',chatter]])
+    for(const [name,bytes] of [['recipe.json',recipe],['literals.dat',literals],['restoration-model.bin',model]])
       engine.FS.writeFile('/mod/'+name,bytes);
     const result=engine.callMain([]);
     if(result!==0) throw Error(logs.findLast(line=>line.startsWith('Preparation failed:'))||'The game could not be prepared.');

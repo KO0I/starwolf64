@@ -39,9 +39,10 @@
         <input id="code" placeholder="Room code" maxlength="16" autocapitalize="characters" autocomplete="off" spellcheck="false">
         <button id="join">Join room</button>
       </div>
-      <p class="connection-steps"><em>Hosting: open a room, share its code, choose a mode and confirm your pilot, ship and hue. Prepare the game, then launch.<br>Joining: enter the host's room code, confirm your pilot, ship and hue, then prepare and join. WebRTC connects your browser to the host; keep this page open. Use the same build and stay on the tailnet.</em></p>
+      <p class="connection-steps"><em>Hosting: open a room and share its code. Prepare your own ROM, choose a mode and confirm your pilot, ship and hue, then launch.<br>Joining: enter the host's room code, prepare your own ROM and confirm your pilot, ship and hue, then join. WebRTC connects your browser to the host; keep this page open. Use the same build and stay on the tailnet.</em></p>
     </section>
     <p id="notice"  role="alert" hidden></p>
+    <section id="preparation-panel"><h2 class="panel-title">BRING YOUR OWN ROM</h2><div id="local-preparation"></div></section>
     <div id="selection-screen">
     <section id="match-panel" aria-labelledby="match-title" hidden>
       <h2 id="match-title" class="panel-title">MISSION SELECT</h2>
@@ -78,7 +79,7 @@
             <small id="pilot-preview-detail"></small>
           </div>
           <div class="loadout-controls">
-            <figure class="ship-preview-frame"><canvas id="ship-preview" role="img" aria-label="Selected ship wireframe"></canvas><figcaption id="ship-preview-caption">Loading ship geometry…</figcaption></figure>
+            <figure class="ship-preview-frame"><canvas id="ship-preview" role="img" aria-label="Selected ship wireframe"></canvas><figcaption id="ship-preview-caption">Prepare your game to view your ship.</figcaption></figure>
             <label for="vehicle">Starting vehicle</label><select id="vehicle"></select>
             <p class="selection-note">Your confirmed aircraft appears in flight. Arwing, Wolfen, Katt’s fighter and Vitzy’s fighter have distinct models. Tank and on-foot play come later.</p>
             <fieldset><legend>Preferred hue</legend><div id="hue-options" class="hue-options"></div></fieldset>

@@ -10,6 +10,7 @@
 #include <stdexcept>
 #include <string>
 #include <unordered_set>
+#include <unordered_map>
 
 using nlohmann::json;
 namespace fs = std::filesystem;
@@ -50,7 +51,7 @@ static std::string readArchive(zip_t* archive, const std::string& path) {
 
 static void applyMod() {
     const auto recipe = json::parse(readFile("/mod/recipe.json"));
-    if (recipe.at("format") != "starwolf64-native-mod-v1")
+    if (recipe.at("format") != "starwolf64-native-mod-v2")
         throw std::runtime_error("Unsupported mod recipe");
     const auto literals = readFile("/mod/literals.dat");
     if (sha1(literals) != recipe.at("literalsSha1").get<std::string>())
@@ -59,6 +60,7 @@ static void applyMod() {
     std::unique_ptr<zip_t, decltype(&zip_discard)> base(zip_open("/output/sf64.o2r", ZIP_RDONLY, &error), zip_discard);
     std::unique_ptr<zip_t, decltype(&zip_discard)> mod(zip_open("/output/wolfen.o2r", ZIP_CREATE | ZIP_TRUNCATE, &error), zip_discard);
     if (!base || !mod) throw std::runtime_error("Cannot open prepared archives");
+    std::unordered_map<std::string, std::pair<std::string, std::string>> sourceCache;
     std::vector<std::string> resources;
     resources.reserve(recipe.at("entries").size());
     std::unordered_set<std::string> names;
@@ -68,18 +70,29 @@ static void applyMod() {
         if (!validPath(name) || !names.insert(name).second || size > 16 * 1024 * 1024)
             throw std::runtime_error("Invalid mod resource");
         std::string target(size, '\0');
-        if (entry.contains("source")) {
-            const auto& source = entry.at("source");
+        size_t cursor = 0;
+        for (const auto& source : entry.at("sources")) {
             const auto path = source.at("path").get<std::string>();
-            if (!validPath(path)) throw std::runtime_error("Invalid mod source path");
             const auto kind = source.at("kind").get<std::string>();
-            if (kind != "base" && kind != "project") throw std::runtime_error("Invalid mod source");
-            const auto bytes = kind == "base" ? readArchive(base.get(), path) : readFile("/mod/" + path);
-            if (sha1(bytes) != source.at("sha1").get<std::string>())
+            if (!validPath(path) || (kind != "base" && !(kind == "project" && path == "restoration-model.bin")))
+                throw std::runtime_error("Invalid mod source");
+            const auto key = kind + ":" + path;
+            auto found = sourceCache.find(key);
+            if (found == sourceCache.end()) {
+                auto bytes = kind == "base" ? readArchive(base.get(), path) : readFile("/mod/" + path);
+                found = sourceCache.emplace(key, std::make_pair(sha1(bytes), std::move(bytes))).first;
+            }
+            const auto& [digest, bytes] = found->second;
+            if (digest != source.at("sha1").get<std::string>())
                 throw std::runtime_error("Extracted assets do not match this mod: " + path);
-            const size_t shift = source.value("shift", size_t(0));
-            if (shift > size) throw std::runtime_error("Invalid mod source offset");
-            std::copy_n(bytes.begin(), std::min(bytes.size(), size - shift), target.begin() + shift);
+            const size_t offset = source.at("offset").get<size_t>();
+            const size_t length = source.at("length").get<size_t>();
+            const size_t dest = source.value("destination", cursor);
+            if (offset > bytes.size() || length > bytes.size() - offset || dest > size)
+                throw std::runtime_error("Invalid mod source range");
+            const size_t count = std::min(length, size - dest);
+            std::copy_n(bytes.begin() + offset, count, target.begin() + dest);
+            cursor = std::max(cursor, dest + count);
         }
         for (const auto& write : entry.at("writes")) {
             const size_t destination = write.at(0).get<size_t>();
@@ -88,7 +101,8 @@ static void applyMod() {
             if (destination > size || length > size - destination || source > literals.size() ||
                 length > literals.size() - source)
                 throw std::runtime_error("Invalid mod patch range");
-            std::copy_n(literals.begin() + source, length, target.begin() + destination);
+            for (size_t i = 0; i < length; ++i)
+                target[destination + i] = char(uint8_t(target[destination + i]) ^ uint8_t(literals[source + i]));
         }
         if (sha1(target) != entry.at("sha1").get<std::string>())
             throw std::runtime_error("Prepared mod resource failed verification: " + name);

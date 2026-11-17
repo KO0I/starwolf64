@@ -53,7 +53,7 @@ test('decoder rejects invalid UTF-8, JSON, messages, and oversized frames', () =
 test('selection requests, confirmations and authoritative setup round trip', () => {
   const request = '11111111111141118111111111111111';
   const setup = {revision:2,match:{kind:'versus',stage:'sector_z',rules:'time'},
-    members:[{peer:'00000000000000000000000000000001',slot:0,
+    members:[{peer:'00000000000000000000000000000001',slot:0,status:'confirmed',hue:0,
       selection:{pilot:'fox_original',vehicle:'arwing',preferredHue:0,hue:0}}]};
   for (const message of [
     {type:'select-loadout',version:VERSION,request,selection:{pilot:'fox_original',vehicle:'arwing',hue:0}},
@@ -82,4 +82,11 @@ test('stage descriptors bound mission identity and supported flight topology',()
   const waiting={...stage,status:1,level:0,topology:0,incarnation:0};
   assert.deepEqual(decodeMessage(encodeMessage(waiting)),waiting);
   assert.deepEqual(decodeMessage(encodeMessage({...waiting,status:2,level:13})),{...waiting,status:2,level:13});
+});
+
+test('only anonymous preparation status and advisory hue cross the wire',()=>{
+  const message={type:'pilot-status',version:VERSION,status:'signing-in',hue:3};
+  assert.deepEqual(decodeMessage(encodeMessage(message)),message);
+  for(const fields of [{status:'confirmed'},{status:'ready'},{hue:-1},{hue:8},{hue:1.5},{pilot:'wolf'},{vehicle:'wolfen'}])
+    assert.equal(validateMessage({...message,...fields}),false,JSON.stringify(fields));
 });

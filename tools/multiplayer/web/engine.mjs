@@ -99,8 +99,8 @@ export class WasmEngine extends EventTarget {
     if (!crossOriginIsolated || typeof SharedArrayBuffer === 'undefined')
       throw Error('Shared memory isolation is required');
     const names = ['sf64.o2r', 'starship.o2r', 'wolfen.o2r'];
-    if (d.assets.length !== 3 || new Set(d.assets.map(a => a.name)).size !== 3 ||
-        d.assets.some(a => !names.includes(a.name)))
+    if (!Array.isArray(d.archives) || d.archives.length !== 3 || new Set(d.archives.map(a => a.name)).size !== 3 ||
+        d.archives.some(a => !names.includes(a.name) || !ArrayBuffer.isView(a.bytes) || a.bytes.BYTES_PER_ELEMENT!==1 || !a.bytes.length))
       throw Error('Incomplete archives');
     const f = this.frame = document.createElement('iframe');
     f.title = 'Starship network game';
@@ -110,19 +110,7 @@ export class WasmEngine extends EventTarget {
     u.searchParams.set('prepared', '1');
     f.src = u;
     this.container.append(f);
-    const archives = await Promise.all(d.assets.map(async a => {
-      const r = await fetch(this.url(a.url), {signal: this.abort.signal});
-      if (!r.ok || Number(r.headers.get('content-length')) > 67108864) throw Error('Archive unavailable');
-      const bytes = new Uint8Array(await r.arrayBuffer());
-      if (!bytes.length || bytes.length > 67108864) throw Error('Invalid archive');
-      const hash = Array
-                       .from(
-                           new Uint8Array(await crypto.subtle.digest('SHA-256', bytes)),
-                           n => n.toString(16).padStart(2, '0'))
-                       .join('');
-      if (hash !== a.sha256) throw Error('Archive fingerprint mismatch');
-      return {name: a.name, bytes};
-    }));
+    const archives=d.archives.map(({name,bytes})=>({name,bytes}));
     await this.wait(() => f.contentWindow?.STARSHIP_RUNTIME_READY, 'Runtime initialization', 90000);
     const w = f.contentWindow, m = w.Module;
     w.STARSHIP_INSTALL_ASSETS(archives);

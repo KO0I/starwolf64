@@ -275,7 +275,7 @@ main {background:#030318cc;width:min(1120px,100%);}
 #peers {display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;padding:0;list-style:none;}
 #peers .squadron-card {display:flex;flex-direction:column;align-items:stretch;gap:8px;border:3px ridge var(--pilot-hue,#817198);padding:12px;background:linear-gradient(#20102f,#0b0820);min-width:0;}
 .squadron-card .roster-identity {display:flex;gap:10px;align-items:center;}
-.squadron-card canvas {display:block;width:100%;height:140px;background:radial-gradient(ellipse,#2d1648,#080516);border:1px solid #554363;}
+.squadron-card .roster-ship {display:block;width:100%;height:140px;background:radial-gradient(ellipse,#2d1648,#080516);border:1px solid #554363;}
 .squadron-card figcaption {font:11px/1.5 "Courier New",monospace;color:var(--pilot-hue,#bff7ff);}
 .squadron-card .roster-detail {display:block;margin-top:4px;font-size:12px;}
 #proof {font-size:12px;} #proof summary {cursor:pointer;color:#bff7ff;font-style:italic;}
@@ -284,3 +284,5 @@ main {background:#030318cc;width:min(1120px,100%);}
 @media(max-width:420px){.pilot-grid{grid-template-columns:repeat(3,minmax(0,1fr));}}
 
 #selection-screen:fullscreen{overflow:auto;padding:20px;background:linear-gradient(#050411,#230c5c 35%,#8e1e65 72%,#050411);color:#f1edff;}
+
+.squadron-card .radio-rain{display:block;flex-shrink:0;width:44px;height:44px;border:1px solid #9991bc;background:#030a08;image-rendering:pixelated}.byorom-controls label{display:block;margin:14px 0}.byorom-controls input[type=checkbox]{width:auto}.byorom-controls [role=alert]{color:#ffb7b7}.byorom-controls button{margin:4px}.byorom-controls small{display:block;font-style:italic}
