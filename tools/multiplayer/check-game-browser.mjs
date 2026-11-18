@@ -225,6 +225,7 @@ try {
       await wait('Corneria flight and weapons',()=>value(host,"window.STARWOLF_GAME.engine.state.tick>"+(before.tick+30)),20000);
       const after=await value(host,"window.STARWOLF_GAME.engine.state");
       assert(after.positions.slice(0,3).some((n,i)=>Math.abs(n-before.positions[i])>10),'Corneria still launches and accepts flight controls',after);
+      assert((after.controls[0]&65535)===0x8000 && (after.controls[0]<<8>>24)===45,'Corneria host controls still reach the native slot',after.controls[0]);
       await screenshot('corneria-smoke.png');
     }
     await value(host,"window.STARWOLF_MP.close()");

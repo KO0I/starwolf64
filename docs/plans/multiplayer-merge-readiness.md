@@ -88,3 +88,11 @@ eight-player capacity, Safari support, or TURN fallback across remote networks.
 The migration passes 80 JavaScript tests and 17 Python publication/recipe tests. Actual WASM extraction matches 15,898 base resources, 2,742 mod resources, and four shaders byte for byte. Real-browser runs verify 26 four-player gameplay assertions and 24 sign-in, import, cache deletion, complete-download launch, and shared main-page preparation assertions. The audited export contains no prepared archives or extracted portrait/geometry routes.
 
 Four actual browsers also pass 20 co-op assertions through the host map, checkpoint-assisted rails, all-range handoff, and debug completion back to the map. The final main-page check passes invalid-ROM rejection, prepared download verification, native title/menu launch, and actual audio without hosted image requests.
+
+## Bolse Interior verification
+
+The Bolse release passes 33 browser assertions with four actual WASM players: local ROM preparation, matching authored geometry, visible garden decks, distinct spawns, flight input, live joining, interrupted synchronization, departure, replacement, containment, accepted ships and hues, and host shutdown. The image check rejects the earlier flat view and requires visible gardens and varied station surfaces. Reports are in build/bolse-release-check.
+
+The current multiplayer/shared suite passes 74 JavaScript tests. All 17 Python browser-publication and recipe tests pass. The pinned WASM build and ROM-free export pass; the exporter verifies 2,771 mod source inputs. The generated numeric scene schema remains unchanged. The authored geometry importer reproduces all 24 selected geometry and collision functions from its source receipt.
+
+The Corneria smoke route passes local preparation, native flight, and packed host-input checks against the same engine build. Its report is build/bolse-corneria-smoke/result.json.

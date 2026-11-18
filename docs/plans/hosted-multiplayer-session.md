@@ -1,7 +1,7 @@
 # Hosted pilot setup and joining during play
 
 Date: 2026-11-14
-Status: Corneria Points launches real WASM host/guest workers with authoritative world replication and joining during play. Four native player slots and the local single-player HUD are implemented. See [the bridge reference](../multiplayer-wasm-bridge.md) for current limits.
+Status: Corneria Points and Bolse Interior Points launch real WASM host/guest workers with authoritative world replication and joining during play. Four native player slots and the local single-player HUD are implemented. See [the bridge reference](../multiplayer-wasm-bridge.md) for current limits.
 Related decisions: [ADR 0001](../adr/0001-lan-versus-multiplayer.md), [WebRTC plan](browser-webrtc-multiplayer.md).
 
 ## Player flow
@@ -15,11 +15,11 @@ Loading or timing out one guest never pauses the host or other active players.
 This replaces the earlier lobby-only admission rule.
 Each participant fixes their pilot before their first spawn in that match.
 Vehicle switching after death remains allowed.
-The host can start Corneria Points alone.
+The host can start Corneria Points or Bolse Interior Points alone.
 
 Vitzy remains visible and unavailable with the label "portrait pending", as the user requested.
 Her existing fighter and voice do not substitute for a radio portrait.
-Original Fox, Falco, Slippy, and Peppy keep distinct logical IDs and their unmodified radio PNGs.
+Original Fox, Falco, Slippy, and Peppy keep distinct logical IDs. Their radio portraits are extracted from each viewer's local ROM.
 
 ## Current implementation
 
@@ -27,9 +27,9 @@ The existing 1990s page provides synchronized setup over the real reliable WebRT
 
 - [catalog.mjs](../../tools/multiplayer/web/catalog.mjs) defines pilots, actual portrait assets, aircraft, hues, map/rule combinations, and pure selection policies.
 - [session.mjs](../../tools/multiplayer/web/session.mjs) owns accepted choices and match configuration in the playing host's browser.
-- [protocol.mjs](../../tools/multiplayer/web/protocol.mjs) validates version 3 selection requests, confirmations, and complete room setup messages.
+- [protocol.mjs](../../tools/multiplayer/web/protocol.mjs) validates selection requests, confirmations, and complete room setup messages.
 - [app.mjs](../../tools/multiplayer/web/app.mjs) renders drafts and confirmed choices. A draft never becomes another player's authoritative selection.
-- [server.mjs](../../tools/multiplayer/server.mjs) serves explicit portrait routes and continues to relay connection setup only.
+- [server.mjs](../../tools/multiplayer/server.mjs) serves the audited BYOROM builder and relays connection setup. Extracted portrait and archive routes are blocked.
 
 The public additions are `selectLoadout(selection)` and `configureMatch(match)`.
 Guests propose selections; only the host commits them.
@@ -40,11 +40,11 @@ Departures and slot reuse do not recolor remaining players or reuse the old peer
 A newly connected guest receives the current complete setup after the channel handshake.
 Late setup synchronization is followed by a reliable native baseline and fresh-world acknowledgment before the host activates a guest.
 
-VS choices preserve native combinations: Corneria with Points or Battle; Katina with Time; Sector Z with Points, Battle, or Time.
+VS choices preserve native combinations: Corneria with Points or Battle; Katina with Time; Sector Z with Points, Battle, or Time. The authored Bolse Interior entry supports Points.
 Main-game setup selects one crew. Star Fox normally uses Arwings, with Katt using her own fighter. Star Wolf normally uses Wolfens, with Vitzy's separate signature fighter exception when her pilot becomes available.
 Changing the crew during setup clears incompatible unspawned choices and allows players to choose again.
 
-The Start action launches the actual WASM engine for Corneria Points. Other map and appearance choices remain saved setup targets.
+The Start action launches the actual WASM engine for Corneria Points or Bolse Interior Points. The accepted aircraft and hue render in the game. Other battle maps remain saved setup targets. Story co-op uses the supported mission handoff described in the bridge reference.
 
 ## Architecture decision
 
