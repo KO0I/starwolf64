@@ -147,8 +147,19 @@ async function captureArenaView(host) {
     const clip=await value(host,"(()=>{const f=window.STARWOLF_GAME.engine.frame,r=f.getBoundingClientRect(),c=f.contentWindow.document.getElementById('canvas').getBoundingClientRect();return {x:r.x+c.x+window.scrollX,y:r.y+c.y+window.scrollY,width:c.width,height:c.height,scale:1};})()");
     const shot=await call('Page.captureScreenshot',{format:'png',clip},host.sessionId),path=resolve(output,'bolse-arena.png');
     await writeFile(path,Buffer.from(shot.data,'base64'));
-    const fraction=Number(execFileSync('python3',['-B','-c',"from PIL import Image;import sys;im=Image.open(sys.argv[1]).convert('RGB');print(sum(max(p)>20 and sum(p)>50 for p in zip(*[iter(im.tobytes())]*3))/(im.width*im.height))",path],{encoding:'utf8'}));
-    assert(fraction>.25,'authored station surfaces actually render in the flight view',{fraction});
+    report.arenaPixels=JSON.parse(execFileSync('python3',['-B','-c',[
+      'from PIL import Image',
+      'from collections import Counter',
+      'import json,sys',
+      'im=Image.open(sys.argv[1]).convert("RGB")',
+      'im=im.crop((0,int(im.height*.22),im.width,int(im.height*.55)))',
+      'pixels=list(zip(*[iter(im.tobytes())]*3))',
+      'garden=sum(g>r*1.12 and g>b*1.08 and g>25 for r,g,b in pixels)/len(pixels)',
+      'dominant=max(Counter(pixels).values())/len(pixels)',
+      'print(json.dumps(dict(garden=garden,dominant=dominant)))'
+    ].join('\n'),path],{encoding:'utf8'}));
+    assert(report.arenaPixels.garden>.03 && report.arenaPixels.dominant<.85,
+      'Bolse flight view contains visible gardens and distinct station surfaces',report.arenaPixels);
 }
 
 async function screenshot(name) {
@@ -505,6 +516,7 @@ try {
   if(arena==='bolse_interior'){
     report.arena=await wait("Bolse native geometry initialized",()=>value(host,"(()=>{const s=window.STARWOLF_GAME.engine.frame.contentWindow.STARSHIP_GAME_STATE;return s?.arenaVertices>1000?s:null;})()"),60000);
     assert(report.arena.versusStage===3&&report.arena.arenaVertices>1000,'host loads the actual authored Bolse interior',report.arena);
+    await captureArenaView(host);
   }
   await wait('host publishes native scenes',()=>value(host,"Boolean(window.STARWOLF_GAME.latest?.tick>4)"),60000);
   await value(host,"window.STARWOLF_GAME.engine.pad={buttons:0x8000,stickX:45,stickY:0}");
@@ -541,7 +553,6 @@ try {
     assert(Math.abs(report.hostAfterInput.positions[4]-before.positions[4])>20,'guest flight controls change altitude inside Bolse');
   }
   assert(report.guestAfterInput.lastImportedTick>report.guestBaseline.lastImportedTick,'live world imports advance');
-  if(arena==='bolse_interior')await captureArenaView(host);
   for(const p of [host,guest]){await value(p,"document.getElementById('game-container').scrollIntoView({block:'center'})");const shot=await call('Page.captureScreenshot',{format:'png'},p.sessionId);await writeFile(resolve(output,p.label+'.png'),Buffer.from(shot.data,'base64'));}
   report.diagnostics.host=await value(host,"window.STARWOLF_MP.getDiagnostics()");
   report.diagnostics.guest=await value(guest,"window.STARWOLF_MP.getDiagnostics()");
@@ -591,6 +602,11 @@ try {
     await wait(name+' admitted',()=>value(peer,"window.STARWOLF_GAME.active"),30000);
     const observed=await value(peer,"window.STARWOLF_GAME.engine.state");
     assert(observed.slot===slot&&observed.lastImportedTick>0,name+' renders its own native player slot',observed);
+    if(arena==='bolse_interior'){
+      const start=slot===2?[2400,1200,-3500]:[-2400,-1200,-8500];
+      const position=observed.positions.slice(slot*3,slot*3+3);
+      assert(Math.hypot(...position.map((n,i)=>n-start[i]))<1200,name+' uses a distinct Bolse spawn',position);
+    }
     report.fourPlayers.push(observed);
     if(shipModels){
       await value(peer,"document.getElementById('game-container').scrollIntoView({block:'center'})");

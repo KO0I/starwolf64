@@ -37,7 +37,6 @@ static int sStationVertexCount,sStationCommandCount,sStationObstacleCount,sStati
 static StationTree sStationTrees[64];
 static StationTerrain sStationTerrain[3];
 static bool sStationReady;
-static int sStationDrawCalls;
 static BolseInteriorDockPad sStationDockPads[BOLSE_INTERIOR_DOCK_PADS];
 static int sStationPadCommand[BOLSE_INTERIOR_DOCK_PADS];
 static int sStationPadGuideVertex[BOLSE_INTERIOR_DOCK_PADS],sStationPadGuideEnd[BOLSE_INTERIOR_DOCK_PADS];
@@ -550,7 +549,6 @@ static bool Bolse_StationResolve(Vec3f* pos, Vec3f previous, f32 gap) {
 
 void BolseInterior_Draw(void) {
     if (!sStationReady) return;
-    sStationDrawCalls++;
     FrameInterpolation_RecordOpenChild(sStationMesh, 0);
     Matrix_Push(&gGfxMatrix);
     Matrix_SetGfxMtx(&gMasterDisp);
@@ -639,7 +637,6 @@ bool BolseInterior_Active(void) {
     return gCurrentLevel==LEVEL_VERSUS && gVersusStage==VS_STAGE_BOLSE_INTERIOR;
 }
 int BolseInterior_VertexCount(void) {return sStationReady?sStationVertexCount:0;}
-int BolseInterior_DrawCalls(void) {return sStationDrawCalls;}
 void BolseInterior_Load(void) {
     Bolse_StationDockingLoad();
     Bolse_StationBuild();
