@@ -25,7 +25,7 @@ def hash_bytes(name, swapped):
 def preserve_starfox(archive):
     hashes = {hash_bytes(name, swapped): (name, swapped)
               for name in archive.namelist() for swapped in (False, True)}
-    pending = [ROOT_MODEL]
+    pending = [ROOT_MODEL, "ast_common/D_101AED0"]
     resources = {}
     while pending:
         name = pending.pop()
@@ -39,6 +39,12 @@ def preserve_starfox(archive):
                 data[offset:offset + 8] = hash_bytes(PREFIX + target, swapped)
                 pending.append(target)
         resources[PREFIX + name] = bytes(data)
+    # Rival speech and portraits must bypass the global playable-cast replacements.
+    portraits = ("aFoxPortraitTex", "D_1006000", "aFalcoPortraitTex", "D_10041C0",
+                 "aSlippyPortraitTex", "D_100E820", "aPeppyPortraitTex", "D_100C9E0")
+    for name in archive.namelist():
+        if name.startswith("ast_radio/gMsg_ID_") or name in {"ast_common/" + p for p in portraits}:
+            resources[PREFIX + name] = archive.read(name)
     return resources
 
 

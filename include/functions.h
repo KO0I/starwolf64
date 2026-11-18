@@ -29,6 +29,7 @@ void ActorAllRange_UpdateStarWolfEvents(Actor*);
 void ActorAllRange_UpdateEnemyEvents(Actor*);
 void ActorAllRange_ApplyDamage(Actor*);
 bool func_360_80031900(Actor*);
+bool ActorAllRange_UsesAdvancedRivalAI(void);
 void ActorAllRange_Update(Actor* this);
 void ActorAllRange_Draw(Actor* this);
 

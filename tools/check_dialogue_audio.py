@@ -121,6 +121,7 @@ harness=r'''
 #include <stdint.h>
 #include <string.h>
 #include <assert.h>
+#include <stdio.h>
 typedef int32_t s32;
 typedef uint16_t u16;
 typedef struct {s32 msgId;u16* msgPtr;const char* path;} MsgLookup;
@@ -141,6 +142,10 @@ int main(void){
         assert(Message_IdFromPtr(original_text)==(crew?0:2040));
         assert(Message_IdFromPtr((u16*)"__OTR__ast_radio/gMsg_ID_2040")==(crew?0:2040));
         assert(Message_IdFromPtr(changed_text)==0);
+        assert(Message_GetId(original_text)==2040);
+        assert(Message_GetId(changed_text)==2050);
+        assert(Message_GetId((u16*)"__OTR__ast_radio/gMsg_ID_2050")==2050);
+        assert(Message_GetId(unknown_text)==-1);
         assert(Message_IdFromPtr(unknown_text)==65535);
     }
     return 0;

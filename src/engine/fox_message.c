@@ -1,5 +1,6 @@
 #include "global.h"
 #include "mods.h"
+#include <stdio.h>
 #include "port/audio/CrewChatter.h"
 #include "port/audio/VoiceBlips.h"
 
@@ -38,22 +39,30 @@ static u16 Message_VoiceId(u16 msgId) {
     }
 }
 
-u16 Message_IdFromPtr(u16* msgPtr) {
-    MsgLookup* lookup = (MsgLookup*) LOAD_ASSET(gMsgLookup);
-
+static const MsgLookup* Message_Find(u16* msgPtr) {
+    const MsgLookup* lookup = (MsgLookup*) LOAD_ASSET(gMsgLookup);
     while (lookup->msgPtr != NULL) {
         if (GameEngine_OTRSigCheck(msgPtr)) {
-            if (strcmp(((char*) msgPtr) + 7, lookup->path) == 0) {
-                return Message_VoiceId(lookup->msgId);
-            }
-        } else {
-            if (lookup->msgPtr == msgPtr) {
-                return Message_VoiceId(lookup->msgId);
-            }
+            if (strcmp(((char*) msgPtr) + 7, lookup->path) == 0) return lookup;
+        } else if (lookup->msgPtr == msgPtr) {
+            return lookup;
         }
         lookup++;
     }
-    return -1;
+    return NULL;
+}
+
+s32 Message_GetId(u16* msgPtr) {
+    const MsgLookup* lookup = Message_Find(msgPtr);
+    s32 id;
+    if (lookup == NULL) return -1;
+    /* Edited dialogue may share a muted voice ID; its resource keeps its own ID. */
+    return sscanf(lookup->path, "ast_radio/gMsg_ID_%d", &id) == 1 ? id : lookup->msgId;
+}
+
+u16 Message_IdFromPtr(u16* msgPtr) {
+    const MsgLookup* lookup = Message_Find(msgPtr);
+    return lookup == NULL ? (u16) -1 : Message_VoiceId(lookup->msgId);
 }
 
 s32 Message_GetWidth(u16* msgPtr) {

@@ -2257,6 +2257,12 @@ void HUD_RadioCharacterName_Draw(void) {
             xPos = 73.0f;
         }
 
+        const char* rivalName = VenomMission_RadioName(gRadioMsgRadioId);
+        if (rivalName != NULL) {
+            Graphics_DisplaySmallText(xPos, 173, 1.0f, 1.0f, (char*) rivalName);
+            return;
+        }
+
         switch ((s32) gRadioMsgRadioId) {
             case RCID_FOX:
                 Graphics_DisplaySmallText(xPos, 173, 1.0f, 1.0f, "WOLF");

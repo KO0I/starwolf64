@@ -50,6 +50,10 @@ bool gShowAllRangeCountdown;
 s32 gAllRangeFrameCount;
 f32 gAllRangeCountdownScale;
 
+bool ActorAllRange_UsesAdvancedRivalAI(void) {
+    return (gCurrentLevel == LEVEL_VENOM_2) && !VenomMission_IsArena();
+}
+
 void AllRange_GetStarWolfHits(Actor* this) {
     s32 hits = 0;
 
@@ -893,7 +897,7 @@ void ActorAllRange_ApplyDamage(ActorAllRange* this) {
             if ((this->animFrame == 3) ||
                 ((gCurrentLevel == LEVEL_BOLSE) && (gBosses[1].obj.status != OBJ_FREE) &&
                  (this->aiType >= AI360_WOLF)) ||
-                ((gCurrentLevel == LEVEL_VENOM_2) && (this->aiType >= AI360_WOLF) && (this->aiType < AI360_ENEMY) &&
+                ((ActorAllRange_UsesAdvancedRivalAI()) && (this->aiType >= AI360_WOLF) && (this->aiType < AI360_ENEMY) &&
                  (this->dmgType == DMG_EXPLOSION))) {
                 this->damage = DMG_NONE;
                 var_a1 = true;
@@ -1307,7 +1311,7 @@ void ActorAllRange_Update(ActorAllRange* this) {
         switch (RAND_INT(3.9f)) {
             case 0:
             case 1:
-                if (gCurrentLevel == LEVEL_VENOM_2) {
+                if (ActorAllRange_UsesAdvancedRivalAI()) {
                     this->iwork[16] = STATE360_10;
                 }
                 break;
@@ -1328,7 +1332,7 @@ void ActorAllRange_Update(ActorAllRange* this) {
         }
     }
 
-    if ((this->lockOnTimers[TEAM_ID_FOX] != 0) && (gCurrentLevel != LEVEL_VENOM_2) && (this->aiType < AI360_ENEMY) &&
+    if ((this->lockOnTimers[TEAM_ID_FOX] != 0) && (!ActorAllRange_UsesAdvancedRivalAI()) && (this->aiType < AI360_ENEMY) &&
         (this->lockOnTimers[TEAM_ID_FOX] < 5) && ((gGameFrameCount % 32) == 0)) {
         this->iwork[16] = STATE360_10;
     }
@@ -1574,7 +1578,7 @@ void ActorAllRange_Update(ActorAllRange* this) {
                 }
 
                 if (this->aiIndex == AI360_FOX) {
-                    if (gCurrentLevel != LEVEL_VENOM_2) {
+                    if (!ActorAllRange_UsesAdvancedRivalAI()) {
                         if ((gPlayer[0].somersault && (this->iwork[4] > 10)) ||
                             ((gCurrentLevel == LEVEL_BOLSE) && (gPlayer[0].state == PLAYERSTATE_STANDBY))) {
                             this->state = STATE360_3;
@@ -1591,7 +1595,7 @@ void ActorAllRange_Update(ActorAllRange* this) {
                     }
 
                     if ((this->aiType >= AI360_WOLF) && (this->aiType != AI360_KATT) &&
-                        !((gCurrentLevel == LEVEL_VENOM_2) && (this->aiType == AI360_WOLF))) {
+                        !((ActorAllRange_UsesAdvancedRivalAI()) && (this->aiType == AI360_WOLF))) {
                         spCC = SIN_DEG((this->index * 45) + gGameFrameCount) * 100.0f;
                         spC8 = COS_DEG((this->index * 45) + (gGameFrameCount * 2)) * 100.0f;
                         spC4 = SIN_DEG((this->index * 45) + gGameFrameCount) * 100.0f;
@@ -1606,7 +1610,7 @@ void ActorAllRange_Update(ActorAllRange* this) {
                         this->fwork[3] = 3.0f;
                         this->fwork[1] = gPlayer[0].baseSpeed - 5.0f;
                         this->iwork[11] = 2;
-                    } else if ((gCurrentLevel == LEVEL_VENOM_2) && (this->aiType >= AI360_WOLF)) {
+                    } else if ((ActorAllRange_UsesAdvancedRivalAI()) && (this->aiType >= AI360_WOLF)) {
                         this->fwork[3] = 1.6f;
                         this->fwork[1] = 55.0f;
                     } else {
@@ -1616,7 +1620,7 @@ void ActorAllRange_Update(ActorAllRange* this) {
                     spF4 = 2000.0f;
                     spF8 = 700.0f;
 
-                    if (gCurrentLevel == LEVEL_VENOM_2) {
+                    if (ActorAllRange_UsesAdvancedRivalAI()) {
                         spF0 = 0.5f;
                         sp10F = 3;
                     } else {
@@ -1633,7 +1637,7 @@ void ActorAllRange_Update(ActorAllRange* this) {
                     this->fwork[5] = gActors[this->aiIndex].obj.pos.y + spC8;
                     this->fwork[6] = gActors[this->aiIndex].obj.pos.z + spC4;
 
-                    if ((gCurrentLevel == LEVEL_VENOM_2) && (this->aiType >= AI360_WOLF)) {
+                    if ((ActorAllRange_UsesAdvancedRivalAI()) && (this->aiType >= AI360_WOLF)) {
                         this->fwork[1] = 55.0f;
                         this->fwork[3] = 1.6f;
                     } else if ((gCurrentLevel == LEVEL_FORTUNA) && (this->aiType > AI360_ENEMY)) {
@@ -1659,7 +1663,7 @@ void ActorAllRange_Update(ActorAllRange* this) {
                                 this->fwork[1] = gActors[this->aiIndex].fwork[0] - 5.0f;
                             } else {
                                 this->fwork[1] = gPlayer[0].baseSpeed - 5.0f;
-                                if ((gCurrentLevel == LEVEL_VENOM_2) && (gPlayer[0].state == PLAYERSTATE_U_TURN) &&
+                                if ((ActorAllRange_UsesAdvancedRivalAI()) && (gPlayer[0].state == PLAYERSTATE_U_TURN) &&
                                     (gPlayer[0].aerobaticPitch > 100.0f)) {
                                     this->iwork[16] = STATE360_8;
                                 }
@@ -1888,7 +1892,7 @@ void ActorAllRange_Update(ActorAllRange* this) {
             sp104 = 1;
             if (this->timer_0BC == 0) {
                 if ((this->aiType < AI360_ENEMY) || (gCurrentLevel == LEVEL_BOLSE)) {
-                    if (gCurrentLevel == LEVEL_VENOM_2) {
+                    if (ActorAllRange_UsesAdvancedRivalAI()) {
                         if (this->aiType >= AI360_WOLF) {
                             this->fwork[3] = 1.6f;
                             this->fwork[1] = 55.0f;
@@ -2033,7 +2037,7 @@ void ActorAllRange_Update(ActorAllRange* this) {
         spE0 = this->fwork[5] - this->obj.pos.y;
         spDC = this->fwork[6] - this->obj.pos.z;
 
-        if (gCurrentLevel == LEVEL_VENOM_2) {
+        if (ActorAllRange_UsesAdvancedRivalAI()) {
             var_v0 = 2 - 1;
         }
         if (((this->index + gGameFrameCount) & var_v0) == 0) {
@@ -2089,7 +2093,7 @@ void ActorAllRange_Update(ActorAllRange* this) {
         }
 
         if ((this->fwork[7] > 0.01f) && (this->fwork[7] < 359.9f)) {
-            if ((((gGameFrameCount + 15) % 32) == 0) && (gCurrentLevel != LEVEL_VENOM_2)) {
+            if ((((gGameFrameCount + 15) % 32) == 0) && (!ActorAllRange_UsesAdvancedRivalAI())) {
                 this->lockOnTimers[TEAM_ID_FOX] = 0;
             }
         } else {
@@ -2155,7 +2159,7 @@ void ActorAllRange_Update(ActorAllRange* this) {
         sp90.x = spBC * sp90.z;
         sp90.z = spB4 * sp90.z;
 
-        if ((gCurrentLevel == LEVEL_VENOM_2) && (this->aiType >= AI360_WOLF)) {
+        if ((ActorAllRange_UsesAdvancedRivalAI()) && (this->aiType >= AI360_WOLF)) {
             Matrix_RotateY(gCalcMatrix, this->obj.rot.y * M_DTOR, MTXF_NEW);
             Matrix_RotateX(gCalcMatrix, this->obj.rot.x * M_DTOR, MTXF_APPLY);
             Matrix_RotateZ(gCalcMatrix, this->obj.rot.z * M_DTOR, MTXF_APPLY);

@@ -1,5 +1,6 @@
 #include "global.h"
 #include "bolse_station.h"
+#include "venom_mission.h"
 #include "assets/vitzy_fighter.h"
 #include "assets/ast_landmaster.h"
 #include "assets/ast_aquas.h"
@@ -809,14 +810,14 @@ void PlayerShot_CollisionCheck(PlayerShot* shot) {
                         if (actor->info.unk_16 != 0) {
                             if (actor->obj.id == OBJ_ACTOR_ALLRANGE) {
                                 if ((actor->aiType >= AI360_WOLF) && (actor->aiType < AI360_ENEMY) &&
-                                    (((gCurrentLevel == LEVEL_VENOM_2) &&
+                                    (((ActorAllRange_UsesAdvancedRivalAI()) &&
                                       (shot->sourceId <= NPC_SHOT_ID + AI360_PEPPY)) ||
-                                     ((gCurrentLevel != LEVEL_VENOM_2) && (shot->sourceId == AI360_FOX))) &&
+                                     ((!ActorAllRange_UsesAdvancedRivalAI()) && (shot->sourceId == AI360_FOX))) &&
                                     (shot->obj.id != PLAYERSHOT_LOCK_ON) &&
                                     (fabsf(actor->obj.pos.x - shot->obj.pos.x) < 500.0f) &&
                                     (fabsf(actor->obj.pos.y - shot->obj.pos.y) < 300.0f) &&
                                     (fabsf(actor->obj.pos.z - shot->obj.pos.z) < 500.0f)) {
-                                    if (gCurrentLevel == LEVEL_VENOM_2) {
+                                    if (ActorAllRange_UsesAdvancedRivalAI()) {
                                         actor->iwork[17] = 1;
                                     } else if (Rand_ZeroOne() < 0.1f) {
                                         actor->iwork[17] = 1;
@@ -1130,6 +1131,7 @@ static void PlayerShot_DrawStrikerLaser(void) {
 }
 
 void PlayerShot_DrawLaser(PlayerShot* shot) {
+    if (VenomMission_DrawEnemyLaser(shot)) return;
     if (Bolse_StationIsFriendlyShot(shot)) {
         PlayerShot_DrawStrikerLaser();
         return;

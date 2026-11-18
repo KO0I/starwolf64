@@ -15,6 +15,8 @@ OUT = OUTPUT_PATH
 skip_opening = SKIP_OPENING_MODE
 cloud_draws = 0
 cloud_wingmen_drawn = set()
+rivals_verified = False
+green_laser_draws = 0
 phase = 'boot'
 frames = 0
 phase_frame = 0
@@ -125,6 +127,103 @@ def route_checks():
     check('!Map_LevelPlayedStatus_Check(PLANET_VENOM)')
     report['startup_and_empty_briefing'] = True
 
+
+def radio_text():
+    chars={i+24:c for i,c in enumerate("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!?-,.0123456789'():|")}
+    chars.update({12:' ',1:' '})
+    result=[]
+    for i in range(160):
+        code=num('((unsigned short*)gRadioMsg)[%d]'%i)
+        if code==0: break
+        result.append(chars.get(code,''))
+    return ''.join(result)
+
+def play_radio(message, character):
+    setv('gRadioState',0)
+    call('(void)Audio_ClearVoice()')
+    call('(void)Radio_PlayMessage((u16*)gMsg_ID_%d,(RadioCharacterId)%d)'%(message,character))
+
+def verify_rival_rules():
+    check('gLaserStrength[0] == LASERS_TWIN')
+    check('!ActorAllRange_UsesAdvancedRivalAI()')
+    setv('gLevelPhase',1)
+    check('ActorAllRange_UsesAdvancedRivalAI()')
+    setv('gLevelPhase',0)
+    check('!ActorAllRange_UsesAdvancedRivalAI()')
+    setv('gPlayer[0].mercyTimer',3000)
+    for i in range(4,8):
+        setv('gActors[%d].timer_0C2'%i,1000)
+    # A vulnerable first-encounter rival takes capped bomb damage instead of reflecting it.
+    for field in ('fwork[22]','fwork[23]'): setv('gActors[4].'+field,0)
+    setv('gActors[4].dmgType',2)
+    setv('gActors[4].damage',80)
+    setv('gActors[4].dmgSource',1)
+    health=num('gActors[4].health')
+    call('(void)ActorAllRange_ApplyDamage(&gActors[4])')
+    assert num('gActors[4].health')==health-10
+    # Exercise the real pursuit and firing branch with a clear, distant target.
+    setv('gActors[4].state',2)
+    setv('gActors[4].aiIndex',0)
+    setv('gActors[4].obj.pos.x','gPlayer[0].pos.x')
+    setv('gActors[4].obj.pos.y','gPlayer[0].pos.y + 500')
+    setv('gActors[4].obj.pos.z','gPlayer[0].pos.z + 8000')
+    for i in range(10): setv('gPlayerShots[%d].obj.status'%i,0)
+    setv('gActors[4].iwork[0]',1)
+    call('(void)ActorAllRange_Update(&gActors[4])')
+    check('gActors[4].fwork[1] == gPlayer[0].baseSpeed + 10')
+    assert abs(float(val('gActors[4].fwork[3]'))-1.2)<.001
+    shots=[i for i in range(10) if num('gPlayerShots[%d].obj.status'%i)]
+    assert len(shots)==1,shots
+    shot=shots[0]
+    check('gPlayerShots[%d].sourceId == 104 && gPlayerShots[%d].unk_58 == 1'%(shot,shot))
+    setv('gPlayerShots[%d].obj.pos.x'%shot,'gPlayer[0].pos.x+100')
+    setv('gPlayerShots[%d].obj.pos.y'%shot,'gPlayer[0].pos.y+60')
+    setv('gPlayerShots[%d].obj.pos.z'%shot,'gPlayer[0].pos.z+5000')
+    for axis in 'xyz': setv('gPlayerShots[%d].vel.%s'%(shot,axis),0)
+    setv('gPlayerShots[%d].timer'%shot,180)
+    report['first_encounter_rules']={'bomb_damage':10,'pursuit_turn':1.2,'shots_per_trigger':1}
+    report['rival_radio']=[]
+    for source,rcid,voice,name,portrait in (
+        (19450,200,19240,'FOX','aFoxPortraitTex'),
+        (19451,220,9211,'FALCO','aFalcoPortraitTex'),
+        (19452,210,9212,'SLIPPY','aSlippyPortraitTex'),
+        (19453,230,9213,'PEPPY','aPeppyPortraitTex')):
+        play_radio(source,rcid)
+        assert num('gRadioMsgId')==voice,(source,num('gRadioMsgId'))
+        actual=val('(char*)VenomMission_RadioName((int)gRadioMsgRadioId)').string()
+        texture=val('(char*)VenomMission_RadioPortrait((int)gRadioMsgRadioId)').string()
+        assert actual==name and texture.endswith('/'+portrait),(actual,texture)
+        report['rival_radio'].append({'name':name,'voice':voice,'text':radio_text()})
+    saved=num('gTeamShields[1]')
+    setv('gTeamShields[1]',0)
+    play_radio(19451,220)
+    check('gRadioMsgId == 9211')
+    setv('gTeamShields[1]',saved)
+    report['enemy_radio_ignores_ally_death']=True
+    for source,rcid in ((9250,0),(9260,10),(9280,20),(9270,30),(9180,30)):
+        play_radio(source,rcid)
+        check('gRadioMsgId == 0')
+        if source==9250: assert 'Star Fox' in radio_text(),radio_text()
+        if source==9180: assert 'father' not in radio_text().lower(),radio_text()
+    for rcid,target in ((10,19459),(20,19461),(30,19460)):
+        for source in (19462,19463,19464,20310,20311,20312):
+            play_radio(source,rcid)
+            check('gRadioMsgId == 0')
+            expected=call('(void*)ResourceGetDataByName("venom_starfox/ast_radio/gMsg_ID_%d")'%target)
+            assert num('(void*)gRadioMsg')==int(expected),(source,rcid,radio_text())
+    report['allied_star_wolf_lines']=True
+    report['allied_help_calls_routed']=18
+    play_radio(19450,200)
+    assert 'Star Wolf' in radio_text(),radio_text()
+
+class RivalLaserDraw(gdb.Breakpoint):
+    def stop(self):
+        global green_laser_draws
+        if num('gCurrentLevel == LEVEL_VENOM_2 && gLevelPhase == 0 && shot->unk_58 != 0 && shot->sourceId >= 104 && shot->sourceId <= 107'):
+            green_laser_draws+=1
+        return False
+
+
 class Frame(gdb.Breakpoint):
     def stop(self):
         return True
@@ -152,6 +251,7 @@ class CloudDraw(gdb.Breakpoint):
         if phase == 'cloud': cloud_draws += 1
         return False
 
+RivalLaserDraw('VenomMission_DrawEnemyLaser', internal=True).silent=True
 CloudDraw('Effect_Clouds_Draw', internal=True).silent=True
 OpeningPlanetDraw('Title_Corneria_Draw', internal=True).silent=True
 WingmanDraw('ActorTeamArwing_Draw', internal=True).silent=True
@@ -215,6 +315,7 @@ while frames < 4200:
         check('gCurrentLevel == LEVEL_VENOM_2 && gLevelPhase == 0 && gMissionNumber == 0')
         phase, phase_frame = 'cloud', frames
     elif phase == 'cloud' and age >= 5:
+        check('gLaserStrength[0] == LASERS_TWIN')
         check('gActors[0].obj.status == OBJ_ACTIVE && gActors[0].aiType == AI360_EVENT_HANDLER')
         for i in range(4,8): check('gActors[%d].obj.status == OBJ_FREE'%i)
         if num('gVenomMissionPhase == VENOM_CLOUD_OPENING'):
@@ -264,8 +365,23 @@ while frames < 4200:
             report['descent_start_skip'] = True
         phase, phase_frame = 'battle_wait', frames
     elif phase == 'battle_wait' and num('gVenomMissionPhase == VENOM_STAR_FOX_BATTLE'):
-        check('gPlayer[0].state == PLAYERSTATE_ACTIVE')
+        check('gPlayer[0].state == PLAYERSTATE_ACTIVE && gLaserStrength[0] == LASERS_TWIN')
+        for i in range(4,8): check('gActors[%d].health == 100'%i)
         phase, phase_frame = 'battle', frames
+    elif phase == 'battle' and age >= 95 and not rivals_verified:
+        verify_rival_rules()
+        phase, phase_frame = 'fox_radio_capture', frames
+    elif phase == 'fox_radio_capture' and age >= 65:
+        capture('enemy-fox-radio')
+        play_radio(9250,0)
+        phase, phase_frame = 'wolf_radio_capture', frames
+    elif phase == 'wolf_radio_capture' and age >= 65:
+        capture('allied-wolf-radio')
+        assert green_laser_draws > 0, 'Green Arwing laser was never rendered'
+        report['green_arwing_laser_draws']=green_laser_draws
+        for i in range(4,8): setv('gActors[%d].timer_0C2'%i,0)
+        rivals_verified=True
+        phase, phase_frame = 'battle', frames-95
     elif phase == 'battle' and age >= 95:
         check('gLevelStartStatusScreenTimer == 0')
         check('gCurrentLevel == LEVEL_VENOM_2 && gBosses[0].obj.id == OBJ_BOSS_VE2_BASE')

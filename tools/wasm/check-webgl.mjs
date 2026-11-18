@@ -474,12 +474,22 @@ with zipfile.ZipFile(sys.argv[1]) as z:
       await waitReverse(state=>state.level===19&&state.playerState===2&&state.playerY<4000,'Venom descent',10000);
       await pulse(0x1000);
       const battle=await waitReverse(state=>state.gameState===7&&state.level===19&&state.playerState===3,'Star Fox battle',10000);
+      let rivalDialogue;
+      if(process.argv.includes('--rival-dialogue')) {
+        const ally=await waitReverse(state=>state.radioSpeaker===0&&state.radioMessage===0&&state.radioState===4,'Star Wolf introduction',12000);
+        await captureReverse('reverse-ally-radio');
+        const enemy=await waitReverse(state=>state.radioSpeaker===240&&state.radioMessage===9285&&state.radioState===4,'Star Fox reply',18000);
+        await captureReverse('reverse-enemy-radio');
+        rivalDialogue={ally,enemy};
+      }
       await value('Module._Wasm_SetControllerState(0x8000,40,0)');
       await sleep(1500);
       await value('Module._Wasm_SetControllerState(0,0,0)');
       const steered=await waitReverse(state=>state.level===19&&state.playerState===3&&state.frames>battle.frames+20&&Math.abs(state.playerX-battle.playerX)>5,'Battle flight controls',10000);
       await captureReverse('reverse-battle');
-      result.reverse={map,opening,cloud,arrival,battle,steered};
+      if(opening.laserStrength!==1||battle.laserStrength!==1)
+        throw Error('Reverse campaign did not retain starting twin lasers: '+JSON.stringify({opening,battle}));
+      result.reverse={map,opening,cloud,arrival,battle,steered,rivalDialogue};
     }
     if(process.argv.includes('--training')||process.argv.includes('--six-dof')||touch||collision) {
       const menuShot=await call('Page.captureScreenshot',{format:'png'});

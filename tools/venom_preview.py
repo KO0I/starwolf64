@@ -45,6 +45,11 @@ def main():
     entries = json.loads(subprocess.check_output(['ninja', '-C', str(build), '-t', 'compdb'], text=True))
     # Compile every game source from this checkout, reusing only built dependencies.
     entries = [entry for entry in entries if Path(entry['file']).is_relative_to(original / 'src')]
+    omitted_objects = {
+        shlex.split(entry['command'])[shlex.split(entry['command']).index('-o') + 1]
+        for entry in entries if not (ROOT / Path(entry['file']).relative_to(original)).is_file()
+    }
+    entries = [entry for entry in entries if (ROOT / Path(entry['file']).relative_to(original)).is_file()]
     known_sources = {Path(entry['file']).relative_to(original) for entry in entries}
     template = next(entry for entry in entries if entry['file'].endswith('/src/engine/fox_360.c'))
     additions = []
@@ -72,6 +77,9 @@ def main():
             elif argument == entry['file']:
                 command[i] = str(ROOT / source)
             elif argument in ('-I' + str(original), '-I' + str(original / 'include'), '-I' + str(original / 'src')):
+                command[i] = argument.replace(str(original), str(ROOT), 1)
+            elif any(argument.startswith(prefix + str(original / dependency))
+                     for prefix in ('-I', '') for dependency in ('libultraship', 'tools/Torch')):
                 command[i] = argument.replace(str(original), str(ROOT), 1)
         # Keep generated dependency paths and headers under the original build read-only.
         command = [arg for arg in command if arg not in ('-MD', '-MMD', '-MP')]
@@ -101,7 +109,8 @@ def main():
     link = shlex.split(commands.splitlines()[-1].split(' && ')[1])
     assert '-o' in link
     assert '--dependency-file=' in ' '.join(link)
-    link = [replacements.get(arg, arg) for arg in link if '--dependency-file=' not in arg]
+    link = [replacements.get(arg, arg) for arg in link
+            if '--dependency-file=' not in arg and arg not in omitted_objects]
     link[link.index('-o') + 1] = str(output / 'Starship')
     link[link.index('-o'):link.index('-o')] = [replacements[obj] for obj in additions]
     subprocess.run(link, cwd=build, check=True)

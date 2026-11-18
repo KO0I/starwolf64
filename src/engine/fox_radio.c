@@ -58,7 +58,8 @@ s32 func_radio_800BA7BC(u16* msg, s32 priority) {
 }
 
 void Radio_PlayMessage(u16* msg, RadioCharacterId character) {
-    if (VenomMission_IsArena() && (character >= RCID_WOLF) && (character <= RCID_ANDREW_2)) return;
+    s32 voiceId = -1;
+    VenomMission_RouteRadio(&msg, character, &voiceId);
     TeamId teamId;
     s32 pad;
     s32 priority;
@@ -128,7 +129,7 @@ void Radio_PlayMessage(u16* msg, RadioCharacterId character) {
     gRadioMsg = msg;
     gRadioState = 100;
 
-    gRadioMsgId = Message_IdFromPtr(msg);
+    gRadioMsgId = voiceId >= 0 ? voiceId : Message_IdFromPtr(msg);
     Audio_PlayVoice(gRadioMsgId);
 }
 
@@ -454,6 +455,11 @@ void func_radio_800BAAE8(void) {
                 sRadioUseRedBox = true;
             }
             break;
+    }
+    u16* rivalPortrait = VenomMission_RadioPortrait(gCurrentRadioPortrait);
+    if (rivalPortrait != NULL) {
+        radioPortraitTex = rivalPortrait;
+        sRadioUseRedBox = true;
     }
     if ((radioPortraitTex != NULL) && (gRadioPortraitScaleY != 0.0f)) {
         temp_fa0 = (2.0f * gRadioPortraitScaleY) + gRadioPortraitPosY;
