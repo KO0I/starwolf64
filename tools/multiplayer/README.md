@@ -59,6 +59,8 @@ node tools/multiplayer/check-game-browser.mjs --campaign --campaign-route --camp
 node tools/multiplayer/check-audio-browser.mjs --rom /path/base.z64 --url http://127.0.0.1:8670/multiplayer/ --output build/byorom-audio
 ```
 
+Use --arena-preview with --stage bolse_interior for a focused starting-view check, or --stage corneria for a flight smoke check. The Bolse image check requires visible garden colors and varied station surfaces; a flat fog view fails.
+
 Use --site-dir /path/to/audited/site instead of --url to have the gameplay checker start and stop its own signaling server on a free port. Reports and screenshots go to the selected directory. The campaign checkpoint starts near the end of rails. Return-map verification uses debug completion and does not prove a boss defeat. Omit those flags for an ordinary route flight. Use --native-menu to activate the actual native Multiplayer menu. The setup checker also accepts --rom and --url.
 
 ## Maintain assets

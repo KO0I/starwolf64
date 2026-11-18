@@ -2017,7 +2017,7 @@ void HUD_RadarMarks_Setup(void) {
             continue;
         }
 
-        if (gVersusMode && (gVersusStage == VS_STAGE_SECTOR_Z)) {
+        if (gVersusMode && ((gVersusStage == VS_STAGE_SECTOR_Z) || BolseInterior_Active())) {
             continue;
         }
 

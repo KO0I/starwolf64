@@ -37,7 +37,8 @@ Shared local BYOROM preparation, anonymous code rain, private draft hues, automa
 
 ## Supported scope
 
-The playable routes are Corneria Points and Corneria story phase zero, including rails and all-range topology.
+The playable routes are Corneria Points, Bolse Interior Points, and Corneria story phase zero, including rails and all-range topology.
+Bolse Interior uses a separate native stage ID, contained 6DOF flight, authored habitat collision, and four distinct spawn points. Its procedural geometry is built locally; textures come from each player's ROM. Campaign AI, mission docking, and on-foot play are outside the battle entry.
 Other story missions keep guests waiting while the host continues through the native campaign.
 Every additional stage needs an actor work-field audit, local scene bootstrap, and real browser verification.
 The codec never sends raw C pointers.

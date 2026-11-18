@@ -31,6 +31,7 @@ const deadline = Date.now() + 600000;
 function assert(value, name, detail) {
   if (!value) throw Error(`${name}: ${JSON.stringify(detail)}`);
   report.assertions[name] = true;
+  console.log('PASS: '+name);
 }
 function bound(promise, label, ms = 10000) {
   let timer;
@@ -214,8 +215,18 @@ try {
     await chooseVersus(host,arena,'points');
     await value(host,"window.STARWOLF_GAME.prepare()");
     await value(host,"window.STARWOLF_GAME.launch()");
-    await wait('Bolse geometry ready',()=>value(host,"window.STARWOLF_GAME.engine.frame.contentWindow.STARSHIP_GAME_STATE?.arenaVertices>1000"),60000);
-    await captureArenaView(host);
+    await wait('native battle ready',()=>value(host,"window.STARWOLF_GAME.engine.state.ready && window.STARWOLF_GAME.engine.state.tick>8"),60000);
+    if(arena==='bolse_interior'){
+      await wait('Bolse geometry ready',()=>value(host,"window.STARWOLF_GAME.engine.frame.contentWindow.STARSHIP_GAME_STATE?.arenaVertices>1000"),60000);
+      await captureArenaView(host);
+    }else{
+      const before=await value(host,"window.STARWOLF_GAME.engine.state");
+      await value(host,"window.STARWOLF_GAME.engine.pad={buttons:0x8000,stickX:45,stickY:0}");
+      await wait('Corneria flight and weapons',()=>value(host,"window.STARWOLF_GAME.engine.state.tick>"+(before.tick+30)),20000);
+      const after=await value(host,"window.STARWOLF_GAME.engine.state");
+      assert(after.positions.slice(0,3).some((n,i)=>Math.abs(n-before.positions[i])>10),'Corneria still launches and accepts flight controls',after);
+      await screenshot('corneria-smoke.png');
+    }
     await value(host,"window.STARWOLF_MP.close()");
   } else if(process.argv.includes('--sign-in')) {
     const host=await page('host',url),guest=await page('guest',url);
