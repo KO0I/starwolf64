@@ -14,6 +14,9 @@ if (hostedURL && !['http:', 'https:'].includes(hostedURL.protocol)) throw Error(
 const siteIndex=process.argv.indexOf('--site-dir');
 const siteDirectory=siteIndex<0?undefined:process.argv[siteIndex+1];
 if(siteIndex>=0&&!siteDirectory)throw Error('--site-dir requires an audited export directory');
+const arenaIndex=process.argv.indexOf('--stage');
+const arena=arenaIndex<0?'corneria':process.argv[arenaIndex+1];
+if(!['corneria','bolse_interior'].includes(arena))throw Error('Unsupported playable --stage');
 const shipModels = process.argv.includes('--ship-models');
 const romIndex=process.argv.indexOf('--rom');
 if(romIndex<0 || !process.argv[romIndex+1])throw Error('Supply --rom with your local US 1.1 ROM for each test browser.');
@@ -467,11 +470,16 @@ try {
   await value(host,"document.getElementById('host').click()");
   const room=await wait('room created',async()=>{const s=await state(host);return s.room?s.room:false;});
   await choosePilot(host,{pilot:'wolf',vehicle:'wolfen',hue:0});
+  await chooseVersus(host,arena,'points');
   await value(host,"window.STARWOLF_GAME.prepare()");
   report.prepared=await value(host,"window.STARWOLF_GAME.engine.state");
   await value(host,"window.STARWOLF_GAME.launch()");
   report.hostLaunch=await value(host,"window.STARWOLF_GAME.engine.state");
   assert(report.hostLaunch.ready,'real host stage ready',report.hostLaunch);
+  if(arena==='bolse_interior'){
+    report.arena=await value(host,"window.STARWOLF_GAME.engine.frame.contentWindow.STARSHIP_GAME_STATE");
+    assert(report.arena.versusStage===3&&report.arena.arenaVertices>1000,'host loads the actual authored Bolse interior',report.arena);
+  }
   await wait('host publishes native scenes',()=>value(host,"Boolean(window.STARWOLF_GAME.latest?.tick>4)"),60000);
   await value(host,"window.STARWOLF_GAME.engine.pad={buttons:0x8000,stickX:45,stickY:0}");
   await sleep(2000);
@@ -501,6 +509,11 @@ try {
   const packed=report.hostAfterInput.controls[1];
   assert((packed&65535)===0x8000 && (packed<<8>>24)===-65 && (packed>>24)===25,'guest controls reach native controller slot',packed);
   assert(report.hostAfterInput.activeMask===3,'host contains both players');
+  if(arena==='bolse_interior'){
+    const guestArena=await value(guest,"window.STARWOLF_GAME.engine.frame.contentWindow.STARSHIP_GAME_STATE");
+    assert(guestArena.versusStage===3&&guestArena.arenaVertices===report.arena.arenaVertices,'guest independently builds matching Bolse geometry',guestArena);
+    assert(Math.abs(report.hostAfterInput.positions[4]-before.positions[4])>20,'guest flight controls change altitude inside Bolse');
+  }
   assert(report.guestAfterInput.lastImportedTick>report.guestBaseline.lastImportedTick,'live world imports advance');
   for(const p of [host,guest]){await value(p,"document.getElementById('game-container').scrollIntoView({block:'center'})");const shot=await call('Page.captureScreenshot',{format:'png'},p.sessionId);await writeFile(resolve(output,p.label+'.png'),Buffer.from(shot.data,'base64'));}
   report.diagnostics.host=await value(host,"window.STARWOLF_MP.getDiagnostics()");
@@ -562,6 +575,10 @@ try {
   }
   await wait('four native players active',()=>value(host,"window.STARWOLF_GAME.engine.state.activeMask===15"));
   assert(true,'four actual WASM players share the host world');
+  if(arena==='bolse_interior'){
+    const states=await Promise.all([host,replacement,...pages.filter(p=>['third','fourth'].includes(p.label))].map(p=>value(p,"window.STARWOLF_GAME.engine.state")));
+    assert(states.every(s=>s.positions.every((n,i)=>i%3===2?n>=-14800&&n<=4201:Math.abs(n)<=7400)),'all four pilots stay inside the Bolse arena',states);
+  }
   report.nativeLoadouts=await wait('native loadout scene',()=>value(host,`(()=>{
     const v=new DataView(window.STARWOLF_GAME.latest.bytes);
     if(v.getUint32(4,true)!==3 || v.getUint32(20,true)!==15)return null;

@@ -135,7 +135,7 @@ include_directories(
 )
 
 # Collect source files to build the executable
-file(GLOB_RECURSE ALL_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
+file(GLOB_RECURSE ALL_FILES CONFIGURE_DEPENDS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
     # "src/assets/*.c"
     "src/audio/*.c"
     "src/audio/*.h"
