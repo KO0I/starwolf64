@@ -43,4 +43,5 @@ bool BolseInterior_ShotImpact(PlayerShot* shot);
 void BolseInterior_ItemPosition(int index, Vec3f* position);
 void BolseInterior_Draw(void);
 int BolseInterior_VertexCount(void);
+int BolseInterior_DrawCalls(void);
 #endif

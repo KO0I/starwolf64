@@ -37,6 +37,7 @@ static int sStationVertexCount,sStationCommandCount,sStationObstacleCount,sStati
 static StationTree sStationTrees[64];
 static StationTerrain sStationTerrain[3];
 static bool sStationReady;
+static int sStationDrawCalls;
 static BolseInteriorDockPad sStationDockPads[BOLSE_INTERIOR_DOCK_PADS];
 static int sStationPadCommand[BOLSE_INTERIOR_DOCK_PADS];
 static int sStationPadGuideVertex[BOLSE_INTERIOR_DOCK_PADS],sStationPadGuideEnd[BOLSE_INTERIOR_DOCK_PADS];
@@ -549,6 +550,7 @@ static bool Bolse_StationResolve(Vec3f* pos, Vec3f previous, f32 gap) {
 
 void BolseInterior_Draw(void) {
     if (!sStationReady) return;
+    sStationDrawCalls++;
     FrameInterpolation_RecordOpenChild(sStationMesh, 0);
     Matrix_Push(&gGfxMatrix);
     Matrix_SetGfxMtx(&gMasterDisp);
@@ -637,6 +639,7 @@ bool BolseInterior_Active(void) {
     return gCurrentLevel==LEVEL_VERSUS && gVersusStage==VS_STAGE_BOLSE_INTERIOR;
 }
 int BolseInterior_VertexCount(void) {return sStationReady?sStationVertexCount:0;}
+int BolseInterior_DrawCalls(void) {return sStationDrawCalls;}
 void BolseInterior_Load(void) {
     Bolse_StationDockingLoad();
     Bolse_StationBuild();
@@ -651,6 +654,7 @@ void BolseInterior_Load(void) {
 }
 void BolseInterior_SetupPlayer(Player* player) {
     static const Vec3f starts[4]={{-2400,0,-3500},{2400,0,-8500},{2400,1200,-3500},{-2400,-1200,-8500}};
+    player->num=gPlayerNum;
     player->pos=starts[player->num];player->trueZpos=player->pos.z;
     player->rot=(Vec3f){0,0,0};
     player->yRot_114=player->num%2?180:0;player->xRot_120=player->aerobaticPitch=0;
