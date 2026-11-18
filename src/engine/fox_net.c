@@ -13,7 +13,7 @@ typedef struct {
     int8_t stickX, stickY;
 } NetSlot;
 static struct {
-    int role, localSlot, pending, ready, mode, loading, status, level, phase, topology, blocked;
+    int role, localSlot, pending, ready, stage, mode, loading, status, level, phase, topology, blocked;
     uint32_t match, epoch, activeMask, resumeMask, noiseMask;
     NetSlot slots[NET_SLOTS];
 } sNet;
@@ -172,9 +172,11 @@ void Net_ImportLoadouts(const uint32_t values[12]) {
 int Net_Launch(int role, uint32_t match, uint32_t epoch, int localSlot, int stage, int rules) {
     int i;
     if ((role != NET_HOST && role != NET_GUEST) || !match || !epoch || localSlot < 0 || localSlot >= NET_SLOTS ||
-        (role == NET_HOST && (localSlot != 0 || sNet.slots[0].loadIncarnation != 1)) || stage != VS_STAGE_CORNERIA ||
+        (role == NET_HOST && (localSlot != 0 || sNet.slots[0].loadIncarnation != 1)) || (stage != VS_STAGE_CORNERIA && stage != VS_STAGE_BOLSE_INTERIOR) ||
+        (rules == 1 && stage != VS_STAGE_CORNERIA) ||
         (rules != 0 && rules != 1) || Net_Enabled())
         return 0;
+    sNet.stage = stage;
     sNet.mode = rules; sNet.loading = 0; sNet.status = rules == 1 ? 1 : 0;
     sNet.level = -1; sNet.phase = 0; sNet.topology = LEVELMODE_ON_RAILS;
     sNet.role = role;
@@ -210,7 +212,7 @@ void Net_Pump(void) {
         gNextGameState = GSTATE_MAP;
         return;
     }
-    gVersusStage = VS_STAGE_CORNERIA;
+    gVersusStage = sNet.stage;
     gVsMatchType = VS_MATCH_POINTS;
     gVsPointsToWin = 3;
     for (i = 0; i < NET_SLOTS; i++) {

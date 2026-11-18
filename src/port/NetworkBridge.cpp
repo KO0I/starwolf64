@@ -328,7 +328,7 @@ bool importWorld(const uint8_t* bytes, size_t size) {
         if (scene.globals.gCurrentLevel != LEVEL_CORNERIA || scene.globals.gLevelPhase != 0 ||
             scene.globals.gCamCount != 1 || scene.globals.gVersusMode ||
             scene.globals.gLevelMode != Net_StageTopology()) return false;
-    } else if (scene.globals.gCurrentLevel != LEVEL_VERSUS || scene.globals.gVersusStage != VS_STAGE_CORNERIA ||
+    } else if (scene.globals.gCurrentLevel != LEVEL_VERSUS || scene.globals.gVersusStage != gVersusStage || !scene.globals.gVersusMode ||
                scene.globals.gVsMatchType != VS_MATCH_POINTS || scene.globals.gCamCount != 4) return false;
     if (scene.globals.gLevelMode == LEVELMODE_ALL_RANGE && !gScenery360) return false;
     for (unsigned i = 0; i < 4; i++) {

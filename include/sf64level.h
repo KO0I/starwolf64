@@ -131,6 +131,7 @@ typedef enum VsStage {
     /* 0 */ VS_STAGE_CORNERIA,
     /* 1 */ VS_STAGE_KATINA,
     /* 2 */ VS_STAGE_SECTOR_Z,
+    /* 3 */ VS_STAGE_BOLSE_INTERIOR,
 } VsStage;
 
 typedef enum VsMatchType {

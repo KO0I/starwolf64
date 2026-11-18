@@ -380,7 +380,7 @@ s32 Versus_SelectStartingForm(void) {
     s32 i;
     s32 ret = 0;
 
-    if ((!sUnlockLandmaster && !sUnlockOnFoot) || (gVersusStage == VS_STAGE_SECTOR_Z)) {
+    if ((!sUnlockLandmaster && !sUnlockOnFoot) || ((gVersusStage == VS_STAGE_SECTOR_Z) || (gVersusStage == VS_STAGE_BOLSE_INTERIOR))) {
         for (i = 0; i < 4; i++) {
             if (gPlayerInactive[i]) {
                 continue;
@@ -507,7 +507,7 @@ s32 func_versus_800BEDDC(void) {
     s32 i;
     s32 var_s4 = 0;
 
-    if (!sUnlockLandmaster && !sUnlockOnFoot || (gVersusStage == VS_STAGE_SECTOR_Z)) {
+    if (!sUnlockLandmaster && !sUnlockOnFoot || ((gVersusStage == VS_STAGE_SECTOR_Z) || (gVersusStage == VS_STAGE_BOLSE_INTERIOR))) {
         func_versus_800BED78();
         return 0;
     }
@@ -638,7 +638,7 @@ s32 Versus_UpdatePlayerStatus(void) {
                 sPlayerFormOption[i] = 1;
             }
 
-            if ((!sUnlockLandmaster && !sUnlockOnFoot) || (gVersusStage == VS_STAGE_SECTOR_Z)) {
+            if ((!sUnlockLandmaster && !sUnlockOnFoot) || ((gVersusStage == VS_STAGE_SECTOR_Z) || (gVersusStage == VS_STAGE_BOLSE_INTERIOR))) {
                 D_80178850[i] = false;
                 sPlayerFormOption[i] = 1;
             }
@@ -1343,6 +1343,7 @@ bool Versus_InitViewports(void) {
                 gBgColor = 0xADA7; // 168, 176, 152
                 break;
 
+            case VS_STAGE_BOLSE_INTERIOR:
             case VS_STAGE_SECTOR_Z:
                 gBgColor = 0x0001; // 0, 0, 0
                 break;
@@ -1736,7 +1737,7 @@ void Versus_StartMatch(void) {
             gDrawMode = DRAW_NONE;
             Play_Setup();
 
-            if (gVersusStage == VS_STAGE_SECTOR_Z) {
+            if ((gVersusStage == VS_STAGE_SECTOR_Z) || (gVersusStage == VS_STAGE_BOLSE_INTERIOR)) {
                 gSceneSetup = 1;
             }
 

@@ -1,5 +1,6 @@
 #include "prevent_bss_reordering.h"
 #include "global.h"
+#include "bolse_interior.h"
 #include "sf64net.h"
 #include "fox_map.h"
 #include "assets/ast_corneria.h"
@@ -358,6 +359,9 @@ void Play_InitVsStage(void) {
     s32 var_s4_2;
 
     switch (gVersusStage) {
+        case VS_STAGE_BOLSE_INTERIOR:
+            BolseInterior_Load();
+            return;
         case VS_STAGE_CORNERIA:
             gLevelObjects = SEGMENTED_TO_VIRTUAL(D_versus_302DE3C);
             break;
@@ -569,6 +573,7 @@ void Play_InitEnvironment(void) {
             case 1:
                 sEnvironment = SEGMENTED_TO_VIRTUAL(&D_versus_302DDB4);
                 break;
+            case VS_STAGE_BOLSE_INTERIOR:
             case 2:
                 sEnvironment = SEGMENTED_TO_VIRTUAL(&D_versus_302DDF8);
                 break;
@@ -3741,6 +3746,7 @@ void Player_UpdatePath(Player* player) {
 }
 
 void Player_CheckBounds360(Player* player) {
+    if(BolseInterior_Active()){BolseInterior_Constrain(player);return;}
     f32 var_fv1;
     bool var_v0 = false;
 
@@ -3796,10 +3802,11 @@ void Player_CheckBounds360(Player* player) {
 }
 
 static bool Player_Uses6DOF(Player* player) {
-    return (player->form == FORM_ARWING) && CVarGetInteger("gSixDofFlight", 0);
+    return (player->form == FORM_ARWING) && (BolseInterior_Active() || CVarGetInteger("gSixDofFlight", 0));
 }
 
 static void Player_Update6DOFToggle(Player* player) {
+    if(BolseInterior_Active())return;
     if ((player->num != 0) || (player->form != FORM_ARWING) ||
         (player->state != PLAYERSTATE_ACTIVE) || (gPlayState != PLAY_UPDATE) ||
         (gLevelMode == LEVELMODE_TURRET) || player->somersault ||
@@ -4896,6 +4903,7 @@ void Player_Setup(Player* playerx) {
                 }
                 break;
         }
+        if(BolseInterior_Active())BolseInterior_SetupPlayer(player);
         Camera_Update360(player, true);
     }
 
@@ -7246,9 +7254,12 @@ void Play_SpawnVsItem(ObjectId objId, Item* item) {
         if (item->obj.status == OBJ_FREE) {
             Item_Initialize(item);
             item->obj.status = OBJ_INIT;
-            item->obj.pos.x = gScenery360[spawnIndex].obj.pos.x;
-            item->obj.pos.y = gScenery360[spawnIndex].obj.pos.y;
-            item->obj.pos.z = gScenery360[spawnIndex].obj.pos.z;
+            if(BolseInterior_Active())BolseInterior_ItemPosition(spawnIndex,&item->obj.pos);
+            else {
+                item->obj.pos.x = gScenery360[spawnIndex].obj.pos.x;
+                item->obj.pos.y = gScenery360[spawnIndex].obj.pos.y;
+                item->obj.pos.z = gScenery360[spawnIndex].obj.pos.z;
+            }
             item->obj.id = objId;
             CALL_CANCELLABLE_EVENT(ItemDropEvent, item) {
                 Object_SetInfo(&item->info, item->obj.id);

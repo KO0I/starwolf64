@@ -1,0 +1,35 @@
+{
+  "format": "starwolf64-authored-arena-v1",
+  "sources": {
+    "include/bolse_station.h": "134d0710a79dd7259c9c07c260a05f0dba854335835d2301baa5c21bcbb27476",
+    "src/overlays/ovl_i4/bolse_station.inc": "4672dbe50c1f44b70401fc33c4498006390b84175c7747a785f443f22d748bd4",
+    "src/overlays/ovl_i4/bolse_docking.inc": "5fa73f56998b860a318153df64d3604955824e1c808b637128f4983e8aa66436",
+    "src/overlays/ovl_i4/bolse_ground_allies.inc": "3d99121fa8c11839e1c9e2ba66b851fcbf95fa5a0021982d8525c890f0ea593b"
+  },
+  "functions": [
+    "Point",
+    "Triangle",
+    "Quad",
+    "Panel",
+    "Obstacle",
+    "Box",
+    "GardenTray",
+    "Tree",
+    "TerrainPanel",
+    "LightLevel",
+    "ShadeVertex",
+    "BakeLighting",
+    "Wire",
+    "PadAngle",
+    "PadPoint",
+    "DockingLoad",
+    "BuildDockingArea",
+    "BuildDockingGuides",
+    "HullFacet",
+    "Build",
+    "Clamp",
+    "Aperture",
+    "Resolve",
+    "Draw"
+  ]
+}

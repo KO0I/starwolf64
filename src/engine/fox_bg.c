@@ -1,4 +1,5 @@
 #include "global.h"
+#include "bolse_interior.h"
 #include "assets/ast_katina.h"
 #include "assets/ast_venom_1.h"
 #include "assets/ast_venom_2.h"
@@ -1317,6 +1318,7 @@ void AllRangeGround_Draw(void) {
 }
 
 void Background_DrawGround(void) {
+    if(BolseInterior_Active()){BolseInterior_Draw();return;}
     f32 sp1D4;
     s32 i;
     u32 temp_fv0;

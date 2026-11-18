@@ -1,4 +1,5 @@
 #include "global.h"
+#include "bolse_interior.h"
 #include "sf64net.h"
 #include "assets/vitzy_fighter.h"
 #include "assets/ast_landmaster.h"
@@ -2412,6 +2413,10 @@ void PlayerShot_Update(PlayerShot* shot) {
                 gShotHitPosY = shot->obj.pos.y;
                 gShotHitPosX = shot->obj.pos.x;
                 PlayerShot_UpdateShot(shot, i);
+                if(shot->obj.status==SHOT_ACTIVE && BolseInterior_ShotImpact(shot)) {
+                    if(shot->obj.id==PLAYERSHOT_BOMB)PlayerShot_ExplodeBomb(shot);
+                    else shot->obj.status=SHOT_FREE;
+                }
             }
             break;
         case SHOT_HITMARK:
