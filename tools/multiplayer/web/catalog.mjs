@@ -33,6 +33,7 @@ export const VEHICLES = Object.freeze([
 
 export const STAGES = Object.freeze([
   {id:'corneria', name:'Corneria', rules:['points','battle']},
+  {id:'bolse_interior', name:'Bolse Interior', rules:['points']},
   {id:'katina', name:'Katina', rules:['time']},
   {id:'sector_z', name:'Sector Z', rules:['points','battle','time']},
 ]);
@@ -99,4 +100,13 @@ export function validSetup(value) {
 export function nativeLoadout(selection) {
   if(!validAcceptedSelection(selection))throw Error('Confirm your pilot, ship and hue first.');
   return {pilot:PILOTS.indexOf(pilotById(selection.pilot)),ship:VEHICLES.indexOf(vehicleById(selection.vehicle)),rgb:parseInt(hueById(selection.hue).color.slice(1),16)};
+}
+
+export function nativeStage(match) {
+  if(match?.kind==='campaign' && validMatch(match))return 0;
+  if(match?.kind==='versus' && match.rules==='points'){
+    if(match.stage==='corneria')return 0;
+    if(match.stage==='bolse_interior')return 3;
+  }
+  throw Error('This engine build plays Corneria or Bolse Interior Points.');
 }

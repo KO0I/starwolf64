@@ -1,5 +1,5 @@
 import {preparation} from '../../shared/preparation.mjs';
-import {nativeLoadout} from './catalog.mjs';
+import {nativeLoadout,nativeStage,STAGES} from './catalog.mjs';
 import {WasmEngine,StaleStageError} from './engine.mjs';
 export class NetworkGame extends EventTarget {
   constructor(session, container, provider = preparation) {
@@ -196,22 +196,23 @@ export class NetworkGame extends EventTarget {
     if(!setup.members.find(member=>member.peer===this.session.peer)?.selection)return {available:false,reason:'Confirm your pilot, ship and hue before launching.'};
     if(this.session.slot>=4)return {available:false,reason:'This build has four flight slots.'};
     if(match.kind==='campaign')return {available:true,reason:'Host-led story co-op. Corneria is the first supported mission.'};
-    if(match.stage!=='corneria'||match.rules!=='points')return {available:false,reason:'This engine build plays Classic VS: Corneria Points.'};
-    return {available:true,reason:'Four-player Classic VS / Corneria Points.'};
+    try{nativeStage(match);}catch(error){return {available:false,reason:error.message};}
+    return {available:true,reason:'Four-player battle / '+STAGES.find(stage=>stage.id===match.stage).name+' Points.'};
   }
   launch() {
     const availability=this.launchAvailability();
     if(!availability.available)throw Error(availability.reason);
     if(!this.engine?.state.prepared)throw Error('Prepare the game first');
     if(this.running)return Promise.resolve();
-    this.mode=this.session.setup.match.kind;
+    const selectedMatch=this.session.setup.match,stage=nativeStage(selectedMatch);
+    this.mode=selectedMatch.kind;
     if(this.session.role==='host'){
       this.match=crypto.getRandomValues(new Uint32Array(1))[0]||1;this.epoch=1;this.running=true;
       this.session.lockedLoadouts.add(this.session.peer);
       const selection=this.session.setup.members.find(member=>member.peer===this.session.peer)?.selection;
-      return this.engine.start({role:'host',matchId:this.match,epoch:this.epoch,slot:0,mode:this.mode,loadout:nativeLoadout(selection)}).then(()=>{
+      return this.engine.start({role:'host',matchId:this.match,epoch:this.epoch,slot:0,mode:this.mode,stage,loadout:nativeLoadout(selection)}).then(()=>{
         this.active=true;
-        this.status(this.mode==='campaign'?'Choose a mission on the story map. Enter is Start; Z confirms.':'Hosting Corneria Points. Friends can join while you fly.');
+        this.status(this.mode==='campaign'?'Choose a mission on the story map. Enter is Start; Z confirms.':'Hosting '+STAGES.find(item=>item.id===selectedMatch.stage).name+' Points. Friends can join while you fly.');
         if(this.mode==='campaign')this.hostStage(this.engine.readStage());
         this.offer();
       }).catch(e=>{this.fail(e);throw e;});
@@ -220,7 +221,7 @@ export class NetworkGame extends EventTarget {
     const invitation=this.invitation;
     if(invitation.fingerprint!==this.descriptor.fingerprint)throw Error('Host and guest game builds differ');
     this.match=invitation.match;this.epoch=invitation.epoch;this.running=true;
-    return this.engine.start({role:'guest',matchId:this.match,epoch:this.epoch,slot:this.session.slot,mode:this.mode}).then(()=>{
+    return this.engine.start({role:'guest',matchId:this.match,epoch:this.epoch,slot:this.session.slot,mode:this.mode,stage}).then(()=>{
       if(this.closed||this.invitation!==invitation||!this.session.setup?.members.find(member=>member.peer===this.session.peer)?.selection)return;
       if(this.mode==='campaign'){
         if(this.pendingStage)this.receiveStage(this.pendingStage);

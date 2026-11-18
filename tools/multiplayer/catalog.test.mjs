@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {
   DEFAULT_MATCH, HUES, PILOTS, STAGES, assignSelection, pilotById,
-  selectionProblem, validMatch, validSetup, campaignVehicle,
+  selectionProblem, validMatch, validSetup, campaignVehicle,nativeStage,
 } from './web/catalog.mjs';
 
 const read = path => readFileSync(new URL('../../' + path, import.meta.url));
@@ -26,7 +26,7 @@ test('versus choices match the existing stage and rule registry', () => {
   for (const id of ['CORNERIA', 'KATINA', 'SECTOR_Z']) assert.match(header, new RegExp('VS_STAGE_' + id + '\\b'));
   for (const id of ['POINTS', 'BATTLE', 'TIME']) assert.match(header, new RegExp('VS_MATCH_' + id + '\\b'));
   assert.match(options, /gVersusStage = VS_STAGE_CORNERIA;[\s\S]*?sVsMenuSelection == OPTION_TT_MATCH[\s\S]*?gVersusStage = VS_STAGE_KATINA;[\s\S]*?gVersusStage = VS_STAGE_SECTOR_Z;/);
-  const allowed = {corneria: ['points', 'battle'], katina: ['time'], sector_z: ['points', 'battle', 'time']};
+  const allowed = {corneria: ['points', 'battle'], bolse_interior:['points'], katina: ['time'], sector_z: ['points', 'battle', 'time']};
   assert.deepEqual(STAGES.map(stage => stage.id).sort(), Object.keys(allowed).sort());
   for (const [stage, rules] of Object.entries(allowed)) {
     for (const rule of ['points', 'battle', 'time']) {
@@ -123,4 +123,12 @@ test('Katt and Vitzy keep separate signature ships', () => {
   assert.equal(selectionProblem(selection('katt', 'katt_fighter'), {kind:'campaign',crew:'star_fox'}), null);
   assert.match(selectionProblem(selection('katt', 'arwing'), {kind:'campaign',crew:'star_fox'}), /Katt.*fighter/);
   assert.equal(pilotById('vitzy').unavailable,'portrait pending');
+});
+
+test('playable battle stages map to distinct native arenas',()=>{
+  assert.equal(nativeStage({kind:'versus',stage:'corneria',rules:'points'}),0);
+  assert.equal(nativeStage({kind:'versus',stage:'bolse_interior',rules:'points'}),3);
+  assert.equal(nativeStage({kind:'campaign',crew:'star_fox'}),0);
+  assert.throws(()=>nativeStage({kind:'versus',stage:'bolse_interior',rules:'battle'}));
+  assert.throws(()=>nativeStage({kind:'versus',stage:'katina',rules:'time'}));
 });

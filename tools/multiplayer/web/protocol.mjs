@@ -1,7 +1,7 @@
 import {validSelection, validSetup} from './catalog.mjs';
 
 // Gameplay control messages. Bulk scenes use world-protocol.mjs.
-export const VERSION = 5;
+export const VERSION = 6;
 export const MAX_FRAME = 65536;
 const encoder = new TextEncoder();
 const decoder = new TextDecoder('utf-8', { fatal: true });

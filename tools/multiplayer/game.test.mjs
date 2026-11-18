@@ -42,7 +42,7 @@ test('guest needs a host campaign invitation',()=>{
   guest.engine={state:{prepared:true}};
   assert.throws(()=>guest.launch(),/host has not started/i);
 });
-test('versus remains restricted to supported Corneria Points',()=>{
+test('versus restricts launch to the supported Points arenas',()=>{
   assert.equal(gameFor({kind:'versus',stage:'katina',rules:'time'}).launchAvailability().available,false);
   assert.equal(gameFor({kind:'versus',stage:'corneria',rules:'points'}).launchAvailability().available,true);
 });
@@ -153,4 +153,25 @@ test('withdrawn versus admission cannot acknowledge an old world as a new incarn
     release();await new Promise(resolve=>setImmediate(resolve));
     assert.equal(sent.some(message=>message.op==='baseline-ack'),false);
   }finally{release();game.close();}
+});
+
+test('Bolse Interior is a playable Points arena with an accurate launch label',()=>{
+  const battle=gameFor({kind:'versus',stage:'bolse_interior',rules:'points'});
+  assert.equal(battle.launchAvailability().available,true);
+  assert.match(battle.launchAvailability().reason,/Bolse Interior/);
+  assert.equal(gameFor({kind:'versus',stage:'bolse_interior',rules:'battle'}).launchAvailability().available,false);
+});
+for(const role of ['host','guest'])for(const [match,stage] of [
+  [{kind:'versus',stage:'corneria',rules:'points'},0],
+  [{kind:'versus',stage:'bolse_interior',rules:'points'},3],
+  [{kind:'campaign',crew:'star_fox'},0]
+])test(role+' starts '+JSON.stringify(match)+' with its native stage',async()=>{
+  const game=gameFor(match,{role,slot:role==='host'?0:1});
+  game.session.lockedLoadouts=new Set();game.session.links=new Map();game.session.sendGame=()=>true;
+  game.descriptor={fingerprint:'a'.repeat(64)};
+  game.invitation={match:1,epoch:1,incarnation:1,fingerprint:game.descriptor.fingerprint};
+  let started;
+  game.engine={state:{prepared:true},async start(value){started=value;},readStage(){return {};},close(){}};
+  game.hostStage=()=>{};game.offer=()=>{};
+  await game.launch();assert.equal(started.stage,stage);assert.equal(started.mode,match.kind);
 });

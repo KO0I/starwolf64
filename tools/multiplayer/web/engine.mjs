@@ -130,18 +130,19 @@ export class WasmEngine extends EventTarget {
     this.poll();
     return this.state;
   }
-  start({role, matchId, epoch, slot, loadout, mode = 'versus'}) {
+  start({role, matchId, epoch, slot, loadout, mode = 'versus', stage = 0}) {
     this.check();
     if (!this.prepared) throw Error('Prepare game first');
+    if(stage!==0 && (mode!=='versus'||stage!==3))throw Error('Invalid stage');
     if (this.starting) return this.starting;
     integer(matchId, 1, 0xffffffff);
     integer(epoch, 1, 0xffffffff);
     integer(slot, 0, 3);
     const r = role === 'host' ? 1 : role === 'guest' ? 2 : 0;
     if (!r || r === 1 && slot !== 0 || !['versus','campaign'].includes(mode)) throw Error('Invalid role or mode');
-    this.match = {role:r,matchId,epoch,slot,mode};
+    this.match = {role:r,matchId,epoch,slot,mode,stage};
     this.frame.contentWindow.document.getElementById('launch').click();
-    return this.starting = (r===1?this.setLoadout(slot,1,loadout):Promise.resolve()).then(()=>this.command(1,[r,matchId,epoch,slot,0,mode === 'campaign' ? 1 : 0],0)).then(async () => {
+    return this.starting = (r===1?this.setLoadout(slot,1,loadout):Promise.resolve()).then(()=>this.command(1,[r,matchId,epoch,slot,stage,mode === 'campaign' ? 1 : 0],0)).then(async () => {
       await this.wait(
           () => this.state.matchId === matchId && this.state.role === r && (mode === 'campaign' || this.state.ready), 'Stage initialization', 90000);
       return this.state;

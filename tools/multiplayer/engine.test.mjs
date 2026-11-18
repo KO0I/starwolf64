@@ -41,3 +41,18 @@ test('a full command queue does not poison the next input',async()=>{
   await assert.rejects(engine.submitInput(input),/Queue full/);
   assert.deepEqual(await engine.submitInput({...input,seq:2}),[1,2,2,0,0,0]);
 });
+
+for(const [role,slot] of [['host',0],['guest',1]])test(role+' transmits the selected native arena to the launch command',async()=>{
+  const engine=new WasmEngine({});
+  engine.prepared=true;engine.frame={contentWindow:{document:{getElementById(){return {click(){}};}}}};
+  const commands=[];
+  engine.setLoadout=async()=>{};engine.wait=async()=>{};
+  engine.command=async(op,args)=>commands.push({op,args});
+  await engine.start({role,slot,matchId:1,epoch:1,stage:3,loadout:{}});
+  assert.equal(commands[0].op,1);assert.equal(commands[0].args[4],3);
+});
+test('unknown or campaign battle-stage values fail before starting the runtime',()=>{
+  const engine=new WasmEngine({});engine.prepared=true;
+  assert.throws(()=>engine.start({role:'host',slot:0,matchId:1,epoch:1,stage:1}),/Invalid stage/);
+  assert.throws(()=>engine.start({role:'host',slot:0,matchId:1,epoch:1,stage:3,mode:'campaign'}),/Invalid stage/);
+});
