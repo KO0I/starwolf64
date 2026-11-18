@@ -21,6 +21,7 @@ extern "C" {
 #include <sf64context.h>
 void Wasm_GetTitleStatus(double* state);
 int BolseInterior_VertexCount(void);
+int BolseInterior_DrawCalls(void);
 bool BolseInterior_Active(void);
 void Audio_PlayVoice(s32 message);
 void Audio_SetVolume(u8 type, u8 volume);
