@@ -1,5 +1,6 @@
 #include "sf64net.h"
 #include "global.h"
+#include "bolse_interior.h"
 #include "wolfen.h"
 #include "mods/hit64.c"
 #include "assets/ast_arwing.h"
@@ -2012,7 +2013,7 @@ void Display_Update(void) {
     Matrix_LookAt(gGfxMatrix, gPlayCamEye.x, gPlayCamEye.y, gPlayCamEye.z, gPlayCamAt.x, gPlayCamAt.y, gPlayCamAt.z,
                   playerCamUp.x, playerCamUp.y, playerCamUp.z, MTXF_APPLY);
 
-    if ((gLevelType == LEVELTYPE_PLANET) || (gCurrentLevel == LEVEL_BOLSE)) {
+    if ((gLevelType == LEVELTYPE_PLANET) || (gCurrentLevel == LEVEL_BOLSE) || BolseInterior_Active()) {
         if ((gCurrentLevel == LEVEL_TITANIA) &&
             ((gPlayer[0].state != PLAYERSTATE_LEVEL_INTRO) || (gPlayer[0].unk_19C != 0))) {
             Matrix_Push(&gGfxMatrix);

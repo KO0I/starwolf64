@@ -23,13 +23,15 @@ Each viewer derives confirmed portraits and hue-coordinated wireframes from thei
 
 ## Playable scope
 
-For battle, select Corneria / Points, confirm your loadout, click **Prepare game**, then **Start game**. Guests prepare their own assets and choose **Join host game**.
+For battle, select Corneria or Bolse Interior / Points, confirm your loadout, click **Prepare game**, then **Start game**. Guests prepare their own assets and choose **Join host game**.
 
 For story, select **Main game co-op** and one crew. Players use that crew's matching aircraft. The host chooses missions on the native story map. Guests join once and follow supported transitions. Corneria supports rails and all-range flight with up to four total players. Other missions leave guests waiting while the host continues.
 
 Each browser uses one camera and the single-player HUD. Arrow keys or WASD steer, Z or Space fires, X drops a bomb, Shift boosts, Ctrl brakes, and Q/E roll. Loading, timeout, or departure never pauses the host.
 
 Selected hulls are Arwing, Wolfen, Katt's fighter, and Vitzy's fighter. Lasers use accepted hues. Arwing retains Star Fox engine colors and blue radar; other aircraft use selected engine hues and purple radar. Katt and Vitzy have intact hulls only. Vitzy's pilot is unavailable as **portrait pending**.
+
+Bolse Interior is a contained aerial arena with the habitat's gardens, terraces, docking decks, and entrance barrier. It uses 6DOF flight, collision with the station, and arena-specific spawns and pickups. It shares the existing Points rules and selected ships. Its campaign AI, mission docking sequence, and on-foot play are outside this battle entry.
 
 Rooms hold eight people; this engine admits the first four slots. Other VS maps, eight-player Venom, vehicle switching, distinct in-game pilot heads, and remaining campaign stages need further work.
 
@@ -52,7 +54,7 @@ Supply a running audited service and a local ROM. Chromium is required at /usr/b
 node --test tools/multiplayer/*.test.mjs tools/shared/*.test.mjs
 python3 tools/multiplayer/generate-scene-schema.py --check
 node tools/multiplayer/check-game-browser.mjs --sign-in --rom /path/base.z64 --url http://127.0.0.1:8670/multiplayer/ --output build/byorom-sign-in
-node tools/multiplayer/check-game-browser.mjs --ship-models --rom /path/base.z64 --url http://127.0.0.1:8670/multiplayer/ --output build/byorom-ships
+node tools/multiplayer/check-game-browser.mjs --stage bolse_interior --ship-models --rom /path/base.z64 --url http://127.0.0.1:8670/multiplayer/ --output build/byorom-ships
 node tools/multiplayer/check-game-browser.mjs --campaign --campaign-route --campaign-four --campaign-checkpoint --campaign-return-map --rom /path/base.z64 --url http://127.0.0.1:8670/multiplayer/ --output build/byorom-campaign
 node tools/multiplayer/check-audio-browser.mjs --rom /path/base.z64 --url http://127.0.0.1:8670/multiplayer/ --output build/byorom-audio
 ```
@@ -62,3 +64,5 @@ Use --site-dir /path/to/audited/site instead of --url to have the gameplay check
 ## Maintain assets
 
 See [the recipe guide](../../assets/wasm/README.md) for source-bound mod freezing, [the bridge reference](../../docs/multiplayer-wasm-bridge.md) for scene ownership, and [merge readiness](../../docs/plans/multiplayer-merge-readiness.md) for campaign release checks. The offline wireframe exporter remains an authoring diagnostic. Its generated geometry is excluded from publication.
+
+The authored habitat import is repeatable with python3 -B tools/multiplayer/import-bolse-interior.py --source-root /path/to/authoring/worktree. Its source receipt is tools/multiplayer/bolse-interior-source.json. The multiplayer implementation imports geometry and collision only. Textures still resolve from each browser's locally prepared ROM. Imported C geometry and source tracking do not add extracted assets to the hosted site.

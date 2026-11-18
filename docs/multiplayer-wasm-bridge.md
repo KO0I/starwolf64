@@ -11,7 +11,7 @@ The engine adapter prepares a same-origin iframe, receives locally verified arch
 The worker alone changes C gameplay state.
 JavaScript submits bounded commands and scene imports through atomic shared-memory mailboxes at frame boundaries.
 
-Protocol version 5 uses the reliable ordered WebRTC channel for controls and admission.
+Protocol version 6 uses the reliable ordered WebRTC channel for controls and admission.
 A guest must match the host's runtime, schema, ROM revision, and semantic resource-set fingerprint and schema before admission.
 The host sends a reliable baseline, checks its match, epoch, incarnation and tick acknowledgment, then repeats that barrier with a fresh complete image.
 The host worker activates the slot after both imports. Guest controls remain disabled until the imported scene contains that incarnation.
@@ -55,7 +55,9 @@ Each additional stage needs a resource/work-field inventory and a real runtime c
 
 ## Scope and limits
 
-Corneria Points uses the native four-slot simulation with a single camera per browser.
+Corneria Points and Bolse Interior Points use the native four-slot simulation with a single camera per browser.
+Bolse Interior has its own native VsStage value, 3. Both host and guest launch that value, and native scene imports reject a different arena. The scene format remains version 3 because the stage field was already present. Procedural habitat geometry is built locally and never sent through world images.
+
 The setup catalog has more pilots, aircraft, maps and room slots than this initial engine bridge can render or simulate.
 The selected aircraft and hue render natively. Original Arwing assets and their dependencies are isolated under net/original.
 Wolfen's native multiplayer and map resources retain the full hull, textures, UVs, and normals.

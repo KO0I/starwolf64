@@ -1,4 +1,4 @@
-import {spawn} from 'node:child_process';
+import {spawn,execFileSync} from 'node:child_process';
 import {mkdir, mkdtemp, rm, writeFile} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {resolve} from 'node:path';
@@ -477,7 +477,7 @@ try {
   report.hostLaunch=await value(host,"window.STARWOLF_GAME.engine.state");
   assert(report.hostLaunch.ready,'real host stage ready',report.hostLaunch);
   if(arena==='bolse_interior'){
-    report.arena=await value(host,"window.STARWOLF_GAME.engine.frame.contentWindow.STARSHIP_GAME_STATE");
+    report.arena=await wait("Bolse native geometry initialized",()=>value(host,"(()=>{const s=window.STARWOLF_GAME.engine.frame.contentWindow.STARSHIP_GAME_STATE;return s?.arenaVertices>1000?s:null;})()"),60000);
     assert(report.arena.versusStage===3&&report.arena.arenaVertices>1000,'host loads the actual authored Bolse interior',report.arena);
   }
   await wait('host publishes native scenes',()=>value(host,"Boolean(window.STARWOLF_GAME.latest?.tick>4)"),60000);
@@ -515,6 +515,14 @@ try {
     assert(Math.abs(report.hostAfterInput.positions[4]-before.positions[4])>20,'guest flight controls change altitude inside Bolse');
   }
   assert(report.guestAfterInput.lastImportedTick>report.guestBaseline.lastImportedTick,'live world imports advance');
+  if(arena==='bolse_interior'){
+    await value(host,"document.getElementById('game-container').scrollIntoView({block:'center'})");
+    const clip=await value(host,"(()=>{const f=window.STARWOLF_GAME.engine.frame,r=f.getBoundingClientRect(),c=f.contentWindow.document.getElementById('canvas').getBoundingClientRect();return {x:r.x+c.x,y:r.y+c.y,width:c.width,height:c.height,scale:1};})()");
+    const shot=await call('Page.captureScreenshot',{format:'png',clip},host.sessionId),path=resolve(output,'bolse-arena.png');
+    await writeFile(path,Buffer.from(shot.data,'base64'));
+    const fraction=Number(execFileSync('python3',['-B','-c',"from PIL import Image;import sys;im=Image.open(sys.argv[1]).convert('RGB');print(sum(max(p)>20 and sum(p)>50 for p in im.getdata())/(im.width*im.height))",path],{encoding:'utf8'}));
+    assert(fraction>.25,'authored station surfaces actually render in the flight view',{fraction});
+  }
   for(const p of [host,guest]){await value(p,"document.getElementById('game-container').scrollIntoView({block:'center'})");const shot=await call('Page.captureScreenshot',{format:'png'},p.sessionId);await writeFile(resolve(output,p.label+'.png'),Buffer.from(shot.data,'base64'));}
   report.diagnostics.host=await value(host,"window.STARWOLF_MP.getDiagnostics()");
   report.diagnostics.guest=await value(guest,"window.STARWOLF_MP.getDiagnostics()");

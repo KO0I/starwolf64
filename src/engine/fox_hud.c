@@ -56,6 +56,7 @@ f32 sGoldRingsFwork[20];
 s32 D_80161900[20];
 
 #include "global.h"
+#include "bolse_interior.h"
 
 #include "assets/ast_bg_space.h"
 #include "assets/ast_bg_planet.h"
@@ -2218,8 +2219,9 @@ s32 HUD_RadarMarks_Update(void) {
     }
 
     for (i = ARRAY_COUNT(gRadarMarks) - 1; i >= 0; i--) {
+        f32 radarZ=gRadarMarks[i].pos.z-(BolseInterior_Active()?(BOLSE_INTERIOR_FRONT+BOLSE_INTERIOR_BACK)*0.5f:0);
         if ((gRadarMarks[i].enabled == 0) || (fabsf(gRadarMarks[i].pos.x) >= (temp2 + 1000.0f)) ||
-            (fabsf(gRadarMarks[i].pos.z) >= (temp2 + 1000.0f))) {
+            (fabsf(radarZ) >= (temp2 + 1000.0f))) {
             continue;
         }
 
@@ -2228,7 +2230,7 @@ s32 HUD_RadarMarks_Update(void) {
         // @port: Tag the transform.
         FrameInterpolation_RecordOpenChild(&gRadarMarks[i], i);
 
-        Matrix_Translate(gGfxMatrix, gRadarMarks[i].pos.x * 0.008f, -gRadarMarks[i].pos.z * 0.008f, 0.0f, MTXF_APPLY);
+        Matrix_Translate(gGfxMatrix, gRadarMarks[i].pos.x * 0.008f, -radarZ * 0.008f, 0.0f, MTXF_APPLY);
 
         if (gRadarMarks[i].type == 103) {
             gRadarMarks[i].yRot = 45.0f;
