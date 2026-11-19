@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Produce stable standard-flight and experimental 6DOF cartridge filenames."""
+"""Build standard-flight and 6DOF cartridges with the Multilock pickup."""
 import argparse
 import json
 import os
@@ -30,6 +30,7 @@ def main():
                             *map(str, arguments)], cwd=ROOT, env=env, check=True)
 
         standard = output / "starwolf64.z64"
+        baseline = output / "standard/starwolf64-base.z64"
         if args.variant == "standard":
             work = output / "standard"
             assets = work / "starwolf64-assets.z64"
@@ -41,19 +42,25 @@ def main():
             source = voices / latest["directory"] / "starwolf64-blips.z64"
             run("check_wing_attachments.py", "--mod", work / "wolfen.o2r", "--browser", source)
             rom = source.read_bytes()
-            report = verify(BASE_ROM.read_bytes(), rom)
-            staging = standard.with_suffix(".z64.tmp")
+            verify(BASE_ROM.read_bytes(), rom)
+            staging = baseline.with_suffix(".z64.tmp")
             staging.write_bytes(rom)
-            staging.replace(standard)
+            staging.replace(baseline)
+            run("build_multilock_rom.py", "--input-rom", baseline, "--output", standard,
+                "--build-dir", output / "multilock-standard", "--toolchain", args.toolchain)
+            report = verify(BASE_ROM.read_bytes(), standard.read_bytes())
             standard.with_suffix(".compatibility.json").write_text(
                 json.dumps(report, indent=2) + "\n")
             artifact = standard
         else:
-            if not standard.is_file():
+            if not baseline.is_file():
                 raise ValueError("Build the standard ROM first with make rom")
             artifact = output / "starwolf64-6dof.z64"
-            run("build_6dof_rom.py", "--input-rom", standard, "--output", artifact,
+            flight = output / "6dof/starwolf64-flight.z64"
+            run("build_6dof_rom.py", "--input-rom", baseline, "--output", flight,
                 "--build-dir", output / "6dof", "--toolchain", args.toolchain)
+            run("build_multilock_rom.py", "--input-rom", flight, "--output", artifact,
+                "--build-dir", output / "multilock-6dof", "--toolchain", args.toolchain)
             run("check_wing_attachments.py", "--mod", output / "standard/wolfen.o2r",
                 "--browser", artifact)
         print("ROM:", artifact, flush=True)

@@ -71,3 +71,5 @@ mods*/
 
 # Generated soundtrack exports and intermediate audio
 /exports/
+
+!tools/build_multilock_rom.py

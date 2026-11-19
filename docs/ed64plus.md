@@ -2,7 +2,9 @@
 
 Use the `wolf_rom` branch, starting at `checkpoint_before_lan`
 (`d279d7b4`). The first cartridge build uses standard Star Fox 64 flight.
-It includes the Wolfen, reviewed characters, portraits and cartridge dialogue.
+It includes the Wolfen, reviewed characters, portraits, cartridge dialogue and
+the blue M Multilock pickup. Both flight variants include Multilock; see
+[n64-multilock.md](n64-multilock.md) for its controls and ROM checks.
 The separate experimental build adds 6DOF movement, camera rotation and a
 green wireframe attitude indicator with translucent ground shading.
 Rival encounters use Fox, Falco, Peppy and Slippy in Arwings, with matching
@@ -44,7 +46,10 @@ make rom
 ```
 
 The output is `build/rom/starwolf64.z64`. Asset and dialogue intermediates stay
-under `build/rom/standard/`. The target verifies the original boot code and
+under `build/rom/standard/`, including the unpatched asset and dialogue
+baseline `starwolf64-base.z64`. The 6DOF patch consumes that baseline before
+Multilock is applied, so its original instruction checks remain effective.
+The target verifies the original boot code and
 cartridge checksum before publishing the stable ROM filename. It also checks
 every scene asset pair against its DMA payload and rejects invalid lengths or
 allocations that reach the fixed RAM buffers. Both variants
@@ -57,7 +62,7 @@ The 6DOF target builds the standard ROM first. Its output is
 `build/rom/starwolf64-6dof.z64`.
 
 Override `ROM_OUT` to change the output directory. Set `PYTHON` to a Python
-executable with the required packages. The 6DOF build also accepts
+executable with the required packages. Both builds also accept
 `N64_TOOLCHAIN`, defaulting to `/opt/libdragon/bin`.
 
 ```sh

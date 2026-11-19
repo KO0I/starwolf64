@@ -86,3 +86,6 @@ It chooses the gate from the callsite before restoring those registers.
 It dispatches before modifying `a0-a2`, which contain live original locals.
 The original boost branch-likely delay slot and the brake path's `a3 = 5`
 assignment are reproduced explicitly.
+
+The cartridge Multilock module, loader and ABI are described in
+[docs/n64-multilock.md](../../docs/n64-multilock.md).
