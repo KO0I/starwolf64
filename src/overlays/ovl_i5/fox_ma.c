@@ -6,6 +6,7 @@
 
 // #include "prevent_bss_reordering.h"
 #include "global.h"
+#include "campaign_vehicle.h"
 #include "assets/ast_macbeth.h"
 #include "assets/ast_landmaster.h"
 #include "assets/ast_enmy_planet.h"
@@ -5541,6 +5542,18 @@ void Macbeth_LevelStart(Player* player) {
     sp48 = 0.0f;
     sp44 = 0.0f;
 
+    if (CampaignVehicle_Intro(player)) {
+        if (player->state == PLAYERSTATE_ACTIVE && player->form == FORM_ARWING) {
+            gLevelObjects = SEGMENTED_TO_VIRTUAL(D_MA_6035678);
+            for (objInit = gLevelObjects; objInit->id != OBJ_INVALID; objInit++)
+                Object_Load(objInit, 4000, -4000, 4000, -4000);
+            gLevelObjects = SEGMENTED_TO_VIRTUAL(gLevelObjectInits[gCurrentLevel]);
+            for (i = 0, objInit = gLevelObjects; i < 40; i++, objInit++)
+                Object_Load(objInit, 4000, -4000, 4000, -4000);
+            gObjectLoadIndex = 40;
+        }
+        return;
+    }
     Player_UpdatePath(player);
 
     switch (player->csState) {
