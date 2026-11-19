@@ -5,6 +5,7 @@
  */
 
 #include "global.h"
+#include "reverse_titania.h"
 #include "assets/vitzy_fighter.h"
 #include "medusa.h"
 #include "assets/ast_aquas.h"
@@ -2327,6 +2328,7 @@ void func_demo_8004F798(ActorCutscene* this) {
 }
 
 void ActorCutscene_Update(ActorCutscene* this) {
+    if (ReverseTitania_ActorUpdate(this)) return;
     if (gCurrentLevel == LEVEL_AQUAS) {
         Aquas_CsIntroActors_Update(this);
         return;
@@ -2534,6 +2536,7 @@ void ActorCutscene_SyShip_Setup(ActorCutscene* this, s32 idx) {
 }
 
 void ActorCutscene_Draw(ActorCutscene* this) {
+    if (ReverseTitania_ActorDraw(this)) return;
     static f32 D_800CA210 = 0.0f;
     static f32 D_800CA214 = 0.0f;
     static f32 D_800CA218 = 0.0f;

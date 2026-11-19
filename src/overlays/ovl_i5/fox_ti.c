@@ -5,6 +5,7 @@
  */
 
 #include "global.h"
+#include "reverse_titania.h"
 #include "assets/ast_bg_planet.h"
 #include "assets/ast_titania.h"
 #include "assets/ast_7_ti_1.h"
@@ -4974,208 +4975,10 @@ void Titania_80193DF0(Boss*);
 
 s16 D_i5_801B8D54[4] = { 30, 35, 60, 70 };
 
+#include "reverse_titania.inc"
+
 void Titania_TiGoras_Update(Boss* boss) {
-    Vec3f sp3C;
-
-    boss->swork[38]++;
-
-    if ((boss->dmgType != DMG_NONE) &&
-        (((boss->state >= 0) && (boss->state <= 1)) || ((boss->state >= 4) && (boss->state <= 6)))) {
-        AUDIO_PLAY_SFX(NA_SE_EN_REFLECT, boss->sfxSource, 4);
-        boss->dmgType = DMG_NONE;
-    }
-    if ((gPlayer[0].grounded != 0) && (boss->swork[39] > 0)) {
-        gControllerRumbleFlags[0] = 1;
-        boss->swork[39]--;
-    }
-
-    if (boss->swork[28] == 2) {
-        if (gTeamShields[TEAM_ID_PEPPY] > 0) {
-            Radio_PlayMessage(gMsg_ID_4091, RCID_PEPPY);
-        }
-        D_i5_801BBEF0[42] = 1;
-    }
-
-    if (D_i5_801BBEF0[45] >= 2) {
-        D_i5_801BBEF0[45]--;
-    }
-
-    if (boss->swork[30] == 4) {
-        if ((boss->swork[37] & 8) && (D_i5_801BBEF0[44] == 0)) {
-            Radio_PlayMessage(gMsg_ID_4110, RCID_SLIPPY);
-            boss->swork[37] &= ~8;
-        }
-        if ((boss->swork[37] & 0x10) && (D_i5_801BBEF0[44] >= 2) && (gRadioState == 0)) {
-            Radio_PlayMessage(gMsg_ID_4092, RCID_SLIPPY);
-            boss->swork[37] &= ~0x10;
-            D_i5_801BBEF0[45] = 101;
-        }
-
-        if (D_i5_801BBEF0[45] == 1) {
-            gBossHealthBar = ((boss->swork[21] * 255.0f) / 100.0f);
-            gShowBossHealth = true;
-            D_i5_801BBEF0[45] = 0;
-        }
-    }
-
-    if ((boss->state >= 3) && (boss->state <= 13)) {
-        gBossFrameCount++;
-    }
-
-    switch (boss->state) {
-        case 0:
-        case 1:
-        case 2:
-        case 3:
-        case 4:
-            Titania_80192118(boss);
-            break;
-        case 5:
-        case 6:
-        case 7:
-        case 8:
-        case 9:
-        case 10:
-        case 11:
-        case 12:
-        case 13:
-            Titania_80193DF0(boss);
-            break;
-    }
-
-    switch (boss->swork[30]) {
-        case 0:
-            switch (boss->swork[31]) {
-                case 1:
-                    Radio_PlayMessage(gMsg_ID_20266, RCID_FOX);
-                    break;
-                case 80:
-                    gTeamShields[TEAM_ID_SLIPPY] = 1;
-                    Radio_PlayMessage(gMsg_ID_4112, RCID_SLIPPY);
-                    gTeamShields[TEAM_ID_SLIPPY] = -2;
-                    break;
-                case 240:
-                    gTeamShields[TEAM_ID_SLIPPY] = 1;
-                    Radio_PlayMessage(gMsg_ID_4093, RCID_SLIPPY);
-                    gTeamShields[TEAM_ID_SLIPPY] = -2;
-                    break;
-            }
-            break;
-
-        case 1:
-            if (boss->swork[31] == 1) {
-                SEQCMD_STOP_SEQUENCE(SEQ_PLAYER_BGM, 90);
-                SEQCMD_STOP_SEQUENCE(SEQ_PLAYER_FANFARE, 90);
-            }
-            break;
-
-        case 2:
-            if (boss->swork[31] == 11) {
-                gTeamShields[TEAM_ID_SLIPPY] = 1;
-                Radio_PlayMessage(gMsg_ID_4111, RCID_SLIPPY);
-                gTeamShields[TEAM_ID_SLIPPY] = -2;
-            }
-            break;
-
-        case 3:
-            switch (boss->swork[31]) {
-                case 1:
-                    break;
-                case 50:
-                    if (gTeamShields[TEAM_ID_FALCO] > 0) {
-                        Radio_PlayMessage(gMsg_ID_4094, RCID_FALCO);
-                    }
-                default:
-                    break;
-            }
-            break;
-
-        case 4:
-            if (boss->swork[35] == 0) {
-                if (D_i5_801BBEF0[42] == 0) {
-                    switch (boss->swork[4]) {
-                        case 1:
-                            if (gTeamShields[TEAM_ID_PEPPY] > 0) {
-                                Radio_PlayMessage(gMsg_ID_4095, RCID_PEPPY);
-                            }
-                            D_i5_801BBEF0[42] = 1;
-                            break;
-
-                        case 3:
-                            if ((D_i5_801BBEF0[8] == 0) && (gTeamShields[TEAM_ID_FALCO] > 0)) {
-                                Radio_PlayMessage(gMsg_ID_4097, RCID_FALCO);
-                            }
-                            D_i5_801BBEF0[42] = 1;
-                            break;
-
-                        default:
-                            break;
-                    }
-
-                    if (boss->swork[4] >= 4 && !(D_i5_801BBEF0[46] & 1)) {
-                        if ((gTeamShields[TEAM_ID_FALCO] > 0) && (D_i5_801BBEF0[8] == 0) && (gRadioState == 0) &&
-                            (boss->swork[10] >= 2)) {
-                            gTeamShields[TEAM_ID_SLIPPY] = 1;
-                            Radio_PlayMessage(gMsg_ID_4098, RCID_SLIPPY);
-                            gTeamShields[TEAM_ID_SLIPPY] = -2;
-                            D_i5_801BBEF0[46] |= 1;
-                        }
-                        D_i5_801BBEF0[42] = 1;
-                    }
-                }
-            }
-
-            if (boss->swork[37] & 4) {
-                D_i5_801BBEF0[43]++;
-                switch (D_i5_801BBEF0[43]) {
-                    case 1:
-                        gTeamShields[TEAM_ID_SLIPPY] = 1;
-                        Radio_PlayMessage(gMsg_ID_20190, RCID_SLIPPY);
-                        gTeamShields[TEAM_ID_SLIPPY] = -2;
-                        break;
-                    case 80:
-                        if (gTeamShields[TEAM_ID_FALCO] > 0) {
-                            Radio_PlayMessage(gMsg_ID_4096, RCID_FALCO);
-                        }
-                        boss->swork[37] &= ~4;
-                        break;
-                    default:
-                        break;
-                }
-            }
-            break;
-    }
-
-    if ((boss->state != 5) && ((boss->state != 4) || (boss->swork[31] <= 100)) && (D_i5_801BBEF0[8] == 0)) {
-        Math_SmoothStepToF(&D_i5_801BBEF4[74], D_i5_801BBEF4[75], 0.5f, 0.04f, 0.01f);
-        if (D_i5_801BBEF4[74] == D_i5_801BBEF4[74]) {
-            if ((boss->swork[38] % 2) != 0) {
-                D_i5_801BBEF4[75] = 0.7f;
-                D_i5_801BBEF4[74] = D_i5_801BBEF4[75];
-            } else {
-                D_i5_801BBEF4[75] = 0.6f;
-                D_i5_801BBEF4[74] = D_i5_801BBEF4[75];
-            }
-        }
-
-        if ((D_i5_801BBEF0[49] >= 25) && (((D_i5_801BBEF0[49] - 25) % 2) == 0)) {
-            D_i5_801BBEF4[74] = RAND_FLOAT(0.4f) + 0.9f;
-            D_i5_801BBEF4[75] = 0.6f;
-        }
-        if (D_i5_801BBEF0[49] == 0) {
-            sp3C.x = boss->fwork[29] + boss->obj.pos.x;
-            sp3C.y = boss->fwork[30] + boss->obj.pos.y;
-            sp3C.z = boss->fwork[31] + boss->obj.pos.z;
-            Effect_SpawnTimedSfxAtPos(&sp3C, NA_SE_ARWING_DASH);
-            D_i5_801BBEF0[49] = D_i5_801B8D54[RAND_INT(4.0f)];
-            D_i5_801BBEF4[74] = RAND_FLOAT(0.4f) + 0.9f;
-            D_i5_801BBEF4[75] = 0.6f;
-        }
-        if (D_i5_801BBEF0[49] > 0) {
-            D_i5_801BBEF0[49]--;
-        }
-    }
-    boss->swork[31]++;
+    if (sReverseTitania.phase != RT_REUNION) ReverseTitania_Update(boss);
 }
 
 f32 D_i5_801B8D5C[2][25] = {
@@ -5208,6 +5011,9 @@ void Titania_TiGoras_Draw(TiGoras* boss) {
     s32 temp_v1_28;
     f32 half = 0.5f;
     s32 temp;
+
+    ReverseTitania_DrawEncounter(boss);
+    if (sReverseTitania.phase != RT_ESCORT && sReverseTitania.phase != RT_REUNION) return;
 
     Matrix_Push(&gGfxMatrix);
     RCP_SetupDL(&gMasterDisp, SETUPDL_30);
@@ -5449,7 +5255,7 @@ void Titania_TiGoras_Draw(TiGoras* boss) {
                 }
             }
         }
-        boss->state = boss->swork[1];
+        /* Encounter state advances in ReverseTitania_Update. */
     }
 }
 

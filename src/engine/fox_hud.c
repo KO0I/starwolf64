@@ -803,7 +803,7 @@ void HUD_DrawLevelClearScreen(void) {
 
     missionStatus = gMissionStatus;
 
-    if ((gCurrentLevel == LEVEL_TITANIA) || (gCurrentLevel == LEVEL_BOLSE) || (gCurrentLevel == LEVEL_VENOM_1) ||
+    if ((gCurrentLevel == LEVEL_BOLSE) || (gCurrentLevel == LEVEL_VENOM_1) ||
         (gCurrentLevel == LEVEL_VENOM_2) || (gCurrentLevel == LEVEL_AREA_6) || (gCurrentLevel == LEVEL_AQUAS) ||
         (gCurrentLevel == LEVEL_SOLAR)) {
         missionStatus = MISSION_ACCOMPLISHED;

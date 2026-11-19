@@ -6,6 +6,7 @@
 
 #include "prevent_bss_reordering.h"
 #include "global.h"
+#include "reverse_titania.h"
 #include "assets/ast_allies.h"
 #include "assets/ast_corneria.h"
 #include "assets/ast_meteo.h"
@@ -59,6 +60,7 @@ void Radio_PlayMessage(u16* msg, RadioCharacterId character) {
     TeamId teamId;
     s32 pad;
     s32 priority;
+    if (gGameState == GSTATE_PLAY && gCurrentLevel == LEVEL_TITANIA) return;
     msg = SEGMENTED_TO_VIRTUAL(msg);
 
     switch (msg[0]) {
@@ -532,6 +534,7 @@ s32 D_radio_80178748; // set to 1, never used
 s32 sRadioCheckMouthFlag;
 
 void Radio_Draw(void) {
+    if (ReverseTitania_DrawRadio()) return;
     s32 idx;
     RadioCharacterId radioCharId;
     u32 ret;

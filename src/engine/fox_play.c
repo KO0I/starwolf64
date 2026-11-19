@@ -1,5 +1,6 @@
 #include "prevent_bss_reordering.h"
 #include "global.h"
+#include "reverse_titania.h"
 #include "fox_map.h"
 #include "assets/ast_corneria.h"
 #include "assets/ast_training.h"
@@ -5040,6 +5041,8 @@ void Player_Setup(Player* playerx) {
     if ((gCurrentLevel == LEVEL_TRAINING)) {
         gClearPlayerInfo = true;
     }
+
+    if (gCurrentLevel == LEVEL_TITANIA && player->num == 0) ReverseTitania_Setup(player);
 
     player->sfx.levelType = gLevelType;
     player->sfx.form = player->form;
