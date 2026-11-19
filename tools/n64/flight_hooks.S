@@ -3,6 +3,11 @@
 .section .text.entry,"ax",@progbits
 .globl Flight_Entry
 Flight_Entry:
+#ifdef MULTILOCK_ROM_ADDRESS
+    addiu $at,$t9,-7
+    beqz $at,Multi_Load
+    nop
+#endif
     addiu $at,$t9,-6
     beqz $at,Flight_DrawAttitude
     nop
@@ -112,3 +117,25 @@ brakeOriginal:
 brakeSkip:
     j 0x800b2d48
     addiu $a3,$zero,5
+
+
+#ifdef MULTILOCK_ROM_ADDRESS
+/* Installed once at Game_Initialize's return, after permanent radio loading. */
+Multi_Load:
+    lui $t0,0x8027
+    ori $t0,$t0,0xd000
+    lui $t1,(MULTILOCK_ROM_ADDRESS >> 16)
+    ori $t1,$t1,(MULTILOCK_ROM_ADDRESS & 0xffff)
+    addiu $t2,$t0,MULTILOCK_MODULE_BYTES
+Multi_Copy:
+    lw $t3,0($t1)
+    sw $t3,0($t0)
+    cache 0x19,0($t0)
+    cache 0x10,0($t0)
+    addiu $t0,$t0,4
+    bne $t0,$t2,Multi_Copy
+    addiu $t1,$t1,4
+    sync
+    j MULTILOCK_ENTRY
+    nop
+#endif

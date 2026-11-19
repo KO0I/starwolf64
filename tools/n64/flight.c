@@ -99,8 +99,8 @@ static void gfx(uint32_t w0, uint32_t w1) {
 }
 
 static void span(int left, int right, int y) {
-    gfx(0xF6000000 | ((right + 160) << 14) | ((y + 67) << 2),
-        ((left + 160) << 14) | ((y + 66) << 2));
+    gfx(0xF6000000 | ((right + 160) << 14) | ((y + 199) << 2),
+        ((left + 160) << 14) | ((y + 198) << 2));
 }
 
 void Flight_DrawAttitude(void) {

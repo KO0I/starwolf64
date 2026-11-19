@@ -20,10 +20,16 @@ Enabling uses `NA_SE_MAP_WINDOW_OPEN`; disabling uses
 `NA_SE_MAP_WINDOW_CLOSE`. The flag resets when the ROM boots and adds no fields
 to the save file.
 
-On rails, the ship stays inside the stage corridor. All-range mode permits
-pitching through vertical and keeps the camera in the ship's orientation.
-Original terrain collisions, ceilings and forced boundary U-turns remain.
-While 6DOF is enabled, a green wireframe attitude indicator appears above
+6DOF raises the flight ceiling to three times the stock height. On rails,
+the corridor extends 25% farther on each side. All-range mode keeps its original
+horizontal boundary and forced U-turns; only the ceiling rises. Floors and
+terrain collisions retain their original behavior.
+
+Switching off above the stock ceiling or outside the stock on-rails corridor
+pushes the ship back gradually with the original down/side arrow cues.
+All-range mode permits pitching through vertical and keeps the camera in the
+ship's orientation. Both ROM variants also include [multi-shot](n64-multishot.md).
+While 6DOF is enabled, a green wireframe attitude indicator appears below
 the ship. The outline uses a single-pixel contour, a narrow horizon band and
 fine center ticks. Its translucent ground hemisphere follows pitch and roll,
 including vertical and inverted flight. The sky stays transparent and there is no text
@@ -50,11 +56,11 @@ Override `ROM_OUT` to change the output directory.
 The underlying command remains available for an already prepared standard ROM:
 
 ```sh
-python3 -B tools/build_6dof_rom.py --input-rom build/rom/starwolf64.z64 --output build/rom/starwolf64-6dof.z64 --build-dir build/rom/6dof
+python3 -B tools/build_6dof_rom.py --input-rom build/rom/standard/starwolf64-audited.z64 --output build/rom/starwolf64-6dof.z64 --build-dir build/rom/6dof
 ```
 
 It refuses an unreviewed input hash, different original hook instructions,
-a live voice-filter allocation, or a module larger than its 4 KiB reservation.
+a live voice-filter allocation, or either payload exceeding its checked RAM reservation.
 The report records source hashes, linked symbols and the complete ROM hash.
 
 ## Check the controls in an emulator

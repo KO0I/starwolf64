@@ -43,13 +43,13 @@ HUD. Original HUD calls already honor `gShowHud`.
 | Loader | Radio offset `0x1030`, RAM `0x8017a040` | 156 bytes | Retired voice filter |
 | Module image | Trailing unused cartridge bytes | Checked at build | ROM builder |
 
-The module is 3808 bytes and its loader is 132 bytes in this build.
+The flight module and installer bridge are 3888 bytes; the radio loader remains 132 bytes.
 The linker rejects growth beyond `0x80138e90`, where the idle-thread object
 begins. The builder also checks the padded binary size.
 
 The initial bootstrap SP is `0x80138e90`. It must not be overwritten during
-boot. Loading occurs only on gameplay movement/camera/boost/brake/HUD entry,
-after thread startup. In the original ROM, the first `osStartThread` checks
+boot. Loading occurs at the original Game_Initialize return after its permanent
+radio load, on the main thread after startup. In the original ROM, the first `osStartThread` checks
 `__osRunningThread` at `0x800c7eb0`, initially zero, and dispatches via
 `__osDispatchThread`. Dispatch restores the new thread SP and EPC and exits
 with `eret`; it does not save a resumable bootstrap thread. Source searches
@@ -86,3 +86,18 @@ It chooses the gate from the callsite before restoring those registers.
 It dispatches before modifying `a0-a2`, which contain live original locals.
 The original boost branch-likely delay slot and the brake path's `a3 = 5`
 assignment are reproduced explicitly.
+
+
+## Multi-shot and flight envelope
+
+The gameplay builder also installs a separate payload at 0x8027D000, bounded
+by the original graphics buffers at 0x80281000. Its 12240 bytes include sidecar
+target state, original-layout adapters, pickup/number geometry and the flight
+bounds wrapper. The builder checks every scene allocation below this region.
+The flight bridge copies it once during installation; subsequent hooks jump
+directly to resident code.
+
+See [the port design and verification](../../docs/n64-multishot.md).
+The original-ROM ABI is asserted in multilock_abi.h. Hook manifests own the
+expected instructions and continuation contracts. The standard variant omits
+all 6DOF movement and envelope hooks.

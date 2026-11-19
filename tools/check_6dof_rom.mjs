@@ -96,12 +96,12 @@ try{
         return data[i+1]>185&&data[i]<130&&data[i+2]<155;
       };
       let marker=0,ring=0;
-      for(let x=148;x<156;x++)marker+=green(x,66);
-      for(let x=165;x<173;x++)marker+=green(x,66);
-      for(let x=158;x<163;x++)marker+=green(x,68);
-      for(let x=159;x<162;x++)marker+=green(x,69);
-      for(let y=45;y<=87;y++)for(let x=139;x<=181;x++){
-        const radius=(x-160)**2+(y-66)**2;
+      for(let x=148;x<156;x++)marker+=green(x,198);
+      for(let x=165;x<173;x++)marker+=green(x,198);
+      for(let x=158;x<163;x++)marker+=green(x,200);
+      for(let x=159;x<162;x++)marker+=green(x,201);
+      for(let y=177;y<=219;y++)for(let x=139;x<=181;x++){
+        const radius=(x-160)**2+(y-198)**2;
         if(radius>=400&&radius<=441)ring+=green(x,y);
       }
       let nativeHud=null;
@@ -127,7 +127,7 @@ try{
             }
             if(!complete)continue;
             nativeHud={
-              doubledCardinalStrokes:[[160,86],[180,66],[160,46],[140,66]].filter(([x,y])=>opaque[y*320+x]).length,
+              doubledCardinalStrokes:[[160,218],[180,198],[160,178],[140,198]].filter(([x,y])=>opaque[y*320+x]).length,
               markerWidths:rects.slice(-5).map(r=>r.right-r.left),
               markerHeights:rects.slice(-5).map(r=>r.bottom-r.top),
               alphas:[...alphas]
@@ -149,6 +149,53 @@ try{
       pixels.nativeHud.markerWidths.join(',')!=='8,8,3,1,1'||pixels.nativeHud.markerHeights.some(h=>h!==1));
     if(badPixels||badGeometry)
       throw Error('Attitude HUD visibility failed: '+JSON.stringify({name,visible,...pixels}));
+  };
+  const boundsPage=(fn,...args)=>evaluate('('+fn.toString()+')('+args.map(x=>JSON.stringify(x)).join(',')+')');
+  const sampleBounds=()=>boundsPage(()=>{
+    const d=new DataView(EJS_emulator.gameManager.Module.HEAPU8.buffer,smokeRam);
+    const p=d.getUint32(0x178280,true)&0x1fffffff,f=o=>d.getFloat32(p+o,true);
+    return {x:f(0x74),y:f(0x78),z:f(0x7c),width:f(0x9c),height:f(0xa0),floor:f(0xa4),
+      centerX:f(0xac),centerY:f(0xb0),flags:d.getUint32(p+0x228,true),
+      enabled:d.getUint32(0x137e94,true),mode:d.getInt32(0x177880,true),
+      state:d.getInt32(p+0x1c8,true),frame:d.getInt32(0x177db0,true)};
+  });
+  const placeBounds=async()=>{
+    report.ram_writes=true;report.controller_inputs_only=false;
+    return boundsPage(all=>{
+      const d=new DataView(EJS_emulator.gameManager.Module.HEAPU8.buffer,smokeRam);
+      const p=d.getUint32(0x178280,true)&0x1fffffff,f=o=>d.getFloat32(p+o,true);
+      if(!all)d.setFloat32(p+0x74,f(0xac)+f(0x9c)*1.20,true);
+      d.setFloat32(p+0x78,(all?0:f(0xb0))+f(0xa0)*2.5,true);
+      d.setFloat32(p+0xc0,0,true);d.setFloat32(p+0xc4,0,true);
+      return {method:'position fixture outside stock envelope but inside 6DOF envelope',allRange:all};
+    },allRange);
+  };
+  const proveExpandedBounds=async()=>{
+    report.bounds_fixture=await placeBounds();
+    await sleep(350);
+    const b=await sampleBounds();report.expanded_bounds=b;
+    const center=allRange?0:b.centerY;
+    if(b.y<center+b.height*2.0)throw Error('6DOF ceiling remained at stock altitude');
+    if(!allRange&&b.x<b.centerX+b.width*1.05)throw Error('6DOF rail corridor remained at stock width');
+    await shot('expanded-flight-envelope');
+  };
+  const proveBoundsReturn=async()=>{
+    const first=await sampleBounds();report.bounds_return={first};
+    const top=(allRange?0:first.centerY)+first.height;
+    if(first.y<=top+1)throw Error('Toggling off teleported altitude to the stock ceiling');
+    if(!(first.flags&8))throw Error('Ceiling return did not show a down-arrow cue');
+    await shot('return-to-stock-envelope');
+    const deadline=Date.now()+15000;
+    let last=first;
+    while(Date.now()<deadline){
+      last=await sampleBounds();
+      if(last.y<=top+.5&&(allRange||last.x<=last.centerX+last.width+.5))break;
+      await sleep(100);
+    }
+    report.bounds_return.final=last;
+    if(last.y>top+.5||(!allRange&&last.x>last.centerX+last.width+.5))
+      throw Error('Ship did not return inside the stock envelope');
+    report.bounds_verified=true;
   };
   const tap=async button=>{
     await evaluate(`EJS_emulator.gameManager.simulateInput(0,${button},1)`);
@@ -228,6 +275,7 @@ try{
   }
   if(!enabled)throw Error('Cannot enable all-range 6DOF: '+JSON.stringify(await state()));
   await checkHud(true,'hud-allrange-level');
+  if(args.includes('--bounds'))await proveExpandedBounds();
   const initial=await state();
   const pitched=await holdFrames(19,32767,110);
   report.pitch_loop={initial,pitched};
@@ -250,6 +298,7 @@ try{
   if(Math.abs(delta(neutral.roll,rolled.roll))>3)throw Error('All-range roll auto-centered');
   if(Math.abs(delta(neutral.camRoll,-neutral.bank))>1)throw Error('All-range camera roll differs from bank');
   await checkHud(true,'allrange-roll');
+  if(args.includes('--bounds'))await placeBounds();
   let disabled=false;
   for(let i=0;i<120;i++){
     await input(20,32767);await sleep(100);await input(20,0);await sleep(250);
@@ -257,6 +306,7 @@ try{
     if(current.enabled===0){disabled=true;report.toggle_off=current;break;}
   }
   if(!disabled)throw Error('Cannot restore standard all-range flight');
+  if(args.includes('--bounds'))await proveBoundsReturn();
   await checkHud(false,'hud-allrange-off');
   report.sixdof_allrange_verified=true;
   report.sixdof_onrails_verified=false;
@@ -276,6 +326,7 @@ try{
   }
   if(!enabled)throw Error('C-right did not enable 6DOF: '+JSON.stringify(await state()));
   await checkHud(true,'hud-onrails-level');
+  if(args.includes('--bounds'))await proveExpandedBounds();
   const sixPitch=await hold(19,18000,500);
   report.sixdof_pitch=sixPitch;
   if(!(sixPitch.pitch<0))throw Error('6DOF pitch sign differs from stock flight');
@@ -302,6 +353,7 @@ try{
   const bankedPitch=await hold(19,10000,500);
   report.banked_pitch=bankedPitch;
   await checkHud(true,'sixdof-banked-pitch');
+  if(args.includes('--bounds'))await placeBounds();
   let disabled=false;
   for(let i=0;i<120;i++){
     await input(20,32767);await sleep(100);await input(20,0);await sleep(250);
@@ -309,6 +361,7 @@ try{
     if(current.enabled===0){disabled=true;report.toggle_off=current;break;}
   }
   if(!disabled)throw Error('C-right did not return to normal flight');
+  if(args.includes('--bounds'))await proveBoundsReturn();
   const beforeNormal=await state();
   const afterNormal=await hold(16,18000,1200);
   report.normal_restored={before:beforeNormal,after:afterNormal};
