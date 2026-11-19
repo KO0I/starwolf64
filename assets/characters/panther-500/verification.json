@@ -1,0 +1,15 @@
+{
+  "passed": true,
+  "original_triangles": 603,
+  "candidate_triangles": 500,
+  "unchanged_head_triangles": 172,
+  "unchanged_materials_and_textures": true,
+  "unchanged_hierarchy_and_transforms": true,
+  "unchanged_animation_clips": 6,
+  "finite_animated_samples": 78,
+  "retained_tail_root_vertices": 6,
+  "minimum_local_triangle_area": 2.1986231803894043,
+  "restored_leg_triangles": 100,
+  "thigh_width_scale": 1.16,
+  "ankle_width_local": 36
+}

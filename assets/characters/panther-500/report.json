@@ -1,0 +1,354 @@
+{
+  "original_triangles": 603,
+  "preview_triangles": 500,
+  "head_triangles": 172,
+  "head_changed": false,
+  "source_sha256": "cf12029ab847cfc8f79eb73520960f3aae48c88359d7ef1bdb0434eed324729a",
+  "candidate_sha256": "493e0be9ebc1ec6f55570a4741081171052e9489a6dd57a84294fa58cd74ad95",
+  "leg_changes": [
+    {
+      "node": "limb_09",
+      "triangles": 8,
+      "ankle_width_local": 36,
+      "knee_width_local": 48
+    },
+    {
+      "node": "limb_10",
+      "triangles": 12,
+      "width_scale": 1.16,
+      "depth_scale": 1.12
+    },
+    {
+      "node": "limb_12",
+      "triangles": 8,
+      "ankle_width_local": 36,
+      "knee_width_local": 48
+    },
+    {
+      "node": "limb_13",
+      "triangles": 12,
+      "width_scale": 1.16,
+      "depth_scale": 1.12
+    }
+  ],
+  "groups": {
+    "head": 172,
+    "body": 282,
+    "tail": 32,
+    "rose": 14
+  },
+  "parts": [
+    {
+      "name": "limb_02",
+      "part": 0,
+      "group": "body",
+      "original": 32,
+      "count": 28,
+      "error": 0.021228743717074394
+    },
+    {
+      "name": "limb_03",
+      "part": 0,
+      "group": "body",
+      "original": 24,
+      "count": 20,
+      "error": 0.1345919817686081
+    },
+    {
+      "name": "limb_04",
+      "part": 0,
+      "group": "body",
+      "original": 20,
+      "count": 14,
+      "error": 0.2221979945898056
+    },
+    {
+      "name": "limb_05",
+      "part": 0,
+      "group": "body",
+      "original": 32,
+      "count": 28,
+      "error": 0.021228743717074394
+    },
+    {
+      "name": "limb_06",
+      "part": 0,
+      "group": "body",
+      "original": 24,
+      "count": 20,
+      "error": 0.05411888286471367
+    },
+    {
+      "name": "limb_07",
+      "part": 0,
+      "group": "body",
+      "original": 20,
+      "count": 14,
+      "error": 0.2948743402957916
+    },
+    {
+      "name": "limb_08",
+      "part": 0,
+      "group": "body",
+      "original": 30,
+      "count": 30,
+      "error": 0
+    },
+    {
+      "name": "limb_09",
+      "part": 0,
+      "group": "body",
+      "original": 8,
+      "count": 8,
+      "error": 0
+    },
+    {
+      "name": "limb_10",
+      "part": 0,
+      "group": "body",
+      "original": 12,
+      "count": 12,
+      "error": 0
+    },
+    {
+      "name": "limb_11",
+      "part": 0,
+      "group": "body",
+      "original": 30,
+      "count": 30,
+      "error": 0
+    },
+    {
+      "name": "limb_12",
+      "part": 0,
+      "group": "body",
+      "original": 8,
+      "count": 8,
+      "error": 0
+    },
+    {
+      "name": "limb_13",
+      "part": 0,
+      "group": "body",
+      "original": 12,
+      "count": 12,
+      "error": 0
+    },
+    {
+      "name": "limb_19",
+      "part": 0,
+      "group": "head",
+      "original": 76,
+      "count": 76,
+      "error": 0
+    },
+    {
+      "name": "limb_19",
+      "part": 1,
+      "group": "head",
+      "original": 20,
+      "count": 20,
+      "error": 0
+    },
+    {
+      "name": "limb_19",
+      "part": 2,
+      "group": "head",
+      "original": 28,
+      "count": 28,
+      "error": 0
+    },
+    {
+      "name": "limb_19",
+      "part": 3,
+      "group": "head",
+      "original": 6,
+      "count": 6,
+      "error": 0
+    },
+    {
+      "name": "limb_19",
+      "part": 4,
+      "group": "head",
+      "original": 1,
+      "count": 1,
+      "error": 0
+    },
+    {
+      "name": "limb_19",
+      "part": 5,
+      "group": "head",
+      "original": 6,
+      "count": 6,
+      "error": 0
+    },
+    {
+      "name": "limb_19",
+      "part": 6,
+      "group": "head",
+      "original": 1,
+      "count": 1,
+      "error": 0
+    },
+    {
+      "name": "limb_19",
+      "part": 7,
+      "group": "head",
+      "original": 4,
+      "count": 4,
+      "error": 0
+    },
+    {
+      "name": "limb_19",
+      "part": 8,
+      "group": "head",
+      "original": 4,
+      "count": 4,
+      "error": 0
+    },
+    {
+      "name": "limb_19",
+      "part": 9,
+      "group": "head",
+      "original": 2,
+      "count": 2,
+      "error": 0
+    },
+    {
+      "name": "limb_19",
+      "part": 10,
+      "group": "head",
+      "original": 4,
+      "count": 4,
+      "error": 0
+    },
+    {
+      "name": "limb_19",
+      "part": 11,
+      "group": "head",
+      "original": 4,
+      "count": 4,
+      "error": 0
+    },
+    {
+      "name": "limb_19",
+      "part": 12,
+      "group": "head",
+      "original": 2,
+      "count": 2,
+      "error": 0
+    },
+    {
+      "name": "limb_19",
+      "part": 13,
+      "group": "head",
+      "original": 1,
+      "count": 1,
+      "error": 0
+    },
+    {
+      "name": "limb_19",
+      "part": 14,
+      "group": "head",
+      "original": 1,
+      "count": 1,
+      "error": 0
+    },
+    {
+      "name": "limb_19",
+      "part": 15,
+      "group": "head",
+      "original": 2,
+      "count": 2,
+      "error": 0
+    },
+    {
+      "name": "limb_19",
+      "part": 16,
+      "group": "head",
+      "original": 6,
+      "count": 6,
+      "error": 0
+    },
+    {
+      "name": "limb_19",
+      "part": 17,
+      "group": "head",
+      "original": 2,
+      "count": 2,
+      "error": 0
+    },
+    {
+      "name": "limb_19",
+      "part": 18,
+      "group": "head",
+      "original": 2,
+      "count": 2,
+      "error": 0
+    },
+    {
+      "name": "limb_20",
+      "part": 0,
+      "group": "body",
+      "original": 2,
+      "count": 2,
+      "error": 0
+    },
+    {
+      "name": "limb_20",
+      "part": 1,
+      "group": "body",
+      "original": 2,
+      "count": 2,
+      "error": 0
+    },
+    {
+      "name": "limb_20",
+      "part": 2,
+      "group": "body",
+      "original": 28,
+      "count": 22,
+      "error": 0.11520874500274658
+    },
+    {
+      "name": "limb_20",
+      "part": 3,
+      "group": "body",
+      "original": 4,
+      "count": 4,
+      "error": 0
+    },
+    {
+      "name": "limb_20",
+      "part": 4,
+      "group": "body",
+      "original": 3,
+      "count": 2,
+      "error": 0.29160603880882263
+    },
+    {
+      "name": "limb_21",
+      "part": 0,
+      "group": "body",
+      "original": 38,
+      "count": 26,
+      "error": 0.2645748257637024
+    },
+    {
+      "name": "Panther_rose",
+      "part": 0,
+      "group": "rose",
+      "original": 34,
+      "count": 14,
+      "error": 0.10301119089126587
+    },
+    {
+      "name": "Panther_feline_tail",
+      "part": 0,
+      "group": "tail",
+      "original": 68,
+      "count": 32,
+      "error": 0.029762204736471176
+    }
+  ]
+}
