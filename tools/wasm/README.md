@@ -1,5 +1,47 @@
 # Build the WASM dependencies
 
+## Play locally over Tailscale
+
+From the repository root:
+
+```sh
+make localsite
+```
+
+The target initializes missing pinned submodules and the WASM SDK/dependencies,
+refreshes a stale mod snapshot, builds the player and exports
+`build/wasm/site`. It then serves that site through Tailscale HTTPS.
+The default local and HTTPS ports are both 8667. The command prints the exact
+tailnet URL. Keep it running while playing; Ctrl+C closes the HTTP server and
+removes that preview's Tailscale route.
+
+Tailscale must be installed and connected. The command uses your normal
+Tailscale permission first. If this host requires root to update Serve,
+it tries `sudo -n tailscale`; passwordless permission must already be available.
+The page uses its normal local-ROM picker.
+
+```sh
+make localsite SITE_PORT=8668 SITE_HTTPS_PORT=8668
+```
+
+The target holds a worktree lock, checks for an occupied Serve port before and
+after building, and removes only its own route on shutdown. It does not reset
+the existing Serve configuration. See the
+[Tailscale Serve CLI](https://tailscale.com/docs/reference/tailscale-cli/serve).
+
+A linked worktree can reuse the main checkout's SDK and dependency prefix
+when `tools/wasm/lock.json` matches exactly. The build still verifies the
+SDK revision and WASM archives. Project CMake output stays in the current
+worktree. Set `WASM_CACHE=/path/to/another/build/wasm` to select a matching
+cache explicitly. Fresh checkouts download the pinned dependencies.
+
+The original local-only server remains available for an existing export:
+
+```sh
+python3 -B tools/wasm/serve_site.py --directory build/wasm/site --port 8667 --no-browser
+```
+
+
 Run in the Starship project. Host prerequisites are Python 3.12+, Git,
 CMake 3.24+, Ninja, Bash and GNU patch. The recorded build used CMake 4.4.5.
 Downloads, source caches, SDK and build outputs stay under ignored `build/wasm`.

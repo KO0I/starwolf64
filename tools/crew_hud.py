@@ -103,13 +103,9 @@ def patch_rom(builder, rom):
     from build_wolfen import manifest
     virtual, _ = manifest('ast_common')
     old_end = virtual + builder.hud_original_size
-    needle = struct.pack('>II', virtual, old_end)
-    builder.hud_scene_ranges = []
-    for offset in range(0xCAFB4, 0xCC9D4, 4):
-        if builder.rom[offset:offset + 8] == needle:
-            new_end = virtual + len(builder.segments['ast_common'])
-            struct.pack_into('>I', rom, offset + 4, new_end)
-            builder.hud_scene_ranges.append((offset, virtual, new_end))
+    from n64_scenes import resize_asset
+    new_end = virtual + len(builder.segments['ast_common'])
+    builder.hud_scene_ranges = resize_asset(rom, virtual, old_end, new_end)
     if len(builder.hud_scene_ranges) != 32:
         raise ValueError('Unexpected common scene table references: ' + str(len(builder.hud_scene_ranges)))
 

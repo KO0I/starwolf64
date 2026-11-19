@@ -1,0 +1,10 @@
+Graphics_SetScaleMtx = 0x8005980C;
+RCP_SetupDL = 0x800B8DD0;
+Matrix_Push = 0x80005708;
+Matrix_Pop = 0x80005740;
+Matrix_Translate = 0x80005B00;
+Matrix_Scale = 0x80005C34;
+Matrix_SetGfxMtx = 0x80006EB8;
+gGfxMatrix = 0x8013B3C0;
+gReflectY = 0x80161410;
+gLockOnTargetViewPos = 0x80161578;

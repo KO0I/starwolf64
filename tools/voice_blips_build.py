@@ -14,6 +14,11 @@ def build_replacements(root, catalog, roster, game_set):
     manifest = json.loads((root / 'audio_data/manifest.json').read_text())
     aliases = roster['speaker_aliases']
     overrides = roster['game_sets'][game_set]['approved_overrides']
+    source_overrides = roster['game_sets'][game_set].get('source_overrides', {})
+    def bank_key(profile):
+        if profile in source_overrides:
+            return ('source', source_overrides[profile])
+        return ('approved', overrides[profile]) if profile in overrides else ('source', profile)
     events = catalog['events']
     counts = Counter(e['status'] for e in events)
     if counts != {'voiced': 725, 'silent': 54, 'narration': 7, 'control': 4}:
@@ -74,10 +79,10 @@ def build_replacements(root, catalog, roster, game_set):
         raise ValueError(('Voice slot coverage', sorted(expected - slots.keys()), sorted(slots.keys() - expected)))
     encoded_banks, bank_reports = {}, {}
     for profile, notes in sorted(by_profile.items()):
-        key = ('approved', overrides[profile]) if profile in overrides else ('source', profile)
+        key = bank_key(profile)
         if key in encoded_banks:
             continue
-        train = approved_bank(root, key[1]) if key[0] == 'approved' else source_bank(root, profile, notes)
+        train = approved_bank(root, key[1]) if key[0] == 'approved' else source_bank(root, key[1], by_profile[key[1]])
         encoded = encode(train.pcm)
         decoded = decode(encoded)
         clip_hashes = {hashlib.sha256(decoded[span['start']:span['start'] + span['frames']].tobytes()).hexdigest() for span in train.spans}
@@ -103,7 +108,7 @@ def build_replacements(root, catalog, roster, game_set):
             raise ValueError(((fid, slot), 'Region or note conflict'))
         tuning = {region: 2 ** ((39 - next(iter(notes))) / 12) for region, notes in observed.items()}
         profile = entry['profile']
-        key = ('approved', overrides[profile]) if profile in overrides else ('source', profile)
+        key = bank_key(profile)
         replacements[fid, slot] = dict(encoded_banks[key], region_tunings=tuning)
         slot_report.append(dict(font_id=fid, slot=slot, profile=profile, ids=sorted(entry['ids']),
             bank=':'.join(key), region_tunings=tuning))

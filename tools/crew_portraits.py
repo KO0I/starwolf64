@@ -44,12 +44,16 @@ def load_frames():
         spec = manifest['characters'][character]
         for frame in ('closed', 'talking'):
             entry = next(item for item in spec['frames'] if item['frame'] == frame)
-            payload = (PACK / 'rgba16' / f'{character}_{frame}.rgba16.bin').read_bytes()
+            with Image.open(PACK / 'native' / f'{character}_{frame}.rgba16.png') as image:
+                if image.size != (44, 44):
+                    raise ValueError(f'Expected 44x44 portrait: {character}/{frame}')
+                encoded = encode_rgba16(image)
+            raw = PACK / 'rgba16' / f'{character}_{frame}.rgba16.bin'
+            payload = raw.read_bytes() if raw.exists() else encoded
             if len(payload) != SIZE or hashlib.sha256(payload).hexdigest() != entry['sha256_rgba16']:
                 raise ValueError(f'Portrait size/hash mismatch: {character}/{frame}')
-            with Image.open(PACK / 'native' / f'{character}_{frame}.rgba16.png') as image:
-                if image.size != (44, 44) or encode_rgba16(image) != payload:
-                    raise ValueError(f'PNG/raw portrait mismatch: {character}/{frame}')
+            if encoded != payload:
+                raise ValueError(f'PNG/raw portrait mismatch: {character}/{frame}')
             if any(not value & 1 for (value,) in struct.iter_unpack('>H', payload)):
                 raise ValueError(f'Expected opaque portrait: {character}/{frame}')
             frames[character, frame] = payload

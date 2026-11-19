@@ -55,7 +55,13 @@
         "peppy": "krystal"
       },
       "expert_approved_bank": "vitzy",
-      "narration": "full_reversed"
+      "narration": "full_reversed",
+      "source_overrides": {
+        "wolf": "fox",
+        "leon": "falco",
+        "pigma": "peppy",
+        "andrew": "slippy"
+      }
     }
   },
   "preserved_speakers": {

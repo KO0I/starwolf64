@@ -168,9 +168,9 @@ def voice_filter(table_offset, message_ids):
     for entry, group in groupby(entries):
         count = sum(1 for _ in group)
         if entry == b'\x01':
-            while count >= 3:
+            while count >= 2:
                 table.append(0xFE)
-                count -= 3
+                count -= 2
         table.extend(entry * count)
     table.append(0)
     table_address = RADIO_BASE + table_offset
@@ -206,7 +206,7 @@ def voice_filter(table_offset, message_ids):
         0x00001025,  # mute: or v0, zero, zero
         0x03E00008,  # return: jr ra
         0x00000000,  # delay: nop
-        0x24090003,  # run: addiu t1, zero, 3
+        0x24090002,  # run: addiu t1, zero, 2
         0x004A5823,  # subu t3, v0, t2
         0x256BFFFF,  # addiu t3, t3, -1
         0x0169582B,  # sltu t3, t3, t1
@@ -291,7 +291,8 @@ def mute_changed_dialogue(builder):
     radio = builder.segments['ast_radio']
     payload_size = (len(encode('\n'.join(LINES))) * 2 + 3) & ~3
     code, table = voice_filter(payload_size, ids)
-    if payload_size + len(table) > UNUSED_GLYPH_BYTES or any(radio[payload_size:payload_size + len(table)]):
+    # The terminator may reuse the following blank glyph's existing zero byte.
+    if payload_size + len(table) - 1 > UNUSED_GLYPH_BYTES or any(radio[payload_size:payload_size + len(table)]):
         raise ValueError('Voice filter table exceeds the unused control-glyph space')
     radio[payload_size:payload_size + len(table)] = table
     builder.dialogue_voice_table = (payload_size, table)
@@ -346,6 +347,15 @@ def patch_dialogue_voice(builder, rom):
         if builder.rom[offset:offset + len(original)] != original:
             raise ValueError(f'Unexpected crew label at {offset:#x}')
         rom[offset:offset + len(original)] = replacement
+    for offset, original, replacement in (
+        (0xD834C, b'WOLF\0\0\0\0', b'FOX\0\0\0\0\0'),
+        (0xD8354, b'LEON\0\0\0\0', b'FALCO\0\0\0'),
+        (0xD835C, b'PIGMA\0\0\0', b'PEPPY\0\0\0'),
+        (0xD8364, b'ANDREW\0\0', b'SLIPPY\0\0'),
+    ):
+        if builder.rom[offset:offset + 8] != original:
+            raise ValueError(f'Unexpected rival label at {offset:#x}')
+        rom[offset:offset + 8] = replacement
     # Keep the original delay-slot LHU. It supplies the resolved ID to the filter.
     struct.pack_into('>I', rom, VOICE_RETURN_ROM, 0x08000000 | ((address & 0x0FFFFFFF) >> 2))
 
@@ -377,6 +387,28 @@ def verify_dialogue_voice(builder, patched):
         raise ValueError('Browser reverse message lookup does not filter muted voices')
 
 
+PILOT_IDENTITIES = {
+    "Fox McCloud": "Wolf O'Donnell", "Wolf O'Donnell": "Fox McCloud",
+    "Falco Lombardi": "Panther Caroso", "Slippy Toad": "Kami",
+    "Peppy Hare": "Krystal", "Fox": "Wolf", "Wolf": "Fox",
+    "Falco": "Panther", "Slippy": "Kami", "Peppy": "Krystal",
+    "Leon": "Falco", "Pigma": "Peppy", "Andrew": "Slippy",
+}
+RIVAL_LINES = {
+    9289: "Your luck's about\nto run out, Wolf!",
+    9323: "Try keeping up\nwith Falco!",
+    9368: "General Pepper!",
+    11120: "Your squad won't\nsave you this time!",
+    19220: "Too bad Pepper can't\nsee you fail!",
+}
+
+
+def replace_pilot_names(text):
+    import re
+    pattern = r"\b(?:" + "|".join(re.escape(name).replace(r"\ ", r"\s+") for name in PILOT_IDENTITIES) + r")\b"
+    return re.sub(pattern, lambda match: PILOT_IDENTITIES[re.sub(r"\s+", " ", match[0])], text)
+
+
 def replace_identity(builder):
     import re, textwrap
     chars = {index + 24: char for index, char in enumerate(ALPHABET)} | {12: ' ', 13: ' ', 14: ' ', 1: '\n'}
@@ -395,14 +427,7 @@ def replace_identity(builder):
         text = ''.join(chars.get(code, chr(0xE000 + code)) for code in codes[:-1])
         changed = re.sub(r'\b(Arwing|Wolfen)(s?)\b',
                          lambda match: {'Arwing': 'Wolfen', 'Wolfen': 'Arwing'}[match[1]] + match[2], text)
-        changed = re.sub(r'\bFox\s+McCloud\b', "Wolf O'Donnell", changed)
-        changed = re.sub(r'\bFox\b', 'Wolf', changed)
-        changed = re.sub(r'\bFalco\s+Lombardi\b', 'Panther Caroso', changed)
-        changed = re.sub(r'\bFalco\b', 'Panther', changed)
-        changed = re.sub(r'\bSlippy\s+Toad\b', 'Kami', changed)
-        changed = re.sub(r'\bSlippy\b', 'Kami', changed)
-        changed = re.sub(r'\bPeppy\s+Hare\b', 'Krystal', changed)
-        changed = re.sub(r'\bPeppy\b', 'Krystal', changed)
+        changed = replace_pilot_names(changed)
         changed = re.sub(r"\b(?:Andross'|Andross\b|(?:General\s+)?Pepper\b)",
                          lambda match: {"Andross": "Pepper", "Andross'": "Pepper's"}.get(match[0], "Andross"), changed)
         if message_id == 1:
@@ -414,6 +439,8 @@ def replace_identity(builder):
             if message_id in LOCATION_PHRASING:
                 before, after = LOCATION_PHRASING[message_id]
                 changed = changed.replace(before, after)
+        if message_id in RIVAL_LINES:
+            changed = changed[:1] + RIVAL_LINES[message_id]
         if message_id == 4024:
             changed = changed.replace("Don't go too fast,", 'Not too fast,')
         if message_id in (20337, 20338):
