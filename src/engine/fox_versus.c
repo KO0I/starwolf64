@@ -1,6 +1,7 @@
 #include "sf64net.h"
 #include "prevent_bss_reordering.h"
 #include "global.h"
+#include "vs_aircraft.h"
 #include "fox_option.h"
 #include "assets/ast_vs_menu.h"
 #include "assets/ast_text.h"
@@ -140,8 +141,10 @@ void func_versus_800BD10C(f32 xPos, f32 yPos, f32 scale) {
     Lib_TextureRect_CI4(&gMasterDisp, D_versus_30006D0, D_versus_3000810, 64, 10, xPos, yPos, scale, scale);
 }
 
+static const ALIGN_ASSET(2) char sVsArwingMarker[] = "__OTR__net/original/ast_common/aRadarMarkArwingTex";
+
 void func_versus_800BD164(f32 xPos, f32 yPos) {
-    Lib_TextureRect_IA8(&gMasterDisp, D_VS_MENU_7003C70, 16, 16, xPos, yPos, 1.0f, 1.0f);
+    Lib_TextureRect_IA8(&gMasterDisp, sVsArwingMarker, 16, 16, xPos + 1.6f, yPos + 1.6f, 0.8f, 0.8f);
 }
 
 void func_versus_800BD1B0(f32 xPos, f32 yPos) {
@@ -149,7 +152,22 @@ void func_versus_800BD1B0(f32 xPos, f32 yPos) {
 }
 
 void func_versus_800BD1FC(f32 xPos, f32 yPos) {
+    enum { CROWN_CENTER_X = 7, CROWN_TOP_Y = 5 };
+    static const ALIGN_ASSET(2) u8 eyepatch[16 * 16] = {
+        [CROWN_TOP_Y * 16 + CROWN_CENTER_X] = 0x0F,
+        [CROWN_TOP_Y * 16 + CROWN_CENTER_X + 1] = 0x0F,
+        [(CROWN_TOP_Y + 1) * 16 + CROWN_CENTER_X] = 0x0F,
+        [(CROWN_TOP_Y + 1) * 16 + CROWN_CENTER_X + 1] = 0x0F,
+        [(CROWN_TOP_Y + 2) * 16 + CROWN_CENTER_X + 1] = 0x0F,
+        [(CROWN_TOP_Y + 2) * 16 + CROWN_CENTER_X + 2] = 0x0F,
+        [(CROWN_TOP_Y + 3) * 16 + CROWN_CENTER_X + 1] = 0x0F,
+        [8 * 16 + 9] = 0x0F, [8 * 16 + 10] = 0x0F, [8 * 16 + 11] = 0x0F, [8 * 16 + 12] = 0x0F,
+        [9 * 16 + 8] = 0x0F, [9 * 16 + 9] = 0x0F, [9 * 16 + 10] = 0x2F, [9 * 16 + 11] = 0x3F, [9 * 16 + 12] = 0x0F,
+        [10 * 16 + 9] = 0x0F, [10 * 16 + 10] = 0x2F, [10 * 16 + 11] = 0x2F, [10 * 16 + 12] = 0x0F,
+        [11 * 16 + 9] = 0x0F, [11 * 16 + 10] = 0x0F, [11 * 16 + 11] = 0x0F,
+    };
     Lib_TextureRect_IA8(&gMasterDisp, D_VS_MENU_7003E10, 16, 16, xPos, yPos, 1.0f, 1.0f);
+    Lib_TextureRect_IA8(&gMasterDisp, (u8*) eyepatch, 16, 16, xPos, yPos, 1.0f, 1.0f);
 }
 
 void func_versus_800BD248(f32 xPos, f32 yPos) {
@@ -376,9 +394,46 @@ s32 Versus_DrawCountdown(f32 xPos, f32 yPos, s32* countdown) {
     return 0;
 }
 
+static s32 sVsAircraft[4];
+s32 Versus_GetAircraft(s32 slot) { return slot >= 0 && slot < 4 ? sVsAircraft[slot] : 0; }
+static bool Versus_GroundFormsAvailable(void) {
+    return gVersusStage != VS_STAGE_SECTOR_Z && gVersusStage != VS_STAGE_BOLSE_INTERIOR;
+}
+static void Versus_ChooseAircraft(s32 slot) {
+    if (sPlayerFormOption[slot]) return;
+    s32 option = 0;
+    u16 buttons = gControllerPress[slot].button;
+    if (buttons & A_BUTTON) option = 1;
+    else if (buttons & Z_TRIG) option = 4;
+    else if (Versus_GroundFormsAvailable() && sUnlockLandmaster && (buttons & B_BUTTON)) option = 2;
+    else if (Versus_GroundFormsAvailable() && sUnlockOnFoot &&
+             (buttons & (U_CBUTTONS | D_CBUTTONS | L_CBUTTONS | R_CBUTTONS))) option = 3;
+    if (sPlayerRespawnTimer[slot]) sPlayerRespawnTimer[slot]--;
+    else if (!option) {
+        s32 choices[4] = { 1, 4 }, count = 2;
+        if (Versus_GroundFormsAvailable() && sUnlockLandmaster) choices[count++] = 2;
+        if (Versus_GroundFormsAvailable() && sUnlockOnFoot) choices[count++] = 3;
+        option = choices[RAND_INT((f32) count)];
+    }
+    if (!option) return;
+    sPlayerFormOption[slot] = option;
+    if (option == 1 || option == 4) {
+        sVsAircraft[slot] = option == 4;
+        gPlayerForms[slot] = FORM_ARWING;
+    } else gPlayerForms[slot] = option == 2 ? FORM_LANDMASTER : FORM_ON_FOOT;
+    AUDIO_PLAY_SFX(NA_SE_DECIDE, gDefaultSfxSource, 4);
+}
+
 s32 Versus_SelectStartingForm(void) {
     s32 i;
     s32 ret = 0;
+    if (!Net_Enabled()) {
+        for (i = 0; i < 4; i++) if (!gPlayerInactive[i]) {
+            Versus_ChooseAircraft(i);
+            if (sPlayerFormOption[i]) ret++;
+        }
+        return ret;
+    }
 
     if ((!sUnlockLandmaster && !sUnlockOnFoot) || ((gVersusStage == VS_STAGE_SECTOR_Z) || (gVersusStage == VS_STAGE_BOLSE_INTERIOR))) {
         for (i = 0; i < 4; i++) {
@@ -453,6 +508,37 @@ void func_versus_800BE924(s32 index) {
     f32 D_800D4B90[] = { 40.0f, 200.0f, 40.0f, 200.0f };
     f32 D_800D4BA0[] = { 20.0f, 20.0f, 140.0f, 140.0f };
 
+    if (!Net_Enabled()) {
+        f32 x = D_800D4B90[index], y = D_800D4BA0[index];
+        s32 row = 20;
+        bool tank = Versus_GroundFormsAvailable() && sUnlockLandmaster;
+        bool foot = Versus_GroundFormsAvailable() && sUnlockOnFoot;
+        RCP_SetupDL(&gMasterDisp, SETUPDL_78);
+        gDPSetPrimColor(gMasterDisp++, 0, 0, 255, 255, 255, 255);
+        Lib_TextureRect_CI4(&gMasterDisp, aVsHandicapFrameTex, aVsHandicapFrameTLUT, 80, 71, x, y + 10, 1, tank && foot ? 1.24f : 1.0f);
+        func_versus_800BD350(x + 5, y);
+        func_versus_800BD248(x + 15, y + row);
+        RCP_SetupDL(&gMasterDisp, SETUPDL_76); func_versus_800BD164(x + 43, y + row);
+        row += 16;
+        Graphics_FillRectangle(&gMasterDisp, x + 15, y + row, x + 30, y + row + 15, 65, 75, 95, 255);
+        RCP_SetupDL(&gMasterDisp, SETUPDL_76);
+        gDPSetPrimColor(gMasterDisp++, 0, 0, 255, 255, 255, 255);
+        Graphics_DisplaySmallText(x + 19, y + row + 4, 1, 1, "Z");
+        Lib_TextureRect_IA8(&gMasterDisp, aRadarMarkArwingTex, 16, 16, x + 43, y + row, 1, 1);
+        if (tank) {
+            row += 16; RCP_SetupDL(&gMasterDisp, SETUPDL_78); func_versus_800BD2A0(x + 15, y + row);
+            RCP_SetupDL(&gMasterDisp, SETUPDL_76); func_versus_800BD1B0(x + 43, y + row);
+        }
+        if (foot) {
+            row += 16; RCP_SetupDL(&gMasterDisp, SETUPDL_78); func_versus_800BD2F8(x + 15, y + row);
+            RCP_SetupDL(&gMasterDisp, SETUPDL_76); func_versus_800BD1FC(x + 43, y + row);
+        }
+        RCP_SetupDL(&gMasterDisp, SETUPDL_76);
+        gDPSetPrimColor(gMasterDisp++, 0, 0, 255, 255, 0, 255);
+        func_versus_800BD4D4(x + 32, y + row + 18, sPlayerRespawnTimer[index] / 30 + 1);
+        return;
+    }
+
     RCP_SetupDL(&gMasterDisp, SETUPDL_78);
 
     gDPSetPrimColor(gMasterDisp++, 0, 0, 255, 255, 255, 255);
@@ -507,7 +593,7 @@ s32 func_versus_800BEDDC(void) {
     s32 i;
     s32 var_s4 = 0;
 
-    if (!sUnlockLandmaster && !sUnlockOnFoot || ((gVersusStage == VS_STAGE_SECTOR_Z) || (gVersusStage == VS_STAGE_BOLSE_INTERIOR))) {
+    if (Net_Enabled() && ((!sUnlockLandmaster && !sUnlockOnFoot) || gVersusStage == VS_STAGE_SECTOR_Z || gVersusStage == VS_STAGE_BOLSE_INTERIOR)) {
         func_versus_800BED78();
         return 0;
     }
@@ -611,6 +697,8 @@ s32 Versus_UpdatePlayerStatus(void) {
         } else {
             sPlayerFormOption[i] = 0;
             gPlayer[i].csState = 0;
+            if (!Net_Enabled()) Versus_ChooseAircraft(i);
+            else {
             if ((sPlayerFormOption[i] == 0) && (sPlayerRespawnTimer[i] == 0)) {
                 if (sUnlockLandmaster && sUnlockOnFoot) {
                     sPlayerFormOption[i] = RAND_INT(3.0f) + 1;
@@ -643,6 +731,7 @@ s32 Versus_UpdatePlayerStatus(void) {
                 sPlayerFormOption[i] = 1;
             }
 
+            }
             if (sPlayerFormOption[i] != 0) {
                 switch (sPlayerFormOption[i]) {
                     case 1:
@@ -693,7 +782,7 @@ s32 func_versus_800BF59C(void) {
             gDPSetPrimColor(gMasterDisp++, 0, 0, 255, colorGB, colorGB, 255);
             func_versus_800BD76C(D_800D4BFC[i], D_800D4C0C[i]);
         } else {
-            if (sUnlockLandmaster || sUnlockOnFoot) {
+            if (!Net_Enabled() || sUnlockLandmaster || sUnlockOnFoot) {
                 func_versus_800BE924(i);
             }
         }
@@ -1267,6 +1356,7 @@ void Versus_InitMatch(void) {
             sVsPlayerCount++;
         }
         sPlayerFormOption[i] = 0;
+        sVsAircraft[i] = 0;
         D_801787D8[i] = 0.0f;
         D_801787E8[i] = 0.0f;
     }

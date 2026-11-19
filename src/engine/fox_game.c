@@ -1,6 +1,7 @@
 #include "sf64net.h"
 #include "prevent_bss_reordering.h"
 #include "global.h"
+#include "campaign_vehicle.h"
 #include "sf64dma.h"
 #include "assets/ast_logo.h"
 #include "mods.h"
@@ -574,6 +575,7 @@ void Game_Update(void) {
                                    gPlayerGlareAlphas[gPlayerNum]);
             if ((gDrawMode == DRAW_PLAY) || (gDrawMode == DRAW_ENDING)) {
                 Radio_Draw();
+                CampaignVehicle_Draw();
                 if (gShowHud) {
                     HUD_Draw();
                     CALL_CANCELLABLE_EVENT(DrawEdgeArrowsHUDEvent) {

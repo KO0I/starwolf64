@@ -15,7 +15,8 @@ namespace {
 constexpr const char* PREFIX = "net/original/";
 const char* roots[] = {
     "ast_versus/D_versus_300EE80", "ast_versus/D_versus_3010A90",
-    "ast_versus/D_versus_3011470", "ast_versus/D_versus_300D550"
+    "ast_versus/D_versus_3011470", "ast_versus/D_versus_300D550",
+    "ast_common/aRadarMarkArwingTex"
 };
 uint32_t readWord(const std::vector<char>& bytes, size_t offset) {
     return uint8_t(bytes[offset]) | (uint32_t(uint8_t(bytes[offset + 1])) << 8) |

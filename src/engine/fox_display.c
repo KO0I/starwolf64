@@ -1,4 +1,5 @@
 #include "sf64net.h"
+#include "vs_aircraft.h"
 #include "global.h"
 #include "bolse_interior.h"
 #include "wolfen.h"
@@ -741,9 +742,7 @@ static const ALIGN_ASSET(2) char sNetArwingIntact[] = "__OTR__net/original/ast_v
 static const ALIGN_ASSET(2) char sNetArwingRightBroken[] = "__OTR__net/original/ast_versus/D_versus_3010A90";
 static const ALIGN_ASSET(2) char sNetArwingLeftBroken[] = "__OTR__net/original/ast_versus/D_versus_3011470";
 static const ALIGN_ASSET(2) char sNetArwingBothBroken[] = "__OTR__net/original/ast_versus/D_versus_300D550";
-static void Display_NetFighter(Player* player) {
-    uint32_t rgb;
-    uint32_t ship = Net_LoadoutColor(player->num, &rgb) ? Net_LoadoutPart(player->num, 1) : 1;
+static void Display_VersusFighter(Player* player, uint32_t ship) {
     const char* model;
     if (ship == 2) { gSPDisplayList(gMasterDisp++, aKattShipDL); return; }
     if (ship == 3) { gSPDisplayList(gMasterDisp++, gVitzyHullDL); return; }
@@ -787,20 +786,10 @@ void Display_Arwing(Player* player, s32 reflectY) {
         }
     } else {
         if (Net_Enabled()) {
-            Display_NetFighter(player);
+            uint32_t rgb;
+            Display_VersusFighter(player, Net_LoadoutColor(player->num, &rgb) ? Net_LoadoutPart(player->num, 1) : 1);
         } else if (gVersusMode) {
-            if ((player->arwing.rightWingState == WINGSTATE_INTACT) &&
-                (player->arwing.leftWingState == WINGSTATE_INTACT)) {
-                gSPDisplayList(gMasterDisp++, D_versus_300EE80);
-            } else if ((player->arwing.rightWingState <= WINGSTATE_BROKEN) &&
-                       (player->arwing.leftWingState == WINGSTATE_INTACT)) {
-                gSPDisplayList(gMasterDisp++, D_versus_3010A90);
-            } else if ((player->arwing.rightWingState == WINGSTATE_INTACT) &&
-                       (player->arwing.leftWingState <= WINGSTATE_BROKEN)) {
-                gSPDisplayList(gMasterDisp++, D_versus_3011470);
-            } else {
-                gSPDisplayList(gMasterDisp++, D_versus_300D550);
-            }
+            Display_VersusFighter(player, Versus_GetAircraft(player->num));
         } else {
             if ((gLevelType == LEVELTYPE_SPACE) || (gCurrentLevel == LEVEL_BOLSE)) {
                 player->arwing.unk_28 = player->arwing.upperRightFlapYrot = player->arwing.bottomRightFlapYrot =

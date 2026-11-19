@@ -1,5 +1,6 @@
 #include "prevent_bss_reordering.h"
 #include "global.h"
+#include "campaign_vehicle.h"
 #include "bolse_interior.h"
 #include "sf64net.h"
 #include "fox_map.h"
@@ -5065,6 +5066,7 @@ void Player_Setup(Player* playerx) {
         gClearPlayerInfo = true;
     }
 
+    CampaignVehicle_Setup(player);
     player->sfx.levelType = gLevelType;
     player->sfx.form = player->form;
 
