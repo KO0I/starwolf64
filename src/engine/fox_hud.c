@@ -2303,22 +2303,22 @@ void HUD_RadioCharacterName_Draw(void) {
 
             case RCID_WOLF:
             case RCID_WOLF_2:
-                Graphics_DisplaySmallText(xPos, 173, 1.0f, 1.0f, "WOLF");
+                Graphics_DisplaySmallText(xPos, 173, 1.0f, 1.0f, "FOX");
                 break;
 
             case RCID_LEON:
             case RCID_LEON_2:
-                Graphics_DisplaySmallText(xPos, 173, 1.0f, 1.0f, "LEON");
+                Graphics_DisplaySmallText(xPos, 173, 1.0f, 1.0f, "FALCO");
                 break;
 
             case RCID_PIGMA:
             case RCID_PIGMA_2:
-                Graphics_DisplaySmallText(xPos, 173, 1.0f, 1.0f, "PIGMA");
+                Graphics_DisplaySmallText(xPos, 173, 1.0f, 1.0f, "PEPPY");
                 break;
 
             case RCID_ANDREW:
             case RCID_ANDREW_2:
-                Graphics_DisplaySmallText(xPos, 173, 1.0f, 1.0f, "ANDREW");
+                Graphics_DisplaySmallText(xPos, 173, 1.0f, 1.0f, "SLIPPY");
                 break;
 
             case RCID_BILL:
