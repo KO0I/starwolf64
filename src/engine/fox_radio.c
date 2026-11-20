@@ -452,6 +452,31 @@ void func_radio_800BAAE8(void) {
             }
             break;
     }
+    /* The playable crew flies Wolfens; radio static keeps the same allegiance. */
+    switch ((s32) gRadioMsgRadioId) {
+        case RCID_FOX: case RCID_FOX_RED: case RCID_FOX_EXPERT:
+        case RCID_FALCO: case RCID_FALCO_RED:
+        case RCID_SLIPPY: case RCID_SLIPPY_RED:
+        case RCID_PEPPY: case RCID_PEPPY_RED:
+        case RCID_KATT: case RCID_ROB64: case RCID_ROB64_RED: case RCID_ROB64_2:
+        case RCID_ROB64_TITLE:
+        case RCID_GEN_PEPPER: case RCID_GEN_PEPPER_TITLE: /* Allied Andross in this campaign. */
+            sRadioUseRedBox = true;
+            break;
+        case RCID_WOLF: case RCID_WOLF_2:
+        case RCID_LEON: case RCID_LEON_2:
+        case RCID_PIGMA: case RCID_PIGMA_2:
+        case RCID_ANDREW: case RCID_ANDREW_2:
+            sRadioUseRedBox = true;
+            break;
+        case RCID_JAMES: case RCID_BILL:
+        case RCID_ANDROSS: case RCID_ANDROSS_RED: /* Enemy Pepper in this campaign. */
+        case RCID_BOSS_CORNERIA: case RCID_BOSS_CORNERIA2: case RCID_BOSS_METEO:
+        case RCID_BOSS_AREA6: case RCID_CAIMAN_AREA6: case RCID_BOSS_ZONESS:
+        case RCID_BOSS_SECTORX: case RCID_BOSS_SECTORY: case RCID_BOSS_MACBETH:
+            sRadioUseRedBox = false;
+            break;
+    }
     if ((radioPortraitTex != NULL) && (gRadioPortraitScaleY != 0.0f)) {
         temp_fa0 = (2.0f * gRadioPortraitScaleY) + gRadioPortraitPosY;
         if ((gRadioPortraitPosY + 20.0f) <= temp_fa0) {
