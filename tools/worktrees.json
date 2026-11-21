@@ -1,0 +1,94 @@
+{
+  "version": 1,
+  "integration_branch": "starwolf/dev",
+  "targets": [
+    {
+      "name": "sargasso",
+      "branch": "multiplayer-campaign",
+      "planned_branch": "sargasso",
+      "mapping": "provisional",
+      "build": "wasm",
+      "campaign": "Unspecified; network co-op",
+      "description": "Browser WebRTC co-op and experimental player counts. Current branch mapping is a starting point, not a claim that these features are complete.",
+      "checks": ["radio-colors", "portraits", "hud"]
+    },
+    {
+      "name": "voline",
+      "branch": "starwolf/wasm-default-integration",
+      "planned_branch": "voline",
+      "mapping": "provisional",
+      "build": "wasm",
+      "campaign": "OEM and reversed",
+      "description": "Selectable browser campaigns. Current mapping identifies the existing WASM integration worktree, not a completed selectable campaign build.",
+      "checks": ["radio-colors", "portraits", "hud"]
+    },
+    {
+      "name": "kropotkin",
+      "branch": "rom/reverse-story",
+      "planned_branch": "kropotkin",
+      "mapping": "provisional",
+      "build": "rom",
+      "campaign": "Reversed, possibly selectable",
+      "description": "Reverse campaign ROM development, with campaign selection still optional.",
+      "radio_verification": {
+        "surface": "rom",
+        "campaign": "reverse",
+        "artifact": "build/rom/starwolf64-reverse.z64"
+      },
+      "checks": ["radio-colors", "portraits", "hud"]
+    },
+    {
+      "name": "malatesta",
+      "branch": "multiplayer",
+      "planned_branch": "malatesta",
+      "mapping": "provisional",
+      "build": "rom",
+      "campaign": "OEM with couch co-op",
+      "description": "Provisional multiplayer source worktree for the planned couch co-op ROM. This mapping does not establish ROM build readiness.",
+      "checks": ["radio-colors", "portraits", "hud"]
+    },
+    {
+      "name": "dev",
+      "branch": "starwolf/dev",
+      "planned_branch": "starwolf/dev",
+      "mapping": "current",
+      "build": "integration",
+      "campaign": "Shared development",
+      "description": "Integration branch for shared fixes and cross-target development.",
+      "checks": ["radio-colors", "portraits", "hud"]
+    }
+  ],
+  "shared_fixes": [
+    {
+      "id": "reverse-radio-colors",
+      "description": "Star Wolf red dialogue backgrounds across native and cartridge builds",
+      "commit": "d3af61368d7dd095766873a73d8c426da77778b9",
+      "targets": ["voline", "kropotkin", "dev"],
+      "paths": ["src/engine/fox_radio.c", "tools/build_wolfen.py", "tools/radio_colors_rom.py"],
+      "notes": "History evidence only. This fix belongs to the reversed campaign. Malatesta is OEM-only and excluded. Sargasso is not assigned this fix until its campaign policy is chosen. A selectable campaign must preserve OEM colors rather than apply the reverse policy unconditionally. Dirty or manually copied implementations require runtime checks."
+    }
+  ],
+  "checks": [
+    {
+      "id": "radio-colors",
+      "description": "Reverse-campaign rendered radio colors, with speaking and static ROM cases. Native diagnostics also cover the full speaker matrix and Titania dialogue. Existing artifacts have unknown build provenance. WASM and OEM campaign verification require their own renderer profiles.",
+      "inputs": ["src/engine/fox_radio.c", "include/sf64mesg.h"],
+      "inputs_by_target": {
+        "kropotkin": ["src", "include", "assets/crew_portraits", "tools/n64", "tools/build_wolfen.py", "tools/radio_colors_rom.py", "tools/build_reverse_rom.py", "tools/build_bolse_rom.py", "tools/build_6dof_rom.py", "tools/check_reverse_routes.py", "tools/crew_portraits.py", "tools/wolf_portraits.py", "tools/wolf_dialogue.py"]
+      },
+      "reports": ["build/radio-colors/native/verification.json", "build/radio-colors/rom/verification.json"]
+    },
+    {
+      "id": "portraits",
+      "description": "Recorded speaker and portrait identity for the selected campaign. Current input scope covers shared radio source only. Expand it for the tested target's portrait assets and patches.",
+      "inputs": ["src/engine/fox_radio.c", "include/sf64mesg.h"],
+      "reports": []
+    },
+    {
+      "id": "hud",
+      "description": "Recorded HUD and attitude indicator placement. Current input scope covers the native HUD implementation. Add ROM patch and browser implementation inputs when those paths are tested.",
+      "inputs": ["src/engine/fox_hud.c"],
+      "reports": []
+    }
+  ]
+}
