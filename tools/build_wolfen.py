@@ -646,6 +646,8 @@ class Builder:
 
     def patched_rom(self):
         out = bytearray(self.rom)
+        from radio_colors_rom import patch_rom as patch_radio_colors
+        patch_radio_colors(self, out)
         for offset, (expected, replacement) in ROM_PATCHES.items():
             if struct.unpack_from('>I', out, offset)[0] != expected:
                 raise ValueError(f'Unexpected color instruction at {offset:x}')
@@ -670,6 +672,8 @@ class Builder:
         return out
 
     def verify(self, patched):
+        from radio_colors_rom import verify as verify_radio_colors
+        verify_radio_colors(self, patched)
         from wolf_menu_text import verify as verify_menu_text
         verify_menu_text(self, patched)
         from vitzy_fighter import verify_fighter
