@@ -13,6 +13,7 @@ PROBE = r'''
 import gdb, json, subprocess, re
 OUT = OUTPUT_PATH
 skip_opening = SKIP_OPENING_MODE
+arena_only = ARENA_ONLY_MODE
 cloud_draws = 0
 cloud_wingmen_drawn = set()
 rivals_verified = False
@@ -143,6 +144,56 @@ def play_radio(message, character):
     call('(void)Audio_ClearVoice()')
     call('(void)Radio_PlayMessage((u16*)gMsg_ID_%d,(RadioCharacterId)%d)'%(message,character))
 
+def verify_rival_targeting():
+    inferior = gdb.selected_inferior()
+    saved = [(int(val('&'+name)), bytes(inferior.read_memory(int(val('&'+name)), num('sizeof('+name+')'))))
+             for name in ('gActors', 'gPlayerShots', 'gChargeTimers', 'D_display_801615B8', 'D_display_801615A8')]
+    try:
+        for index in range(1, 8):
+            for actor in range(1, 8): setv('gActors[%d].lockOnTimers[0]'%actor, 0)
+            shot = 'gPlayerShots[14]'
+            setv(shot+'.sourceId', 0)
+            setv(shot+'.obj.id', 'PLAYERSHOT_LOCK_SEARCH')
+            setv(shot+'.obj.status', 'SHOT_ACTIVE')
+            for axis in 'xyz':
+                setv(shot+'.obj.pos.'+axis, 'gActors[%d].obj.pos.%s'%(index, axis))
+            setv(shot+'.obj.pos.y', 'gActors[%d].obj.pos.y + gActors[%d].info.targetOffset'%(index,index))
+            locked = num('PlayerShot_FindLockTarget(&'+shot+')')
+            assert bool(locked) == (index >= 4), ('unexpected target eligibility', index, locked)
+            if index >= 4: check('gActors[%d].lockOnTimers[0] > 0'%index)
+        report['rival_lock_on'] = {'enemies': 4, 'allies_excluded': 3}
+    finally:
+        for address, data in saved: inferior.write_memory(address, data)
+
+def verify_arena_returns():
+    inferior = gdb.selected_inferior()
+    saved = [(int(val('&'+name)), bytes(inferior.read_memory(int(val('&'+name)), num('sizeof('+name+')'))))
+             for name in ('gActors', 'gPlayer', 'gGameFrameCount')]
+    try:
+        for index in (1, 4):
+            for axis, sign in (('x', 1), ('x', -1), ('z', 1), ('z', -1)):
+                actor = 'gActors[%d]'%index
+                target = 'gActors[4].obj.pos' if index == 1 else 'gPlayer[0].pos'
+                setv(actor+'.state', 2)
+                setv(actor+'.aiIndex', 4 if index == 1 else 0)
+                setv(actor+'.timer_0C2', 1000)
+                for component in 'xz':
+                    setv(actor+'.obj.pos.'+component, sign*13000 if component == axis else 0)
+                    setv(target+'.'+component, sign*20000 if component == axis else 0)
+                setv('gPlayer[0].trueZpos', 'gPlayer[0].pos.z')
+                setv(actor+'.obj.pos.y', 650)
+                setv(actor+'.rot_0F4.y', (90 if sign > 0 else 270) if axis == 'x' else (0 if sign > 0 else 180))
+                for tick in range(240):
+                    setv('gGameFrameCount', 'gGameFrameCount + 1')
+                    call('(void)ActorAllRange_Update(&'+actor+')')
+                    for component in 'xyz':
+                        setv(actor+'.obj.pos.'+component, actor+'.obj.pos.'+component+' + '+actor+'.vel.'+component)
+                distance = abs(float(val(actor+'.obj.pos.'+axis)))
+                assert distance < 12500, ('ship failed to return to arena', index, axis, sign, distance)
+        report['arena_boundary_returns'] = 8
+    finally:
+        for address, data in saved: inferior.write_memory(address, data)
+
 def verify_rival_rules():
     check('gLaserStrength[0] == LASERS_TWIN')
     check('!ActorAllRange_UsesAdvancedRivalAI()')
@@ -162,6 +213,11 @@ def verify_rival_rules():
     call('(void)ActorAllRange_ApplyDamage(&gActors[4])')
     assert num('gActors[4].health')==health-10
     # Exercise the real pursuit and firing branch with a clear, distant target.
+    # Keep this pursuit fixture inside the arena and clear pending evasive moves.
+    for field in ('pos.x', 'pos.z', 'trueZpos', 'somersault'):
+        setv('gPlayer[0].'+field, 0)
+    for field in ('iwork[16]', 'iwork[17]', 'iwork[4]'):
+        setv('gActors[4].'+field, 0)
     setv('gActors[4].state',2)
     setv('gActors[4].aiIndex',0)
     setv('gActors[4].obj.pos.x','gPlayer[0].pos.x')
@@ -170,7 +226,7 @@ def verify_rival_rules():
     for i in range(10): setv('gPlayerShots[%d].obj.status'%i,0)
     setv('gActors[4].iwork[0]',1)
     call('(void)ActorAllRange_Update(&gActors[4])')
-    check('gActors[4].fwork[1] == gPlayer[0].baseSpeed + 10')
+    assert num('gActors[4].fwork[1] == gPlayer[0].baseSpeed + 10'), str(val('gActors[4]'))
     assert abs(float(val('gActors[4].fwork[3]'))-1.2)<.001
     shots=[i for i in range(10) if num('gPlayerShots[%d].obj.status'%i)]
     assert len(shots)==1,shots
@@ -367,6 +423,11 @@ while frames < 4200:
     elif phase == 'battle_wait' and num('gVenomMissionPhase == VENOM_STAR_FOX_BATTLE'):
         check('gPlayer[0].state == PLAYERSTATE_ACTIVE && gLaserStrength[0] == LASERS_TWIN')
         for i in range(4,8): check('gActors[%d].health == 100'%i)
+        verify_rival_targeting()
+        if arena_only:
+            verify_arena_returns()
+            open(OUT + '/result.json','w').write(json.dumps(report, indent=2) + '\n')
+            break
         phase, phase_frame = 'battle', frames
     elif phase == 'battle' and age >= 95 and not rivals_verified:
         verify_rival_rules()
@@ -541,9 +602,10 @@ def main():
     parser.add_argument('--native-build', type=Path, required=True, help='Existing native build with prepared game archives')
     parser.add_argument('--executable', type=Path, default=ROOT/'build/venom-preview/Starship')
     parser.add_argument('--skip-opening', action='store_true', help='Check Start-button skipping of clouds and descent')
+    parser.add_argument('--arena-only', action='store_true', help='Check boundary returns in isolation from campaign fixtures')
     args = parser.parse_args()
     assets = args.native_build.resolve()
-    output = ROOT/('build/venom-check-skip' if args.skip_opening else 'build/venom-check')
+    output = ROOT/('build/venom-arena-check' if args.arena_only else 'build/venom-check-skip' if args.skip_opening else 'build/venom-check')
     output.mkdir(parents=True, exist_ok=True)
     session = Path(tempfile.mkdtemp(prefix='session-', dir=output))
     (session/'mods').mkdir()
@@ -555,7 +617,7 @@ def main():
                 (session/'mods'/mod.name).symlink_to(mod)
     script = output/'probe.gdb'
     script.write_text('set pagination off\nset confirm off\nset print thread-events off\nset debuginfod enabled off\npython\n' +
-                      PROBE.replace('OUTPUT_PATH', repr(str(output))).replace('SKIP_OPENING_MODE', repr(args.skip_opening)) + '\nend\nquit 0\n')
+                      PROBE.replace('OUTPUT_PATH', repr(str(output))).replace('SKIP_OPENING_MODE', repr(args.skip_opening)).replace('ARENA_ONLY_MODE', repr(args.arena_only)) + '\nend\nquit 0\n')
     env = dict(os.environ, SHIP_HOME=str(session), SDL_AUDIODRIVER='dummy', LIBGL_ALWAYS_SOFTWARE='1')
     (output/'result.json').unlink(missing_ok=True)
     with (output/'engine.log').open('w') as log:

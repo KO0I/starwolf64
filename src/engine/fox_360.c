@@ -2030,6 +2030,22 @@ void ActorAllRange_Update(ActorAllRange* this) {
             break;
     }
 
+    if (VenomMission_IsArena() && (gVenomMissionPhase == VENOM_STAR_FOX_BATTLE) &&
+        (this->aiType >= AI360_FALCO) && (this->aiType <= AI360_ANDREW) &&
+        (this->state >= STATE360_2) && (this->state <= STATE360_10) && (this->state != STATE360_6)) {
+        /* Leave room to turn before the player's 12500-unit arena boundary. */
+        if ((fabsf(this->obj.pos.x) > 10500.0f) || (fabsf(this->obj.pos.z) > 10500.0f)) {
+            this->fwork[4] = this->fwork[6] = 0.0f;
+            this->fwork[5] = 650.0f;
+            this->fwork[1] = 40.0f;
+            this->fwork[3] = 3.0f;
+            sp104 = 1;
+        } else if (sp104 != 0) {
+            this->fwork[4] = CLAMP(this->fwork[4], -10000.0f, 10000.0f);
+            this->fwork[6] = CLAMP(this->fwork[6], -10000.0f, 10000.0f);
+        }
+    }
+
     if (sp104 != 0) {
         s32 var_v0 = 4 - 1;
 

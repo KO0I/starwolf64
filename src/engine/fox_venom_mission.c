@@ -274,7 +274,6 @@ static void VenomMission_StartBattle(Actor* event) {
         enemy->timer_0BC = 30;
         enemy->health = 100;
         enemy->iwork[11] = 1;
-        enemy->info.targetOffset = 0.0f;
         enemy->fwork[0] = enemy->fwork[1] = 40.0f;
         if (i > 0) {
             gActors[i].aiIndex = AI360_WOLF + i;
